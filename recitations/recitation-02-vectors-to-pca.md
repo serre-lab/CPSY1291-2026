@@ -10,14 +10,16 @@ math: katex
   TA-led, 80 minutes. Optional. Assumes Recitation 1 or equivalent numpy.
 
   SCOPE: reconciled against the FINAL Assignment 1 (2026-09-01). Students are
-  deep in parts 2-3 this week. This session carries: the concepts a student
-  without a cog-sci background needs for part 2 (psychological space, Shepard's
-  law), the library call sheets (curve_fit, polyfit/polyval, spearmanr,
-  sklearn, silhouette_score), R^2 worked by hand, the groupby-without-groupby
-  template, and the four skeletons the TAs' review flagged as blockers (2j, 3c,
-  3f, 3i). Every worked example uses toy data, never the assignment's data.
-  Do NOT teach how to derive PCA, how MDS optimizes, or anything about
-  training networks. Those belong to later lectures and later recitations.
+  deep in parts 2-3 this week. The LECTURES own the concepts (psychological
+  space, Shepard's law, the ventral stream) — this deck points at them in one
+  slide and spends its time on the technical side: the library call sheets
+  (curve_fit, polyfit/polyval, spearmanr, sklearn, silhouette_score), the 2g
+  fitting pipeline worked end-to-end on toy data, R^2 by hand, the
+  groupby-without-groupby template, and the four skeletons the TAs' review
+  flagged as blockers (2j, 3c, 3f, 3i). Every worked example uses toy data,
+  never the assignment's data. Do NOT teach how to derive PCA, how MDS
+  optimizes, or anything about training networks. Those belong to later
+  lectures and later recitations.
 
   REGISTER: mixed room, no linear algebra prerequisite. Every abstraction gets
   a picture and a worked number. Students are not being asked to implement
@@ -50,7 +52,7 @@ Part 1 built the machinery: three distances, twelve RDMs, the axioms tested on r
 
 Parts 2 and 3 use it to do **science**: human similarity and Shepard's law, then PCA and the shape of object space.
 
-<mark>Today: the ideas part 2 assumes, the library calls parts 2–3 use, and the code skeletons for the four sections most likely to stall you.</mark>
+<mark>Today: the library calls parts 2–3 use, one fitting pipeline worked end to end, and the code skeletons for the four sections most likely to stall you.</mark>
 
 <!--
 2 min. One-slide map of the session. If someone has not started part 2, tell
@@ -60,73 +62,29 @@ skeletons are printed in the handout so nothing needs transcribing.
 
 ---
 
-# Psychological space
+# Concepts you'll lean on (the lectures own these)
 
-Shepard's premise: your similarity judgments behave **as if** the animals sit at points in an internal metric space, and a rating is a readout of the distance between two of them.
+- **Psychological space** *(Lecture 2)* — ratings behave as if stimuli sit at points in an internal metric space; MDS recovers the map. Why 2e–2f are a claim, not a plot.
+- **Shepard's law** *(Lecture 2)* — generalization falls off like $e^{-d}$; the Gaussian is the rival, and they differ **near $d=0$**. What 2g and 2j actually test.
+- **Depth ↔ ventral stream** *(Lecture 3)* — early layers ↔ early areas, deep layers ↔ IT. Why 2k tracks depth, and why part 3 puts fc6 next to IT recordings.
 
-MDS runs that logic backwards — from the ratings alone, it finds coordinates whose distances reproduce them.
-
-<mark>So 2e is not "make a scatter plot." It is a claim: this internal space exists, and here is its recovered map.</mark>
-
-<!--
-3 min. This is the slide for the strong-CS student to whom 2e otherwise reads
-as a plotting exercise. The notebook's glossary cell says this too; say it
-with more force.
-
-The test of the premise is 2f: put the actual images on the recovered map and
-the neighborhoods make sense — that is 120 x 119 / 2 ratings being jointly
-consistent with ONE configuration of points, which did not have to happen.
-
-Vocabulary check while you are here: "generalization" in part 2 is the
-BEHAVIORAL sense — a pigeon trained on one tone pecks at nearby tones too —
-not the ML train/test sense. The notebook flags this; students with ML
-exposure mix it up anyway.
--->
-
----
-
-# Shepard's law, and why those two curves
-
-Generalization falls off with distance in psychological space. Shepard's claim is about the **shape** of that fall-off: steepest immediately off zero, like $e^{-d}$.
-
-Why the exponential? If a stimulus's consequences hold over some *region* of the space, and you do not know its extent, averaging over your uncertainty gives an exponential gradient.
-
-Why is the **Gaussian** the serious rival? Add noise to the stimulus representation itself and the gradient comes out flat at the origin, falling away only after.
-
-<mark>2g is not curve-shopping. It is two theories of generalization, told apart where they differ: at short distances.</mark>
+<mark>Today is the technical side: the library calls, the pitfalls, the skeletons.</mark>
 
 <!--
-4 min. Cartoon level, on the board: both curves through the same cloud, then
-zoom the region near d = 0 — exponential already plunging, Gaussian still
-flat. That left-hand stretch is exactly what 2g question 1 sends them to look
-at, and the reason the notebook has them beat a Gaussian rather than only a
-line ("any curve that bends the right way beats a line").
+2 min. A pointer slide, not a lesson — the lectures teach these; do not
+re-teach them here. Concept questions go to lecture and office hours; the
+notebooks' glossary cells carry the vocabulary.
 
-Consequential regions in one breath: a berry that size being edible holds over
-some region of sizes; integrate over how big that region might be and the
-exponential drops out. Uncertainty about the REGION gives an exponential;
-noise in the PERCEPT gives a Gaussian. That is as deep as recitation goes.
+Three sentences worth saying aloud while pointing. One: 2e is not "make a
+scatter plot" — it is the claim that an internal space exists, and 2f tests it
+by putting the images on the recovered map. Two: near d = 0 the exponential is
+already plunging while the Gaussian is still flat — that left-hand stretch is
+where 2g question 1 sends them. Three: "generalization" in part 2 is the
+BEHAVIORAL sense (a pigeon trained on one tone pecks at nearby tones too), not
+the ML train/test sense — students with ML exposure mix it up anyway.
 
-Preview the punchline they will meet in 2j: when the network's space replaces
-the psychological space, question 2 has a mechanical answer about the range of
-the distances — welcome, but the moral is about the SPACES, not the curve.
--->
-
----
-
-# Depth and the ventral stream
-
-The visual system is a series of stages — V1 → V4 → IT — and the networks are a series of layers. **Early layers ↔ early areas, deep layers ↔ object areas.**
-
-That parallel is why 2k asks whether alignment with human judgments **rises with depth**, and why part 3 puts fc6 next to recordings from IT.
-
-<!--
-2 min. The cartoon that makes "alignment rises with depth" an expected-and-
-confirmed pattern rather than an arbitrary finding. Part 1's glossary cell
-plants it; part 3's glossary cell adds IT and cortical maps — tell them to
-actually read that cell before 3d, and that recitation 3 picks up the Bao
-et al. question (category patches: modules, or landmarks on one smooth shape
-map?) when they are inside part 3.
+Recitation 3 picks up the Bao et al. cortical-maps question when they are
+inside part 3.
 -->
 
 ---
@@ -253,8 +211,8 @@ y_hat = np.polyval(coef, x)        # evaluate: the line at every x
 ```
 
 <!--
-6 min. This is 2g's toolbox, worked once on toy data (any x, y you generate
-live will do). The notebook defines f_exp and f_gauss and says WHICH tool to
+4 min. This is 2g's toolbox as a call sheet; the next slide runs it end to end
+on toy data. The notebook defines f_exp and f_gauss and says WHICH tool to
 use; this slide is HOW to call them, which the notebook deliberately does not
 spell out.
 
@@ -266,9 +224,46 @@ maxfev are how you tell it otherwise. On 2j's untrained layers the exponential
 may legitimately not converge even then, which is why the notebook says
 try/except — and calls that failure a finding, not a bug.
 
-polyfit/polyval: fit and evaluate are separate calls, same pattern. Score
-every model the same way — the provided r2(y, yhat) in 2g's setup cell takes
-the truth and the prediction, whichever tool produced it.
+polyfit/polyval: fit and evaluate are separate calls, same pattern. Keep the
+patter brief here — every line gets typed and run on the next slide.
+-->
+
+---
+
+# WORKED — 2g's pipeline, end to end on toy data
+
+```python
+rng = np.random.default_rng(0)
+d = np.sort(rng.uniform(0, 4, 60))                  # toy "distances"
+y = 10 * np.exp(-1.3 * d) + rng.normal(0, 0.5, 60)  # toy "similarities"
+
+coef    = np.polyfit(d, y, 1);   y_lin = np.polyval(coef, d)             # line
+popt, _ = curve_fit(f_exp, d, y, p0=[10, 1]);  y_exp = f_exp(d, *popt)   # exponential
+
+print(r2(y, y_lin), r2(y, y_exp))            # 0.71 vs 0.97
+plt.scatter(d, y); plt.plot(d, y_lin); plt.plot(d, y_exp)
+```
+
+Make data → fit both models → score both with the **same** $R^2$ → look at the plot.
+
+<mark>This four-move shape is 2g exactly — swap the toy arrays for `(d_ij, s_ij)` and you are done.</mark>
+
+<!--
+6 min. Type and run this live, top to bottom — it is the technical spine of 2g
+and, inside a loop, of 2j. f_exp is the notebook's own definition
+(a * exp(-b * d)); r2 is the 2g setup cell's helper, and the NEXT slide opens
+it up by hand.
+
+Three beats while it runs. One: we KNOW the truth here — a = 10, b = 1.3 — and
+curve_fit hands back about (10.05, 1.28); fitting toy data with a known answer
+is how you convince yourself a pipeline works before pointing it at real data.
+Two: both models are scored by the same r2 against the same y — 0.71 for the
+line, 0.97 for the exponential — never compare fits scored against different
+targets. Three: the plot is the check the numbers cannot give — the line goes
+negative where similarities never can, and you only see that by looking.
+
+If someone asks about the Gaussian: same curve_fit call with f_gauss, and 2g
+has them do exactly that.
 -->
 
 ---
@@ -614,7 +609,7 @@ expected, not a hang.
 
 | Today | Where it shows up |
 |---|---|
-| psychological space, Shepard's law | reading 2e–2g as science, not plotting |
+| the concept pointers (lectures 2–3) | reading 2e–2g and 2k as science, not plotting |
 | condensed vs square, the tree | clustering (2h, 2i) |
 | `iu` + `spearmanr(...).statistic` | the alignment table (2k) |
 | `curve_fit`, `polyfit`/`polyval`, R² | testing Shepard's law (2g, 2j) |
@@ -635,6 +630,25 @@ only ordinally.")
 
 What recitation 3 carries, before the 9/29 deadline: a working clinic on
 parts 3-4, the Bao et al. cortical-maps story (category patches: modules or
-landmarks on a smooth shape map), and part 4's method fingerprints. Finish by
-pointing at bootcamp-notes.pdf and office hours.
+landmarks on a smooth shape map), and part 4's method fingerprints. Then move
+straight into the buffer slide — do not let this one absorb its minutes.
+-->
+
+---
+
+# Questions / catch-up
+
+- Anything from today you want run again, slower — say so now
+- Or open your own part 2 and get unstuck **while the room is full of help**
+- Not covered today ≠ not on A1: `bootcamp-notes.pdf` and office hours carry the rest
+
+<!--
+3 min. A deliberate buffer, budgeted on purpose — do not fill it with new
+material. If the room is silent, re-run the worked pipeline with a bad p0
+(say p0=[0.001, 50]) and let them watch the "Optimal parameters not found"
+failure from the call-sheet slide actually happen, then fix it.
+
+Close with logistics: A1 is due Monday 9/29; restart-and-run-all before
+submitting re-runs the t-SNE sweep, so budget for it. Office hours and
+bootcamp-notes.pdf for everything else.
 -->
