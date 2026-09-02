@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 const BOOTCAMP = path.join(__dirname, '..');
-const SLIDES = path.join(BOOTCAMP, '..', 'slides');
+const SLIDES = process.env.CPSY_SLIDES_DIR || path.join(BOOTCAMP, '..', '..', 'slides');
 
 const puppeteer = require(path.join(SLIDES, 'node_modules/puppeteer-core'));
 const engineFactory = require(path.join(SLIDES, 'engine.js'));
