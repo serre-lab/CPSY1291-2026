@@ -25,6 +25,12 @@ math: katex
 
   MATERIAL: the companion notes (bootcamp-notes.pdf) cover the same ground in
   prose. Tell students at the start that they do not need to take notes.
+
+  NOTATION (recorded decision, 2026-09-01): the recitation decks follow the
+  notebooks — n items x p features, lowercase, matching the code ((n,), (n, n),
+  n x p). Lecture's D (input dimensionality) and N (sample count) are the same
+  quantities; the mapping is said once, in the slide-4 presenter note. D on a
+  slide means one thing only: a distance matrix.
 ============================================================================ -->
 
 <div class="eyebrow">Recitation 1</div>
@@ -90,17 +96,20 @@ being trained is deciding WHAT to compute, not typing it.
 
 ---
 
-# A list of numbers is a point
+# A data point is a list of numbers
 
 Write down $p$ numbers about something — pixel values, firing rates, ratings —
-and you can treat that list as a **point** in a $D$-dimensional space.
+and that list is a **point** in a $p$-dimensional space.
 
 Two things are "similar" when their points are **close together**.
 
 <mark>The whole first assignment is that sentence, made precise.</mark>
 
 <!--
-2 min. This is the bridge from "programming session" to "why we are here", and
+2 min. Lecture writes D for the dimensionality; the notebooks and these decks
+write p (n items x p features) — same thing, say so once here.
+
+This is the bridge from "programming session" to "why we are here", and
 it is the one conceptual slide in an otherwise practical deck. The psychology
 behind it — Shepard, psychological space — is lecture material and Recitation
 2's opening; the notebooks also carry glossary cells for the vocabulary.
@@ -128,8 +137,9 @@ X = np.array([[1., 2.], [3., 4.]])   # array: numbers, one type, has a SHAPE
 | speed on 4,096 numbers | slow | fast |
 
 <!--
-4 min. The `xs * 2` row is the demo to actually run live — it surprises people
-from every background, and it is a real source of silent bugs.
+3 min. The `xs * 2` row is the demo to actually run live — it surprises people
+from every background, and it is a real source of silent bugs. Keep the asides
+below to one sentence each; the table carries the slide.
 
 MATLAB refugees: reassure them arrays behave much like MATLAB matrices, with
 the crucial difference that indexing starts at 0 and the last index is n-1.
@@ -152,7 +162,11 @@ X[0].shape   # (4096,)      -> one stimulus's vector
 **Course convention:** data is always **stimuli × features** — one row per image, one column per pixel or unit.
 
 <!--
-5 min. Have them type along. Then break something on purpose: transpose a
+5 min. "Unit test" needs a plain version for the psych-only half of the room:
+your automatic correctness check — the thing you look at to know a step worked.
+Say both.
+
+Have them type along. Then break something on purpose: transpose a
 matrix and show the error message, so the first time they meet
 "could not be broadcast together with shapes ..." it is in a room with help
 rather than at 2am.
@@ -174,11 +188,15 @@ X[::24]     # every 24th row
 X[-1]       # last row
 ```
 
-`X[::24]` looks exotic but you will need it: one of our datasets is **51 objects photographed from 24 angles**, stored in order — `F[::24]` is exactly what 3c asks for.
+`X[::24]` looks exotic but you will need it: one of our datasets is **51 objects photographed from 24 angles**, stored in order — `F[::24]` (`F` is part 3's image × feature activations array) is exactly what 3c asks for.
 
 <!--
 3 min. Slices are VIEWS, not copies — modifying a slice modifies the original.
 Mention it once; do not dwell.
+
+IF AHEAD: np.shares_memory(X, X[::24]) -> True — proof that slices are views,
+and why mutating a "copy" can corrupt the original; X[::24].copy() is the
+escape hatch.
 
 The X[::24] example lands better if you ask first: "if the data goes object 1
 from 24 angles, then object 2 from 24 angles, how would you get one picture of
@@ -293,32 +311,85 @@ stuck. B is one line of correlation_dist in 1b.
 
 ---
 
-# 1b hands you the hard idiom — read it
-
-The notebook gives you the Euclidean shape-move; you supply the other two:
+# Three symbols the next slide needs
 
 ```python
-sq = (X ** 2).sum(axis=1)                       # (n,)   given in 1b
-D2 = sq[:, None] + sq[None, :] - 2 * (X @ X.T)  # (n, n) given in 1b
+A.shape        # (2, 3)
+A.T.shape      # (3, 2)     .T flips rows and columns
+```
 
+`A @ B` is **matrix multiplication** — shapes must chain: `(n, p) @ (p, m) -> (n, m)`
+
+```python
+v.shape            # (120,)
+v[:, None].shape   # (120, 1)   None inserts a size-1 axis
+```
+
+<mark>`[:, None]` exists so broadcasting has a size-1 axis to stretch — the keepdims idea, written by hand.</mark>
+
+<!--
+3 min. Three vocabulary items, nothing else — the next slide is unreadable
+without them, so land each one on a shape print.
+
+@ between arrays is matrix multiplication, NOT the decorator @ that sits above
+function definitions in Python tutorials — say that out loud, the Java/CS
+students have seen the decorator and will misread it.
+
+[:, None] is two-axis indexing (row spec, column spec) with None standing in
+for "new axis of size 1". Tie it straight back to keepdims: X.mean(axis=1,
+keepdims=True) and X.mean(axis=1)[:, None] produce the same (120, 1) array.
+-->
+
+---
+
+# 1b hands you the hard idiom — read it
+
+The notebook gives you the Euclidean shape-move; your job is to read it:
+
+```python
+sq = (X ** 2).sum(axis=1)                       # (n,)   each row's squared length
+D2 = sq[:, None] + sq[None, :] - 2 * (X @ X.T)  # (n, n) given in 1b
+```
+
+- `sq[:, None] + sq[None, :]` — `(n,1) + (1,n)` broadcasts to **every pairwise sum**
+- `X @ X.T` — every pairwise dot product, in one multiplication
+- together: $\lVert x_i - x_j \rVert^2 = \lVert x_i \rVert^2 + \lVert x_j \rVert^2 - 2\, x_i \cdot x_j$, all pairs at once
+
+<!--
+4 min. This is 1b's HINT block, read slowly, line by line. The notebook is
+explicit that the Euclidean idiom is given because the definitions are the
+point, not the idiom — so do not re-derive it, just decode it with the three
+symbols from the previous slide: sq[:, None] is (n,1), sq[None, :] is (1,n),
+and broadcasting turns their sum into every pairwise combination; X @ X.T fills
+the cross term.
+
+The algebra bullet is the same expansion they saw in high school,
+(a-b)^2 = a^2 + b^2 - 2ab, done to whole rows — say it that way.
+
+IF AHEAD: np.einsum('ij,ij->i', X, X) is the show-off spelling of
+(X**2).sum(axis=1), and scipy.spatial.distance.cdist(X, X) is what you import
+in real life — 1b makes you write it yourself because the definitions are the
+point.
+-->
+
+---
+
+# Cosine and correlation: two lines each
+
+```python
 n = X / np.linalg.norm(X, axis=1, keepdims=True)   # each row to unit length
 C = 1 - n @ n.T                                    # cosine distance, all pairs
 ```
 
-Correlation distance: **center each row first** (`X - X.mean(axis=1, keepdims=True)`), then the cosine lines.
+Correlation distance: **center each row first** (`X - X.mean(axis=1, keepdims=True)`), then the same two lines.
 
 <mark>One more thing: `np.sqrt(np.maximum(D2, 0))` — floating point leaves tiny negatives where the true value is 0, and `sqrt` of those is `nan`.</mark>
 
 <!--
-5 min. This is 1b's HINT block, read slowly. The notebook is explicit that the
-Euclidean idiom is given because the definitions are the point, not the idiom —
-so do not re-derive it, just decode it: sq[:, None] is (n,1), sq[None, :] is
-(1,n), and broadcasting turns their sum into every pairwise combination.
-
-The cosine skeleton is the two lines on the slide: normalize rows (keepdims
-again, doing real work), then 1 - n @ n.T. Correlation is the same two lines
-after row-centering — the notebook says "one line different" and this is what
-it means.
+3 min. The cosine skeleton is the two lines on the slide: normalize rows
+(keepdims again, doing real work), then 1 - n @ n.T — the same @-and-.T move as
+the Euclidean cross term. Correlation is the same two lines after row-centering
+— the notebook says "one line different" and this is what it means.
 
 The maximum(D2, 0) clip is not paranoia; they WILL hit sqrt of -1e-13 -> nan.
 Say it now so they recognize it later.
@@ -327,6 +398,8 @@ Say it now so they recognize it later.
 ---
 
 # Masks, counting, sorting
+
+`taxon` is A1's label array — one integer per stimulus, `(120,)`, saying which taxonomic group the animal belongs to.
 
 ```python
 mask = (taxon == 2)         # boolean, one per stimulus
@@ -359,7 +432,6 @@ and it is how they check the data was loaded correctly.
 ```python
 (taxon == 2) | (taxon == 5)     # parentheses required — | binds tighter than ==
 np.isin(cat, [0, 2])            # True where cat is 0 OR 2, in one call
-np.argmax(cum >= 0.85)          # FIRST index where a condition holds
 ```
 
 Write `and` / `or` between arrays and you get:
@@ -372,13 +444,11 @@ ambiguous. Use a.any() or a.all()
 <mark>Element-wise logic on arrays is `&` `|` `~`, always with parentheses.</mark>
 
 <!--
-6 min. Every one of these lines is lifted from A1. np.isin(cat, [0, 2]) is 3e's
+5 min. Every one of these lines is lifted from A1. np.isin(cat, [0, 2]) is 3e's
 animate indicator — Animal is category 0 and Face is category 2, so that one
-call builds the binary variable the whole animacy claim rests on. The
-boolean-argmax is "how many components reach 85% of the variance" (3b) —
-argmax of a boolean returns the first True because True > False. (The notebook
-also offers np.searchsorted for that; both are fine, this one generalizes to
-any condition.)
+call builds the binary variable the whole animacy claim rests on. (The
+boolean-argmax "first True" trick for 3b now lives in Recitation 2's
+variance-explained slide, next to cumsum — do not teach it here.)
 
 Show the and/or error live: (taxon == 2) and (taxon == 5). Read the message
 aloud — Python is asking "do you mean ANY of these, or ALL?", because a
@@ -397,7 +467,7 @@ place parenthesized & shows up next.
 the stimulus most similar to stimulus 7.
 
 <!--
-4 min. Answer: np.argsort(S[7])[-2]
+3 min. Answer: np.argsort(S[7])[-2]
 
 The trap is [-1], which returns stimulus 7 itself — nothing is more similar to
 something than itself. Let the room fall into it; do not warn first. It is a
@@ -405,8 +475,11 @@ memorable lesson about checking that an answer is sensible, and 2a says it in
 so many words: "an image is always maximally similar to itself, so exclude the
 query image from its own neighbor list."
 
-Follow-up if quick: how would you get the five most similar, excluding itself?
-Answer: np.argsort(S[7])[::-1][1:6]
+Optional follow-up, only if the room is quick: how would you get the five most
+similar, excluding itself? Answer: np.argsort(S[7])[::-1][1:6]
+
+IF AHEAD: np.argpartition(v, 5)[:5] gets a top-k without a full sort — O(n) vs
+O(n log n); one %timeit on a 10^6-element array makes the point in ten seconds.
 -->
 
 ---
@@ -414,23 +487,24 @@ Answer: np.argsort(S[7])[::-1][1:6]
 # Fancy indexing: index with arrays, not numbers
 
 ```python
-D = np.arange(16).reshape(4, 4)
+M = np.arange(16).reshape(4, 4)
 a = np.array([0, 2, 3])
 b = np.array([1, 0, 3])
-D[a, b]        # array([ 1,  8, 15])  — the pairs (0,1), (2,0), (3,3)
+M[a, b]        # array([ 1,  8, 15])  — the pairs (0,1), (2,0), (3,3)
 ```
 
 Two index arrays pull one element **per pair** — 3 pairs here, 200,000 in 1f:
 
 ```python
+rng = np.random.default_rng(0)    # the notebook's random generator
 t = rng.integers(0, len(X), (200_000, 3))
 a, b, c = t.T
-viol = D[a, c] > D[a, b] + D[b, c] + 1e-9
+viol = D[a, c] > D[a, b] + D[b, c] + 1e-9   # D: your (120, 120) distance matrix
 viol.mean()                       # the fraction 1f asks for
 ```
 
 <!--
-6 min. Work the 4x4 on the board until D[a, b] is obvious: element-wise pairs,
+6 min. Work the 4x4 on the board until M[a, b] is obvious: element-wise pairs,
 NOT a submatrix. Without this idiom students write a Python loop over 200,000
 triples, watch nothing happen for minutes, and conclude Colab hung — that is
 the failure mode this slide exists to prevent.
@@ -443,6 +517,10 @@ decoration — 1d showed your functions agree with SciPy to ~10 decimal places,
 and a bare > counts every rounding disagreement as a violation.
 
 And there is the promised boolean .mean(): the violation rate in one call.
+
+IF AHEAD: %timeit the vectorized triple check against the naive Python loop —
+the "minutes rather than seconds" claim, measured. And np.add.at is the
+write-side sibling of fancy read-indexing.
 -->
 
 ---
@@ -453,7 +531,7 @@ And there is the promised boolean .mean(): the violation rate in one call.
 
 ```python
 iu = np.triu_indices(120, k=1)    # a PAIR of index arrays
-D[iu]                             # 7,140 values — same fancy indexing as D[a, b]
+D[iu]                             # 7,140 values (120·119/2) — fancy indexing again
 ```
 
 **Reordering rows *and* columns** — 1e sorts its matrices by category:
@@ -465,8 +543,9 @@ D[order, order]                   # NOT that — paired indexing: 120 diagonal e
 ```
 
 <!--
-5 min. D[iu] is the same move as the last slide — iu is literally a pair of
-index arrays — and it matters because the assignment leans on it repeatedly:
+4 min. D[iu] is the same move as the last slide — iu is literally a pair of
+index arrays — and 7,140 is no magic number: 120·119/2, every pair once,
+diagonal excluded. It matters because the assignment leans on it repeatedly:
 1e's provided check correlates upper triangles, 2g pairs s_ij = S_human[iu]
 with MDS distances, and 2j/2k reuse the same pair order. Say the phrase "same
 pair order" now; it is why two D[iu] vectors can be correlated at all.
@@ -497,7 +576,12 @@ plt.imshow(S); plt.colorbar()
 ```
 
 <!--
-3 min. An .npz is a zip of named arrays — index by name, not position. The
+2 min. These lines are provided in the notebook — read, don't write. Three
+names to gloss in passing: plt is matplotlib (imported in the setup cell),
+DATA is the setup cell's data-path variable, and f'{...}' is Python's string
+formatting — new syntax for the Java folks, and not something they must write.
+
+An .npz is a zip of named arrays — index by name, not position. The
 loading cells in A1 are PROVIDED, so nobody has to write this; the point is
 reading them and knowing what came back.
 

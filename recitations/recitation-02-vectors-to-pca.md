@@ -25,6 +25,11 @@ math: katex
   a picture and a worked number. Students are not being asked to implement
   these methods — they are being asked to know what goes in, what comes out,
   and what could go wrong.
+
+  NOTATION (recorded decision, 2026-09-01, shared with Recitation 1): these
+  decks follow the notebooks — n items x p features, lowercase (n x n,
+  n(n-1)/2). Lecture's D (input dimensionality) and N (sample count) are the
+  same quantities. D on a slide means one thing only: a distance matrix.
 ============================================================================ -->
 
 <div class="eyebrow">Recitation 2</div>
@@ -50,12 +55,18 @@ useful.
 
 Part 1 built the machinery: three distances, twelve RDMs, the axioms tested on real data.
 
+**RDM** — *representational dissimilarity matrix*: the $n \times n$ matrix of pairwise dissimilarities you built in part 1. Entry $(i, j)$ is how differently items $i$ and $j$ are represented.
+
 Parts 2 and 3 use it to do **science**: human similarity and Shepard's law, then PCA and the shape of object space.
 
 <mark>Today: the library calls parts 2–3 use, one fitting pipeline worked end to end, and the code skeletons for the four sections most likely to stall you.</mark>
 
 <!--
-2 min. One-slide map of the session. If someone has not started part 2, tell
+2 min. The RDM line is not decoration: everything they built in part 1 they
+know as "the distance matrix" — the acronym is a rename, so make it while
+pointing at the definition.
+
+One-slide map of the session. If someone has not started part 2, tell
 them everything today still lands — the examples use toy data, and the
 skeletons are printed in the handout so nothing needs transcribing.
 -->
@@ -64,9 +75,9 @@ skeletons are printed in the handout so nothing needs transcribing.
 
 # Concepts you'll lean on (the lectures own these)
 
-- **Psychological space** *(Lecture 2)* — ratings behave as if stimuli sit at points in an internal metric space; MDS recovers the map. Why 2e–2f are a claim, not a plot.
+- **Psychological space** *(Lecture 2)* — ratings behave as if stimuli sit at points in an internal metric space; **MDS** (*multidimensional scaling*) recovers the map: the $n \times n$ dissimilarity matrix goes in, a 2-D point per item comes out, placed so map distances match the dissimilarities. Why 2e–2f are a claim, not a plot.
 - **Shepard's law** *(Lecture 2)* — generalization falls off like $e^{-d}$; the Gaussian is the rival, and they differ **near $d=0$**. What 2g and 2j actually test.
-- **Depth ↔ ventral stream** *(Lecture 3)* — early layers ↔ early areas, deep layers ↔ IT. Why 2k tracks depth, and why part 3 puts fc6 next to IT recordings.
+- **Depth ↔ ventral stream** *(Lecture 3)* — early layers ↔ early areas, deep layers ↔ IT (a high-level visual brain area). Why 2k tracks depth, and why part 3 puts fc6 (a deep network layer) next to IT recordings.
 
 <mark>Today is the technical side: the library calls, the pitfalls, the skeletons.</mark>
 
@@ -98,7 +109,7 @@ Xc = X - X.mean(axis=1, keepdims=True)   # center each ROW
 # cosine of Xc == correlation of X
 ```
 
-The provided helpers (`correlation_similarity` in 2b, `correlation_distance` in 2j) z-score each row instead — the extra division cancels inside the cosine, so they compute **exactly your 1b function**.
+The provided helpers (`correlation_similarity` in 2b, `correlation_distance` in 2j) **z-score** each row instead — center, then divide by the standard deviation. The extra division cancels inside the cosine, so they compute **exactly your 1b function**.
 
 <!--
 4 min. Kept from part 1 because it comes back twice this week. The 2j notebook
@@ -127,10 +138,12 @@ D = squareform(d)                   # SQUARE:    (n, n)
 squareform(D, checks=False)         # and back
 ```
 
-`linkage` wants **condensed** — 2h passes it `squareform(D_human, checks=False)`. `imshow` wants **square**. `MDS(metric='precomputed')` wants **square**.
+`imshow` wants **square**. `MDS(metric='precomputed')` wants **square**. And the tree-building call you'll meet on the next slide — `linkage` — wants **condensed**: 2h passes it `squareform(D_human, checks=False)`.
 
 <!--
 3 min. Purely practical, and it will save several hours across the class.
+Order matters here: imshow and MDS they already know; linkage is only a name
+until the next slide, so introduce it as "the clustering call coming up".
 
 When a scipy call complains about a distance matrix, this is nearly always the
 reason. The 2h hint hands them the squareform(D_human, checks=False) call;
@@ -174,19 +187,24 @@ iu  = np.triu_indices(120, k=1)          # each pair once, no diagonal
 rho = spearmanr(D1[iu], D2[iu]).statistic
 ```
 
+**Spearman** = Pearson correlation computed on **ranks**: replace every value by its rank, then correlate. Used here because only the *ordering* of dissimilarities is meaningful.
+
 Using the whole matrix counts every pair **twice** and adds $n$ meaningless zeros — which inflates the correlation for no reason.
 
 <mark>`.statistic` — that is where the number lives. 2k builds its whole table from this one line.</mark>
 
 <!--
-2 min. Recitation 1 taught D[iu]; this adds the call around it. Ask before
+3 min. Recitation 1 taught D[iu]; this adds the call around it. Ask before
 revealing: "why not correlate the two full matrices?" Someone gets the
 double-counting; the 120 diagonal zeros are the half people miss, and the more
 damaging half. (7,140 pairs go in, not 14,400.)
 
 spearmanr returns a result object — .statistic is the correlation, .pvalue the
-p-value 2k tells them not to lean on (the pairs are not independent). Spearman
-rather than Pearson because only the ORDERING of dissimilarities is meaningful.
+p-value 2k tells them not to lean on (the pairs are not independent).
+
+IF AHEAD: scipy.stats.rankdata both vectors, Pearson-correlate the ranks, and
+watch it equal spearmanr(...).statistic — the mirror of slide 4's "correlation
+IS centered cosine" identity.
 -->
 
 ---
@@ -195,6 +213,7 @@ rather than Pearson because only the ORDERING of dissimilarities is meaningful.
 
 ```python
 from scipy.optimize import curve_fit
+# the notebook defines  f_exp(d, a, b) = a * np.exp(-b * d)
 popt, _ = curve_fit(f_exp, x, y, p0=[10, 1], maxfev=40000)
 y_hat   = f_exp(x, *popt)          # * unpacks the fitted parameters back in
 ```
@@ -246,6 +265,8 @@ plt.scatter(d, y); plt.plot(d, y_lin); plt.plot(d, y_exp)
 
 Make data → fit both models → score both with the **same** $R^2$ → look at the plot.
 
+$R^2$ for now: 1 = perfect, 0 = no better than guessing the mean — we compute it by hand on the next slide.
+
 <mark>This four-move shape is 2g exactly — swap the toy arrays for `(d_ij, s_ij)` and you are done.</mark>
 
 <!--
@@ -264,6 +285,10 @@ negative where similarities never can, and you only see that by looking.
 
 If someone asks about the Gaussian: same curve_fit call with f_gauss, and 2g
 has them do exactly that.
+
+IF AHEAD: log-linearize the exponential — np.polyfit(d, np.log(y_clipped), 1)
+recovers b as a slope, no optimizer, no p0. Then show where it breaks: noise
+near y ~ 0 dominates the log, which is exactly why curve_fit earns its place.
 -->
 
 ---
@@ -309,7 +334,7 @@ Average your data into bins first and $R^2$ rises — with the fitted curve comp
 <mark>Two $R^2$ values are comparable only if computed against the same target.</mark>
 
 <!--
-3 min. This is 2g question 2, almost verbatim: they fit 7,140 individual pairs
+2 min. This is 2g question 2, almost verbatim: they fit 7,140 individual pairs
 and get about 0.8-something; published gradients fit BINNED averages and
 report 0.95+. The difference is the denominator of the exercise they just did
 — binning removes single-pair noise from the bottom sum, nothing about the
@@ -317,6 +342,29 @@ model improved.
 
 The provided running_mean() in 2g is a guide for the eye and explicitly NOT
 the fitting target; that comment is this slide in one line.
+-->
+
+---
+
+# What PCA gives you
+
+**PCA — principal component analysis.** In: your (items × features) matrix. Out: **new axes for the same points** — directions in feature space, **ordered** by how much of the data's spread each one captures.
+
+- **PC1** — the first principal component: the single direction along which the points are most spread out
+- each next component is perpendicular to the ones before, and explains less
+- picture a tilted, elongated cloud of points: PC1 is its long axis, PC2 the short one
+
+<mark>PCA does not change your data — it re-describes the same points along better axes.</mark>
+
+<!--
+3 min. This is the ground floor; the next two slides are mechanics and
+footnotes. Draw the tilted cloud on the board — long axis PC1, perpendicular
+short axis PC2 — and say the ordering fact twice: components come out sorted,
+PC1 first, each explaining less variance than the one before. Both cumsum (two
+slides on) and part 3's "PC1-PC2 plane" plots lean on that fact.
+
+Nobody derives anything today; they need what goes in, what comes out, and the
+ordering.
 -->
 
 ---
@@ -329,7 +377,13 @@ Y   = est.fit_transform(X)
 est.explained_variance_ratio_    # what it learned: trailing underscore
 ```
 
-Same shape of call for `PCA`, `MDS`, `TSNE`.
+Same shape of call for all three map-makers:
+
+| | goes in | comes out |
+|---|---|---|
+| `PCA` | items × features | same items on the new ordered axes |
+| `MDS` | $n \times n$ dissimilarities (`metric='precomputed'`) | a 2-D point per item, map distances ≈ dissimilarities |
+| `TSNE` | items × features | a 2-D point per item, neighbors kept close |
 
 Three things to watch:
 - the trailing underscore is **not a typo** — it marks attributes that exist only after `.fit`
@@ -352,26 +406,23 @@ changes between runs and what does not. Flag it as a preview, not a lesson.
 
 ---
 
-# What PCA is doing
+# Two PCA facts you will use this week
 
-Center the data (PCA does this for you), form the covariance, take its eigenvectors:
-
-$$\boldsymbol{C}\boldsymbol{v} = \lambda\boldsymbol{v}$$
-
-<mark>They are the directions along which the data varies most, and each $\lambda$ says how much.</mark>
-
-So **PC1** is simply the single direction in which your points are most spread out.
+- PCA **centers each feature for you** (`axis=0`) — the column cousin of 1b's row-centering; 3b's REMEMBER says so
+- a component is a **direction in feature space**, not a column of output — 3d asks you to argue PC1 tracks a shape property, and that argument only makes sense for a direction
 
 <!--
-4 min. Draw a tilted elongated cloud; its long axis is PC1, the perpendicular
-short axis PC2. No algebra beyond the statement on the slide.
+2 min. Two footnotes to the definition two slides back, both cashed in this
+week. Centering: same verb as the correlation identity, different axis,
+different purpose. Directions: without this, 3d's "what does PC1 mean" question
+is unanswerable.
 
-Two footnotes that pay off this week: PCA centers each FEATURE for you — 3b's
-REMEMBER says so, and it is the axis=0 cousin of the row-centering in the
-correlation identity (same verb, different axis, different purpose). And the
-components are DIRECTIONS in feature space; 3d asks them to argue PC1
-corresponds to a shape property, and that argument is impossible if a
-component is just a column of output.
+If a math-y student asks what PCA computes: form the covariance matrix C of the
+centered data and take its eigenvectors, C v = lambda v — the eigenvectors v
+are the component directions, and each eigenvalue lambda is the variance along
+its direction. That is the start of the derivation, and the derivation is
+explicitly out of scope — everyone else needs only the previous slides'
+sentence.
 -->
 
 ---
@@ -379,8 +430,11 @@ component is just a column of output.
 # Variance explained, and the question to ask
 
 ```python
-np.cumsum(est.explained_variance_ratio_)
+cum = np.cumsum(est.explained_variance_ratio_)   # running total: entry i sums entries 0..i
+np.argmax(cum >= 0.85)                           # FIRST index where a condition holds
 ```
+
+`argmax` of a boolean array returns the first `True` — that is "how many components reach 85%" (3b) in one line.
 
 "50 components explain 85% of the variance" sounds like a fact about the network.
 
@@ -389,7 +443,13 @@ np.cumsum(est.explained_variance_ratio_)
 $n$ items can never need more than $n-1$ components — raw counts are not comparable across sets of different size; **fractions of the maximum** are.
 
 <!--
-3 min. Plant this hard — 3c is built on it. The set-up: 1,224 images that are
+4 min. Two mechanics first: cumsum is a running total, and argmax of a boolean
+returns the first True because True > False. (The notebook also offers
+np.searchsorted for 3b; both are fine, argmax generalizes to any condition.)
+The comparison cum >= 0.85 is Recitation 1's boolean machinery; the first-True
+trick is the one new move.
+
+Then plant the question hard — 3c is built on it. The set-up: 1,224 images that are
 51 objects seen from 24 angles each. Rotating one object traces a smooth
 low-dimensional curve, so the extra images add points without adding
 directions; the data therefore looks far more "compact" than it is.
@@ -403,6 +463,8 @@ find.
 ---
 
 # Groupby without groupby — THE template
+
+`F`: part 3's activations, `(1224, 4096)` — 51 objects × 24 views. `obj`: which object each row shows, `(1224,)`.
 
 One line, four moves:
 
@@ -428,6 +490,10 @@ per-category silhouette scores loop the same way over categories. And in part
 [len(np.unique(isl[obj == k])) for k in np.unique(obj)] — same mask, different
 statistic. When they see a "for each object / category / cluster" sentence in
 an assignment, this is the shape of the answer.
+
+IF AHEAD: the loop-free groupby — np.zeros((51, p)); np.add.at(sums, obj, F);
+sums / np.bincount(obj)[:, None] — one pass, no Python loop; at this size the
+list comprehension is fine and clearer.
 -->
 
 ---
@@ -458,7 +524,8 @@ by subtraction. The interpretation question 3c asks (is "50 dimensions at
 this slide.
 
 The three PCA counts in 3c's first half need no skeleton — cumsum plus the
-boolean argmax from recitation 1, three times, on F, on means, on F[::24].
+boolean argmax from the variance-explained slide, three times, on F, on means,
+on F[::24].
 -->
 
 ---
@@ -474,7 +541,7 @@ for tag, a in (('trained', act_tr), ('untrained', act_un)):
         # ... your 2g fitting code, on (d_net, s_ij)
 ```
 
-- `[iu]` puts the network distances in the **same pair order** as `s_ij`
+- `[iu]` puts the network distances in the **same pair order** as `s_ij` (the human similarity for pair $(i,j)$, from 2g's setup)
 - wrap the exponential fit in `try/except` — on untrained layers it may **legitimately fail to converge**, and that failure is a finding, not a bug
 
 <!--
@@ -482,6 +549,10 @@ for tag, a in (('trained', act_tr), ('untrained', act_un)):
 exists (correlation_distance is provided in 2j, iu and s_ij come from 2g's
 setup), and this loop is just plumbing them together. Students who stall here
 stall on "where do I even start", so hand them the start.
+
+The astype(np.float64): the activations are stored float32, and correlations
+accumulate rounding error at that precision — cast up before computing, cheap
+insurance, not superstition.
 
 The two bullets are the two sentences worth saying out loud. Pair order: iu
 always walks the upper triangle the same way, so d_net[i] and s_ij[i] describe
@@ -525,6 +596,10 @@ other, or the measure is wrong.
 What stays theirs: take the LOG (the raw index is heavily skewed — the
 notebook says so), then Spearman against PC1 and PC2, and 3f question 2's
 point about 1,224 images vs 51 objects.
+
+IF AHEAD: np.diff(m, axis=0) is the idiomatic spelling of shift-and-compare —
+and the trick is a convolution with an edge kernel, which is literally what CNN
+filters will do when we get to them.
 -->
 
 ---
@@ -550,8 +625,10 @@ PCA again with each unit z-scored: without it, PCA partly reports which
 electrodes were LOUD.
 
 The two one-liners: drop reads "keep the columns where no entry is NaN" —
-recitation 1's boolean machinery, ~ and any(axis=0). Impute reads "where it
-is NaN, take that unit's nanmean, else keep the value". The notebook accepts
+recitation 1's boolean machinery, ~ and any(axis=0). Impute is three-argument
+np.where — the pattern is np.where(condition, if_true, if_false) — read aloud
+as "where it is NaN, take that unit's nanmean, else keep the value". The
+three-argument form is new; say the pattern explicitly. The notebook accepts
 either and demands only that they SAY WHICH — the habit of stating an
 analytical choice out loud is the actual lesson.
 
@@ -574,6 +651,8 @@ First argument: the **2-D coordinates** in the PC1–PC2 plane. Not the RDM.
 
 Second: a binary labeling — this category against everything else. Near 1 = sits apart; near 0 = on a boundary; negative = closer to another group than its own.
 
+No relation to 3f's silhouette *masks* — the name is a coincidence; this "silhouette" is a cluster-separation diagnostic.
+
 <!--
 2 min. One call, one common mistake. 3h asks for a silhouette score per
 category, for fc6 and for pixels, so the comparison is a number rather than
@@ -593,8 +672,10 @@ coordinates themselves and computes its own distances.
 - **Restart-and-run-all before submitting re-runs everything**, the t-SNE sweep included. Budget for it; do not start it five minutes before the deadline.
 
 <!--
-2 min. Pure logistics, and the difference between a calm submission and a
-panicked one. The failure mode: a student interrupts the "hung" cell, loses
+1 min. Pure logistics, and the difference between a calm submission and a
+panicked one. Perplexity, if anyone asks, is t-SNE's main knob — roughly how
+many neighbors each point listens to; 4b's sweep tries four values of it.
+The failure mode: a student interrupts the "hung" cell, loses
 embeds[(perplexity, seed)], and every later cell in part 4 breaks in ways that
 look unrelated.
 
@@ -619,8 +700,8 @@ expected, not a hang.
 One loop to close: 1f asked where the choice of distance could change a conclusion — 2e is an answer, because **MDS trusts the triangle inequality** you showed can fail.
 
 <!--
-2 min. Read the table out; every row carries a section label they can go find
-tonight.
+1 min. Read the table briskly; every row carries a section label they can go
+find tonight.
 
 The closing callback is worth thirty seconds: they measured triangle
 violations in 1f, and MDS quietly assumes a geometry where none exist — the
