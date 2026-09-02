@@ -1,0 +1,46 @@
+name: build-and-publish
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build decks and collect handouts
+        run: |
+          mkdir -p _site
+          for f in recitation-*.md; do
+            npx --yes @marp-team/marp-cli@latest "$f" -o "_site/${f%.md}.html" --html
+          done
+          cp -f handout-*.pdf bootcamp-notes.pdf colab-setup.html _site/ 2>/dev/null || true
+          {
+            echo '<!doctype html><meta charset="utf-8"><title>CPSY 1291 recitations</title><h1>CPSY 1291 — Fall 2026 recitations</h1><ul>'
+            for f in _site/recitation-*.html; do b=$(basename "$f"); echo "<li><a href=\"$b\">${b%.html}</a></li>"; done
+            for f in _site/*.pdf; do b=$(basename "$f"); echo "<li><a href=\"$b\">$b</a></li>"; done
+            echo '</ul>'
+          } > _site/index.html
+      - uses: actions/upload-pages-artifact@v3
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

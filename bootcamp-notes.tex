@@ -1,0 +1,669 @@
+% CPSY 1291 -- Bootcamp notes
+% Compile:  latexmk -lualatex bootcamp-notes.tex
+\documentclass[11pt]{article}
+
+\usepackage{fontspec}
+\setmainfont{Lora}[
+  Path = /Users/tserre/Library/Fonts/ , Extension = .ttf ,
+  UprightFont = Lora-Regular , BoldFont = Lora-SemiBold ,
+  ItalicFont = Lora-Italic , BoldItalicFont = Lora-Italic ]
+\setsansfont{Poppins}[
+  Path = /Users/tserre/Library/Fonts/ , Extension = .ttf ,
+  UprightFont = Poppins-Regular , BoldFont = Poppins-SemiBold ]
+\setmonofont{Menlo}[Scale=0.86]
+
+\usepackage[margin=1.1in]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{bookmark}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{listings}
+\usepackage{mdframed}
+\usepackage{soul}
+
+\definecolor{accent}{HTML}{9C5A2E}
+\definecolor{brown}{HTML}{6B4F3A}
+\definecolor{ink}{HTML}{1E293B}
+\definecolor{lightgray}{HTML}{8A7E70}
+\definecolor{codebg}{HTML}{F5F1EA}
+\definecolor{gold}{HTML}{F2C14E}
+
+\hypersetup{colorlinks=true, linkcolor=accent, urlcolor=accent, citecolor=accent}
+\sethlcolor{gold}
+\emergencystretch=1em
+
+\titleformat{\section}{\sffamily\large\bfseries\color{brown}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\sffamily\normalsize\bfseries\color{ink}}{\thesubsection}{0.6em}{}
+\setlist[itemize]{leftmargin=1.2em, itemsep=2pt, topsep=3pt}
+\setlist[enumerate]{leftmargin=1.4em, itemsep=2pt, topsep=3pt}
+
+\lstset{
+  basicstyle=\ttfamily\small, backgroundcolor=\color{codebg},
+  frame=single, rulecolor=\color{codebg!60!lightgray}, framesep=5pt,
+  breaklines=true, showstringspaces=false, columns=fullflexible,
+  keywordstyle=\color{accent}, commentstyle=\color{lightgray}\itshape,
+  language=Python, aboveskip=8pt, belowskip=8pt, xleftmargin=2pt,
+}
+
+\newmdenv[backgroundcolor=codebg, linecolor=accent, linewidth=1.6pt,
+          topline=false, bottomline=false, rightline=false,
+          innerleftmargin=9pt, innertopmargin=6pt, innerbottommargin=6pt,
+          skipabove=9pt, skipbelow=9pt]{keybox}
+
+\newcommand{\ask}[1]{\textcolor{accent}{\textbf{#1}}}
+
+\begin{document}
+
+\begin{center}
+{\sffamily\LARGE\bfseries\color{brown} CPSY 1291 --- Bootcamp Notes}\\[3pt]
+{\sffamily\large\color{ink} The Python and mathematics you will actually use}\\[6pt]
+{\color{lightgray}\small Fall 2026 \quad$\cdot$\quad read on your own; the recitations work through the same material}\\[2pt]
+{\color{lightgray}\small scoped to what Assignment 1 actually requires}
+\end{center}
+\vspace{4pt}
+\hrule
+\vspace{10pt}
+
+\section*{How to use these notes}
+\addcontentsline{toc}{section}{How to use these notes}
+
+This is not a tutorial and not a reference manual. It is a \emph{map}: it tells
+you which ideas you need, what each one is for, and roughly what it looks like
+in code. Read it once before the term starts, then come back to whichever
+section an assignment has just made relevant.
+
+Everything here was chosen by working backwards from \textbf{Assignment 1}:
+if a tool appears in these notes, you will use it in the first few weeks. Ideas
+the course needs later --- gradients, the chain rule, how networks are trained
+--- are deliberately absent, and arrive with the assignment that first needs
+them.
+
+If you already program comfortably in Python and have had linear algebra, skim
+the boxes and skip the rest. If you are arriving from Java, Racket, or MATLAB,
+Sections 1--2 are the ones to read slowly.
+
+\begin{keybox}
+\ask{The one rule.} Before you write a line of code, you should be able to say
+in one sentence what it is supposed to compute. If you cannot, the thing you
+are stuck on is the \emph{idea}, not the syntax --- and no amount of fiddling
+with brackets will fix it. Come back to the idea first.
+\end{keybox}
+
+A note on AI tools, since it would be strange not to address it. In this
+course, assignments are your own work and you should not use an LLM to write
+them. Outside this course --- in research, in industry --- you will use these
+tools, and so do we. Both of those are true at once because what is worth
+learning here is not the typing. It is knowing what to compute, what shape the
+answer should be, and how to tell when it is wrong. That judgment is what makes
+generated code useful rather than dangerous, and it is what these notes and the
+assignments are built to develop. Accordingly, the emphasis throughout is on
+\emph{what a computation means and how to check it}, and rather less on syntax.
+
+\vspace{4pt}
+\hrule
+\vspace{6pt}
+{\small\color{lightgray} Sections: (1)~Python essentials \quad (2)~NumPy and the shape
+discipline \quad (3)~Vectors and matrices \quad (4)~Dissimilarity matrices \quad
+(5)~The library calls you will make \quad (6)~Correlation and $p$-values \quad
+(7)~Plots as instruments \quad (8)~A debugging recipe \quad (9)~Exercises \quad
+(10)~Cheat sheet}
+\vspace{6pt}
+\hrule
+
+\section{Python essentials}
+
+\subsection{Values, containers, and the two you will confuse}
+
+A \texttt{list} is a general-purpose sequence that can hold anything. A NumPy
+\texttt{array} is a block of numbers of one type, with a shape. Almost all
+numerical work in this course uses arrays; lists are for bookkeeping.
+
+\begin{lstlisting}
+xs = [3, 1, 4]          # list: fine for a handful of things
+xs.append(1)            # lists grow
+d  = {'cat': 0, 'dog': 1}   # dict: look things up by name
+d['cat']                # -> 0
+for name, idx in d.items():
+    print(name, idx)
+\end{lstlisting}
+
+A \texttt{tuple} \texttt{(a, b)} is an immutable list; you will meet them mostly
+as array shapes and as multiple return values.
+
+\subsection{Functions, and why yours should return rather than print}
+
+\begin{lstlisting}
+def euclidean(a, b):
+    """Straight-line distance between two points."""
+    return ((a - b) ** 2).sum() ** 0.5
+\end{lstlisting}
+
+A function that \texttt{print}s its answer cannot be reused; one that
+\texttt{return}s it can. Write a docstring saying what goes in and what comes
+out --- when you come back in a week, it is the only thing that will still be
+true.
+
+\subsection{Loops, and the habit to unlearn}
+
+Python loops are correct and slow. In numerical code they are also usually a
+sign that you are thinking one item at a time when the operation applies to
+everything at once. Section~2 is about the alternative.
+
+\begin{lstlisting}
+sq = [x**2 for x in xs]            # comprehension: a loop that makes a list
+for i, x in enumerate(xs):         # when you need the index too
+    print(i, x)
+for a, b in zip(names, values):    # two sequences in step
+    print(a, b)
+\end{lstlisting}
+
+\subsection{Reading an error message}
+
+Read the \emph{last} line first: it names the error. Then read upward to find
+the line of \emph{your} code that caused it. Three you will meet constantly:
+
+\begin{itemize}
+\item \texttt{ValueError: operands could not be broadcast}\\
+      \texttt{together with shapes (120,4096) (4096,120)}\\
+      --- an array is the wrong way round. See §2.4.
+\item \texttt{IndexError: index 120 is out of bounds for axis 0}\\
+      \texttt{with size 120} --- Python counts from 0, so the last valid index
+      is 119.
+\item \texttt{TypeError: 'numpy.float64' object is not callable} --- you wrote
+      \texttt{f(x)} where \texttt{f} is a number, usually because a name got
+      reused.
+\end{itemize}
+
+\section{NumPy and the shape discipline}
+
+This is the section that pays for itself. Nearly everything in this course is
+``do the same arithmetic to a few thousand vectors'', and NumPy is how that is
+said.
+
+\subsection{Shape is your unit test}
+
+Every array has a \texttt{shape}: a tuple of its dimensions. \hl{Print shapes
+constantly.} Most bugs in numerical code are shape bugs, and they announce
+themselves immediately if you look.
+
+\begin{lstlisting}
+X.shape       # e.g. (120, 4096): 120 stimuli, 4096 features each
+X.dtype       # float64, uint8, ...
+X.ndim        # 2
+\end{lstlisting}
+
+\begin{keybox}
+\ask{The course convention.} Data matrices are \textbf{stimuli by features}:
+one \emph{row} per image, one \emph{column} per pixel, unit, or voxel. So
+\texttt{X[i]} is the vector for stimulus $i$, and \texttt{X.shape[0]} is how
+many stimuli you have. Every assignment assumes this.
+\end{keybox}
+
+\subsection{Indexing and slicing}
+
+\begin{lstlisting}
+X[0]            # first row: the feature vector of stimulus 0
+X[:, 3]         # column 3: feature 3 across all stimuli
+X[:5]           # first five rows
+X[::24]         # every 24th row -- useful when the data repeats
+X[-1]           # last row
+\end{lstlisting}
+
+Slicing never copies; it gives you a view onto the same memory. Modifying a
+slice modifies the original, which is efficient and occasionally surprising.
+
+\subsection{The axis argument}
+
+\begin{keybox}
+\ask{The axis you name is the axis that disappears.} \texttt{X.sum(axis=0)}
+sums \emph{down} the rows and leaves one number per column. \texttt{X.mean(axis=1)}
+averages \emph{across} the columns and leaves one number per row.
+\end{keybox}
+
+\begin{lstlisting}
+X.shape            # (120, 4096)
+X.mean(axis=0).shape   # (4096,)  -- the average stimulus
+X.mean(axis=1).shape   # (120,)   -- each stimulus's average feature value
+X.mean(axis=1, keepdims=True).shape   # (120, 1) -- kept for broadcasting
+\end{lstlisting}
+
+\subsection{Broadcasting}
+
+When two arrays have different shapes, NumPy stretches size-1 dimensions to
+match. This is what lets you subtract one vector from a whole matrix:
+
+\begin{lstlisting}
+X - X.mean(axis=0)                  # (120,4096) - (4096,)   -> centers each column
+X - X.mean(axis=1, keepdims=True)   # (120,4096) - (120,1)   -> centers each row
+\end{lstlisting}
+
+Note that those two do genuinely different things, and \texttt{keepdims} is
+what selects between them. The rule: compare shapes from the right; dimensions
+must be equal, or one of them must be 1.
+
+The idiom worth memorizing, because it turns any pairwise computation into one
+line:
+
+\begin{lstlisting}
+diff = X[:, None, :] - X[None, :, :]   # (120, 1, 4096) - (1, 120, 4096)
+                                       #                -> (120, 120, 4096)
+D = (diff ** 2).sum(-1) ** 0.5         # (120, 120) all pairwise distances
+\end{lstlisting}
+
+That allocates a large intermediate array. When it is too large, use the
+algebraic route instead --- see §3.3.
+
+\subsection{Masks, counting, and sorting}
+
+\begin{lstlisting}
+mask = (labels == 2)        # boolean array, one entry per stimulus
+X[mask]                     # just the rows where mask is True
+mask.sum()                  # how many -- True counts as 1
+np.unique(labels, return_counts=True)   # what values, how many of each
+np.argsort(v)[:5]           # indices of the five smallest values
+np.argsort(v)[::-1][:5]     # indices of the five largest
+np.triu_indices(n, k=1)     # the upper triangle: each pair exactly once
+\end{lstlisting}
+
+\texttt{argsort} is how you get ``the five most similar images'', and
+\texttt{triu\_indices} is how you compare two matrices of pairwise values
+without counting each pair twice.
+
+\section{Vectors and matrices}
+
+\subsection{A list of numbers is a point}
+
+The central move of this whole course: if you write down $p$ numbers about
+something --- the pixel values of an image, the firing rates of $p$ neurons, a
+person's rating on $p$ scales --- you can treat that list as a \emph{point} in a
+$p$-dimensional space. Two things are ``similar'' when their points are close.
+Everything else is detail about what \emph{close} should mean.
+
+\subsection{Length, distance, and the dot product}
+
+For vectors $\bm{a}, \bm{b} \in \mathbb{R}^p$:
+\[
+\|\bm{a}\| = \sqrt{\textstyle\sum_j a_j^2}, \qquad
+d(\bm{a},\bm{b}) = \|\bm{a}-\bm{b}\|, \qquad
+\bm{a}\cdot\bm{b} = \textstyle\sum_j a_j b_j = \|\bm{a}\|\,\|\bm{b}\|\cos\theta .
+\]
+The dot product is the workhorse. Read it as: \emph{how much of $\bm{a}$ points
+along $\bm{b}$}, scaled by both lengths. It is large when two vectors agree in
+direction, zero when they are perpendicular, negative when they oppose.
+
+\begin{lstlisting}
+a @ b                    # dot product
+np.linalg.norm(a)        # length
+np.linalg.norm(a - b)    # distance
+\end{lstlisting}
+
+\subsection{Cosine, and the identity you will use}
+
+Dividing out the lengths leaves only the angle:
+\[
+\cos\theta = \frac{\bm{a}\cdot\bm{b}}{\|\bm{a}\|\,\|\bm{b}\|}.
+\]
+This ignores magnitude, which is what you want when overall brightness or
+overall firing rate is not the thing you care about.
+
+\begin{keybox}
+\ask{Worth knowing:} \emph{Pearson correlation is exactly cosine similarity
+after subtracting each vector's own mean.} So ``correlation distance'' is
+``cosine distance on centered vectors'', and any code you have for one gives
+you the other for free.
+\end{keybox}
+
+Two ways to get all pairwise distances. The second is the one to use at scale,
+and it follows from expanding $\|\bm{a}-\bm{b}\|^2 = \bm{a}\cdot\bm{a} +
+\bm{b}\cdot\bm{b} - 2\,\bm{a}\cdot\bm{b}$:
+
+\begin{lstlisting}
+sq = (X**2).sum(axis=1)                       # (n,)
+D2 = sq[:, None] + sq[None, :] - 2 * (X @ X.T)
+D  = np.sqrt(np.maximum(D2, 0))               # clip: tiny negatives are roundoff
+\end{lstlisting}
+
+\subsection{Matrices, two ways to read them}
+
+A matrix is a grid of numbers, and which meaning you want depends on context:
+
+\begin{itemize}
+\item \textbf{As data.} $\bm{X}$ with one row per stimulus and one column per
+      feature. This is the reading used above.
+\item \textbf{As a map.} $\bm{W}$ turns a vector into another vector,
+      $\bm{z} = \bm{W}\bm{a}$. Row $j$ of $\bm{W}$ is a vector whose dot product
+      with $\bm{a}$ gives $z_j$. This is what a layer of a neural network does,
+      and it is how we will write them all semester.
+\end{itemize}
+
+Matrix multiplication $\bm{A}\bm{B}$ requires the inner dimensions to match:
+$(m \times k)(k \times n) \rightarrow (m \times n)$. \hl{Check this by
+reading the shapes aloud} before you write the line. The transpose
+\texttt{X.T} swaps rows and columns and is usually how you make the inner
+dimensions agree.
+
+\subsection{Centering, variance, covariance}
+
+Subtracting the mean of each feature puts the cloud of points at the origin
+without changing its shape. After centering, the covariance matrix
+\[
+\bm{C} = \tfrac{1}{n-1}\,\tilde{\bm{X}}^{\!\top}\tilde{\bm{X}}
+\]
+holds the variance of each feature on its diagonal and, off the diagonal, how
+each pair of features vary together.
+
+\subsection{Eigenvectors, and what PCA is doing}
+
+For a square matrix $\bm{C}$, an \emph{eigenvector} $\bm{v}$ is a direction that
+$\bm{C}$ does not rotate --- it only stretches it:
+\[
+\bm{C}\bm{v} = \lambda \bm{v},
+\]
+where the \emph{eigenvalue} $\lambda$ says by how much. Applied to a covariance
+matrix, this has a very concrete reading:
+
+\begin{keybox}
+\ask{PCA in one sentence.} Center the data, form its covariance matrix, and
+take that matrix's eigenvectors: they are the directions along which the data
+varies most, and each eigenvalue is how much variance lies along its direction.
+\end{keybox}
+
+So ``the first principal component'' is just the single direction in feature
+space along which your points are most spread out, and ``variance explained''
+is the fraction of total spread you keep if you describe each point only by
+where it falls along the first few such directions. In practice you will call
+\texttt{PCA} from scikit-learn rather than doing the eigendecomposition
+yourself --- but if you cannot say what the components \emph{are}, the output is
+just numbers.
+
+\section{Dissimilarity matrices}
+
+Almost every analysis in the first assignment consumes the same object: a
+square matrix $\bm{D}$ holding the dissimilarity of every pair of stimuli. It is
+worth being precise about it, because three separate conventions collide here.
+
+\subsection{Square form and condensed form}
+
+A dissimilarity matrix over $n$ stimuli is $n \times n$, symmetric, with zeros
+on the diagonal. That is $n^2$ numbers to store $n(n-1)/2$ facts, so SciPy also
+has a \emph{condensed} form: a flat vector of just the upper triangle.
+\texttt{pdist} returns condensed; \texttt{squareform} converts between the two,
+in both directions.
+
+\begin{lstlisting}
+d = pdist(X, metric='euclidean')   # condensed: (n*(n-1)/2,)
+D = squareform(d)                  # square:    (n, n)
+squareform(D, checks=False)        # back to condensed
+\end{lstlisting}
+
+Functions disagree about which they want. \texttt{linkage} expects condensed;
+\texttt{imshow} needs square; \texttt{MDS} with precomputed dissimilarities
+wants square. \hl{When a call complains about your distance matrix, this is
+almost always why.}
+
+\subsection{Comparing two matrices}
+
+To ask whether two systems organize the same stimuli the same way, you compare
+their dissimilarity matrices entry by entry. Take each one's upper triangle so
+that every pair is counted exactly once, and correlate the two lists:
+
+\begin{lstlisting}
+iu = np.triu_indices(n, k=1)       # k=1 excludes the diagonal
+spearmanr(D1[iu], D2[iu])
+\end{lstlisting}
+
+Using the whole matrix instead would count every pair twice and add $n$
+meaningless zeros, which drags the correlation upward for no reason.
+
+\subsection{Checks worth running every time}
+
+\begin{lstlisting}
+D.shape                              # (n, n)?
+np.abs(D - D.T).max()                # symmetric? (1e-16 is roundoff, not a bug)
+np.diag(D)                           # zeros on the diagonal?
+np.isnan(D).sum()                    # any missing?
+np.fill_diagonal(D, 0)               # force the diagonal if it drifted
+\end{lstlisting}
+
+\section{The library calls you will actually make}
+
+You are not expected to implement MDS or t-SNE. You are expected to know what
+they take, what they return, and what could go wrong --- so this section is
+about the \emph{pattern}, not the arguments.
+
+\subsection{The scikit-learn pattern}
+
+Nearly every scikit-learn tool works the same way: construct an object with its
+settings, then \texttt{fit\_transform} your data to get the result. Anything
+the method learned is then stored on the object, with a trailing underscore.
+
+\begin{lstlisting}
+pca = PCA(n_components=50)
+Y   = pca.fit_transform(X)          # (n_stimuli, 50)
+pca.explained_variance_ratio_       # (50,) fraction of variance per component
+np.cumsum(pca.explained_variance_ratio_)   # running total
+\end{lstlisting}
+
+The same shape of call gives you \texttt{MDS(...)} and \texttt{TSNE(...)}. Two
+things to watch. Some of these take \emph{a dissimilarity matrix} rather than
+feature vectors, which you signal with \texttt{metric='precomputed'}. And some
+are stochastic, so they take a \texttt{random\_state} --- meaning two runs give
+two answers unless you fix it.
+
+\subsection{Hierarchical clustering}
+
+\begin{lstlisting}
+Z    = linkage(squareform(D, checks=False), method='average')
+dendrogram(Z, no_labels=True)       # draw the tree
+grp  = fcluster(Z, 6, criterion='maxclust')   # cut it into 6 groups
+\end{lstlisting}
+
+\texttt{linkage} builds the whole tree; \texttt{fcluster} cuts it at a chosen
+height or into a chosen number of groups. The tree encodes structure at every
+level at once, so \hl{choosing where to cut is choosing which level you want to
+talk about} --- not discovering how many clusters there ``really'' are.
+
+\subsection{Fitting a curve, and what \texorpdfstring{$R^2$}{R2} means}
+
+\begin{lstlisting}
+c  = np.polyfit(x, y, 1)            # straight line: returns coefficients
+yh = np.polyval(c, x)               # the fitted values
+p, _ = curve_fit(lambda x, a, b: a*np.exp(-b*x), x, y)   # a nonlinear fit
+r2 = 1 - ((y - yh)**2).sum() / ((y - y.mean())**2).sum()
+\end{lstlisting}
+
+$R^2$ is the fraction of the variance in $y$ that your fit accounts for. Read
+that definition carefully: it is a \emph{ratio}, so it depends on how variable
+$y$ was to begin with. Averaging your data into bins before fitting removes
+noise from the bottom of that fraction and pushes $R^2$ up without the fitted
+curve changing at all. \hl{Two $R^2$ values are comparable only if they were
+computed against the same target.}
+
+\section{Correlation, ranks, and honest \texorpdfstring{$p$}{p}-values}
+
+\begin{itemize}
+\item \textbf{Mean, variance, standard deviation.} The center, the spread, and
+      the spread in the original units. A feature with \emph{zero} variance is
+      a special hazard: correlation divides by the standard deviation, so a
+      unit that never responds will produce a division by zero or a silent
+      \texttt{nan} in everything downstream.
+\item \textbf{The $z$-score} $(x - \mu)/\sigma$ puts different measurements on a
+      common scale. Note that $z$-scoring each vector and then taking dot
+      products \emph{is} computing correlations.
+\item \textbf{Pearson vs.\ Spearman correlation.} Pearson measures how well a
+      \emph{straight line} fits; Spearman does the same after replacing values
+      by their ranks, so it measures whether two things increase together
+      without assuming the relation is linear. Use Spearman when only the
+      ordering is meaningful.
+\item \textbf{What a $p$-value assumes.} A $p$-value asks how surprising your
+      result would be if nothing were going on --- but it computes that using
+      your sample size $n$. If your rows are not independent (say, 24
+      photographs of the \emph{same} object), then your effective $n$ is far
+      smaller than the number of rows, and the $p$-value is correspondingly
+      overconfident. \hl{Ask what the independent unit is before reporting a
+      $p$-value.}
+\item \textbf{Null baselines beat thresholds.} Rather than comparing a number
+      against a rule of thumb, shuffle your data, redo the analysis, and see
+      what values arise by chance. A result that beats its own shuffled
+      baseline is meaningful in a way that ``above 0.7'' never is.
+\end{itemize}
+
+\section{Plots as instruments}
+
+Plots in this course are not decoration; they are how you check that an
+analysis is doing what you think.
+
+\begin{lstlisting}
+fig, ax = plt.subplots(2, 3, figsize=(12, 7))   # a grid of panels
+ax[0, 1].imshow(D, vmin=..., vmax=...)          # a matrix as an image
+ax[1, 0].scatter(Y[:, 0], Y[:, 1], s=8, c=labels)
+ax[0, 0].set_title('...'); plt.tight_layout(); plt.show()
+\end{lstlisting}
+
+Two habits. First, \hl{look at your raw data before computing anything from
+it} --- display some images, print the range, count the zeros. Second, when a
+matrix plot looks washed out, a few extreme values are eating the color scale;
+set \texttt{vmin} and \texttt{vmax} from percentiles instead of letting
+matplotlib choose.
+
+\section{A debugging recipe}
+
+When something is wrong, work through this in order. It resolves most problems
+before you have to think hard.
+
+\begin{enumerate}
+\item \textbf{Shape.} Print it. Is it what you expect, and is it the right way
+      round?
+\item \textbf{Type and range.} \texttt{X.dtype}, \texttt{X.min()},
+      \texttt{X.max()}. Integer division and \texttt{uint8} overflow cause
+      quiet, plausible-looking wrongness.
+\item \textbf{Missing values.} \texttt{np.isnan(X).sum()}. One \texttt{nan}
+      spreads through everything it touches.
+\item \textbf{Degenerate rows or columns.} Anything with zero variance will
+      break a correlation, because you divide by its standard deviation.
+\item \textbf{A case you can check by hand.} Compute one value with a
+      calculator, or on a $2\times2$ example, and compare.
+\item \textbf{Plot it.} A picture of a wrong matrix usually looks obviously
+      wrong.
+\end{enumerate}
+
+\section{Exercises}
+
+Short, and meant to be done at a keyboard. Answers on the last page.
+
+\begin{enumerate}
+\item \texttt{X} has shape \texttt{(120, 4096)}. What are the shapes of
+      \texttt{X.mean(0)}, \texttt{X.mean(1)}, and
+      \texttt{X.mean(1, keepdims=True)}? Which would you use to center each
+      stimulus's own vector?
+\item Write one line giving the index of the stimulus most similar to stimulus
+      7, given a similarity matrix \texttt{S}. (Careful: what is
+      \texttt{S[7, 7]}?)
+\item \texttt{A} is $(120, 4096)$ and \texttt{B} is $(4096, 10)$. Which of
+      \texttt{A @ B}, \texttt{B @ A}, \texttt{A.T @ B} is legal, and what shape
+      does it give?
+\item Two vectors are $\bm{a}=(1,0)$ and $\bm{b}=(3,0)$. What is their cosine
+      similarity? Their Euclidean distance? What does the disagreement tell you?
+\item You have a $120\times120$ dissimilarity matrix and want to correlate it
+      against another one. How many numbers should go into that correlation,
+      and which NumPy call gets them?
+\item \texttt{linkage} raises an error when you hand it your $120\times120$
+      matrix. What is wrong, and what is the fix?
+\item A published paper reports $R^2 = 0.96$ for the same relationship where you
+      got $0.84$. Before concluding your analysis is worse, what should you
+      check?
+\item You have 1{,}224 images that are 51 objects photographed from 24 angles.
+      You correlate a property across all 1{,}224 and get $p < 10^{-40}$. Why is
+      that misleading, and what would you report instead?
+\item A matrix that should be symmetric has
+      \texttt{np.abs(D - D.T).max() == 3e-17}. Is something wrong?
+\item Write, without a loop, the fraction of entries in \texttt{X} that are
+      exactly zero. Why might you care?
+\end{enumerate}
+
+\section{Cheat sheet}
+
+\begin{center}
+\small
+\begin{tabular}{@{}>{\ttfamily}l l@{}}
+\toprule
+\textnormal{\textbf{Call}} & \textbf{What it is for} \\
+\midrule
+\multicolumn{2}{@{}l}{\textit{\textnormal{getting data in, and looking at it}}}\\
+np.load(path)                 & read \texttt{.npz}; index it like a dict \\
+X.shape, X.dtype              & the first thing to print, always \\
+np.isnan(X).sum()             & count missing values \\
+np.unique(v, return\_counts=True) & what values occur, how often \\
+X.min(), X.max(), np.ptp(X)   & range, and range as one number \\[3pt]
+\multicolumn{2}{@{}l}{\textit{\textnormal{reshaping and selecting}}}\\
+X[::24]                       & every 24th row \\
+X[mask]                       & the rows where a boolean is True \\
+X.reshape(n, -1)              & flatten all but the first axis \\
+np.argsort(v)                 & indices that would sort \texttt{v} \\
+np.triu\_indices(n, k=1)      & each pair once, no diagonal \\[3pt]
+\multicolumn{2}{@{}l}{\textit{\textnormal{the linear algebra}}}\\
+X @ X.T                       & every pairwise dot product at once \\
+X[:, None, :] - X[None, :, :] & every pairwise difference at once \\
+np.linalg.norm(X, axis=1)     & the length of each row \\
+X - X.mean(0)                 & center each feature (column) \\
+X - X.mean(1, keepdims=True)  & center each stimulus (row) \\[3pt]
+\multicolumn{2}{@{}l}{\textit{\textnormal{dissimilarity matrices}}}\\
+pdist(X, metric=...)          & condensed pairwise distances \\
+squareform(d)                 & condensed $\leftrightarrow$ square \\
+np.fill\_diagonal(D, 0)       & force the diagonal to zero \\[3pt]
+\multicolumn{2}{@{}l}{\textit{\textnormal{the methods}}}\\
+PCA(...).fit\_transform(X)    & principal components \\
+.explained\_variance\_ratio\_ & variance carried by each one \\
+MDS(...), TSNE(...)           & same pattern; watch \texttt{random\_state} \\
+linkage(...), fcluster(...)   & build a tree, then cut it \\
+spearmanr(a, b)               & rank correlation \\
+np.polyfit / curve\_fit       & fit a line / a nonlinear curve \\[3pt]
+\multicolumn{2}{@{}l}{\textit{\textnormal{plotting}}}\\
+plt.subplots(r, c)            & a grid of panels \\
+plt.imshow(D, vmin=, vmax=)   & look at a matrix; set limits by percentile \\
+plt.scatter(Y[:,0], Y[:,1])   & look at a 2-D embedding \\
+OffsetImage / AnnotationBbox  & draw images at their coordinates \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{6pt}
+\hrule
+\vspace{6pt}
+
+\subsection*{Answers}
+\small
+\begin{enumerate}
+\item \texttt{(4096,)}, \texttt{(120,)}, \texttt{(120,1)}. Use the third: it
+      broadcasts against \texttt{(120,4096)} to subtract each row's own mean.
+\item \texttt{np.argsort(S[7])[-2]} --- the last entry is stimulus 7 itself,
+      since nothing is more similar to it than itself.
+\item Only \texttt{A @ B} is legal, giving \texttt{(120, 10)}. The inner
+      dimensions must match.
+\item Cosine similarity 1 (identical direction); Euclidean distance 2. They
+      disagree because cosine ignores magnitude --- which is exactly why you
+      would ever choose one over the other.
+\item $120 \times 119 / 2 = 7{,}140$, via \texttt{np.triu\_indices(120, k=1)}.
+      Using the full matrix counts every pair twice and adds 120 meaningless
+      zeros from the diagonal.
+\item \texttt{linkage} wants the condensed form, not the square one. Pass
+      \texttt{squareform(D, checks=False)}.
+\item Whether the two $R^2$ values were computed against the same target. If
+      theirs was fitted to binned averages and yours to individual pairs, the
+      difference is mostly the binning, not the model.
+\item The 24 views of one object are not independent measurements, so the
+      effective sample size is nearer 51 than 1{,}224. Report the correlation
+      computed on the 51 object means.
+\item No. That is floating-point roundoff, around $10^{-17}$. Symmetrize with
+      \texttt{(D + D.T) / 2} and move on.
+\item \texttt{(X == 0).mean()}. Network activations are full of exact zeros
+      because of the \texttt{ReLU} nonlinearity, and a unit that is \emph{always}
+      zero has no variance --- which breaks any correlation computed with it.
+\end{enumerate}
+
+\end{document}

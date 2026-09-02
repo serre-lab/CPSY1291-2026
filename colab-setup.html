@@ -1,0 +1,37 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CPSY 1291 — Colab setup</title>
+<style>body{max-width:44rem;margin:2rem auto;padding:0 1rem;font:16px/1.55 Georgia,serif;color:#1E293B}
+h1,h2{font-family:Helvetica,Arial,sans-serif;color:#6B4F3A}code{background:#f4f1ec;padding:.1em .3em;border-radius:3px;font-size:.92em}
+li{margin:.45em 0}.note{background:#FFF6E0;border-left:4px solid #FFD98A;padding:.6em .9em}</style></head><body>
+<h1>Running the assignments on Google Colab</h1>
+<p>One-time setup, about five minutes. Do this before Assignment 1's first recitation.</p>
+<h2>1. Sign in with your Brown account</h2>
+<p>Open <a href="https://colab.research.google.com">colab.research.google.com</a> and make sure you are signed in as
+<code>your_name@brown.edu</code> — not a personal Gmail. Course notebooks, datasets, and shared folders are released to
+Brown accounts, and work done under a personal account cannot reach them.</p>
+<h2>2. Put the course data in your Drive</h2>
+<ol>
+<li>Open the shared <code>a1_data</code> folder from the link on Canvas.</li>
+<li>In your own Google Drive, create a folder named exactly <code>cpsy1291</code> in "My Drive".</li>
+<li>Right-click the shared <code>a1_data</code> folder &rarr; <em>Organize</em> &rarr; <em>Add shortcut</em>, and place the
+shortcut inside your <code>cpsy1291</code> folder. The notebooks look for
+<code>/content/drive/MyDrive/cpsy1291/a1_data</code>, and this is what makes that path exist.</li>
+</ol>
+<h2>3. Open a notebook and run it</h2>
+<ol>
+<li>From Canvas, open the assignment notebook and choose <em>File &rarr; Save a copy in Drive</em>. Work in your copy.</li>
+<li>Run the first cell. Colab will ask permission to mount your Drive — approve it with your Brown account.</li>
+<li>The setup cell prints what it loaded. If it says it cannot find the data, re-check step 2's folder names.</li>
+</ol>
+<div class="note"><strong>Two things that are normal, not broken:</strong> Part&nbsp;2's first cell upgrades scikit-learn
+and takes an extra half-minute on a fresh runtime — no restart needed. And Part&nbsp;4's t-SNE cell runs for several
+minutes; do not interrupt it.</div>
+<h2>4. Before you submit</h2>
+<p><em>Runtime &rarr; Restart session and run all</em>, wait for every cell to finish, then
+<em>File &rarr; Download &rarr; Download .ipynb</em>, keeping the exact filename. Submission details are at the bottom of
+each notebook.</p>
+<h2>Stuck?</h2>
+<p>Post on Ed in the assignment's category — setup questions are welcome there — or bring it to recitation
+(Tuesdays 6:30&ndash;7:50&nbsp;PM) or office hours (Wednesdays 1&nbsp;PM, Carney&nbsp;429).</p>
+</body></html>

@@ -1,0 +1,329 @@
+% CPSY 1291 -- Recitation handout 11
+% Compile:  latexmk -lualatex handout-11-attention-transformers-generative.tex
+\documentclass[11pt]{article}
+\usepackage{cpsy1291-handout}
+
+\begin{document}
+
+\handouthead{11}{Attention, transformers, and generative models}
+  {Three lectures of mechanics, in one session}
+  {Week 11 \ $\cdot$\ hold this after Lecture 18; Assignment 5 is due Tue 11/24}
+
+\section*{What this session is for}
+\addcontentsline{toc}{section}{What this session is for}
+
+This is the longest handout of the term and the last one about content, because
+the calendar leaves no alternative: Assignment 5 covers Lectures 15--18, it is
+due on Tuesday 11/24, Thanksgiving recess begins the day after, and the final
+exam is the first day back. So Lectures 16, 17 and 18 have to share one session.
+
+Read it in three passes rather than one. Section~1 (attention) is the part
+everything else depends on, and it is worth doing slowly with a pencil. Section~2
+(generation) is short. Section~3 (VAEs and diffusion) is two objectives, each of
+which is five lines of code once you have seen it written down.
+
+\begin{keybox}
+\ask{The one idea, and it covers all three lectures.} Every model here is
+built from the same two moves: compute a set of \emph{weights} that say how much
+each thing should contribute, and take a weighted average. Attention does it over
+positions in a sequence. A VAE does it over a distribution of latent codes.
+Diffusion does it over time steps of a noising process. The differences are in
+what is being averaged and what determines the weights.
+\end{keybox}
+
+\section{Attention}
+
+\subsection{Tokens are a matrix}
+
+A sequence of $T$ tokens, each embedded as a $d$-dimensional vector, is a matrix
+$\boldsymbol{X}$ of shape $(T, d)$. Everything in a transformer operates on that
+matrix. Note what has been given up compared to an RNN: there is no order in a
+matrix's rows unless you put it there, which is why positional encodings exist.
+
+\subsection{Q, K, V are three views of the same input}
+
+\begin{lstlisting}
+Q = X @ Wq        # (T, d_k)   what each position is looking for
+K = X @ Wk        # (T, d_k)   what each position offers
+V = X @ Wv        # (T, d_v)   what each position would contribute
+\end{lstlisting}
+
+All three are linear projections of the \emph{same} $\boldsymbol{X}$ --- that is
+what makes it \emph{self}-attention. The names are a retrieval metaphor: a query
+is matched against keys, and the matching keys' values are returned.
+
+\subsection{Scaled dot-product attention, in four lines}
+
+\[
+\mathrm{Attention}(\boldsymbol{Q},\boldsymbol{K},\boldsymbol{V})
+= \mathrm{softmax}\!\left(\frac{\boldsymbol{Q}\boldsymbol{K}^{\!\top}}{\sqrt{d_k}}\right)\boldsymbol{V}
+\]
+
+\begin{lstlisting}
+scores = Q @ K.transpose(-2, -1) / math.sqrt(d_k)    # (T, T)
+if mask is not None:
+    scores = scores.masked_fill(mask == 0, float('-inf'))
+A = torch.softmax(scores, dim=-1)                    # (T, T), rows sum to 1
+out = A @ V                                          # (T, d_v)
+\end{lstlisting}
+
+Track the shapes, because they are the whole thing:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Step & Shape & Meaning \\
+\midrule
+$\boldsymbol{Q}\boldsymbol{K}^{\!\top}$ & $(T, T)$ & every position against every position \\
+after softmax & $(T, T)$ & each \emph{row} is a distribution over positions \\
+$\boldsymbol{A}\boldsymbol{V}$ & $(T, d_v)$ & each position: a weighted average of all values \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keybox}
+\ask{Three details that are not decoration.}
+\textbf{The $\sqrt{d_k}$}: dot products of $d_k$-dimensional vectors grow like
+$\sqrt{d_k}$, and a softmax of large numbers saturates to a one-hot vector with
+almost no gradient. Remove it and training fails for large $d_k$.
+\textbf{\texttt{dim=-1}}: the softmax runs across \emph{keys}, so each row is a
+distribution over what to attend to. Softmax over the wrong axis produces
+nonsense that runs perfectly.
+\textbf{The mask is $-\infty$, not $0$}: it must be applied \emph{before} the
+softmax, because zeroing afterwards leaves rows that no longer sum to one.
+\end{keybox}
+
+\subsection{Multi-head, which is only a reshape}
+
+Split the $d$ dimensions into $H$ groups, run the same operation on each, and
+concatenate the results. It lets different heads attend to different things.
+
+\begin{lstlisting}
+# (N, T, d) -> (N, H, T, d//H)
+Q = Q.view(N, T, H, d // H).transpose(1, 2)
+# ... attention exactly as above, batched over the H axis ...
+out = out.transpose(1, 2).reshape(N, T, d)     # concatenate the heads back
+\end{lstlisting}
+
+The \texttt{transpose(1, 2)} before and after is the only subtle part. It puts
+the head axis next to the batch axis so that the matrix multiplies treat heads
+as independent problems.
+
+\subsection{Reading an attention map, carefully}
+
+The $(T, T)$ matrix $\boldsymbol{A}$ is tempting to plot and interpret. Three
+cautions, all of which have caused published overclaims:
+
+\begin{itemize}
+  \item There are $H$ heads per layer and many layers, so ``the attention map''
+        is a choice among dozens, and they disagree.
+  \item Attention weights are \emph{not} feature importances. A position can be
+        attended to heavily and contribute little, because what it contributes
+        is its \emph{value} vector, not itself.
+  \item The residual stream carries information around the attention block
+        entirely, so a position with zero attention is not disconnected.
+\end{itemize}
+
+\begin{keybox}
+\ask{The one-sentence version.} An attention map tells you where information was
+\emph{routed}, not what the model \emph{used}. Recitation 9's whole discipline
+applies here too.
+\end{keybox}
+
+\section{Autoregressive generation}
+
+Training a language model is next-token prediction with teacher forcing ---
+exactly the mechanism from Recitation 10, at scale. Generation is a loop:
+
+\begin{lstlisting}
+for _ in range(n_new):
+    logits = model(idx)[:, -1, :] / temperature      # last position only
+    if top_k is not None:
+        v, _ = torch.topk(logits, top_k)
+        logits[logits < v[:, [-1]]] = float('-inf')
+    probs = torch.softmax(logits, dim=-1)
+    nxt   = torch.multinomial(probs, num_samples=1)  # SAMPLE, do not argmax
+    idx   = torch.cat([idx, nxt], dim=1)
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Knob & What it does \\
+\midrule
+\texttt{temperature} $\to 0$ & approaches greedy: repetitive, often degenerate \\
+\texttt{temperature} $= 1$ & samples from the model's own distribution \\
+\texttt{temperature} $> 1$ & flatter, more surprising, less coherent \\
+\texttt{top\_k} & restricts to the $k$ most likely tokens before sampling \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keybox}
+\ask{Sampling is not a detail of the model.} Two very different outputs from the
+same weights differ only in these two numbers, so any claim about ``what the
+model does'' has to state them. A surprising fraction of published prompting
+results are partly results about a temperature setting.
+\end{keybox}
+
+A useful measurement, and one you can do on a laptop: \textbf{surprisal}, the
+negative log probability the model assigned to the token that actually occurred.
+It is the quantity that correlates with human reading times, which is the whole
+basis of using language models as models of language processing.
+
+\begin{lstlisting}
+logp = torch.log_softmax(model(idx).logits, dim=-1)
+surprisal = -logp[0, :-1].gather(1, idx[0, 1:, None]) / math.log(2)   # in bits
+\end{lstlisting}
+
+\section{Generative models, two objectives}
+
+\subsection{VAE: the reparameterization trick and the ELBO}
+
+The encoder outputs a \emph{distribution} over codes rather than a code. You
+cannot backpropagate through ``draw a sample'', so you rewrite the sample as a
+deterministic function of the parameters plus fixed noise:
+
+\[
+\boldsymbol{z} = \boldsymbol{\mu} + \boldsymbol{\sigma}\odot\boldsymbol{\varepsilon},
+\qquad \boldsymbol{\varepsilon}\sim\mathcal{N}(0, \boldsymbol{I}).
+\]
+
+Now the randomness sits in $\boldsymbol{\varepsilon}$, which needs no gradient,
+and $\boldsymbol{\mu}$ and $\boldsymbol{\sigma}$ are on the differentiable path.
+
+\begin{lstlisting}
+mu, logvar = encoder(x).chunk(2, dim=1)      # predict log-variance, not variance
+std = torch.exp(0.5 * logvar)
+z   = mu + std * torch.randn_like(std)       # the reparameterization trick
+xhat = decoder(z)
+
+recon = F.mse_loss(xhat, x, reduction='sum')
+kl    = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+loss  = recon + beta * kl
+\end{lstlisting}
+
+The network predicts \texttt{logvar} rather than the variance so that its output
+is unconstrained --- a variance must be positive, and $\exp$ enforces that for
+free. The two loss terms pull against each other: reconstruction wants codes
+that are distinct and informative, the KL wants them close to a standard normal
+so that the space is smooth and samplable. \texttt{beta} sets the exchange rate,
+and the whole character of the model follows from it.
+
+\begin{keybox}
+\ask{The failure mode with a name.} If the KL term dominates --- large
+\texttt{beta}, or a decoder powerful enough to reconstruct without help --- the
+encoder collapses to the prior, $\boldsymbol{\mu}\to0$ and
+$\boldsymbol{\sigma}\to1$, and the latent code carries \emph{nothing}. Samples
+still look fine because the decoder learned the data on its own. This is
+posterior collapse, and the diagnostic is to check whether the KL term goes to
+zero.
+\end{keybox}
+
+\subsection{Diffusion: one closed form and a five-line loss}
+
+Adding Gaussian noise repeatedly has a closed form, so you never simulate the
+forward process step by step:
+
+\[
+\boldsymbol{x}_t = \sqrt{\bar\alpha_t}\,\boldsymbol{x}_0 +
+\sqrt{1-\bar\alpha_t}\,\boldsymbol{\varepsilon}.
+\]
+
+That is the whole reason training is cheap: pick a random $t$, jump straight
+there, and ask the network to name the noise.
+
+\begin{lstlisting}
+t   = torch.randint(0, T, (x0.shape[0],))
+eps = torch.randn_like(x0)
+xt  = abar[t].sqrt()[:, None] * x0 + (1 - abar[t]).sqrt()[:, None] * eps
+loss = F.mse_loss(model(xt, t), eps)          # predict the noise you added
+\end{lstlisting}
+
+The training objective is a mean squared error. That is all it is. The
+complexity of diffusion models lives entirely in the \emph{sampling} loop, which
+runs the learned denoiser backwards many times, and in the architecture of the
+denoiser --- not in the loss.
+
+\section{Exercises}
+
+\ask{1.} You delete the $\sqrt{d_k}$ from scaled dot-product attention. Training
+works at $d_k = 8$ and fails at $d_k = 512$. Why?
+
+\ask{2.} You apply a causal mask by multiplying the attention weights by 0
+\emph{after} the softmax. What is wrong?
+
+\ask{3.} You take softmax over \texttt{dim=-2} instead of \texttt{dim=-1}. Does
+anything error? What does the model now compute?
+
+\ask{4.} A colleague shows an attention map and says it proves the model bases
+its answer on the word ``not''. Give two objections.
+
+\ask{5.} Generation at \texttt{temperature=0.1} produces the same sentence
+repeated forever. Explain in terms of the sampling loop.
+
+\ask{6.} Your VAE's KL term drops to almost zero within a few epochs, and
+reconstructions look good. What has happened, and is the model useful?
+
+\ask{7.} Diffusion training is a plain MSE. Where did all the complexity go?
+
+\subsection*{Answers}
+
+\ask{1.} Dot products of $d_k$-dimensional vectors have magnitude growing like
+$\sqrt{d_k}$. At $d_k = 512$ the unscaled scores are large, the softmax saturates
+to nearly one-hot, and its gradient is nearly zero, so nothing trains. At
+$d_k = 8$ the scores are small enough that it hardly matters.
+
+\ask{2.} The softmax has already distributed weight to the masked positions, so
+zeroing afterwards leaves rows that do not sum to one --- and the unmasked
+positions get less than their share. Mask with $-\infty$ \emph{before} the
+softmax.
+
+\ask{3.} Nothing errors: the matrix is $(T, T)$, so both axes are valid. You now
+normalize down the columns, so each row is no longer a distribution over
+positions and the output is a weighted combination with weights that do not sum
+to one. It trains, badly, with no diagnostic.
+
+\ask{4.} (i) There are many heads and many layers; ``the attention map'' is one
+choice among dozens that disagree. (ii) Attention weight is not importance --- a
+position contributes its \emph{value} vector, which may be near zero, and the
+residual stream carries information around the block regardless.
+
+\ask{5.} At low temperature the softmax is nearly one-hot, so sampling is
+effectively \texttt{argmax}. The model deterministically picks its most likely
+continuation, enters a state it has seen before, and cycles. Raising the
+temperature or using \texttt{top\_k} with sampling breaks the loop.
+
+\ask{6.} Posterior collapse: the encoder has matched the prior and the latent
+code carries no information, with the decoder reconstructing on its own. It is
+not useful as a \emph{representation} --- $\boldsymbol{z}$ tells you nothing about
+$\boldsymbol{x}$ --- even though samples may look fine. Lower \texttt{beta}, or
+weaken the decoder.
+
+\ask{7.} Into the sampling loop, which runs the learned denoiser backwards
+across many steps, and into the denoiser architecture. The training objective is
+genuinely just ``predict the noise you added'', which is why diffusion models are
+much easier to train than GANs.
+
+\section*{Cheat sheet}
+\addcontentsline{toc}{section}{Cheat sheet}
+
+\begin{center}
+\begin{tabular}{@{}p{0.44\textwidth}p{0.5\textwidth}@{}}
+\toprule
+\textbf{You want} & \textbf{You write} \\
+\midrule
+attention scores          & \texttt{Q @ K.transpose(-2,-1) / sqrt(d\_k)} \\
+a causal mask             & \texttt{masked\_fill(mask == 0, float('-inf'))} \emph{before} softmax \\
+the softmax axis          & \texttt{dim=-1} --- over keys, always \\
+split into heads          & \texttt{view(N,T,H,d//H).transpose(1,2)} \\
+sample a token            & \texttt{torch.multinomial(probs, 1)} --- not \texttt{argmax} \\
+surprisal in bits         & \texttt{-log\_softmax(...).gather(...) / log(2)} \\
+the reparameterization    & \texttt{mu + torch.exp(0.5*logvar) * randn\_like(mu)} \\
+the KL term               & \texttt{-0.5 * sum(1 + logvar - mu**2 - logvar.exp())} \\
+a diffusion training step & \texttt{mse\_loss(model(xt, t), eps)} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}

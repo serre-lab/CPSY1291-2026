@@ -1,0 +1,418 @@
+% CPSY 1291 -- Recitation handout 6
+% Compile:  latexmk -lualatex handout-06-heldout-data-and-images.tex
+\documentclass[11pt]{article}
+\usepackage{cpsy1291-handout}
+
+\begin{document}
+
+\handouthead{6}{Held-out data, and images through a network}
+  {Splits, overfitting curves, error bars --- and what a convolution actually does}
+  {Week 6 \ $\cdot$\ hold this after Lecture 10; Assignment 3 is due Tue 10/27}
+
+\section*{What this session is for}
+\addcontentsline{toc}{section}{What this session is for}
+
+This week carries two jobs, because the calendar leaves no room for a third
+session. The midterm is Thursday of next week and Recitation 7 is given over to
+it entirely, so everything Assignment 3 needs mechanically has to arrive here.
+
+\textbf{Part A} is the discipline of held-out data --- the three splits, the
+diagnostic plot of the whole course, and the small amount of probability needed
+to put an error bar on anything. It is the most transferable material in the
+term: it applies to a psychology experiment as directly as to a network.
+
+\textbf{Part B} is images. What a convolution computes, how to predict the shape
+that comes out of one, and why weight sharing is the whole reason vision models
+work. Lecture 11 covers the biology and the architecture; this covers the
+arithmetic, a few days early, so that the assignment is not blocked.
+
+\begin{keybox}
+\ask{The one idea.} A number computed on data your model has already seen is not
+a measurement of your model. It is a measurement of your model's memory. Every
+practice in Part A exists to keep those two things apart.
+\end{keybox}
+
+\part*{Part A --- Held-out data}
+\addcontentsline{toc}{section}{Part A --- Held-out data}
+
+\section{Three splits, three jobs}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Split & Used for & Seen by the model \\
+\midrule
+\textbf{training}   & fitting the parameters & constantly \\
+\textbf{validation} & choosing hyperparameters, early stopping & indirectly, many times \\
+\textbf{test}       & one final estimate of generalization & \emph{once}, at the very end \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The distinction between the second and third row is the one people get wrong.
+Validation data is not seen by the optimizer, but it \emph{is} seen by you ---
+every time you look at validation accuracy and change something, a little
+information leaks from the validation set into your model. Do that twenty times
+and validation accuracy is optimistic too.
+
+\begin{keybox}
+\ask{The cardinal rule.} The test set is looked at once, after every decision has
+been made. If you tune anything against the test set, you no longer have an
+estimate of generalization --- you have a training score with extra steps. This
+is the most common methodological error in student projects, in papers, and in
+industry.
+\end{keybox}
+
+\begin{lstlisting}
+from sklearn.model_selection import train_test_split
+
+Xtr, Xte, ytr, yte = train_test_split(
+    X, y, test_size=0.2, random_state=0, stratify=y)
+\end{lstlisting}
+
+\texttt{stratify=y} keeps the class proportions the same in both halves. Without
+it a small or imbalanced dataset can give a split whose test set is missing a
+class entirely, and the resulting accuracy is not comparable to anything.
+
+\subsection{When the data is small: cross-validation}
+
+Splitting off 20\% of 200 examples leaves a test set of 40, and an accuracy
+estimated from 40 examples has a standard error of several percentage points.
+Cross-validation reuses the data: split into $k$ folds, train on $k-1$, test on
+the held-out one, rotate, average.
+
+\begin{lstlisting}
+from sklearn.model_selection import cross_val_score
+scores = cross_val_score(clf, X, y, cv=5)
+print(f"{scores.mean():.3f} +/- {scores.std():.3f}")
+\end{lstlisting}
+
+Report the spread as well as the mean. A model scoring $0.72 \pm 0.02$ and one
+scoring $0.75 \pm 0.09$ are not distinguishable, and quoting only the means
+would say otherwise.
+
+\begin{keybox}
+\ask{The leak that hides here.} Any preprocessing fitted on the data --- scaling,
+PCA, feature selection --- must be fitted \emph{inside} each fold, on the training
+part only. Fit PCA on all your data and then cross-validate and every fold's
+``held-out'' data has already influenced the features. The scores go up. They are
+wrong. Use \texttt{sklearn.pipeline.Pipeline}, which does this correctly by
+construction.
+\end{keybox}
+
+\section{The diagnostic plot of the course}
+
+Plot training error and validation error against something that increases model
+capacity --- epochs, hidden units, parameters --- on the same axes. Four shapes,
+four diagnoses:
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+What you see & What it means \\
+\midrule
+both high, both flat & \textbf{underfitting} --- too little capacity, or too small an $\eta$ \\
+train falls, val follows & healthy; keep going \\
+train $\to 0$, val turns up & \textbf{overfitting} --- stop at the val minimum \\
+train high, val \emph{lower} & a bug: leakage, or a mismatched split \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{lstlisting}
+plt.plot(train_acc, label='train')
+plt.plot(val_acc,  label='validation')
+plt.legend()
+\end{lstlisting}
+
+\begin{keybox}
+\ask{Overfitting is really about too few examples.} A model with a million
+parameters is not overfitting because a million is a large number --- it is
+overfitting because it has more freedom than the data constrains. The same
+model on ten times the data may not overfit at all. Whenever you are tempted to
+say ``the model is too big'', check whether you mean ``the dataset is too small''.
+\end{keybox}
+
+\section{Double descent, plotted honestly}
+
+The classical picture says test error follows a U as capacity grows: it falls,
+then rises once the model can memorize. That picture is incomplete. Keep
+growing the model past the point where it fits the training data exactly --- the
+\textbf{interpolation threshold} --- and test error frequently falls again, often
+below the bottom of the U.
+
+\begin{lstlisting}
+plt.plot(widths, test_err, 'o-')
+plt.xscale('log')            # you cannot see it on a linear axis
+plt.axvline(w_interp, ls=':')
+\end{lstlisting}
+
+Two practical notes, both of which decide whether you see the effect at all:
+
+\begin{itemize}
+  \item \textbf{Use a log $x$-axis.} The interesting widths span orders of
+        magnitude, and on a linear axis the entire first descent is compressed
+        against the origin.
+  \item \textbf{The peak is at the interpolation threshold}, roughly where the
+        number of parameters matches the number of training examples --- so you
+        have to sweep widths that bracket it. Sample too coarsely and you get a
+        curve that merely looks noisy.
+\end{itemize}
+
+\begin{keybox}
+\ask{What double descent does and does not claim.} It says the classical
+capacity--generalization bargain is not the whole story, and that ``bigger
+overfits more'' is false past a point. It does \emph{not} say overfitting is
+imaginary, and it does not license training without a validation set.
+\end{keybox}
+
+\section{Enough probability to put an error bar on things}
+
+\subsection{Four definitions}
+
+A \textbf{random variable} is a quantity whose value depends on chance --- a
+network's test accuracy, given a random initialization. Its
+\textbf{expectation} $\mathbb{E}[X]$ is its long-run average, and its
+\textbf{variance} $\mathrm{Var}[X] = \mathbb{E}[(X - \mathbb{E}[X])^2]$ is how
+much it typically departs from that average. The \textbf{standard deviation} is
+$\sqrt{\mathrm{Var}[X]}$, and lives in the same units as $X$.
+
+\subsection{The fact everything rests on}
+
+If you draw $n$ independent samples with standard deviation $\sigma$ and take
+their mean, that \emph{mean} has standard deviation $\sigma/\sqrt{n}$ --- the
+\textbf{standard error}.
+
+\begin{lstlisting}
+acc = np.array([run(seed) for seed in range(10)])
+print(f"{acc.mean():.3f} +/- {acc.std(ddof=1)/np.sqrt(len(acc)):.3f}")
+\end{lstlisting}
+
+\begin{keybox}
+\ask{Standard deviation or standard error?} They answer different questions.
+The \textbf{standard deviation} says how much a single run varies --- report it
+when the question is ``how reliable is this architecture?''. The \textbf{standard
+error} says how well you know the average --- report it when the question is
+``is this mean different from that one?''. Label your error bars. An unlabeled
+error bar is uninterpretable, and roughly half of them in the literature are.
+\end{keybox}
+
+The $\sqrt{n}$ is also why quadrupling your seeds only halves your error bar. If
+a difference is not visible with 10 seeds, 40 will rarely rescue it.
+
+\subsection{Which \texttt{n} is it?}
+
+The commonest error is counting the wrong things. Ten training runs of one
+architecture give $n = 10$ \emph{runs}, not $n = 10{,}000$ test images. Runs are
+what varied; the images were held fixed. Ask what you would have to redo to get
+another independent number --- that is your $n$.
+
+\part*{Part B --- Images through a network}
+\addcontentsline{toc}{section}{Part B --- Images through a network}
+
+\section{An image is a tensor}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Object & Shape & Note \\
+\midrule
+one grayscale image & $(H, W)$ & \\
+one color image     & $(3, H, W)$ & channels \textbf{first} in PyTorch \\
+a batch             & $(N, 3, H, W)$ & ``NCHW'' \\
+a conv layer's weights & $(C_{\text{out}}, C_{\text{in}}, k, k)$ & $C_\text{out}$ filters \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Pretrained models were trained on inputs normalized per channel, and expect the
+same normalization at test time. For torchvision's ImageNet models that is mean
+$(0.485, 0.456, 0.406)$ and standard deviation $(0.229, 0.224, 0.225)$. Skip it
+and the model still produces numbers; they are simply not comparable to
+anything published.
+
+\section{Convolution is template matching, repeated}
+
+A convolutional layer holds a small filter --- say $3\times3\times C_{\text{in}}$
+--- and slides it over the image. At every position it computes a dot product
+between the filter and the patch underneath. So each output pixel is the answer
+to ``how well does the pattern in this filter match the image \emph{here}?''
+
+Everything from Recitation 4 applies unchanged: the response is
+$\|\boldsymbol{w}\|\|\boldsymbol{x}\|\cos\theta$ at each location, the optimal
+patch is the filter itself, and this is why the first layer's filters can be
+displayed as images and recognized as edge detectors.
+
+\subsection{Weight sharing, and the number that justifies it}
+
+The same filter is used at every position. Compare the parameter counts for one
+layer mapping a $224 \times 224 \times 3$ image to 64 feature maps:
+
+\begin{center}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Fully connected, to 64 outputs & $224 \cdot 224 \cdot 3 \cdot 64 \approx 9.6$ million \\
+Convolutional, $11 \times 11$, 64 filters & $11 \cdot 11 \cdot 3 \cdot 64 = 23{,}232$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Four hundred times fewer parameters, and --- more importantly --- the built-in
+assumption that a feature worth detecting in one part of the image is worth
+detecting everywhere. That assumption is a claim about vision, and it is
+approximately true, which is why it works.
+
+\subsection{The output-size formula}
+
+For an input of size $H$, filter size $k$, padding $p$, stride $s$:
+
+\[
+H_{\text{out}} \;=\; \left\lfloor \frac{H - k + 2p}{s} \right\rfloor + 1 .
+\]
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Setting & Effect & Common choice \\
+\midrule
+$p = (k-1)/2$, $s=1$ & size unchanged & ``same'' padding, odd $k$ \\
+$s = 2$ & halves the size & downsampling inside the conv \\
+max-pool $2\times2$ & halves the size & downsampling as its own layer \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{lstlisting}
+conv = nn.Conv2d(in_channels=3, out_channels=64, kernel_size=3, padding=1)
+conv(torch.zeros(1, 3, 32, 32)).shape     # (1, 64, 32, 32)  -- check by running
+\end{lstlisting}
+
+\begin{keybox}
+\ask{Do not compute this in your head.} Build the layer, push a tensor of zeros
+of the right shape through it, and print the result. It takes one line and it is
+never wrong, whereas the formula in your head frequently is.
+\end{keybox}
+
+\subsection{One block: conv $\to$ ReLU $\to$ pool}
+
+\begin{lstlisting}
+block = nn.Sequential(
+    nn.Conv2d(3, 32, 3, padding=1),   # template matching
+    nn.ReLU(),                        # keep the matches, discard the mismatches
+    nn.MaxPool2d(2),                  # tolerate small shifts; halve the size
+)
+\end{lstlisting}
+
+This is the unit every convolutional network repeats, and it maps onto the
+simple-cell/complex-cell story from Lecture 11: selectivity from the
+convolution, tolerance from the pooling. Stacking blocks makes the receptive
+field of a unit grow with depth --- which is why deep units respond to large,
+complicated things and early units respond to edges.
+
+\section{Getting the activations out of the middle of a network}
+
+For most of what you will do, the simplest approach is enough: run the part of
+the model you want.
+
+\begin{lstlisting}
+net = torchvision.models.alexnet(weights='DEFAULT').eval()
+with torch.no_grad():
+    feats = net.features[:5](x)        # everything up to layer 5
+feats.shape
+\end{lstlisting}
+
+When the layer you want is not a prefix --- or when the model's \texttt{forward}
+does something slicing cannot reproduce --- register a \textbf{forward hook}, a
+function the layer calls with its own output:
+
+\begin{lstlisting}
+store = {}
+def grab(name):
+    def hook(module, inp, out):  store[name] = out.detach()
+    return hook
+
+h = net.features[8].register_forward_hook(grab('conv4'))
+with torch.no_grad():
+    net(x)
+h.remove()                             # always remove it afterwards
+store['conv4'].shape
+\end{lstlisting}
+
+Hooks come back properly in Recitation 9. For now: \texttt{.detach()} or you keep
+the whole graph, and \texttt{.remove()} or the hook fires on every subsequent
+forward pass and quietly overwrites your data.
+
+\section{Exercises}
+
+\ask{1.} You tune the number of hidden units by trying eight values and keeping
+the one with the best test accuracy, then report that accuracy. What have you
+actually measured?
+
+\ask{2.} You run PCA on your whole dataset, then use \texttt{cross\_val\_score}
+on the components. Why are your scores too high?
+
+\ask{3.} Training accuracy is 0.61 and validation accuracy is 0.74. Name the
+most likely cause. (It is not that your model generalizes unusually well.)
+
+\ask{4.} Ten seeds give a mean accuracy of 0.82 with a standard deviation of
+0.06. What is the standard error? How many seeds would you need to halve it?
+
+\ask{5.} \texttt{nn.Conv2d(3, 16, kernel\_size=5, padding=2, stride=1)} applied
+to a $(8, 3, 64, 64)$ batch. Output shape? Number of parameters?
+
+\ask{6.} Your test-error-vs-width curve looks like meaningless noise with no U
+and no second descent. Give two things about how you plotted it that could
+cause that.
+
+\subsection*{Answers}
+
+\ask{1.} The best of eight noisy numbers, which is biased upward --- you used the
+test set as a validation set. You have measured how well the best of eight
+models fits data you selected it on. The honest procedure: choose the width on a
+validation set, then evaluate that single model once on test.
+
+\ask{2.} PCA fitted on all the data has already seen every fold's held-out
+portion, so the ``held-out'' data influenced the features being scored. Fit the
+PCA inside each fold --- \texttt{Pipeline} does this for you.
+
+\ask{3.} A bug. Most often the split is mismatched (validation is easier, or
+smaller and unstratified), or there is leakage, or dropout is on during training
+and off during evaluation and you are comparing the two regimes. Real
+generalization does not exceed training performance.
+
+\ask{4.} $0.06/\sqrt{10} \approx 0.019$. Halving it needs four times as many
+seeds --- 40 --- because the standard error falls as $1/\sqrt{n}$.
+
+\ask{5.} $H_{\text{out}} = (64 - 5 + 4)/1 + 1 = 64$, so $(8, 16, 64, 64)$.
+Parameters: $16 \cdot 3 \cdot 5 \cdot 5 + 16 = 1{,}216$.
+
+\ask{6.} (i) A linear $x$-axis, which compresses the whole first descent against
+the origin --- use \texttt{xscale('log')}. (ii) Widths sampled too coarsely to
+bracket the interpolation threshold, so the peak falls between two of your
+points. Also acceptable: a single seed per width, so the curve is dominated by
+initialization noise.
+
+\section*{Cheat sheet}
+\addcontentsline{toc}{section}{Cheat sheet}
+
+\begin{center}
+\begin{tabular}{@{}p{0.44\textwidth}p{0.5\textwidth}@{}}
+\toprule
+\textbf{You want} & \textbf{You write} \\
+\midrule
+a split that keeps class balance   & \texttt{train\_test\_split(..., stratify=y)} \\
+$k$-fold scores                    & \texttt{cross\_val\_score(clf, X, y, cv=5)} \\
+no leakage in a fold               & \texttt{Pipeline([('pca', PCA()), ('clf', ...)])} \\
+the overfitting plot               & \texttt{plt.plot(train); plt.plot(val)} \\
+a double-descent curve             & \texttt{plt.plot(widths, err); plt.xscale('log')} \\
+standard error of a mean           & \texttt{a.std(ddof=1) / np.sqrt(len(a))} \\
+a conv layer                       & \texttt{nn.Conv2d(c\_in, c\_out, k, padding=p)} \\
+its output shape                   & push \texttt{torch.zeros(1, c, h, w)} through it \\
+one vision block                   & \texttt{Conv2d $\to$ ReLU $\to$ MaxPool2d(2)} \\
+activations from a prefix          & \texttt{net.features[:5](x)} \\
+activations from anywhere          & \texttt{register\_forward\_hook} (then \texttt{.remove()}) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}

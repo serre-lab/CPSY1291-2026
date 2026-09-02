@@ -1,0 +1,384 @@
+% CPSY 1291 -- Recitation handout 5
+% Compile:  latexmk -lualatex handout-05-pytorch-training-loop.tex
+\documentclass[11pt]{article}
+\usepackage{cpsy1291-handout}
+
+\begin{document}
+
+\handouthead{5}{PyTorch: tensors, autograd, and the training loop}
+  {The five lines that train every network in this course}
+  {Week 5 \ $\cdot$\ hold this after Lecture 8; Assignment 2 is due Tue 10/13}
+
+\section*{What this session is for}
+\addcontentsline{toc}{section}{What this session is for}
+
+Last week you derived a learning rule by hand and checked it numerically. This
+week you hand that job to a library.
+
+You will not be asked to write a training loop from scratch in this course. You
+\emph{will} be asked to read one, modify one, and diagnose one that is not
+working --- and to know which of its lines are doing something and which are
+ceremony. That is the whole of this session.
+
+\begin{keybox}
+\ask{The one idea.} PyTorch is NumPy that \emph{remembers what you did to it}. Every
+operation on a tensor is recorded, so when you finally produce one number --- the
+loss --- the library can replay the recording backwards and hand you the
+derivative with respect to every parameter that took part. That replay is
+\texttt{loss.backward()}, and it is the only thing PyTorch does that NumPy
+cannot.
+\end{keybox}
+
+\section{Tensors}
+
+A tensor is an array. Almost every NumPy habit transfers: indexing, slicing,
+\texttt{.shape}, broadcasting, \texttt{axis=} (spelled \texttt{dim=}).
+
+\begin{lstlisting}
+import torch
+
+x = torch.tensor([[1., 2.], [3., 4.]])   # from a Python list
+x = torch.from_numpy(arr).float()        # from a NumPy array -- note .float()
+x.numpy()                                # and back again
+x.shape                                  # torch.Size([2, 2])
+x.mean(dim=0)                            # 'axis' is spelled 'dim'
+\end{lstlisting}
+
+\subsection{The dtype trap}
+
+NumPy defaults to \texttt{float64}. PyTorch defaults to \texttt{float32} and
+most layers refuse anything else. So converted arrays need an explicit cast:
+
+\begin{lstlisting}
+X = torch.tensor(X_np, dtype=torch.float32)      # do this
+\end{lstlisting}
+
+\begin{keybox}
+\ask{The error you will get, and what it really means.}
+\texttt{RuntimeError: expected scalar type Float but found Double}. ``Double''
+is \texttt{float64}, i.e.\ a NumPy array that came across without a cast. It is
+never a bug in your model.
+\end{keybox}
+
+A second dtype rule: classification \emph{targets} must be \texttt{long}
+(integers), not floats, and they are class indices --- $0,1,2$ --- not one-hot
+vectors.
+
+\subsection{Batch first, always}
+
+Every layer in PyTorch expects the first dimension to be the batch. A single
+example still needs that dimension:
+
+\begin{lstlisting}
+x.shape             # (784,)      one image -- layers will reject this
+x[None].shape       # (1, 784)    now it is a batch of one
+\end{lstlisting}
+
+The corresponding shapes for the data you will meet this term:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Data & Shape & Read as \\
+\midrule
+tabular / flattened & $(N, D)$ & $N$ examples, $D$ features \\
+images & $(N, C, H, W)$ & $N$ images, $C$ channels, height, width \\
+sequences & $(N, T, D)$ & $N$ sequences, $T$ steps, $D$ features \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Note that images are \textbf{channels-first} in PyTorch and channels-\emph{last}
+in matplotlib. \texttt{plt.imshow} on a $(3, 64, 64)$ tensor fails; you need
+\texttt{img.permute(1, 2, 0)}.
+
+\section{Autograd in three lines}
+
+\begin{lstlisting}
+w = torch.tensor([2.0], requires_grad=True)
+loss = (w ** 2).sum()      # a graph is being recorded
+loss.backward()            # replay it backwards
+w.grad                     # tensor([4.])   -- d(w^2)/dw = 2w = 4
+\end{lstlisting}
+
+Three facts that explain most autograd confusion:
+
+\begin{enumerate}
+  \item \textbf{Gradients accumulate.} \texttt{.grad} is \emph{added} to, not
+        replaced, on every \texttt{backward()}. This is deliberate --- it lets you
+        sum gradients over several batches --- but it means you must call
+        \texttt{opt.zero\_grad()} each step or you are descending on the sum of
+        every gradient since the program started. Forget it and the loss
+        typically diverges after a few epochs.
+  \item \textbf{\texttt{backward()} only works from a scalar.} The loss must be
+        one number. If it is not, you forgot a \texttt{.mean()} or a
+        \texttt{.sum()}.
+  \item \textbf{The graph is freed after the backward pass.} Calling
+        \texttt{backward()} twice on the same loss raises an error. That error
+        almost always means you built the loss outside the loop.
+\end{enumerate}
+
+\begin{keybox}
+\ask{\texttt{torch.no\_grad()}.} Inside this block nothing is recorded. Use it
+whenever you are evaluating rather than training --- computing validation
+accuracy, extracting features from a pretrained network, plotting. It is faster
+and it uses far less memory, and forgetting it is the usual reason a script runs
+out of memory during evaluation but not during training.
+\end{keybox}
+
+\section{Building a model}
+
+\subsection{\texttt{nn.Linear} is the neuron layer from lecture}
+
+\texttt{nn.Linear(in\_features, out\_features)} computes
+$\boldsymbol{x}\boldsymbol{W}^{\!\top} + \boldsymbol{b}$ --- a whole layer of the
+units you studied last week, in one object. Its \texttt{weight} attribute has
+shape \texttt{(out, in)}, which is the transpose of what you might expect; that
+is a convention, and reading it wrong is a common source of confusion when you
+inspect a trained model.
+
+\begin{lstlisting}
+import torch.nn as nn
+
+model = nn.Sequential(
+    nn.Linear(64, 16),      # 64 inputs -> 16 hidden units
+    nn.ReLU(),
+    nn.Linear(16, 10),      # 16 -> 10 class scores
+)
+sum(p.numel() for p in model.parameters())     # count the parameters
+\end{lstlisting}
+
+\texttt{nn.Sequential} is enough for everything in Assignment 2. Note that
+\texttt{ReLU} is a layer here, sitting \emph{between} the linear layers ---
+without it the whole stack collapses to a single linear map, which is exactly
+the point Lecture 8 makes about why depth needs nonlinearity.
+
+\subsection{The output layer, and the trap}
+
+The last layer emits \textbf{logits} --- raw, unbounded scores, one per class.
+They are not probabilities and they are not meant to be.
+
+\begin{keybox}
+\ask{Never put a ReLU or a softmax after your final layer if you are using
+\texttt{nn.CrossEntropyLoss}.} That loss applies \texttt{log\_softmax}
+internally. Applying softmax yourself first applies it twice and the model
+trains badly for reasons nothing will report. Applying \emph{ReLU} first is
+worse: it clamps every negative logit to zero, so the model can no longer
+express ``this class is unlikely'' at all. Both are silent. Both are common in
+code found online.
+\end{keybox}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Task & Loss & Final layer emits \\
+\midrule
+regression & \texttt{nn.MSELoss()} & one number per target, no activation \\
+classification & \texttt{nn.CrossEntropyLoss()} & raw logits, no activation \\
+binary, if you must & \texttt{nn.BCEWithLogitsLoss()} & one raw logit \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{The training loop}
+
+Here it is, complete. Read it as five jobs, not as eleven lines.
+
+\begin{lstlisting}
+model = nn.Sequential(nn.Linear(64, 16), nn.ReLU(), nn.Linear(16, 10))
+lossfn = nn.CrossEntropyLoss()
+opt    = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+for epoch in range(200):
+    model.train()
+    opt.zero_grad()               # 1. forget last step's gradients
+    out  = model(Xtr)             # 2. forward: predictions
+    loss = lossfn(out, ytr)       # 3. how wrong are we?
+    loss.backward()               # 4. gradient of loss w.r.t. every parameter
+    opt.step()                    # 5. take one step downhill
+
+    if epoch % 20 == 0:
+        model.eval()
+        with torch.no_grad():
+            acc = (model(Xte).argmax(1) == yte).float().mean()
+        print(f"{epoch:4d}  loss {loss.item():.4f}  test acc {acc:.3f}")
+\end{lstlisting}
+
+\begin{itemize}
+  \item \texttt{opt.zero\_grad()} --- because gradients accumulate.
+  \item \texttt{loss.backward()} --- the replay from the box on page 1.
+  \item \texttt{opt.step()} --- \emph{this} is the line that changes the weights.
+        Steps 1--4 only compute; nothing moves until here.
+  \item \texttt{.item()} --- pulls a Python float out of a one-element tensor.
+        Printing the tensor itself works but drags the whole graph along.
+  \item \texttt{model.train()} / \texttt{model.eval()} --- switches the behavior
+        of dropout and batch-norm layers. Harmless with the model above; a real
+        bug the moment you use either, and free to write, so write it.
+\end{itemize}
+
+\subsection{SGD or Adam?}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+& \texttt{SGD} & \texttt{Adam} \\
+\midrule
+is & the update you derived last week & a per-parameter adaptive step \\
+typical \texttt{lr} & $10^{-2}$ to $10^{-1}$ & $10^{-3}$ \\
+use when & you want to see the rule work & you want it to just train \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The learning rates are not interchangeable. Adam's default of $10^{-3}$ given to
+SGD trains imperceptibly slowly; SGD's $10^{-1}$ given to Adam usually diverges.
+When someone says a network ``did not learn'', the first question is which
+optimizer, and the second is what learning rate.
+
+\subsection{Reproducibility}
+
+\begin{lstlisting}
+torch.manual_seed(0)      # weight init, shuffling, dropout
+\end{lstlisting}
+
+Same caveat as Recitation 3, and it is worth repeating in this new setting:
+seeding makes a run \emph{reproducible}, not \emph{meaningful}. A claim about an
+architecture needs several seeds, because weight initialization is random and
+the loss surface is not a bowl.
+
+\section{Using a pretrained network}
+
+You will spend more of this course \emph{reading} networks than training them.
+
+\begin{lstlisting}
+import torchvision
+net = torchvision.models.alexnet(weights='DEFAULT')
+net.eval()                                   # not training: turn off train mode
+
+W = net.features[0].weight.detach().numpy()  # (64, 3, 11, 11)
+\end{lstlisting}
+
+\texttt{.detach()} removes the tensor from the autograd graph so it can become a
+NumPy array; without it you get an error telling you to call it. The shape reads
+as: 64 filters, each with 3 color channels, each $11\times11$ pixels. To display
+one, move the channel dimension last and rescale to $[0,1]$:
+
+\begin{lstlisting}
+f = W[10].transpose(1, 2, 0)
+plt.imshow((f - f.min()) / np.ptp(f))
+\end{lstlisting}
+
+Pretrained vision models expect their inputs normalized the way they were
+trained --- a specific per-channel mean and standard deviation. Skip that step
+and the filters still respond, but the numbers are not comparable to anything
+published. Whenever you feed a pretrained model your own images, find the
+normalization it was trained with and apply it.
+
+\section{When it does not learn}
+
+Work down this list in order. It is ordered by how often each one is the answer.
+
+\begin{enumerate}
+  \item \textbf{Is the loss going down at all?} Print it every epoch, on a log
+        axis. ``Flat'' and ``slow'' look identical on a linear axis.
+  \item \textbf{Did you call \texttt{opt.zero\_grad()}?} Symptom: the loss falls
+        for a few epochs, then explodes.
+  \item \textbf{Learning rate.} Try $\times 10$ and $\div 10$ before anything
+        else. This fixes more cases than every other item combined.
+  \item \textbf{Are the targets the right dtype and shape?} Class indices as
+        \texttt{long}, shape $(N,)$ --- not one-hot, not $(N,1)$.
+  \item \textbf{Is there a nonlinearity between the linear layers?} Without one
+        the model is linear regardless of depth, and will plateau exactly where
+        a linear model plateaus.
+  \item \textbf{Did you apply softmax or ReLU to the logits?} Silent, and it
+        halves your accuracy.
+  \item \textbf{Can it overfit 10 examples?} Train on a tiny subset and try to
+        drive the loss to zero. If it cannot, the bug is in the model or the
+        loss. If it can, the model works and the problem is the data or the
+        amount of training.
+\end{enumerate}
+
+\begin{keybox}
+\ask{Item 7 is the one to remember.} ``Can it memorize a handful of examples?''
+separates a broken pipeline from a hard problem in about thirty seconds, and it
+is the first thing an experienced person does. A model that cannot overfit ten
+points will never generalize from ten thousand.
+\end{keybox}
+
+\section{Exercises}
+
+\ask{1.} You write \texttt{model(X)} and get \texttt{expected scalar type Float
+but found Double}. What did you do, and what is the fix?
+
+\ask{2.} Your loss decreases for 5 epochs, then grows without bound and reaches
+\texttt{nan}. Give the two most likely causes and how to tell them apart.
+
+\ask{3.} A classmate's classifier ends with
+\texttt{nn.Linear(16, 10)} followed by \texttt{nn.ReLU()}, trained with
+\texttt{nn.CrossEntropyLoss}. It reaches 60\% where yours reaches 95\%. Explain
+what the ReLU did.
+
+\ask{4.} \texttt{nn.Sequential(nn.Linear(64,16), nn.Linear(16,10))}. How many
+parameters, and what function class can this model express?
+
+\ask{5.} You extract features from a pretrained network inside a
+\texttt{for} loop over 5,000 images and run out of memory. One line fixes it.
+Which?
+
+\ask{6.} Your model gets 100\% training accuracy on 10 examples and 12\% test
+accuracy on 10,000. Is the pipeline broken?
+
+\subsection*{Answers}
+
+\ask{1.} You passed a NumPy \texttt{float64} array (or a tensor built from one)
+into a layer expecting \texttt{float32}. Fix:
+\texttt{torch.tensor(X, dtype=torch.float32)}.
+
+\ask{2.} (i) A missing \texttt{opt.zero\_grad()}, so gradients accumulate and
+each step grows; (ii) a learning rate too large. Tell them apart by fixing
+\texttt{zero\_grad} first --- if it still diverges, the learning rate is the
+cause. A missing \texttt{zero\_grad} typically shows a few good epochs first;
+too large a learning rate usually misbehaves from the start.
+
+\ask{3.} \texttt{CrossEntropyLoss} expects raw logits. ReLU clamps every
+negative logit to zero, so the model can no longer express ``this class is
+unlikely'' --- all the evidence \emph{against} a class is destroyed, leaving only
+evidence for. Nothing errors.
+
+\ask{4.} $(64{\times}16 + 16) + (16{\times}10 + 10) = 1{,}040 + 170 = 1{,}210$
+parameters. With no nonlinearity between them it can express exactly the linear
+maps from $\mathbb{R}^{64}$ to $\mathbb{R}^{10}$ --- the same class as a single
+\texttt{nn.Linear(64, 10)}, with more parameters and no more power.
+
+\ask{5.} Wrap the loop in \texttt{with torch.no\_grad():}. Without it, PyTorch
+keeps the graph for all 5,000 forward passes.
+
+\ask{6.} No --- that is the expected outcome of the overfit-ten-examples check,
+and it tells you the model and loss are wired correctly. It says nothing about
+generalization, which is a separate question and the subject of next week.
+
+\section*{Cheat sheet}
+\addcontentsline{toc}{section}{Cheat sheet}
+
+\begin{center}
+\begin{tabular}{@{}p{0.44\textwidth}p{0.5\textwidth}@{}}
+\toprule
+\textbf{You want} & \textbf{You write} \\
+\midrule
+NumPy $\rightarrow$ tensor             & \texttt{torch.tensor(a, dtype=torch.float32)} \\
+tensor $\rightarrow$ NumPy             & \texttt{t.detach().numpy()} \\
+add a batch dimension                  & \texttt{x[None]} \\
+image for \texttt{imshow}              & \texttt{img.permute(1, 2, 0)} \\
+a small MLP                            & \texttt{nn.Sequential(nn.Linear(..), nn.ReLU(), ..)} \\
+count parameters                       & \texttt{sum(p.numel() for p in m.parameters())} \\
+one training step                      & \texttt{zero\_grad; forward; loss; backward; step} \\
+evaluate without recording             & \texttt{with torch.no\_grad():} \\
+predicted class                        & \texttt{out.argmax(1)} \\
+a Python float from a tensor           & \texttt{loss.item()} \\
+a pretrained network                   & \texttt{torchvision.models.alexnet(weights='DEFAULT')} \\
+same run twice                         & \texttt{torch.manual\_seed(0)} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}

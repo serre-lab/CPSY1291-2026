@@ -1,0 +1,289 @@
+% CPSY 1291 -- Recitation handout 10
+% Compile:  latexmk -lualatex handout-10-sequences-recurrence-dynamics.tex
+\documentclass[11pt]{article}
+\usepackage{cpsy1291-handout}
+
+\begin{document}
+
+\handouthead{10}{Sequences, recurrence, and dynamics}
+  {Unrolling, vanishing gradients, fixed points, and a Hopfield network in fifteen lines}
+  {Week 10 \ $\cdot$\ hold this after Lecture 15; Assignment 5 is due Tue 11/24}
+
+\section*{What this session is for}
+\addcontentsline{toc}{section}{What this session is for}
+
+Two lectures, one object. Lecture 14 treats a recurrent network as a machine
+that processes sequences; Lecture 15 treats the same equations as a
+\emph{dynamical system} with fixed points and basins of attraction. They are the
+same object viewed from two directions, and the second view is what lets you
+reverse-engineer a trained network instead of merely evaluating it.
+
+This session is the code for both, plus the two things that reliably go wrong:
+shapes, and gradients that vanish.
+
+\begin{keybox}
+\ask{The one idea.} A recurrent network is a \emph{map} $\boldsymbol{h} \mapsto
+f(\boldsymbol{h}, \boldsymbol{x})$ applied over and over. Everything else
+follows from that: training difficulties come from differentiating a long
+composition of that map, and memory comes from the map having states it does not
+leave.
+\end{keybox}
+
+\section{Shapes, before anything else}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Object & Shape & Note \\
+\midrule
+a batch of sequences & $(N, T, D)$ & with \texttt{batch\_first=True} \\
+the same, PyTorch default & $(T, N, D)$ & the default is \emph{not} batch-first \\
+hidden state & $(\text{layers}, N, H)$ & note: batch is in the middle, always \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keybox}
+\ask{Always pass \texttt{batch\_first=True}} to \texttt{nn.RNN},
+\texttt{nn.LSTM}, and \texttt{nn.GRU}, and note that the hidden state ignores it
+--- $h$ is $(\text{layers}, N, H)$ either way. That inconsistency is the single
+most common source of silent shape bugs in recurrent code. It is silent because
+$(T, N, D)$ and $(N, T, D)$ have the same number of elements, so nothing errors
+when $T$ and $N$ happen to be compatible; you simply train on transposed data.
+\end{keybox}
+
+\section{A recurrent cell, by hand}
+
+\[
+\boldsymbol{h}_t = \tanh(\boldsymbol{W}_{hh}\boldsymbol{h}_{t-1} +
+\boldsymbol{W}_{xh}\boldsymbol{x}_t + \boldsymbol{b})
+\]
+
+\begin{lstlisting}
+class RNNCell(nn.Module):
+    def __init__(self, d_in, d_hid):
+        super().__init__()
+        self.Wxh = nn.Linear(d_in, d_hid)
+        self.Whh = nn.Linear(d_hid, d_hid, bias=False)
+
+    def forward(self, x, h):
+        return torch.tanh(self.Wxh(x) + self.Whh(h))
+
+h = torch.zeros(N, d_hid)
+for t in range(T):
+    h = cell(X[:, t], h)          # the SAME weights at every step
+\end{lstlisting}
+
+Two things to notice in that loop. The weights do not change with $t$ --- that is
+\textbf{weight sharing across time}, the temporal analogue of a convolution's
+weight sharing across space, and it is what lets one network handle sequences of
+any length. And the loop builds a graph $T$ layers deep: \textbf{unrolling}. An
+RNN run for 50 steps is a 50-layer feedforward network whose layers happen to be
+identical.
+
+\subsection{The library version}
+
+\begin{lstlisting}
+rnn = nn.LSTM(input_size=D, hidden_size=H, num_layers=1, batch_first=True)
+out, (h_n, c_n) = rnn(X)          # out: (N, T, H)   h_n: (1, N, H)
+\end{lstlisting}
+
+\texttt{out} holds the hidden state at \emph{every} step; \texttt{h\_n} holds only
+the last one. Which you want depends on the task: classifying a whole sequence
+uses \texttt{h\_n} (or a pooled \texttt{out}); labeling every step uses
+\texttt{out}.
+
+\section{Why gradients vanish, and how to see it}
+
+Differentiating a loss at step $T$ with respect to a weight at step $1$ requires
+the chain rule through every intervening step, which produces a \emph{product} of
+$T$ Jacobians. Products of many numbers below 1 go to zero; products of numbers
+above 1 explode. That is the whole phenomenon.
+
+\begin{lstlisting}
+loss.backward()
+for t, h in enumerate(hidden_states):
+    print(t, h.grad.norm().item())      # requires h.retain_grad() beforehand
+\end{lstlisting}
+
+Plot those norms against $t$ on a log axis. A clean exponential decay backwards
+in time is the vanishing gradient made visible, and it is worth seeing once ---
+it converts a piece of received wisdom into an observation.
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Problem & What you do about it \\
+\midrule
+exploding & \texttt{clip\_grad\_norm\_(model.parameters(), 1.0)} --- reliable, one line \\
+vanishing & gating: LSTM or GRU. Clipping does not help \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Gating} works because the cell state passes through an \emph{addition}
+rather than a repeated multiplication, so the gradient has a path back through
+time that is not a long product. That is the mechanism; the three gates are the
+bookkeeping around it.
+
+\subsection{Teacher forcing}
+
+When training a model to generate a sequence, you can feed back either the
+model's own output or the true previous token. Feeding the truth is
+\textbf{teacher forcing}: it trains far faster and more stably, and it creates a
+mismatch --- at generation time the model sees its own outputs, including its own
+mistakes, which it never saw during training. Errors then compound. This is worth
+knowing before Lecture 17, where the same trick trains every language model.
+
+\section{The same equations as a dynamical system}
+
+Set the input to a constant and the update becomes a map from
+$\boldsymbol{h}$ to $\boldsymbol{h}$. Iterate it and ask where it goes.
+
+\subsection{Finding fixed points numerically}
+
+A \textbf{fixed point} satisfies $\boldsymbol{h}^* = f(\boldsymbol{h}^*)$. Find
+them by minimizing $q(\boldsymbol{h}) = \tfrac12\|f(\boldsymbol{h}) -
+\boldsymbol{h}\|^2$ from many random starting points:
+
+\begin{lstlisting}
+h = torch.randn(200, H, requires_grad=True)       # 200 starting points at once
+opt = torch.optim.Adam([h], lr=0.01)
+for _ in range(2000):
+    opt.zero_grad()
+    q = 0.5 * ((cell(x_const, h) - h) ** 2).sum(1)
+    q.sum().backward()
+    opt.step()
+found = h[q.detach() < 1e-8]                      # keep the ones that converged
+\end{lstlisting}
+
+This is the standard method for reverse-engineering a trained RNN, and it is
+short because autograd does the work. Starting from many points matters: a
+network can have several fixed points, and each one has its own basin.
+
+\subsection{Stable or unstable?}
+
+Linearize at a fixed point --- take the Jacobian $\boldsymbol{J} = \partial
+f/\partial\boldsymbol{h}$ evaluated there --- and look at its eigenvalues.
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+All $|\lambda| < 1$ & \textbf{stable}: nearby states fall in. A memory \\
+Some $|\lambda| > 1$ & \textbf{unstable} in those directions: a saddle \\
+One $|\lambda| \approx 1$ & a \textbf{line attractor}: the state drifts freely along it \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The third row is the interesting one for neuroscience: a direction that neither
+decays nor grows is a way to hold a continuous quantity, which is how a network
+integrates evidence or holds a value in working memory.
+
+\begin{lstlisting}
+J = torch.autograd.functional.jacobian(lambda h: cell(x_const, h), h_star)
+np.abs(np.linalg.eigvals(J.numpy()))
+\end{lstlisting}
+
+\section{A Hopfield network in fifteen lines}
+
+The clearest case of a network whose memories \emph{are} its attractors.
+
+\begin{lstlisting}
+def store(patterns):                       # patterns: (P, n) of +/-1
+    W = patterns.T @ patterns / len(patterns)      # Hebbian outer product
+    np.fill_diagonal(W, 0)                         # no self-connections
+    return W
+
+def recall(W, s, steps=20, rng=np.random.default_rng(0)):
+    s = s.copy()
+    for _ in range(steps):
+        for i in rng.permutation(len(s)):          # asynchronous update
+            s[i] = 1 if W[i] @ s >= 0 else -1
+    return s
+
+def energy(W, s):
+    return -0.5 * s @ W @ s
+\end{lstlisting}
+
+Three points to check by running it. Recall \textbf{monotonically decreases the
+energy}, which is why it converges rather than cycling --- and asynchronous
+updating is required for that guarantee. The \textbf{capacity} is about
+$0.14n$ patterns for $n$ units; store more and recall returns blends. And the
+\textbf{negation} of every stored pattern is also a fixed point, which falls
+straight out of the symmetry of the update rule.
+
+\section{Exercises}
+
+\ask{1.} You pass $(N, T, D)$ data to \texttt{nn.LSTM} without
+\texttt{batch\_first=True}. Nothing errors. What is the model learning?
+
+\ask{2.} Your RNN trains fine on sequences of length 10 and not at all on
+sequences of length 200. Name the mechanism, and the architectural fix.
+
+\ask{3.} Gradient clipping at 1.0 does not help a network whose loss is flat
+from epoch 1. Why not?
+
+\ask{4.} You find 40 candidate fixed points from 200 random starts, but 160 of
+them have $q > 10^{-3}$. What are those 160, and should you report them?
+
+\ask{5.} A trained RNN has a fixed point whose Jacobian has one eigenvalue at
+$0.999$ and the rest below $0.6$. What is the network doing?
+
+\ask{6.} A Hopfield network with 100 units is given 30 patterns to store. What
+happens on recall, and why?
+
+\subsection*{Answers}
+
+\ask{1.} It reads your batch dimension as time and your time dimension as batch:
+each ``sequence'' is one time step across $N$ different examples. It trains, it
+produces a loss, and it is learning nothing about temporal structure. Nothing
+errors because both layouts contain the same number of elements.
+
+\ask{2.} Vanishing gradients: the gradient from step 200 back to step 1 is a
+product of 200 Jacobians. Fix: gating --- an LSTM or GRU --- because the cell state
+passes through an addition rather than a repeated multiplication.
+
+\ask{3.} Clipping bounds gradients from above; it does nothing to gradients that
+are too small. A flat loss from the start is vanishing gradients, a dead
+nonlinearity, or a learning rate far too small --- none of which clipping
+addresses.
+
+\ask{4.} They are starting points that did not converge --- the optimizer was
+still descending, or it was heading toward a region with no fixed point. Discard
+them, and report both numbers: ``40 fixed points found from 200 random
+initializations''. Reporting only the 40 hides how thoroughly you searched.
+
+\ask{5.} It has a \textbf{line attractor}: one direction along which the state
+neither decays nor grows, and every other direction contracting onto it. That is
+how a network holds a continuous quantity --- integrating evidence, or
+maintaining a value in working memory.
+
+\ask{6.} Capacity is about $0.14 \times 100 = 14$ patterns, so 30 is roughly
+double it. Recall converges to spurious states --- blends and mixtures of stored
+patterns --- rather than to the patterns themselves, and the failure gets worse
+the more you store.
+
+\section*{Cheat sheet}
+\addcontentsline{toc}{section}{Cheat sheet}
+
+\begin{center}
+\begin{tabular}{@{}p{0.44\textwidth}p{0.5\textwidth}@{}}
+\toprule
+\textbf{You want} & \textbf{You write} \\
+\midrule
+sequences shaped how you think     & \texttt{nn.LSTM(..., batch\_first=True)} \\
+every step's hidden state          & \texttt{out, \_ = rnn(X)} $\rightarrow$ \texttt{(N, T, H)} \\
+only the last                      & \texttt{\_, (h\_n, \_) = rnn(X)} $\rightarrow$ \texttt{(1, N, H)} \\
+to stop exploding gradients        & \texttt{clip\_grad\_norm\_(m.parameters(), 1.0)} \\
+to stop vanishing gradients        & use gating; clipping will not help \\
+gradient norms through time        & \texttt{h.retain\_grad()}, then \texttt{h.grad.norm()} \\
+fixed points                       & minimize $\tfrac12\|f(h)-h\|^2$ from many starts \\
+stability at a fixed point         & eigenvalues of the Jacobian; $|\lambda|<1$ is stable \\
+a Hopfield weight matrix           & \texttt{P.T @ P / len(P)}, zero the diagonal \\
+Hopfield capacity                  & about $0.14n$ patterns \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}

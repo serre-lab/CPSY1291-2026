@@ -1,0 +1,370 @@
+% CPSY 1291 -- Recitation handout 12
+% Compile:  latexmk -lualatex handout-12-final-review.tex
+\documentclass[11pt]{article}
+\usepackage{cpsy1291-handout}
+
+\begin{document}
+
+\handouthead{12}{Final exam review}
+  {Lectures 9--19, in eight pages and sixteen problems}
+  {Week 12 \ $\cdot$\ the exam is in class, Tue 12/1 --- the first day back from recess}
+
+\section*{How to use this}
+\addcontentsline{toc}{section}{How to use this}
+
+\hl{The exam is Tuesday 12/1, the first day back from Thanksgiving recess.}
+This session is held before recess because there is no session between recess and
+the exam. Plan accordingly.
+
+The exam covers Lectures 9--19. Read Section~1 first --- it is those eleven
+lectures compressed into the statements you should be able to make without notes
+--- then close it and do Section~2.
+
+\begin{keybox}
+\ask{The shape of the second half of this course.} Lectures 1--8 built machinery.
+Lectures 9--19 spend it on one repeated question: \emph{does this model tell us
+anything about the brain, and how would we know?} Almost every lecture presents
+a method for answering that, then presents a reason the method is not enough.
+Both halves are examinable, and the second half is where the marks are.
+\end{keybox}
+
+\section{Lectures 9--19, compressed}
+
+\subsection{L09 --- Generalization}
+
+Training error and test error are different quantities, and only the second one
+is a measurement of the model. Three splits, three jobs; the test set is opened
+once.
+
+The \textbf{classical bargain}: more capacity lowers training error and
+eventually raises test error --- the U-shaped curve. \textbf{Bias--variance}
+decomposes the error into what the model class cannot express and how much its
+answer moves with the sample.
+
+Classical theory breaks in three places, and each is examinable. Networks fit
+\textbf{random labels} perfectly (Zhang et al.), so capacity-based bounds cannot
+explain why they generalize. \textbf{Double descent}: past the interpolation
+threshold, test error falls again. \textbf{Grokking}: generalization can appear
+long after training error reaches zero.
+
+\textbf{Compositional generalization} --- systematically recombining known parts
+--- is something humans do easily and networks do poorly. \textbf{Shortcut
+learning}: a model solves the task using a feature that happens to correlate with
+the label in your data --- texture rather than shape, a watermark rather than a
+diagnosis --- and fails out of distribution. This is the recurring failure of the
+second half of the course.
+
+\subsection{L10 --- Autoencoders and sparse coding}
+
+An autoencoder compresses and reconstructs, and is trained on its own input, so
+it needs no labels. A \textbf{linear autoencoder with tied weights, trained on
+centered data, recovers the PCA subspace} --- not necessarily the individual
+components, but the space they span. Add nonlinearity and it can beat PCA,
+because it can follow a curved manifold.
+
+\textbf{Sparse coding} (Olshausen \& Field): reconstruct natural image patches
+using as few active units as possible. The learned dictionary is
+oriented, localized, bandpass --- Gabor-like, and quantitatively similar to V1
+simple-cell receptive fields. This is the course's cleanest example of a
+\emph{normative} explanation: a computational objective, not a mechanism,
+predicting the biology.
+
+\textbf{Efficient coding} is the reason to expect this: natural images are
+redundant, and a code that removes redundancy under a cost constraint is forced
+toward these filters. \textbf{Sparse autoencoders} apply the same idea to a
+trained network's activations to extract more monosemantic features, which is
+the current interpretability workhorse.
+
+\subsection{L11 --- The visual system and CNNs}
+
+The ventral stream --- retina, LGN, V1, V2, V4, IT --- is a hierarchy of
+increasing receptive-field size, increasing complexity of preferred features, and
+increasing tolerance to position and size. \textbf{Core object recognition} is
+the behavior to explain: fast, accurate identification despite enormous image
+variation.
+
+Center-surround in retina and LGN; \textbf{orientation-tuned} simple cells in V1,
+well described by Gabors; complex cells with the same orientation preference and
+more position tolerance. \textbf{HMAX} stacks that: selectivity from
+template-matching, invariance from max-pooling.
+
+A CNN's convolution is template matching with \textbf{weight sharing}; pooling
+gives tolerance; depth grows receptive fields. Task-optimized CNNs were the first
+models to predict IT responses well --- and models can now be used to
+\emph{control} neurons via synthesized images, which is a stronger test than
+prediction.
+
+But: \textbf{texture bias} (CNNs classify by texture where humans use shape),
+brittle out-of-distribution behavior, and a scorecard of human signatures most
+CNNs do not reproduce.
+
+\subsection{L12 --- RSA, model--brain comparison, and decoding}
+
+Two systems have no shared coordinates, so compare \emph{geometry}. An RDM
+discards units and keeps pairwise dissimilarity; RSA is the (Spearman)
+correlation between two RDMs. Interpretation requires a \textbf{noise ceiling}
+and a null obtained by \textbf{permuting stimuli}.
+
+The \textbf{mapping hypothesis}: a model layer corresponds to a brain area if a
+(usually linear) map from the model's units predicts held-out responses.
+Alternatives: RSA, CKA, regression-based scores, and Brain-Score as a
+standardized aggregate. \textbf{The metrics disagree}, high scores can be
+engineered, and at scale many models score alike --- so a single number is weak
+evidence.
+
+\textbf{Decoding} (MVPA) asks what can be read out of a population. A decoder is
+a cross-validated classifier; chance depends on the class balance; decodability
+does not establish that the organism uses the information. An SVM maximizes the
+margin, and regularization ($C$) matters most when features outnumber examples,
+which is the normal case.
+
+\subsection{L13 --- Explainability}
+
+Two families. \textbf{Attribution} --- saliency (gradient of a logit with respect
+to the input), Grad-CAM (feature-map level) --- is fast and fragile, and can
+survive randomizing the model's weights, which means it was showing the image
+rather than the model. \textbf{Synthesis} --- feature visualization by optimizing
+an input --- requires strong regularization to produce anything interpretable, so
+the picture is partly a statement about the prior you chose.
+
+\textbf{Maximally-activating patches} are the oldest and often most informative
+method; \textbf{Network Dissection} quantifies it against labeled concepts.
+Units are frequently \textbf{polysemantic}, which motivates sparse-autoencoder
+features. Meaning generally lives in \emph{directions} in activation space rather
+than in single neurons. Attribution can catch shortcut learning, which is its
+clearest scientific use.
+
+\subsection{L14--L15 --- Recurrence and dynamics}
+
+An RNN carries a state: $\boldsymbol{h}_t = g(\boldsymbol{W}_{hh}\boldsymbol{h}_{t-1}
++ \boldsymbol{W}_{xh}\boldsymbol{x}_t)$, with weights shared across time.
+Unrolled, it is a deep feedforward network. BPTT differentiates through the
+unrolled graph, producing a \emph{product} of Jacobians --- hence vanishing and
+exploding gradients. Clipping fixes exploding; \textbf{gating} (LSTM, GRU) fixes
+vanishing, because the cell state passes through an addition.
+
+Viewed as a dynamical system, the same network has \textbf{fixed points}. Stable
+ones are point attractors: discrete memories and decisions. A near-unity
+eigenvalue gives a \textbf{line attractor}: continuous integration and working
+memory. Trained RNNs are reverse-engineered by finding fixed points numerically
+and linearizing.
+
+\textbf{Hopfield networks} store patterns via a Hebbian outer product, recall by
+descending an energy function, and hold about $0.14n$ patterns before spurious
+blends dominate. Energy-based models generalize this, and connect forward to
+diffusion. The brain is not feedforward: recurrent circuit models (e.g.\ the
+hGRU) solve tasks like Pathfinder where feedforward networks of comparable size
+fail.
+
+\subsection{L16 --- Attention and the transformer}
+
+Self-attention: $\mathrm{softmax}(\boldsymbol{Q}\boldsymbol{K}^{\!\top}/\sqrt{d_k})\boldsymbol{V}$,
+with $\boldsymbol{Q},\boldsymbol{K},\boldsymbol{V}$ all linear projections of the
+same input. Every position sees every other in one step --- no long product of
+Jacobians, and it parallelizes --- at the cost of $O(T^2)$ and of losing order,
+which positional encodings restore. Multi-head is a reshape. A block is
+attention $+$ MLP with residual connections and LayerNorm. \textbf{ViTs} treat
+image patches as tokens. Attention maps show routing, not importance.
+
+\subsection{L17 --- LLMs, scaling, and self-supervision}
+
+Next-token prediction, trained with \textbf{teacher forcing}. Generation samples
+from the predicted distribution; temperature and top-$k$ change the output
+substantially with the weights fixed. \textbf{Scaling laws}: loss falls as a
+power law in parameters, data and compute; Chinchilla showed models were badly
+under-trained relative to their size. \textbf{In-context learning} and
+\textbf{emergent abilities} are claimed; part of the emergence literature is
+sensitive to the choice of metric, and the exam may ask you to say why.
+
+\textbf{Self-supervised learning} makes the data label itself. Two families:
+\textbf{contrastive} (SimCLR, InfoNCE --- augmentations of one image attract, other
+images repel) and \textbf{masked prediction} (BERT, MAE --- hide part of the input
+and predict it). Both learn representations that transfer, without labels, which
+matters for biology because the brain has no labeled dataset.
+
+\subsection{L18 --- Generative models}
+
+\textbf{VAE}: an encoder outputs a distribution; the reparameterization trick
+makes sampling differentiable; the ELBO is reconstruction plus a KL to the prior.
+Latent directions are meaningful and steerable, and VAE latents have been related
+to IT face-patch coding.
+
+\textbf{GAN}: generator versus discriminator, a minimax game. Sharp samples,
+unstable training, mode collapse. Latent directions found in a GAN can be used as
+psychological instruments --- GANalyze finds a memorability direction.
+
+\textbf{Diffusion}: add noise with a closed-form forward process, learn to
+predict the noise, sample by denoising repeatedly. The training objective is a
+mean squared error; the complexity is in sampling.
+
+\subsection{L19 --- World models and frontiers}
+
+A \textbf{world model} is an internal model of environmental dynamics that
+supports prediction and mental simulation. Whether next-step prediction alone
+builds a coherent one is open --- the taxi-map result suggests it often does not.
+Evidence for mental simulation in primates; recurrent models learn simulation
+where feedforward ones do not.
+
+Three limits of current AI: out-of-distribution robustness and shortcut learning;
+visual and abstract reasoning; data efficiency. And the question the course
+closes on: \emph{does better AI mean better models of biology?} The trend is
+worrying --- as benchmark performance rises, brain-predictivity has not kept
+pace --- and the proposed diagnosis is to compare \emph{strategies} rather than
+outputs (ClickMe, harmonization, data diets, better objectives).
+
+\section{Problems}
+
+\ask{1.} A network reaches 100\% training accuracy on randomly shuffled labels.
+Why does this undermine capacity-based explanations of generalization?
+
+\ask{2.} Sketch a double-descent curve. Mark the interpolation threshold and say
+what is true of the model there.
+
+\ask{3.} A classifier reaches 94\% on a held-out test set and 41\% on
+photographs taken in a different hospital. Name the phenomenon and one method
+from L13 that could have caught it in advance.
+
+\ask{4.} Why does a linear autoencoder with tied weights recover the PCA
+subspace, and why is ``the PCA subspace'' the right phrasing rather than ``the
+principal components''?
+
+\ask{5.} Sparse coding on natural images produces Gabor-like filters. Explain in
+two sentences why this is evidence about V1 rather than a coincidence.
+
+\ask{6.} What does max-pooling buy, what does it cost, and which cortical cell
+type is it usually likened to?
+
+\ask{7.} A model scores 0.42 by RSA against IT. Give the two numbers you need
+before this means anything, and say how each is obtained.
+
+\ask{8.} Explain why permuting the entries of an RDM's upper triangle produces a
+null distribution that is too narrow.
+
+\ask{9.} You randomize a network's weights and its saliency map is unchanged.
+What follows?
+
+\ask{10.} An RNN trains on sequences of length 20 and fails at length 300.
+Name the mechanism, and say why gradient clipping does not fix it.
+
+\ask{11.} A trained RNN has a fixed point with one Jacobian eigenvalue at 1.00
+and the rest near 0.3. What computation does this support, and give a task that
+would need it.
+
+\ask{12.} Why is the $\sqrt{d_k}$ in scaled dot-product attention necessary, and
+what fails without it?
+
+\ask{13.} A colleague shows an attention map and claims it explains the model's
+answer. Give two objections.
+
+\ask{14.} Teacher forcing makes training faster and creates a problem. State the
+problem.
+
+\ask{15.} Explain posterior collapse in a VAE, and give the one-line diagnostic.
+
+\ask{16.} State the closing question of L19 and the evidence that makes it
+worrying.
+
+\subsection*{Answers}
+
+\ask{1.} If a network can fit arbitrary labels, its capacity is sufficient to
+memorize the training set outright --- so capacity cannot be what prevents it from
+memorizing when the labels are real. Whatever explains generalization must
+therefore involve the data, the optimizer, or the architecture's inductive bias,
+not the parameter count.
+
+\ask{2.} Test error falls, rises to a peak at the interpolation threshold, then
+falls again. At the threshold the model has just enough capacity to fit the
+training data exactly --- roughly, parameters $\approx$ training examples --- and
+the fit is maximally constrained and unstable.
+
+\ask{3.} Shortcut learning: the model used a feature that correlates with the
+label in the training hospital (scanner, marking, preprocessing) rather than the
+pathology. Attribution --- a saliency or Grad-CAM map --- would show the model
+attending to a region that could not carry the diagnosis.
+
+\ask{4.} Minimizing squared reconstruction error through a $k$-dimensional
+linear bottleneck is exactly the problem PCA solves, so the optimum spans the top
+$k$ principal directions. It recovers the \emph{subspace} rather than the
+components because any rotation within that subspace reconstructs equally well ---
+nothing in the objective orders or aligns the axes.
+
+\ask{5.} The filters were not fitted to neural data: they fall out of an
+objective (reconstruct natural images with few active units) applied to natural
+images alone, and they then match measured V1 receptive fields quantitatively.
+That makes it a normative explanation --- the biology is what you would expect if
+V1 were solving that problem --- rather than a curve fit.
+
+\ask{6.} It buys tolerance to small shifts (and reduces spatial resolution
+cheaply); it costs position information, which later layers cannot recover. It is
+likened to the complex cell, which shares its simple cells' orientation
+preference but responds across a range of positions.
+
+\ask{7.} The \textbf{noise ceiling}, from a split-half correlation of the neural
+RDMs, which bounds what any model could achieve; and a \textbf{null distribution}
+from permuting stimulus labels and reindexing rows and columns together, which
+says what chance looks like.
+
+\ask{8.} The upper-triangle entries are not exchangeable --- they are generated by
+$n$ stimuli, so moving one stimulus moves an entire row and column together.
+Permuting entries independently destroys that structure and produces nulls far
+more disordered than any real relabeling, so the null spread is too small and
+every observed score looks extreme.
+
+\ask{9.} The map is determined by the input image and the architecture, not by
+anything the model learned. Any claim it supported about the trained model's
+strategy is unsupported; the figure is evidence about edges.
+
+\ask{10.} Vanishing gradients: BPTT over 300 steps multiplies 300 Jacobians, and
+the product decays exponentially. Clipping bounds gradients from \emph{above} and
+does nothing for gradients that are too small; the fix is gating, which routes
+the cell state through an addition.
+
+\ask{11.} A line attractor --- a direction in state space that neither decays nor
+grows, with everything else contracting onto it. It supports integrating evidence
+or holding a continuous value: perceptual decision-making with accumulated
+evidence, or maintaining eye position or a remembered angle.
+
+\ask{12.} Dot products of $d_k$-dimensional vectors grow like $\sqrt{d_k}$, so
+without the scaling the softmax argument becomes large, the softmax saturates to
+nearly one-hot, and its gradient nearly vanishes. Training then fails for large
+$d_k$ while appearing fine for small $d_k$.
+
+\ask{13.} (i) There are many heads and many layers, and their maps disagree, so
+``the'' map is a selected one. (ii) Attention weight is not importance --- what a
+position contributes is its value vector, and the residual stream carries
+information around the attention block regardless.
+
+\ask{14.} Exposure bias: during training the model always sees ground-truth
+history, but at generation time it sees its own outputs, including its own
+errors, which it was never trained to recover from. Errors compound over a
+sequence.
+
+\ask{15.} The KL term drives the encoder to match the prior, so
+$\boldsymbol{\mu}\to0$, $\boldsymbol{\sigma}\to1$, and the latent code carries no
+information about the input while a strong decoder reconstructs anyway.
+Diagnostic: the KL term goes to (near) zero during training.
+
+\ask{16.} Does better AI mean better models of biology? The worry is that as
+benchmark performance has risen, brain-predictivity has not risen with it, and at
+scale many quite different models score alike --- so the standard scores no longer
+discriminate. The proposed response is to compare strategies rather than outputs.
+
+\section*{The night before}
+\addcontentsline{toc}{section}{The night before}
+
+Eight things worth being able to state cold:
+
+\begin{enumerate}
+  \item the three splits, and what the random-labels result rules out;
+  \item why sparse coding predicting V1 is a \emph{normative} explanation;
+  \item selectivity from convolution, tolerance from pooling --- and the cortical
+        analogue of each;
+  \item the noise ceiling and the stimulus permutation, and what each is for;
+  \item why a saliency map that survives weight randomization is worthless;
+  \item vanishing gradients as a product, and why gating and not clipping fixes
+        it;
+  \item what a line attractor is, and one task that needs one;
+  \item what an attention map does and does not show.
+\end{enumerate}
+
+\end{document}

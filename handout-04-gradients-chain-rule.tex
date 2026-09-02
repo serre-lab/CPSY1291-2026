@@ -1,0 +1,421 @@
+% CPSY 1291 -- Recitation handout 4
+% Compile:  latexmk -lualatex handout-04-gradients-chain-rule.tex
+\documentclass[11pt]{article}
+\usepackage{cpsy1291-handout}
+
+\begin{document}
+
+\handouthead{4}{One neuron, and the calculus of learning}
+  {Angles, gratings, derivatives, gradients, and the chain rule}
+  {Week 4 \ $\cdot$\ hold this after Lecture 6; Assignment 2 is due Tue 10/13}
+
+\section*{What this session is for}
+\addcontentsline{toc}{section}{What this session is for}
+
+Assignment 2 is about what a single neuron computes and how it learns. Two
+things it assumes are not taught in lecture, and this is where you get them.
+
+\textbf{Part A} is geometry: the dot product written as
+$\|\boldsymbol{w}\|\|\boldsymbol{x}\|\cos\theta$, angles in radians, and how to
+build a sinusoidal grating --- the stimulus used to measure orientation tuning in
+real visual cortex and, in the assignment, in a network.
+
+\textbf{Part B} is calculus: derivatives, partial derivatives, the gradient, the
+chain rule, and gradient descent. Every learning rule in this course is one
+line of calculus applied to an error. Once you can differentiate a squared
+error, the delta rule stops being something to memorize and becomes something
+you can rederive on the exam in thirty seconds.
+
+If you have had a calculus course, Part B is revision and you can skim it. If
+you have not, read it slowly --- it is written for you, and nothing beyond it is
+required all term.
+
+\begin{keybox}
+\ask{The one idea.} A derivative answers exactly one question: \emph{if I nudge
+this input a little, how much does the output move, and in which direction?}
+Everything else --- gradients, backpropagation, the whole training loop --- is that
+question asked about more variables at once.
+\end{keybox}
+
+\part*{Part A --- The geometry of one neuron}
+\addcontentsline{toc}{section}{Part A --- The geometry of one neuron}
+
+\section{The dot product, written two ways}
+
+A linear neuron computes $a = \boldsymbol{w}\cdot\boldsymbol{x} + b$. The same
+quantity can be written
+
+\[
+\boldsymbol{w}\cdot\boldsymbol{x} \;=\; \sum_i w_i x_i
+\qquad\text{and}\qquad
+\boldsymbol{w}\cdot\boldsymbol{x} \;=\; \|\boldsymbol{w}\|\,\|\boldsymbol{x}\|\,\cos\theta .
+\]
+
+The first tells you how to compute it. The second tells you what it \emph{means},
+and it separates the response into two independent causes:
+
+\begin{itemize}
+  \item $\|\boldsymbol{x}\|$ --- how strong the input is (its contrast, its
+        overall firing rate);
+  \item $\cos\theta$ --- how well its \emph{pattern} matches the neuron's
+        preferred pattern.
+\end{itemize}
+
+\begin{keybox}
+\ask{Why this matters.} A unit can respond strongly either because the stimulus
+matched its preference or because the stimulus was simply intense. Those are
+different scientific claims. Normalizing every stimulus to unit length removes
+the second cause, and then the response is $\|\boldsymbol{w}\|\cos\theta$ --- a
+pure measure of pattern match.
+\end{keybox}
+
+\begin{lstlisting}
+xn = x / np.linalg.norm(x)                 # unit length: intensity removed
+cos = (w @ xn) / np.linalg.norm(w)         # in [-1, 1]
+theta_deg = np.degrees(np.arccos(np.clip(cos, -1, 1)))
+\end{lstlisting}
+
+The \texttt{np.clip} is not paranoia. Floating point returns things like
+$1.0000000000000002$, and \texttt{arccos} of that is \texttt{nan}.
+
+\subsection{Which stimulus drives a unit hardest?}
+
+Among all inputs of a fixed length, the response
+$\|\boldsymbol{w}\|\|\boldsymbol{x}\|\cos\theta$ is largest when $\cos\theta=1$
+--- that is, when $\boldsymbol{x}$ points in the same direction as
+$\boldsymbol{w}$. \textbf{The optimal stimulus for a linear unit is its own
+weight vector.} This is why plotting a unit's weights as an image is a
+meaningful thing to do, and it is the entire basis for calling the first layer
+of a network ``Gabor-like''.
+
+\section{Radians, degrees, and gratings}
+
+\subsection{Angles}
+
+NumPy's trigonometric functions take \textbf{radians}. A full turn is $2\pi$
+radians, $180^\circ = \pi$ radians.
+
+\begin{lstlisting}
+np.deg2rad(45)      # 0.7853...   use these two functions and never
+np.rad2deg(np.pi)   # 180.0       convert by hand
+\end{lstlisting}
+
+Orientation, unlike direction, is defined modulo $180^\circ$: a bar tilted at
+$10^\circ$ and one at $190^\circ$ are the same bar. When you average or compare
+preferred orientations, work modulo $180$, or a unit preferring $175^\circ$ and
+one preferring $5^\circ$ will look maximally different when they are
+$10^\circ$ apart.
+
+\subsection{A sinusoidal grating in four lines}
+
+A grating is a stripe pattern: brightness varying as a sine wave along one
+direction. It has an orientation $\theta$, a spatial frequency $f$ (stripes per
+image), and a phase $\varphi$ (where the stripes sit).
+
+\begin{lstlisting}
+def grating(size=11, theta=0.0, freq=2.0, phase=0.0):
+    y, x = np.mgrid[0:size, 0:size] / size          # coordinates in [0, 1)
+    proj = x * np.cos(theta) + y * np.sin(theta)    # distance along theta
+    return np.sin(2 * np.pi * freq * proj + phase)
+\end{lstlisting}
+
+The middle line is the idea: project each pixel's position onto the direction
+$\theta$, then make brightness a sine of that projection. Everything
+perpendicular to $\theta$ has the same projection, which is why the stripes come
+out parallel.
+
+\subsection{Tuning curves, and the number to report}
+
+A \textbf{tuning curve} is a unit's response plotted against a stimulus
+parameter. Measure it by sweeping the parameter and recording the response.
+
+Phase is a nuisance parameter: a unit that likes vertical stripes may respond
+strongly to one phase and weakly to its opposite, purely because the light and
+dark bars swapped. The standard fix is to average over several phases at each
+orientation, which is what makes the curve about orientation and not about
+where the stripes happened to land.
+
+The usual summary of how sharp a tuning curve is:
+
+\begin{keybox}
+\ask{Half-width at half-maximum (HWHM).} Find the peak. Find the two
+orientations either side where the response has fallen to halfway between the
+peak and the baseline. Half the distance between them is the bandwidth. Smaller
+means more sharply tuned. Macaque V1 simple cells sit near $23^\circ$.
+\end{keybox}
+
+\part*{Part B --- The calculus of learning}
+\addcontentsline{toc}{section}{Part B --- The calculus of learning}
+
+\section{A derivative is a slope}
+
+$f'(x)$ --- also written $\dfrac{df}{dx}$ --- is the slope of $f$ at $x$: how much
+$f$ changes per unit change in $x$.
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+$f(x)$ & $f'(x)$ & where you meet it \\
+\midrule
+$c$ (a constant)      & $0$                & biases that are not being trained \\
+$x$                   & $1$                & everywhere \\
+$x^2$                 & $2x$               & squared error \\
+$e^{x}$               & $e^{x}$            & exponentials, softmax \\
+$\log x$              & $1/x$              & cross-entropy, surprisal \\
+$\sigma(x) = \frac{1}{1+e^{-x}}$ & $\sigma(x)\,(1-\sigma(x))$ & sigmoid units \\
+$\tanh x$             & $1 - \tanh^2 x$    & RNNs \\
+$\mathrm{ReLU}(x) = \max(0,x)$ & $1$ if $x>0$, else $0$ & almost every network \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Two remarks on that table. The sigmoid and $\tanh$ derivatives are written in
+terms of the function's \emph{own output}, which is why a network can compute
+them cheaply during backpropagation --- it already has the output. And ReLU has
+no derivative at exactly $0$; every library simply picks $0$ and nothing
+depends on the choice.
+
+\begin{keybox}
+\ask{The two combining rules, and they are all you need.}
+Sum: $(f+g)' = f' + g'$.\quad
+Chain: if $y = f(g(x))$ then $\dfrac{dy}{dx} = f'(g(x))\cdot g'(x)$.
+\end{keybox}
+
+\section{The chain rule as a pipeline}
+
+Read the chain rule as bookkeeping about a pipeline rather than as an
+identity. Suppose
+
+\[
+z = \boldsymbol{w}\cdot\boldsymbol{x} + b, \qquad
+a = \mathrm{ReLU}(z), \qquad
+L = \tfrac{1}{2}(a - y)^2 .
+\]
+
+To ask how the loss responds to $w_i$, walk backwards and multiply the local
+slopes:
+
+\[
+\frac{\partial L}{\partial w_i}
+= \underbrace{(a - y)}_{\partial L / \partial a}
+\cdot \underbrace{\mathbb{1}[z>0]}_{\partial a / \partial z}
+\cdot \underbrace{x_i}_{\partial z / \partial w_i}.
+\]
+
+Each factor is local: it involves only one stage and quantities that stage
+already has. That locality \emph{is} backpropagation --- the algorithm is nothing
+more than this multiplication, done once per layer, from the loss backwards.
+
+\begin{keybox}
+\ask{Where dead ReLUs come from.} If $z \le 0$ the middle factor is $0$, so the
+whole product is $0$ and the weight does not move --- no matter how wrong the
+answer was. A unit that outputs $0$ for every input in the training set can
+never recover. You will see exactly this when you look inside the networks that
+fail to learn XOR.
+\end{keybox}
+
+\section{Partial derivatives and the gradient}
+
+With several inputs, a \textbf{partial derivative}
+$\partial f/\partial w_i$ is the slope in the $w_i$ direction with every other
+variable held fixed. Stack them and you have the \textbf{gradient}:
+
+\[
+\nabla_{\boldsymbol{w}} f =
+\Big(\frac{\partial f}{\partial w_1}, \dots, \frac{\partial f}{\partial w_p}\Big).
+\]
+
+\begin{keybox}
+\ask{The gradient points uphill.} It is the direction of steepest \emph{increase},
+and its length says how steep. To decrease a loss you therefore step in
+$-\nabla$. Every minus sign in every learning rule in this course is that
+sentence.
+\end{keybox}
+
+Two gradients worth knowing by sight, because they turn a page of algebra into
+one line:
+
+\[
+\nabla_{\boldsymbol{w}}\,(\boldsymbol{w}\cdot\boldsymbol{x}) = \boldsymbol{x},
+\qquad
+\nabla_{\boldsymbol{w}}\,\tfrac{1}{2}\|\boldsymbol{w}\|^2 = \boldsymbol{w}.
+\]
+
+\section{Gradient descent, and where the delta rule comes from}
+
+The algorithm, in one line, repeated:
+
+\[
+\boldsymbol{w} \leftarrow \boldsymbol{w} - \eta\,\nabla_{\boldsymbol{w}} L .
+\]
+
+Now take a linear neuron $\hat{y} = \boldsymbol{w}\cdot\boldsymbol{x}$ and the
+squared error $L = \tfrac{1}{2}(y - \hat{y})^2$, and turn the handle:
+
+\[
+\frac{\partial L}{\partial \boldsymbol{w}}
+= (\hat{y} - y)\cdot \frac{\partial \hat{y}}{\partial \boldsymbol{w}}
+= (\hat{y} - y)\,\boldsymbol{x}
+\qquad\Longrightarrow\qquad
+\Delta \boldsymbol{w} = \eta\,(y - \hat{y})\,\boldsymbol{x}.
+\]
+
+\begin{keybox}
+\ask{That is the delta rule}, and also Rescorla--Wagner, and also the LMS rule
+in signal processing. Three literatures, three names, one derivation ---
+\emph{move the weights in proportion to the error, along the input}. If you can
+reproduce these two lines you never have to memorize any of the three.
+\end{keybox}
+
+\subsection{The learning rate is the whole difficulty}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+$\eta$ too small & loss falls, slowly and smoothly; you run out of patience \\
+$\eta$ about right & loss falls fast, then flattens \\
+$\eta$ too large & loss oscillates, or jumps to \texttt{nan} within a few steps \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Plot the loss on a \textbf{log} $y$-axis (\texttt{plt.semilogy}). Progress that
+looks like a flat line on a linear axis is often a clean straight descent on a
+log axis, and the difference decides whether you conclude ``it is not learning''
+or ``it needs more epochs''.
+
+A decaying learning rate, $\eta_t = \eta_0/(1+t)$, is the classical choice: it
+shrinks fast enough to settle but slowly enough to still travel any finite
+distance. That is the Robbins--Monro condition, and it is worth remembering
+when the fashionable schedulers show up later in the term.
+
+\section{Checking a gradient you derived by hand}
+
+The single most useful debugging tool in this part of the course. A derivative
+is a limit of a difference quotient, so approximate it numerically and compare:
+
+\begin{lstlisting}
+def numerical_grad(f, w, eps=1e-5):
+    g = np.zeros_like(w, dtype=float)
+    for i in range(w.size):
+        wp, wm = w.astype(float).copy(), w.astype(float).copy()
+        wp[i] += eps
+        wm[i] -= eps
+        g[i] = (f(wp) - f(wm)) / (2 * eps)
+    return g
+
+# analytic vs numerical -- these should agree to ~1e-7
+np.abs(my_grad(w) - numerical_grad(loss, w)).max()
+\end{lstlisting}
+
+Use the \emph{two-sided} difference shown here, not $(f(w+\epsilon)-f(w))/\epsilon$:
+it is far more accurate for the same $\epsilon$. It is slow --- one pass per
+parameter --- so run it once on a tiny example, confirm the match, then never
+again.
+
+\begin{keybox}
+\ask{If the check fails.} A factor of exactly $2$ means a missing
+$\tfrac{1}{2}$ in the loss. A sign flip means you wrote $(y - \hat{y})$ where
+the derivative gives $(\hat{y} - y)$. Agreement everywhere except at a few
+entries usually means a ReLU sitting exactly at its kink.
+\end{keybox}
+
+\section{Why gradient descent can fail}
+
+For a linear neuron with squared error the loss surface is a bowl: one minimum,
+and descent finds it from anywhere. The moment you add a hidden layer this stops
+being true, and three things become possible.
+
+\begin{itemize}
+  \item \textbf{Local minima} --- a valley that is not the deepest valley.
+        Descent stops there because every direction is uphill.
+  \item \textbf{Saddle points} --- uphill in one direction, downhill in another,
+        with a near-zero gradient in between. Progress stalls without the loss
+        being low.
+  \item \textbf{Dead units} --- the ReLU case above: a gradient of exactly zero,
+        permanently.
+\end{itemize}
+
+\begin{keybox}
+\ask{The practical consequence.} With a non-convex loss, \emph{the same network
+trained twice with different random initializations can give different answers,
+and one of them can simply fail}. This is not a bug to fix. It means a single
+training run is a single observation, and a claim about an architecture needs
+several seeds --- the same discipline that Recitation 3 applied to $t$-SNE.
+\end{keybox}
+
+\section{Exercises}
+
+\ask{1.} Differentiate $L = \tfrac{1}{2}(y - wx)^2$ with respect to $w$, treating
+$x$ and $y$ as constants. Then write the gradient-descent update.
+
+\ask{2.} A unit computes $a = \mathrm{ReLU}(\boldsymbol{w}\cdot\boldsymbol{x})$
+and currently has $\boldsymbol{w}\cdot\boldsymbol{x} = -3$ while the target is
+$a = 5$. What is $\partial L/\partial \boldsymbol{w}$, and what happens on the
+next update?
+
+\ask{3.} You normalize every input patch to unit length and find that a unit's
+response now correlates $0.98$ with $\cos\theta$ between the patch and the
+weights, where before normalizing it correlated $0.31$. Explain, in one
+sentence, using $\|\boldsymbol{w}\|\|\boldsymbol{x}\|\cos\theta$.
+
+\ask{4.} Your analytic gradient is exactly twice your numerical gradient
+everywhere. What is the bug?
+
+\ask{5.} A training loss looks like a flat line for 500 epochs. Name two
+different things this could be, and the one plot that distinguishes them.
+
+\ask{6.} Two units have preferred orientations of $175^\circ$ and $5^\circ$. A
+classmate reports their difference as $170^\circ$. What is wrong, and what is
+the right answer?
+
+\subsection*{Answers}
+
+\ask{1.} $\dfrac{dL}{dw} = -(y - wx)\,x$, so
+$w \leftarrow w + \eta\,(y - wx)\,x$. The sign flips because we step against the
+gradient.
+
+\ask{2.} The ReLU factor $\mathbb{1}[z>0]$ is $0$, so the whole gradient is
+$\boldsymbol{0}$ and nothing changes --- no matter how large the error. The unit
+is dead for this input.
+
+\ask{3.} Before normalizing, the response confounded two causes,
+$\|\boldsymbol{x}\|$ and $\cos\theta$, and variation in patch intensity
+dominated. Fixing $\|\boldsymbol{x}\| = 1$ removes the first cause, leaving the
+response proportional to $\cos\theta$ alone.
+
+\ask{4.} A missing factor of $\tfrac{1}{2}$ in the loss: you differentiated
+$(y-\hat{y})^2$ but your analytic expression is for
+$\tfrac{1}{2}(y-\hat{y})^2$, or the reverse.
+
+\ask{5.} (i) The learning rate is far too small and it is descending
+imperceptibly; (ii) it is genuinely stuck --- dead units, or a saddle. Plot the
+loss on a log axis: a steady straight descent means (i), a truly flat line means
+(ii).
+
+\ask{6.} Orientation is defined modulo $180^\circ$, so the difference is
+$\min(170, 180-170) = 10^\circ$. The two units have nearly the same preference.
+
+\section*{Cheat sheet}
+\addcontentsline{toc}{section}{Cheat sheet}
+
+\begin{center}
+\begin{tabular}{@{}p{0.44\textwidth}p{0.5\textwidth}@{}}
+\toprule
+\textbf{You want} & \textbf{You write} \\
+\midrule
+length of a vector                 & \texttt{np.linalg.norm(x)} \\
+unit-length version                & \texttt{x / np.linalg.norm(x)} \\
+angle between two vectors          & \texttt{np.degrees(np.arccos(np.clip(c,-1,1)))} \\
+degrees $\leftrightarrow$ radians  & \texttt{np.deg2rad} / \texttt{np.rad2deg} \\
+orientation difference             & \texttt{d = abs(a-b) \% 180; min(d, 180-d)} \\
+a grating                          & \texttt{np.sin(2*np.pi*f*proj + phase)} \\
+gradient-descent step              & \texttt{w -= eta * grad} \\
+delta rule                         & \texttt{w += eta * (y - yhat) * x} \\
+loss curve worth reading           & \texttt{plt.semilogy(losses)} \\
+check a hand-derived gradient      & two-sided difference, \texttt{eps=1e-5} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}

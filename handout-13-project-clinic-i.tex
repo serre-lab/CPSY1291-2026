@@ -1,0 +1,242 @@
+% CPSY 1291 -- Recitation handout 13
+% Compile:  latexmk -lualatex handout-13-project-clinic-i.tex
+\documentclass[11pt]{article}
+\usepackage{cpsy1291-handout}
+
+\begin{document}
+
+\handouthead{13}{Project clinic I}
+  {A question you can answer, data you can actually get, and a baseline by Friday}
+  {Week 13 \ $\cdot$\ project work begins Thu 12/3; presentations Mon 12/21}
+
+\section*{What this session is for}
+\addcontentsline{toc}{section}{What this session is for}
+
+You have about two and a half weeks and roughly 31 hours each. The single
+largest risk to your project is not that the model fails --- a negative result,
+clearly analyzed, is a perfectly good project and the syllabus says so. The risk
+is spending twelve days on setup and having nothing to say on the thirteenth.
+
+So this handout is about the first three days: choosing a question that is
+answerable at this scale, getting data that actually loads, and having a working
+end-to-end result --- however bad --- before you improve anything.
+
+\begin{keybox}
+\ask{The one rule.} \textbf{Get to a bad answer fast.} A pipeline that runs
+end to end on ten items and produces a wrong number is worth more on day three
+than a beautiful half-finished component, because it tells you what the real
+obstacles are. Everything after that is improvement, and improvement is
+schedulable in a way that discovery is not.
+\end{keybox}
+
+\section{Scoping a question}
+
+\subsection{The three shapes, and what each needs by day three}
+
+\begin{center}
+\begin{tabular}{@{}p{0.28\textwidth}p{0.32\textwidth}p{0.32\textwidth}@{}}
+\toprule
+Shape & The risk & What you must have by day 3 \\
+\midrule
+\textbf{Extend a paper} & the original result does not reproduce & the original result, reproduced on a subset \\
+\textbf{Improve a model} & no measurable axis & a baseline number on your metric \\
+\textbf{Compare with data} & the data never arrives & the data loaded and plotted \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Every one of these is a \emph{de-risking} step rather than a result. Do it first,
+and if it fails you still have eleven days to change course.
+
+\subsection{The sentence test}
+
+Write your question in this form, filling every blank with something concrete:
+
+\begin{keybox}
+\ask{``We measure \underline{\hspace{3.2cm}} on \underline{\hspace{3.2cm}},
+comparing \underline{\hspace{2.4cm}} against \underline{\hspace{2.4cm}}, and we
+expect \underline{\hspace{3.2cm}}.''}
+\end{keybox}
+
+If any blank is vague, the project is not yet scoped, and no amount of coding
+will fix that. Two failure patterns to check for:
+
+\begin{itemize}
+  \item \textbf{No comparison.} ``We will see whether a CNN represents shape'' has
+        no second condition and therefore no possible result. ``We compare a
+        CNN's accuracy on shape-preserving versus texture-preserving distortions''
+        does.
+  \item \textbf{No expectation.} If you cannot say what you expect, you will not
+        be able to tell an interesting result from a bug. Write the expectation
+        down \emph{before} you run anything, and keep it --- being wrong is a
+        finding, and being wrong without a record is just confusion.
+\end{itemize}
+
+\subsection{Scope: what fits in 31 hours}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Fits & Does not fit \\
+\midrule
+fine-tuning a pretrained model & training a large model from scratch \\
+a few thousand images & ImageNet \\
+2--4 conditions & a factorial sweep \\
+one dataset, done carefully & three datasets, done carelessly \\
+a laptop or Colab's free tier & anything needing a reserved GPU \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keybox}
+\ask{Assume the network is slow.} Downloads in this course have run at
+kilobytes per second. Start every download on day one, in the background, and
+build against a small local subset while it runs. A project blocked on a
+download at day ten is the most avoidable failure there is.
+\end{keybox}
+
+\section{Getting data}
+
+\subsection{Where to look, in order}
+
+\begin{enumerate}
+  \item \textbf{Datasets you already have.} Assignments 1--5 shipped stimulus
+        sets, activation matrices, and real neural data. Reusing one is not
+        cheating; it is good sense, and it means day one is a loading step
+        rather than a search.
+  \item \textbf{The paper's own release.} Many papers post data on OSF, Zenodo,
+        or GitHub. Check for a ``Data availability'' statement before you write
+        to anyone.
+  \item \textbf{Standard repositories} --- OpenNeuro for neuroimaging, CRCNS for
+        electrophysiology, the Natural Scenes Dataset, Brain-Score's public
+        benchmarks, HuggingFace Datasets for text and images.
+  \item \textbf{Ask.} Authors often share on request, but budget a week for a
+        reply and never make the project depend on one arriving.
+\end{enumerate}
+
+\subsection{Load it, then look at it}
+
+Before any analysis, and without exception:
+
+\begin{lstlisting}
+print(X.shape, X.dtype)
+print(np.isnan(X).sum(), np.isinf(X).sum())
+print(X.min(), X.max(), X.mean())
+print(np.unique(y, return_counts=True))     # class balance
+plt.imshow(X[0]); plt.show()                # LOOK at one item
+\end{lstlisting}
+
+Five lines, and they catch: transposed dimensions, images in $[0,255]$ where the
+model expects $[0,1]$, a class that occurs eleven times, dead units that will
+produce \texttt{nan} correlations, and files that decoded into noise. Every one
+of those has cost somebody a week.
+
+\subsection{Write a loader, once}
+
+\begin{lstlisting}
+def load_data(root, subset=None):
+    """Return X, y, meta. The ONLY place that touches the filesystem."""
+    ...
+    return X, y, meta
+\end{lstlisting}
+
+Everything downstream calls this. When you discover on day nine that the labels
+were off by one, you fix it in one place and rerun --- rather than hunting for
+six notebooks that each did their own loading slightly differently.
+
+\section{The end-to-end skeleton}
+
+Write this on day two, with every step deliberately stupid, and run it on ten
+items.
+
+\begin{lstlisting}
+X, y, meta = load_data(ROOT, subset=10)     # 1. ten items
+model      = get_model()                    # 2. pretrained, off the shelf
+preds      = predict(model, X)              # 3. no batching, no speed
+score      = evaluate(preds, y)             # 4. one number
+plot(score)                                 # 5. one figure
+\end{lstlisting}
+
+\begin{keybox}
+\ask{Why ten items.} Because it runs in seconds, so you can iterate; because
+you can verify every number by hand; and because scaling from 10 to 10,000 is a
+known, boring change, whereas scaling from ``nothing runs'' to ``something runs''
+is not. When the skeleton works, raise \texttt{subset} and go and have lunch.
+\end{keybox}
+
+\subsection{Two baselines you always need}
+
+\textbf{Chance.} What score does a model that knows nothing get? For a classifier
+with imbalanced classes it is the majority proportion, not $1/k$. Compute it, do
+not assume it.
+
+\textbf{A trivial model.} Whatever the sophisticated thing is, run the dumb thing
+too --- raw pixels instead of network features, logistic regression instead of a
+fine-tuned transformer, mean luminance instead of a shape descriptor. If the dumb
+thing does nearly as well, you have learned the most important fact about your
+problem, and you have learned it on day three rather than in the last slide of
+your talk.
+
+\section{Reproducibility, cheaply}
+
+Four habits, each costing under a minute, that will save your group hours:
+
+\begin{enumerate}
+  \item \textbf{One seed, set once, at the top.} \texttt{np.random.default\_rng(0)},
+        \texttt{torch.manual\_seed(0)}. And remember Recitation 3: one seed makes
+        it reproducible, not meaningful. For any headline number, run several.
+  \item \textbf{Save results, not just figures.} Write the numbers to a
+        \texttt{.csv} or \texttt{.npz} as you go. Regenerating a figure from a
+        saved array takes ten seconds; regenerating it from scratch takes an
+        hour and may not match.
+  \item \textbf{Never edit a figure by hand.} If it needs a change, change the
+        code. Hand-edited figures cannot be regenerated, and you will need to
+        regenerate them.
+  \item \textbf{One notebook per question, not one per person.} Three people
+        working in three copies of the same notebook is the most common way a
+        group project loses a day to merge conflicts. Split by \emph{question},
+        with a shared \texttt{utils.py} that all three import.
+\end{enumerate}
+
+\section{A schedule that works}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+By & You have \\
+\midrule
+day 3  & data loaded and looked at; the skeleton runs on 10 items; chance and a trivial baseline \\
+day 6  & the real comparison run once, at full size, with one figure \\
+day 9  & the comparison run across seeds, with error bars; one control \\
+day 12 & every figure final; the result stated in one sentence \\
+day 14 & slides built and rehearsed once, out loud, with a timer \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keybox}
+\ask{The deadline that matters is day 9, not day 14.} If the main comparison is
+not running by day 9 you do not have time to add error bars, and a result without
+error bars cannot be defended --- which is the single most common way a
+technically fine project loses marks.
+\end{keybox}
+
+\section{Ten questions to ask your own project}
+
+\begin{enumerate}
+  \item What is the comparison? If there is only one condition, there is no result.
+  \item What did you \emph{expect}, and did you write it down first?
+  \item What is chance, and did you compute it or assume it?
+  \item What does the trivial baseline get?
+  \item How many seeds, and what is the spread?
+  \item What is the noise ceiling, if you are comparing against data?
+  \item What single change would most likely overturn your conclusion?
+  \item Did you touch the test set more than once?
+  \item Can someone else run your pipeline from your loader?
+  \item If the result had come out the other way, would the project still work?
+\end{enumerate}
+
+Question 10 is the one to ask on day one. If the answer is no, the project is a
+bet rather than an experiment, and you have two weeks.
+
+\end{document}

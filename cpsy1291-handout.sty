@@ -1,0 +1,72 @@
+% cpsy1291-handout.sty -- shared preamble for the CPSY 1291 recitation handouts.
+% Extracted from bootcamp-notes.tex so that every weekly handout looks the same.
+% Compile handouts with:  latexmk -lualatex handout-NN-slug.tex
+\ProvidesPackage{cpsy1291-handout}[2026/08/19 CPSY 1291 recitation handout style]
+
+\RequirePackage{fontspec}
+\setmainfont{Lora}[
+  Path = /Users/tserre/Library/Fonts/ , Extension = .ttf ,
+  UprightFont = Lora-Regular , BoldFont = Lora-SemiBold ,
+  ItalicFont = Lora-Italic , BoldItalicFont = Lora-Italic ]
+\setsansfont{Poppins}[
+  Path = /Users/tserre/Library/Fonts/ , Extension = .ttf ,
+  UprightFont = Poppins-Regular , BoldFont = Poppins-SemiBold ]
+\setmonofont{Menlo}[Scale=0.86]
+
+\RequirePackage[margin=1.1in]{geometry}
+\RequirePackage{enumitem}
+\RequirePackage{titlesec}
+\RequirePackage{hyperref}
+\RequirePackage{bookmark}
+\RequirePackage{xcolor}
+\RequirePackage{parskip}
+\RequirePackage{booktabs}
+\RequirePackage{array}
+\RequirePackage{amsmath,amssymb,bm}
+\RequirePackage{listings}
+\RequirePackage{mdframed}
+\RequirePackage{soul}
+
+\definecolor{accent}{HTML}{9C5A2E}
+\definecolor{brown}{HTML}{6B4F3A}
+\definecolor{ink}{HTML}{1E293B}
+\definecolor{lightgray}{HTML}{8A7E70}
+\definecolor{codebg}{HTML}{F5F1EA}
+\definecolor{gold}{HTML}{F2C14E}
+
+\hypersetup{colorlinks=true, linkcolor=accent, urlcolor=accent, citecolor=accent}
+\sethlcolor{gold}
+\emergencystretch=1em
+
+\titleformat{\section}{\sffamily\large\bfseries\color{brown}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\sffamily\normalsize\bfseries\color{ink}}{\thesubsection}{0.6em}{}
+\setlist[itemize]{leftmargin=1.2em, itemsep=2pt, topsep=3pt}
+\setlist[enumerate]{leftmargin=1.4em, itemsep=2pt, topsep=3pt}
+
+\lstset{
+  basicstyle=\ttfamily\small, backgroundcolor=\color{codebg},
+  frame=single, rulecolor=\color{codebg!60!lightgray}, framesep=5pt,
+  breaklines=true, showstringspaces=false, columns=fullflexible,
+  keywordstyle=\color{accent}, commentstyle=\color{lightgray}\itshape,
+  language=Python, aboveskip=8pt, belowskip=8pt, xleftmargin=2pt,
+}
+
+\newmdenv[backgroundcolor=codebg, linecolor=accent, linewidth=1.6pt,
+          topline=false, bottomline=false, rightline=false,
+          innerleftmargin=9pt, innertopmargin=6pt, innerbottommargin=6pt,
+          skipabove=9pt, skipbelow=9pt]{keybox}
+
+\newcommand{\ask}[1]{\textcolor{accent}{\textbf{#1}}}
+
+% \handouthead{number}{title}{subtitle}{serves}
+\newcommand{\handouthead}[4]{%
+  \begin{center}
+  {\sffamily\small\color{accent}\MakeUppercase{CPSY 1291 \ $\cdot$\ Recitation handout #1}}\\[5pt]
+  {\sffamily\LARGE\bfseries\color{brown} #2}\\[3pt]
+  {\sffamily\large\color{ink} #3}\\[6pt]
+  {\color{lightgray}\small Fall 2026 \quad$\cdot$\quad #4}
+  \end{center}
+  \vspace{4pt}\hrule\vspace{10pt}}
+
+% Section-opening "why you are reading this" line
+\newcommand{\lede}[1]{{\itshape\color{lightgray} #1}\par\vspace{4pt}}

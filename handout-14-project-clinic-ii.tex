@@ -1,0 +1,231 @@
+% CPSY 1291 -- Recitation handout 14
+% Compile:  latexmk -lualatex handout-14-project-clinic-ii.tex
+\documentclass[11pt]{article}
+\usepackage{cpsy1291-handout}
+
+\begin{document}
+
+\handouthead{14}{Project clinic II}
+  {Figures that are instruments, a report that is honest, and a talk that lands}
+  {Week 14 \ $\cdot$\ last class meeting Thu 12/10; presentations Mon 12/21, 9:00\,AM}
+
+\section*{What this session is for}
+\addcontentsline{toc}{section}{What this session is for}
+
+By now you have results, or you have discovered that you will not get the ones
+you wanted. Both are fine, and the syllabus is explicit that a negative result
+clearly analyzed is a perfectly good project. What is graded is the quality of
+the question, the soundness of the method, and how honestly you interpret what
+you found.
+
+This handout is about turning what you have into three things: figures that
+carry an argument, a report that survives a skeptical reader, and a talk that
+lands in the time you are given.
+
+\begin{keybox}
+\ask{The one idea.} \textbf{The claim comes first, and everything else is
+evidence for it.} Write your one-sentence result before you make a single
+figure. Then every figure either supports that sentence or comes out. Projects
+that assemble figures first and look for a story afterwards produce talks that
+are a tour of what was done rather than an argument about what is true.
+\end{keybox}
+
+\section{Figures as instruments}
+
+\subsection{One figure, one claim}
+
+Each figure should be describable in one sentence that is a claim, not a
+description. ``Accuracy by condition and model'' is a description. ``The texture
+model loses more accuracy under shape distortion than the shape model'' is a
+claim, and it tells you what to plot and what to leave out.
+
+If a figure needs two sentences, it is two figures. If it needs none, it is not a
+figure.
+
+\subsection{The checklist}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Every figure & Why \\
+\midrule
+axis labels with \textbf{units} & an unlabeled axis is uninterpretable \\
+\textbf{error bars}, and a caption saying which & SD and SE answer different questions \\
+a \textbf{chance line} where one exists & a reader cannot infer it \\
+$n$ stated --- of \emph{what} & runs? stimuli? subjects? \\
+readable at the size it will be seen & shrink it to slide size and check \\
+distinguishable without color & about 8\% of men are color-blind \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keybox}
+\ask{The error-bar rule, once more.} Label them. \emph{Standard deviation} says
+how much a single run varies; \emph{standard error} says how well you know the
+mean. An unlabeled error bar cannot be read, and a figure whose error bars are
+unlabeled is asking the reader to trust you rather than to check you.
+\end{keybox}
+
+\subsection{Three plots that are almost always worth making}
+
+\textbf{The distribution, not just the mean.} A bar chart of two means hides
+whether the distributions overlap completely. Plot the individual points over the
+bars --- with ten runs there is no reason not to.
+
+\textbf{The thing that would falsify you.} If your claim is that model A beats
+model B, plot the per-item differences, not just the two averages. If A wins on
+51\% of items by a hair, that is a different claim from A winning on 90\%.
+
+\textbf{The failure cases.} Show the items your model got wrong. It is the most
+informative figure in most projects and it is almost always missing, because
+nobody wants to put their failures on a slide. It is also what makes a talk
+credible.
+
+\subsection{Two things not to do}
+
+\textbf{Do not truncate a $y$-axis} to make a difference look big. If the
+difference needs a truncated axis, the difference is small, and saying so is
+better than being caught.
+
+\textbf{Do not use a rainbow colormap} for continuous data. It creates
+boundaries that are not in the data. \texttt{viridis} is the default for a
+reason.
+
+\section{The report}
+
+\subsection{A structure that always works}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Section & The one job it does \\
+\midrule
+Question & what you asked, and why it is worth asking \\
+Method & enough that someone else could redo it \\
+Results & what happened --- figures, numbers, no interpretation \\
+Interpretation & what it means, and what it does not \\
+Limitations & what would change your mind \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The split between Results and Interpretation is the one that matters. Keeping
+them separate is what lets a reader disagree with your interpretation while
+accepting your results, which is how science is supposed to work --- and it is
+what makes a report readable by someone who does not already agree with you.
+
+\subsection{Limitations is a strength section}
+
+Students write limitations defensively, as damage control. Written well it is
+the section that demonstrates you understand your own work.
+
+Say what would change your mind. ``We used one architecture, so we cannot
+separate an effect of depth from an effect of this particular network'' is a
+strong sentence: it names the confound, bounds the claim, and tells the reader
+exactly which experiment would settle it. ``More data would help'' is not a
+limitation; it is a truism.
+
+\subsection{The AI disclosure}
+
+The syllabus permits AI tools for the project and requires a short disclosure
+saying which tools you used and how they contributed. Write it plainly and
+specifically --- ``we used an LLM to draft the plotting code and to debug the data
+loader'' --- rather than vaguely. It costs two lines, it is a course requirement,
+and vagueness reads worse than the use itself.
+
+\section{The talk}
+
+\subsection{The arc}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Slide(s) & Job \\
+\midrule
+1 & the question, in one sentence, and why anyone should care \\
+2 & what you did, in one picture --- not in bullets \\
+3--5 & the result: one figure per slide, one claim per figure \\
+6 & the honest caveat: what would change your mind \\
+7 & what you would do next \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keybox}
+\ask{Slide 2 is the one people get wrong.} Your method is a pipeline, and a
+pipeline is a picture --- boxes and arrows, from data to number. Three bullet
+points describing the same pipeline take longer to say and are harder to follow.
+Draw it.
+\end{keybox}
+
+\subsection{Rehearsal, which is not optional}
+
+\begin{enumerate}
+  \item \textbf{Out loud, with a timer, once.} Silent reading takes roughly half
+        the time speaking does, so a deck that feels right unspoken is about
+        twice too long.
+  \item \textbf{Decide who says what.} In a group talk, silent handovers are the
+        commonest thing to go wrong. Write the handover into the notes.
+  \item \textbf{Cut to fit.} If you are over, cut a \emph{result}, not the caveat
+        and not the question. A talk that covers less and lands is better than
+        one that covers everything at speed.
+\end{enumerate}
+
+\subsection{Questions you will be asked}
+
+\begin{itemize}
+  \item \emph{What is chance here?} --- have the number, not a gesture.
+  \item \emph{How many seeds / subjects / stimuli?} --- have the $n$, and say what
+        it is the $n$ \emph{of}.
+  \item \emph{What does a trivial baseline get?} --- if you do not have one, say
+        so plainly; do not improvise.
+  \item \emph{Would this hold for a different dataset or architecture?} --- the
+        honest answer is usually ``we do not know, and here is why we think it
+        might not''.
+  \item \emph{Why this metric?} --- have a reason, even a modest one.
+\end{itemize}
+
+\begin{keybox}
+\ask{``We don't know'' is a good answer.} Said once, with a reason, it reads as
+command of the material. What reads badly is a confident answer to a question you
+did not investigate --- and the room can tell the difference.
+\end{keybox}
+
+\section{If the result did not come out}
+
+This happens, and it is survivable. The syllabus grades the question, the method
+and the honesty of the interpretation --- not whether the model worked.
+
+\begin{enumerate}
+  \item \textbf{Say what you expected and what you got.} Both, plainly, early.
+  \item \textbf{Show that the pipeline works.} A positive control --- a case where
+        your method \emph{does} detect a known effect --- turns ``our analysis
+        found nothing'' into ``there is nothing there to find, and here is the
+        evidence that we could have found it''. Those are very different claims
+        and the second is a result.
+  \item \textbf{Bound it.} How large an effect could you have detected? A null
+        with a stated sensitivity is informative; a null without one is silence.
+  \item \textbf{Say what you would do differently.} This is the part that shows
+        you learned something, which is what the exercise was for.
+\end{enumerate}
+
+\section{The last checklist}
+
+Run this the night before.
+
+\begin{enumerate}
+  \item Can you state the result in one sentence, without hedging?
+  \item Does every figure have labeled axes, labeled error bars, and a stated $n$?
+  \item Is chance marked on every figure that has one?
+  \item Does the talk have a positive control or a trivial baseline somewhere?
+  \item Have you said out loud what would change your mind?
+  \item Did you rehearse with a timer, out loud, at least once?
+  \item Does the report separate what happened from what you think it means?
+  \item Is the AI-use disclosure written?
+  \item Can someone else run your pipeline from your loader?
+  \item Have you cut the slide you are keeping only because the work was hard?
+\end{enumerate}
+
+Item 10 catches something in almost every project.
+
+\end{document}
