@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perceptron / Boolean-logic playground — CPSY 1291</title>
+<style>
+  :root {
+    --sienna: #9C5A2E;
+    --slate:  #3E6D8E;
+    --cream:  #FAF9F5;
+    --ink:    #1E293B;
+    --pos:    #3E6D8E;   /* output 1 / half-space > 0  (slate-blue) */
+    --neg:    #9C5A2E;   /* output 0 / half-space < 0  (sienna)     */
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Arial, system-ui, sans-serif;
+    height: 100%;
+  }
+  #app {
+    display: flex;
+    flex-direction: row;
+    gap: 28px;
+    align-items: stretch;
+    padding: 22px 26px;
+    height: 100%;
+  }
+  #left  { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  #right { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; gap: 16px; min-width: 0; }
+
+  svg { background: var(--cream); border-radius: 10px; display: block; }
+
+  h1 { font-size: 30px; margin: 0 0 4px 0; color: var(--ink); font-weight: 700; }
+  .sub { font-size: 17px; color: #5b6b7a; margin: 0 0 6px 0; }
+
+  /* ---- slider rows ---- */
+  .slider-row { display: grid; grid-template-columns: 70px 1fr 96px; align-items: center; gap: 14px; }
+  .slider-row label { font-size: 26px; font-weight: 700; }
+  .slider-row .val   { font-size: 26px; font-variant-numeric: tabular-nums; text-align: right; color: var(--ink); }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 10px; border-radius: 6px;
+    background: #d9d2c6; outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--slate); border: 3px solid var(--cream);
+    box-shadow: 0 1px 4px rgba(0,0,0,.35); cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--slate); border: 3px solid var(--cream); cursor: pointer;
+  }
+  #wlabel  { color: var(--sienna); }   /* w1, w2 colored to match weight arrow */
+  #w2label { color: var(--sienna); }
+
+  /* ---- preset buttons ---- */
+  .presets { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  .presets button {
+    font-size: 20px; font-weight: 700;
+    padding: 10px 18px; border-radius: 8px;
+    border: 2px solid var(--slate); background: #fff; color: var(--slate);
+    cursor: pointer; transition: all .12s;
+  }
+  .presets button:hover { background: var(--slate); color: #fff; }
+
+  /* ---- readout ---- */
+  #readout {
+    border-radius: 12px; padding: 16px 20px;
+    background: #fff; border: 2px solid #e4ddd0;
+  }
+  #gate { font-size: 34px; font-weight: 800; line-height: 1.1; }
+  #gate .name { color: var(--slate); }
+  #gate.nogate .name { color: var(--sienna); }
+  #truth { margin-top: 12px; font-size: 22px; font-variant-numeric: tabular-nums; }
+  #truth table { border-collapse: collapse; }
+  #truth th, #truth td { padding: 4px 16px; text-align: center; }
+  #truth th { color: #5b6b7a; font-weight: 700; border-bottom: 2px solid #e4ddd0; }
+  #truth td.out1 { color: var(--pos); font-weight: 800; }
+  #truth td.out0 { color: var(--neg); font-weight: 800; }
+  .eqn { font-size: 22px; margin-top: 2px; }
+  .eqn b1 { color: var(--sienna); font-weight: 800; }
+  .eqn b2 { color: var(--slate);  font-weight: 800; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- ====== LEFT: input plane ====== -->
+  <div id="left">
+    <svg id="plane" width="640" height="640" viewBox="0 0 640 640" aria-label="input plane"></svg>
+  </div>
+
+  <!-- ====== RIGHT: controls + readout ====== -->
+  <div id="right">
+    <div>
+      <h1>Perceptron &middot; Boolean-logic playground</h1>
+      <p class="sub">Output = step(<b style="color:var(--sienna)">w</b>&middot;<b>x</b> + <b style="color:var(--slate)">b</b>) &nbsp;&rarr;&nbsp; 1 if &ge; 0, else 0</p>
+    </div>
+
+    <div class="slider-row">
+      <label id="wlabel">w&#8321;</label>
+      <input type="range" id="w1" min="-3" max="3" step="0.1" value="1">
+      <span class="val" id="w1v">1.0</span>
+    </div>
+    <div class="slider-row">
+      <label id="w2label">w&#8322;</label>
+      <input type="range" id="w2" min="-3" max="3" step="0.1" value="1">
+      <span class="val" id="w2v">1.0</span>
+    </div>
+    <div class="slider-row">
+      <label style="color:var(--slate)">b</label>
+      <input type="range" id="b" min="-3" max="3" step="0.1" value="-1.5">
+      <span class="val" id="bv">-1.5</span>
+    </div>
+
+    <div class="presets">
+      <button data-gate="AND">AND</button>
+      <button data-gate="OR">OR</button>
+      <button data-gate="NAND">NAND</button>
+      <button data-gate="NOR">NOR</button>
+      <button data-gate="XOR" title="try to make XOR with one line!">XOR?</button>
+    </div>
+
+    <div id="readout">
+      <div id="gate">computes: <span class="name">&mdash;</span></div>
+      <div id="truth"></div>
+      <div id="xornote" style="display:none; margin-top:14px; font-size:21px; font-weight:700; color:var(--sienna); line-height:1.3;">
+        Goal: <b>XOR</b> = (0,1,1,0). No single line can separate it &mdash;
+        the two &ldquo;1&rdquo; corners sit on opposite diagonals.
+        <span style="color:#5b6b7a; font-weight:600;">Move the sliders all you like; the readout will never say XOR.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- the four Boolean inputs ----
+  const PTS = [[0,0],[0,1],[1,0],[1,1]];
+
+  // ---- canonical gate truth tables (output for [00,01,10,11]) ----
+  const GATES = {
+    "AND":   [0,0,0,1],
+    "OR":    [0,1,1,1],
+    "NAND":  [1,1,1,0],
+    "NOR":   [1,0,0,0],
+    "XOR":   [0,1,1,0],
+    "XNOR":  [1,0,0,1],
+    "x₁":      [0,0,1,1],   // pass-through x1
+    "x₂":      [0,1,0,1],   // pass-through x2
+    "NOT x₁":  [1,1,0,0],
+    "NOT x₂":  [1,0,1,0],
+    "x₁ AND NOT x₂": [0,0,1,0],
+    "x₂ AND NOT x₁": [0,1,0,0],
+    "x₁ OR NOT x₂":  [1,0,1,1],
+    "x₂ OR NOT x₁":  [1,1,0,1],
+    "TRUE (always 1)":  [1,1,1,1],
+    "FALSE (always 0)": [0,0,0,0]
+  };
+  // The two functions a single line can NEVER realise:
+  const NONLINEAR = { "0110":"XOR", "1001":"XNOR" };
+
+  // ---- preset (w1,w2,b) for the buttons ----
+  const PRESETS = {
+    "AND":  [1, 1, -1.5],
+    "OR":   [1, 1, -0.5],
+    "NAND": [-1, -1, 1.5],
+    "NOR":  [-1, -1, 0.5],
+    "XOR":  [1, -1, -0.5]   // deliberately impossible -> teaching moment
+  };
+
+  // ---- SVG plane geometry (data coords -0.5..1.5 -> pixels) ----
+  const SVG = document.getElementById("plane");
+  const NS = "http://www.w3.org/2000/svg";
+  const W = 640, H = 640, PAD = 70;
+  const DMIN = -0.5, DMAX = 1.5;               // data range on each axis
+  const sx = v => PAD + (v - DMIN) / (DMAX - DMIN) * (W - 2*PAD);
+  const sy = v => (H - PAD) - (v - DMIN) / (DMAX - DMIN) * (H - 2*PAD);
+
+  // sliders
+  const elW1 = document.getElementById("w1");
+  const elW2 = document.getElementById("w2");
+  const elB  = document.getElementById("b");
+  const outW1 = document.getElementById("w1v");
+  const outW2 = document.getElementById("w2v");
+  const outB  = document.getElementById("bv");
+
+  let xorChallenge = false;   // true after the XOR? button is pressed
+
+  function step(z){ return z >= 0 ? 1 : 0; }
+
+  function mk(tag, attrs){
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  function clear(node){ while(node.firstChild) node.removeChild(node.firstChild); }
+
+  function render(){
+    const w1 = +elW1.value, w2 = +elW2.value, b = +elB.value;
+    outW1.textContent = w1.toFixed(1);
+    outW2.textContent = w2.toFixed(1);
+    outB.textContent  = b.toFixed(1);
+
+    clear(SVG);
+
+    // ---- shaded half-spaces: sample a grid, color by sign ----
+    // Draw as a coarse pixel grid of rects (cheap, robust, no clip math).
+    const G = 64;                       // grid cells per axis
+    const cw = (W - 2*PAD) / G, ch = (H - 2*PAD) / G;
+    // We instead shade with two big polygons split by the boundary, but the
+    // simplest robust approach: a low-opacity raster.
+    const raster = mk("g", {opacity: 0.16});
+    for (let i = 0; i < G; i++){
+      for (let j = 0; j < G; j++){
+        const dx = DMIN + (i + 0.5)/G * (DMAX - DMIN);
+        const dy = DMIN + (j + 0.5)/G * (DMAX - DMIN);
+        const s = w1*dx + w2*dy + b;
+        const col = s >= 0 ? getCss("--pos") : getCss("--neg");
+        raster.appendChild(mk("rect", {
+          x: PAD + i*cw, y: (H-PAD) - (j+1)*ch,
+          width: cw+0.6, height: ch+0.6, fill: col
+        }));
+      }
+    }
+    SVG.appendChild(raster);
+
+    // ---- axes ----
+    SVG.appendChild(mk("line", {x1:sx(DMIN),y1:sy(0),x2:sx(DMAX),y2:sy(0),stroke:"#b9b0a2","stroke-width":2}));
+    SVG.appendChild(mk("line", {x1:sx(0),y1:sy(DMIN),x2:sx(0),y2:sy(DMAX),stroke:"#b9b0a2","stroke-width":2}));
+    // tick labels 0 and 1 on each axis
+    [["0",0],["1",1]].forEach(([t,v])=>{
+      const tx = mk("text",{x:sx(v),y:sy(0)+30,"text-anchor":"middle","font-size":20,fill:"#5b6b7a"}); tx.textContent=t; SVG.appendChild(tx);
+      const ty = mk("text",{x:sx(0)-26,y:sy(v)+7,"text-anchor":"middle","font-size":20,fill:"#5b6b7a"}); ty.textContent=t; SVG.appendChild(ty);
+    });
+    const xa = mk("text",{x:sx(DMAX),y:sy(0)+44,"text-anchor":"end","font-size":24,"font-weight":700,fill:"#1E293B"}); xa.textContent="x₁"; SVG.appendChild(xa);
+    const ya = mk("text",{x:sx(0)+18,y:sy(DMAX)+4,"text-anchor":"start","font-size":24,"font-weight":700,fill:"#1E293B"}); ya.textContent="x₂"; SVG.appendChild(ya);
+
+    // ---- decision boundary line w1 x1 + w2 x2 + b = 0 ----
+    drawBoundary(w1, w2, b);
+
+    // ---- weight vector arrow (normal to boundary), anchored at decision midpoint of unit square center ----
+    drawWeightArrow(w1, w2, b);
+
+    // ---- the four points, colored by output ----
+    const outs = PTS.map(([x,y]) => step(w1*x + w2*y + b));
+    PTS.forEach(([x,y], k) => {
+      const o = outs[k];
+      const col = o ? getCss("--pos") : getCss("--neg");
+      SVG.appendChild(mk("circle", {cx:sx(x), cy:sy(y), r:18, fill:col, stroke:"#fff","stroke-width":4}));
+      const lab = mk("text",{x:sx(x), y:sy(y)+8, "text-anchor":"middle","font-size":22,"font-weight":800, fill:"#fff"});
+      lab.textContent = o; SVG.appendChild(lab);
+    });
+
+    // ---- identify the gate ----
+    identify(outs, w1, w2, b);
+  }
+
+  function drawBoundary(w1, w2, b){
+    // solve for two points where line crosses the plotting box [DMIN,DMAX]^2
+    const pts = [];
+    const inrange = v => v >= DMIN - 1e-9 && v <= DMAX + 1e-9;
+    if (Math.abs(w2) > 1e-9){
+      for (const xx of [DMIN, DMAX]){
+        const yy = -(w1*xx + b)/w2;
+        if (inrange(yy)) pts.push([xx, yy]);
+      }
+    }
+    if (Math.abs(w1) > 1e-9){
+      for (const yy of [DMIN, DMAX]){
+        const xx = -(w2*yy + b)/w1;
+        if (inrange(xx)) pts.push([xx, yy]);
+      }
+    }
+    // dedupe
+    const uniq = [];
+    pts.forEach(p => { if(!uniq.some(q => Math.abs(q[0]-p[0])<1e-6 && Math.abs(q[1]-p[1])<1e-6)) uniq.push(p); });
+    if (uniq.length >= 2){
+      const [a,c] = uniq;
+      SVG.appendChild(mk("line", {
+        x1:sx(a[0]),y1:sy(a[1]),x2:sx(c[0]),y2:sy(c[1]),
+        stroke:"#1E293B","stroke-width":4
+      }));
+    }
+  }
+
+  function drawWeightArrow(w1, w2, b){
+    const n = Math.hypot(w1, w2);
+    if (n < 1e-9) return;
+    // anchor at the point on the boundary closest to the square centre (0.5,0.5)
+    const cx0 = 0.5, cy0 = 0.5;
+    const t = (w1*cx0 + w2*cy0 + b) / (n*n);
+    const ax = cx0 - t*w1, ay = cy0 - t*w2;        // foot of perpendicular (on the line)
+    const len = 0.45;                               // arrow length in data units
+    const ux = w1/n, uy = w2/n;
+    const ex = ax + len*ux, ey = ay + len*uy;
+    const col = getCss("--sienna");
+    SVG.appendChild(mk("line", {x1:sx(ax),y1:sy(ay),x2:sx(ex),y2:sy(ey),stroke:col,"stroke-width":6,"stroke-linecap":"round"}));
+    // arrowhead
+    const ang = Math.atan2(sy(ey)-sy(ay), sx(ex)-sx(ax));
+    const hl = 18, ha = 0.5;
+    const hx = sx(ex), hy = sy(ey);
+    const p1 = [hx - hl*Math.cos(ang-ha), hy - hl*Math.sin(ang-ha)];
+    const p2 = [hx - hl*Math.cos(ang+ha), hy - hl*Math.sin(ang+ha)];
+    SVG.appendChild(mk("polygon", {points:`${hx},${hy} ${p1[0]},${p1[1]} ${p2[0]},${p2[1]}`, fill:col}));
+    // label w
+    const wl = mk("text",{x:sx(ex)+(ux>=0?10:-10), y:sy(ey)-10, "text-anchor":ux>=0?"start":"end","font-size":26,"font-weight":800, fill:col});
+    wl.textContent = "w"; SVG.appendChild(wl);
+  }
+
+  function identify(outs, w1, w2, b){
+    const key = outs.join("");
+    let name = null;
+    for (const g in GATES){ if (GATES[g].join("") === key){ name = g; break; } }
+    const gateEl = document.getElementById("gate");
+    if (name){
+      gateEl.classList.remove("nogate");
+      gateEl.innerHTML = 'computes: <span class="name">' + name + '</span>';
+    } else {
+      // a single perceptron realises only the 14 linearly-separable functions,
+      // never XOR/XNOR -> this branch is effectively unreachable for valid (w,b).
+      gateEl.classList.add("nogate");
+      gateEl.innerHTML = 'computes: <span class="name">a linear threshold function</span>';
+    }
+
+    // XOR teaching moment: persistent note whenever the XOR? challenge is active
+    document.getElementById("xornote").style.display = xorChallenge ? "block" : "none";
+
+    buildTruth(outs);
+  }
+
+  function buildTruth(outs){
+    const rows = PTS.map((p,k) =>
+      `<tr><td>${p[0]}</td><td>${p[1]}</td><td class="out${outs[k]}">${outs[k]}</td></tr>`).join("");
+    document.getElementById("truth").innerHTML =
+      '<table><thead><tr><th>x₁</th><th>x₂</th><th>out</th></tr></thead><tbody>' +
+      rows + '</tbody></table>';
+  }
+
+  // cache CSS custom props
+  const _css = {};
+  function getCss(name){
+    if (!(name in _css))
+      _css[name] = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return _css[name];
+  }
+
+  // ---- wire up ----
+  [elW1, elW2, elB].forEach(el => el.addEventListener("input", render));
+  document.querySelectorAll(".presets button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const g = btn.getAttribute("data-gate");
+      xorChallenge = (g === "XOR");   // arm/keep the XOR note only for the XOR? button
+      const p = PRESETS[g];
+      if (p){ elW1.value = p[0]; elW2.value = p[1]; elB.value = p[2]; render(); }
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

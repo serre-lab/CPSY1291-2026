@@ -1,0 +1,104 @@
+<!doctype html><meta charset="utf-8">
+<title>Perceptron vs delta rule — CPSY 1291</title>
+<style>
+ :root{--ink:#1E293B;--taupe:#8A7E70;--mag:#B5396B;--grn:#3F7A6B;--gold:#F2C14E;--bg:#FDFBF7}
+ body{margin:0;font:15px/1.45 Lora,Georgia,serif;color:var(--ink);background:var(--bg)}
+ .wrap{display:flex;gap:14px;padding:12px}
+ canvas{background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.12)}
+ .panel{width:260px;font-family:Poppins,system-ui,sans-serif;font-size:13px}
+ label{display:block;margin:9px 0 2px;color:var(--taupe)}
+ button{font:inherit;padding:6px 11px;margin:2px 3px 2px 0;border:0;border-radius:7px;
+        background:#EDE7DE;cursor:pointer}
+ button.primary{background:var(--gold)}
+ select,input[type=range]{width:100%}
+ .stat{margin-top:10px;padding:8px 10px;background:#fff;border-radius:8px;
+       box-shadow:0 1px 4px rgba(0,0,0,.08)}
+ .stat b{font-size:19px} .k{color:var(--taupe)}
+</style>
+<div class="wrap">
+  <canvas id="cv" width="430" height="430"></canvas>
+  <div class="panel">
+    <label>learning rule</label>
+    <select id="rule">
+      <option value="perceptron" selected>Perceptron — update only on mistakes</option>
+      <option value="delta">Delta rule — update on every example</option>
+    </select>
+    <label>learning rate η — <span id="etav">0.05</span></label>
+    <input type="range" id="eta" min="-3" max="0" step="0.05" value="-1.3">
+    <label>class overlap — <span id="ovv">none</span></label>
+    <input type="range" id="ov" min="0" max="40" step="2" value="0">
+    <div style="margin-top:10px">
+      <button class="primary" id="run">run</button><button id="step">one pass</button>
+      <button id="reset">reset w</button><button id="regen">new data</button>
+    </div>
+    <div class="stat">updates this pass <b id="upd">–</b><br>
+      <span class="k">total</span> <b id="tot">0</b> &nbsp; <span class="k">pass</span> <b id="ep">0</b></div>
+    <div class="stat"><span class="k">training accuracy</span> <b id="acc">–</b></div>
+    <div class="stat" id="msg" style="min-height:2.6em"></div>
+  </div>
+</div>
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),S=430;
+let pts=[],w=[0,0],b=0,ep=0,tot=0,timer=null;
+const $=id=>document.getElementById(id);
+const eta=()=>Math.pow(10,+$('eta').value);
+const toPx=p=>[S/2+p[0]*70,S/2-p[1]*70];
+
+function regen(){
+  pts=[];const ov=+$('ov').value/100;
+  for(let i=0;i<70;i++){
+    const s=i<35?-1:1, x=s*(0.9+Math.random()*1.6)+ (Math.random()-.5)*.5;
+    let y=(Math.random()-.5)*3.4;
+    let lab=s;
+    if(Math.random()<ov) lab=-s;                 // flip a fraction of the labels
+    pts.push({x:[x,y],y:lab});
+  }
+  reset();
+}
+function reset(){w=[0,0];b=0;ep=0;tot=0;$('tot').textContent=0;$('ep').textContent=0;
+  $('upd').textContent='–';draw();say('');}
+function acc(){let c=0;for(const p of pts) if(Math.sign(p.x[0]*w[0]+p.x[1]*w[1]+b||1)===p.y)c++;
+  return c/pts.length;}
+function pass(){
+  const e=eta(),rule=$('rule').value;let u=0;
+  const order=[...pts.keys()].sort(()=>Math.random()-.5);
+  for(const i of order){
+    const p=pts[i],z=p.x[0]*w[0]+p.x[1]*w[1]+b;
+    if(rule==='perceptron'){
+      if(p.y*z<=0){w[0]+=e*p.y*p.x[0];w[1]+=e*p.y*p.x[1];b+=e*p.y;u++;}
+    }else{
+      const d=p.y-z;                              // linear output, no threshold
+      w[0]+=e*d*p.x[0];w[1]+=e*d*p.x[1];b+=e*d;
+      if(Math.abs(d)>1e-6)u++;
+    }
+  }
+  ep++;tot+=u;$('upd').textContent=u;$('tot').textContent=tot;$('ep').textContent=ep;
+  $('acc').textContent=(100*acc()).toFixed(1)+'%';
+  if($('rule').value==='perceptron'&&u===0) say('The perceptron has <b>stopped</b>. Every point is on the correct side, so no test fires and nothing changes — however narrow the gap it left.');
+  else if($('rule').value==='delta'&&ep>6) say('The delta rule is <b>still updating</b>. It is chasing the target value ±1, not just the correct side, so there is always some error left.');
+  draw();
+}
+function say(h){$('msg').innerHTML=h}
+function draw(){
+  ctx.clearRect(0,0,S,S);
+  ctx.strokeStyle='#EDE7DE';ctx.beginPath();ctx.moveTo(0,S/2);ctx.lineTo(S,S/2);
+  ctx.moveTo(S/2,0);ctx.lineTo(S/2,S);ctx.stroke();
+  if(w[0]||w[1]){                                  // decision boundary
+    const f=x=>-(w[0]*x+b)/(w[1]||1e-9);
+    const a=toPx([-3,f(-3)]),c=toPx([3,f(3)]);
+    ctx.strokeStyle='#1E293B';ctx.lineWidth=2;ctx.beginPath();
+    ctx.moveTo(a[0],a[1]);ctx.lineTo(c[0],c[1]);ctx.stroke();
+  }
+  for(const p of pts){
+    const q=toPx(p.x);ctx.beginPath();ctx.arc(q[0],q[1],5,0,7);
+    ctx.fillStyle=p.y>0?'#B5396B':'#3F7A6B';ctx.fill();
+  }
+}
+$('run').onclick=()=>{if(timer){clearInterval(timer);timer=null;$('run').textContent='run';}
+  else{timer=setInterval(pass,220);$('run').textContent='stop';}};
+$('step').onclick=pass; $('reset').onclick=reset; $('regen').onclick=regen;
+$('eta').oninput=()=>$('etav').textContent=eta().toFixed(3);
+$('ov').oninput=()=>{$('ovv').textContent=$('ov').value==='0'?'none':$('ov').value+'% labels flipped';regen();};
+$('rule').onchange=reset;
+regen();
+</script>

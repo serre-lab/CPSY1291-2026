@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hebbian learning: the weight aligns with the data</title>
+<!--
+  CPSY 1291 — interactive companion to the L02 "weight chases the data" figures.
+  Self-contained (no dependencies). Drag the points, regenerate the cloud, pick a
+  rule, and watch the weight w (brown) rotate onto PC1 (red). Embeddable in the
+  Marp HTML export via <iframe>; the static SVGs remain the PDF/book fallback.
+  Palette mirrors slides/template/cpsy1291.css.
+-->
+<style>
+  :root{
+    --bg:#FAF9F5; --ink:#1E293B; --body:#334155; --w:#9C5A2E; --x:#3E6D8E;
+    --pc:#B23A2E; --mean:#3F7A6B; --rule:#E7E3DA; --muted:#A89B8C;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  .wrap{display:flex;gap:18px;padding:16px;align-items:flex-start;flex-wrap:wrap;}
+  canvas{background:var(--bg);border:1px solid var(--rule);border-radius:10px;
+    touch-action:none;cursor:crosshair;}
+  .panel{min-width:230px;max-width:300px;}
+  h1{font-size:18px;margin:0 0 10px;}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;}
+  button{font:inherit;font-size:13px;padding:7px 11px;border:1px solid var(--rule);
+    background:#fff;border-radius:8px;cursor:pointer;color:var(--ink);}
+  button:hover{background:#F1EEE7;}
+  button.primary{background:var(--w);color:#fff;border-color:var(--w);}
+  label{font-size:13px;color:var(--body);display:flex;align-items:center;
+    gap:8px;margin:8px 0;justify-content:space-between;}
+  select,input[type=range]{font:inherit;}
+  .readout{font-variant-numeric:tabular-nums;background:#F1EEE7;border-radius:8px;
+    padding:10px 12px;margin-top:10px;font-size:13px;line-height:1.7;}
+  .readout b{color:var(--w);} .k{color:var(--muted);}
+  .legend{font-size:12.5px;color:var(--body);margin-top:10px;line-height:1.8;}
+  .sw{display:inline-block;width:22px;height:0;border-top:3px solid;
+    vertical-align:middle;margin-right:6px;}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <canvas id="cv" width="560" height="560"></canvas>
+  <div class="panel">
+    <h1>The weight chases the data</h1>
+    <div class="row">
+      <button class="primary" id="run">▶ Run</button>
+      <button id="step">Step</button>
+      <button id="reset">Reset w</button>
+    </div>
+    <div class="row">
+      <button id="regen">Regenerate cloud</button>
+      <button id="clear">Clear</button>
+    </div>
+    <label>Rule
+      <select id="rule">
+        <option value="hebb">Plain Hebb</option>
+        <option value="hebbnorm">Hebb + renormalise</option>
+        <option value="oja" selected>Oja's rule</option>
+      </select>
+    </label>
+    <label>Learning rate η
+      <input type="range" id="eta" min="0.005" max="0.12" step="0.005" value="0.04">
+    </label>
+    <label>Mean-center the data
+      <input type="checkbox" id="center" checked>
+    </label>
+    <div class="readout">
+      ‖w‖ = <b id="rNorm">–</b><br>
+      |cos(w, PC1)| = <b id="rCos">–</b> <span class="k">(1 = aligned)</span><br>
+      step <span id="rStep">0</span>
+    </div>
+    <div class="legend">
+      <span class="sw" style="border-color:var(--w)"></span>weight w<br>
+      <span class="sw" style="border-color:var(--pc);border-top-style:dashed"></span>PC1 (top eigenvector of C)<br>
+      <span class="sw" style="border-color:var(--mean)"></span>data mean
+    </div>
+    <div class="hint">Drag any point to reshape the cloud · click empty space to add a point.</div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height, CX = W/2, CY = H/2, SCALE = 46; // px per unit
+const css = getComputedStyle(document.documentElement);
+const COL = k => css.getPropertyValue(k).trim();
+
+let pts = [], w = {x:1, y:0}, steps = 0, running = false, drag = null;
+
+// ---- coordinate transforms (data <-> screen) ----
+const toPx = p => ({x: CX + p.x*SCALE, y: CY - p.y*SCALE});
+const toData = (px,py) => ({x:(px-CX)/SCALE, y:-(py-CY)/SCALE});
+
+// ---- data ----
+function gaussian(){ // Box-Muller
+  let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+function regen(){
+  pts = [];
+  const A=[[2.0,0],[1.1,0.6]];               // mixing -> anisotropic, tilted
+  const mx = 1.6, my = 1.1;                   // off-origin (so centering matters)
+  for(let i=0;i<140;i++){
+    const a=gaussian(), b=gaussian();
+    pts.push({x:A[0][0]*a+A[0][1]*b+mx, y:A[1][0]*a+A[1][1]*b+my});
+  }
+  resetW();
+}
+function resetW(){ w={x:-0.6,y:0.8}; const n=Math.hypot(w.x,w.y); w.x/=n; w.y/=n; steps=0; }
+
+// ---- statistics ----
+function meanOf(P){ let mx=0,my=0; for(const p of P){mx+=p.x;my+=p.y;} return {x:mx/P.length,y:my/P.length}; }
+function covOf(P,center){
+  const m = center ? meanOf(P) : {x:0,y:0};
+  let a=0,b=0,d=0; for(const p of P){const dx=p.x-m.x,dy=p.y-m.y; a+=dx*dx;b+=dx*dy;d+=dy*dy;}
+  const n=Math.max(P.length,1); return {a:a/n,b:b/n,d:d/n,mean:m};
+}
+function pc1(C){ // top eigenvector of [[a,b],[b,d]]
+  const tr=(C.a+C.d)/2, det=Math.sqrt(((C.a-C.d)/2)**2 + C.b*C.b);
+  const l1=tr+det; let vx=C.b, vy=l1-C.a;
+  if(Math.hypot(vx,vy)<1e-9){vx=1;vy=0;} const n=Math.hypot(vx,vy); return {x:vx/n,y:vy/n,l1};
+}
+function matVec(C,v){ return {x:C.a*v.x+C.b*v.y, y:C.b*v.x+C.d*v.y}; }
+
+// ---- one learning step (batch / expected update for a smooth demo) ----
+function update(){
+  if(pts.length<2) return;
+  const center = document.getElementById('center').checked;
+  const eta = +document.getElementById('eta').value;
+  const rule = document.getElementById('rule').value;
+  const C = covOf(pts, center);
+  const Cw = matVec(C, w);
+  if(rule==='oja'){
+    const wCw = w.x*Cw.x + w.y*Cw.y;
+    w = {x:w.x+eta*(Cw.x-wCw*w.x), y:w.y+eta*(Cw.y-wCw*w.y)};
+  } else {
+    w = {x:w.x+eta*Cw.x, y:w.y+eta*Cw.y};
+    if(rule==='hebbnorm'){ const n=Math.hypot(w.x,w.y); w.x/=n; w.y/=n; }
+  }
+  steps++;
+}
+
+// ---- drawing ----
+function arrow(from,to,color,lw){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=lw;
+  ctx.beginPath(); ctx.moveTo(from.x,from.y); ctx.lineTo(to.x,to.y); ctx.stroke();
+  const ang=Math.atan2(to.y-from.y,to.x-from.x), hs=11;
+  ctx.beginPath(); ctx.moveTo(to.x,to.y);
+  ctx.lineTo(to.x-hs*Math.cos(ang-0.4),to.y-hs*Math.sin(ang-0.4));
+  ctx.lineTo(to.x-hs*Math.cos(ang+0.4),to.y-hs*Math.sin(ang+0.4));
+  ctx.closePath(); ctx.fill();
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // axes
+  ctx.strokeStyle=COL('--ink'); ctx.globalAlpha=.5; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,CY); ctx.lineTo(W,CY); ctx.moveTo(CX,0); ctx.lineTo(CX,H); ctx.stroke();
+  ctx.globalAlpha=1;
+  const center=document.getElementById('center').checked;
+  const C=covOf(pts,center), m=C.mean;
+  const origin = center ? toPx(m) : toPx({x:0,y:0});   // updates act around this point
+  // points
+  ctx.fillStyle=COL('--body');
+  for(const p of pts){ const q=toPx(p); ctx.globalAlpha=.55;
+    ctx.beginPath(); ctx.arc(q.x,q.y,4,0,2*Math.PI); ctx.fill(); }
+  ctx.globalAlpha=1;
+  if(pts.length>=2){
+    const v=pc1(C), L=3.2;
+    // PC1 line through the origin-of-update
+    ctx.strokeStyle=COL('--pc'); ctx.setLineDash([7,6]); ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(origin.x - v.x*SCALE*L, origin.y + v.y*SCALE*L);
+    ctx.lineTo(origin.x + v.x*SCALE*L, origin.y - v.y*SCALE*L);
+    ctx.stroke(); ctx.setLineDash([]);
+    // mean marker
+    if(center){ const mp=toPx(m); ctx.fillStyle=COL('--mean');
+      ctx.beginPath(); ctx.arc(mp.x,mp.y,6,0,2*Math.PI); ctx.fill(); }
+    // weight arrow (display length fixed so it stays visible)
+    const wn=Math.hypot(w.x,w.y)||1, disp=2.6;
+    const tip={x:origin.x + w.x/wn*SCALE*disp, y:origin.y - w.y/wn*SCALE*disp};
+    arrow(origin, tip, COL('--w'), 4);
+    // readouts
+    const cos=Math.abs(w.x*v.x+w.y*v.y)/wn;
+    document.getElementById('rNorm').textContent = wn.toFixed(3);
+    document.getElementById('rCos').textContent = cos.toFixed(4);
+    document.getElementById('rStep').textContent = steps;
+  }
+}
+
+// ---- interaction ----
+function nearest(px,py){
+  let best=-1,bd=14*14;
+  pts.forEach((p,i)=>{const q=toPx(p);const d=(q.x-px)**2+(q.y-py)**2; if(d<bd){bd=d;best=i;}});
+  return best;
+}
+cv.addEventListener('pointerdown',e=>{
+  const r=cv.getBoundingClientRect(), px=e.clientX-r.left, py=e.clientY-r.top;
+  const i=nearest(px,py);
+  if(i>=0){ drag=i; } else { pts.push(toData(px,py)); }
+  draw();
+});
+cv.addEventListener('pointermove',e=>{
+  if(drag===null) return;
+  const r=cv.getBoundingClientRect();
+  pts[drag]=toData(e.clientX-r.left,e.clientY-r.top); draw();
+});
+window.addEventListener('pointerup',()=>{drag=null;});
+
+// ---- loop + buttons ----
+function loop(){ if(running){ update(); draw(); requestAnimationFrame(loop); } }
+document.getElementById('run').onclick=function(){
+  running=!running; this.textContent=running?'⏸ Pause':'▶ Run'; if(running) loop();
+};
+document.getElementById('step').onclick=()=>{update();draw();};
+document.getElementById('reset').onclick=()=>{resetW();draw();};
+document.getElementById('regen').onclick=()=>{regen();draw();};
+document.getElementById('clear').onclick=()=>{pts=[];resetW();draw();};
+document.getElementById('center').onchange=draw;
+document.getElementById('rule').onchange=()=>{};
+regen(); draw();
+</script>
+</body>
+</html>
