@@ -1,8 +1,9 @@
 // check_overflow_bootcamp.js — the v8 overflow check, pointed at the recitation decks.
 //
-// The theme locks `section { height: 720px; overflow: hidden }`, so any slide
-// taller than that is silently cropped. slides/check_overflow.js hard-codes the
-// v8 lecture directory; this is the same measurement for 2026/bootcamp/.
+// The recitation theme (theme/cpsy1291-recitation.css) locks the slide height
+// (1920x1080), so any slide taller than that is silently cropped.
+// slides/check_overflow.js hard-codes the v8 lecture directory; this is the
+// same measurement for the recitation decks.
 //
 //   node build/check_overflow_bootcamp.js          # all decks
 //   node build/check_overflow_bootcamp.js 03       # only decks matching "03"
@@ -19,7 +20,7 @@ const engineFactory = require(path.join(SLIDES, 'engine.js'));
 
 const CHROME = process.env.CHROME_PATH ||
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const themeCSS = fs.readFileSync(path.join(SLIDES, 'template/cpsy1291.css'), 'utf8');
+const themeCSS = fs.readFileSync(path.join(BOOTCAMP, 'theme/cpsy1291-recitation.css'), 'utf8');
 const TMP = path.join(BOOTCAMP, '_ovf_check.html');
 const THRESHOLD = 4;
 

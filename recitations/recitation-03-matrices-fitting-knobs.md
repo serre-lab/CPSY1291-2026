@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
@@ -27,7 +27,7 @@ math: katex
   different data on purpose.
 ============================================================================ -->
 
-<div class="eyebrow">Recitation 3 · Week 3</div>
+<div class="eyebrow">Recitation 3</div>
 
 # Matrices, fitting, and knobs
 

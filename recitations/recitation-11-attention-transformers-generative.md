@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
@@ -25,7 +25,7 @@ math: katex
   the term, seven exercises. Tell them to read it in three passes, not one.
 ============================================================================ -->
 
-<div class="eyebrow">Recitation 11 · Week 11</div>
+<div class="eyebrow">Recitation 11</div>
 
 # Attention, transformers, generative models
 

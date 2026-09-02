@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
@@ -23,7 +23,7 @@ math: katex
   prose, with six exercises and answers.
 ============================================================================ -->
 
-<div class="eyebrow">Recitation 6 · Week 6</div>
+<div class="eyebrow">Recitation 6</div>
 
 # Held-out data, and images
 

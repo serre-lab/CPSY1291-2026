@@ -1,12 +1,12 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
 
 <!-- ===========================================================================
-  CPSY 1291 — BOOTCAMP RECITATION 1 of 2: Python and NumPy
+  CPSY 1291 — RECITATION 1: Python and NumPy
   TA-led, 80 minutes. Optional session; students who already program
   comfortably in Python should skip it.
 
@@ -27,7 +27,7 @@ math: katex
   prose. Tell students at the start that they do not need to take notes.
 ============================================================================ -->
 
-<div class="eyebrow">Bootcamp · Recitation 1 of 2</div>
+<div class="eyebrow">Recitation 1</div>
 
 # Python and NumPy
 

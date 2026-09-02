@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
@@ -25,7 +25,7 @@ math: katex
   prose, with a seven-item debugging checklist and six exercises.
 ============================================================================ -->
 
-<div class="eyebrow">Recitation 5 · Week 5</div>
+<div class="eyebrow">Recitation 5</div>
 
 # PyTorch
 

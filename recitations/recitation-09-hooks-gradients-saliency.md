@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
@@ -26,7 +26,7 @@ math: katex
   MATERIAL: handout-09-hooks-gradients-saliency.pdf, six exercises.
 ============================================================================ -->
 
-<div class="eyebrow">Recitation 9 · Week 9</div>
+<div class="eyebrow">Recitation 9</div>
 
 # Looking inside a network
 

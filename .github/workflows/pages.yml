@@ -26,7 +26,7 @@ jobs:
           mkdir -p _site/recitations
           for f in recitations/recitation-*.md; do
             b=$(basename "$f" .md)
-            npx --yes @marp-team/marp-cli@latest "$f" -o "_site/recitations/$b.html" --html
+            npx --yes @marp-team/marp-cli@latest "$f" -o "_site/recitations/$b.html" --html --theme-set recitations/theme/cpsy1291-recitation.css
           done
           cp -f recitations/handout-*.pdf recitations/bootcamp-notes.pdf _site/recitations/ 2>/dev/null || true
           cp -f colab-setup.html _site/ 2>/dev/null || true

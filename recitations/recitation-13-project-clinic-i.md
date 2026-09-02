@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
@@ -25,7 +25,7 @@ math: katex
   the day-by-day schedule.
 ============================================================================ -->
 
-<div class="eyebrow">Recitation 13 · Week 13</div>
+<div class="eyebrow">Recitation 13</div>
 
 # Project clinic I
 

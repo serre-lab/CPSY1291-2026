@@ -21,7 +21,8 @@ House rules for any change, by any contributor or tooling:
 4. Never include solutions to graded questions. Code skeletons appear only where the
    course has decided to hand them out.
 5. Before pushing, rebuild what you touched
-   (`npx @marp-team/marp-cli <deck>.md -o <deck>.html --html`) and run
+   (`npx @marp-team/marp-cli <deck>.md -o <deck>.html --html --theme-set recitations/theme/cpsy1291-recitation.css`
+   — the same invocation CI uses) and run
    `node recitations/build/check_overflow_bootcamp.js` — zero clipped slides is a hard gate.
 6. Handouts compile with lualatex, never pdflatex.
 7. Structural changes (adding/removing a week, changing the handout scheme) are

@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
@@ -25,7 +25,7 @@ math: katex
   MATERIAL: handout-08-rsa-decoding-permutation.pdf, with six exercises.
 ============================================================================ -->
 
-<div class="eyebrow">Recitation 8 · Week 8</div>
+<div class="eyebrow">Recitation 8</div>
 
 # Comparing representations
 

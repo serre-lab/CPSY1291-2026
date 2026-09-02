@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
@@ -26,7 +26,7 @@ math: katex
   with six exercises and answers.
 ============================================================================ -->
 
-<div class="eyebrow">Recitation 4 · Week 4</div>
+<div class="eyebrow">Recitation 4</div>
 
 # One neuron, and the calculus of learning
 

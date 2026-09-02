@@ -1,12 +1,12 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
 
 <!-- ===========================================================================
-  CPSY 1291 — BOOTCAMP RECITATION 2 of 2: from vectors to PCA
+  CPSY 1291 — RECITATION 2: from vectors to PCA
   TA-led, 80 minutes. Optional. Assumes Recitation 1 or equivalent numpy.
 
   SCOPE: reconciled against the FINAL Assignment 1 (2026-09-01). Students are
@@ -27,7 +27,7 @@ math: katex
   and what could go wrong.
 ============================================================================ -->
 
-<div class="eyebrow">Bootcamp · Recitation 2 of 2</div>
+<div class="eyebrow">Recitation 2</div>
 
 # From vectors to PCA
 

@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
@@ -24,7 +24,7 @@ math: katex
   checklist.
 ============================================================================ -->
 
-<div class="eyebrow">Recitation 14 · Week 14</div>
+<div class="eyebrow">Recitation 14</div>
 
 # Project clinic II
 

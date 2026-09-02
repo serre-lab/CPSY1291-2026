@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
@@ -25,7 +25,7 @@ math: katex
   MATERIAL: handout-10-sequences-recurrence-dynamics.pdf, six exercises.
 ============================================================================ -->
 
-<div class="eyebrow">Recitation 10 · Week 10</div>
+<div class="eyebrow">Recitation 10</div>
 
 # Sequences, recurrence, dynamics
 

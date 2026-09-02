@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
@@ -27,7 +27,7 @@ math: katex
   L09-L19 and sixteen problems with worked answers.
 ============================================================================ -->
 
-<div class="eyebrow">Recitation 12 · Week 12</div>
+<div class="eyebrow">Recitation 12</div>
 
 # Final exam review
 

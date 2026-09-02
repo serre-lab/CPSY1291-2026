@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: cpsy1291
+theme: cpsy1291-recitation
 paginate: true
 math: katex
 ---
@@ -27,7 +27,7 @@ math: katex
   that it exists so nobody transcribes the board.
 ============================================================================ -->
 
-<div class="eyebrow">Recitation 7 · Week 7</div>
+<div class="eyebrow">Recitation 7</div>
 
 # Midterm review
 
