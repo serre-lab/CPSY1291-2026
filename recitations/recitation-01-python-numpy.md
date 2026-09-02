@@ -431,7 +431,7 @@ and it is how they check the data was loaded correctly.
 
 ```python
 (taxon == 2) | (taxon == 5)     # parentheses required — | binds tighter than ==
-np.isin(cat, [0, 2])            # True where cat is 0 OR 2, in one call
+np.isin(cat, [0, 2])            # cat: Part 3's category array (ints, like taxon)
 ```
 
 Write `and` / `or` between arrays and you get:
