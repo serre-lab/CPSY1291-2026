@@ -1,0 +1,132 @@
+% CPSY 1291 -- Assignment 1 call sheet
+% One page: the signatures and idioms Recitations 1-2 taught, as a lookup card.
+% Compile:  lualatex callsheet-A1.tex
+\documentclass[10pt]{article}
+\usepackage{cpsy1291-handout}
+\usepackage{multicol}
+\geometry{margin=0.55in}
+\pagestyle{empty}
+\setlength{\columnsep}{24pt}
+\setlength{\parskip}{2pt}
+
+\lstset{basicstyle=\ttfamily\footnotesize, aboveskip=3pt, belowskip=2pt, framesep=4pt}
+
+% Compact block header and "what it returns / what to remember" line
+\newcommand{\block}[1]{\vspace{5pt}{\sffamily\bfseries\color{brown}#1}\par\vspace{0pt}}
+\newcommand{\ret}[1]{{\footnotesize\color{ink}#1\par}\vspace{1pt}}
+
+\begin{document}
+
+\begin{center}
+{\sffamily\small\color{accent}\MakeUppercase{CPSY 1291 \ $\cdot$\ Assignment 1 call sheet}}\\[3pt]
+{\sffamily\LARGE\bfseries\color{brown} Signatures and idioms}\\[2pt]
+{\color{lightgray}\small Fall 2026 \quad$\cdot$\quad everything here was taught in Recitations 1--2 \quad$\cdot$\quad keep it next to the notebook}
+\end{center}
+\vspace{1pt}\hrule\vspace{2pt}
+
+\begin{multicols}{2}
+
+\block{Shapes, \texttt{axis=}, \texttt{keepdims}}
+\begin{lstlisting}
+X.shape                    # (120, 4096) stimuli x features
+X.mean(axis=0).shape       # (4096,)  the named axis disappears
+X.mean(axis=1, keepdims=True).shape   # (120, 1)
+X - X.mean(axis=1)         # ValueError: (120,4096) (120,)
+\end{lstlisting}
+\ret{Compare shapes \emph{from the right}: each pair equal, or one is 1, or you get the error above. \texttt{keepdims=True} keeps a size-1 axis so subtraction lines up; \texttt{v[:, None]} is the same idea by hand.}
+
+\block{Boolean masks}
+\begin{lstlisting}
+mask = (taxon == 2)     # one boolean per stimulus
+X[mask]                 # just those rows
+mask.sum(); mask.mean() # how many; what FRACTION (a rate)
+np.isin(cat, [0, 2])    # membership in a set of labels
+\end{lstlisting}
+\ret{Element-wise logic on arrays: \texttt{\&} and \ $\cdot$\ \texttt{|} or \ $\cdot$\ \texttt{\textasciitilde} not --- \emph{always with parentheses}: \texttt{(taxon == 2) | (taxon == 5)}. Writing \texttt{and}/\texttt{or} between arrays raises ``truth value \dots\ is ambiguous''.}
+
+\block{The upper triangle, and reordering a matrix}
+\begin{lstlisting}
+iu = np.triu_indices(120, k=1)  # a PAIR of index arrays
+D[iu]                    # 7,140 values: every pair once
+order = np.argsort(taxon)
+D[np.ix_(order, order)]  # rows AND columns reordered
+D[order, order]          # NOT that: 120 diagonal entries
+\end{lstlisting}
+\ret{\texttt{iu} walks the upper triangle in a \emph{fixed pair order}, so \texttt{D1[iu]} and \texttt{D2[iu]} describe the same pair at every position --- the whole reason two such vectors can be correlated. \texttt{np.ix\_} builds the open grid; \texttt{D[order, order]} silently applies the paired rule instead.}
+
+\block{Fancy indexing and \texttt{argsort}}
+\begin{lstlisting}
+D[a, c] > D[a, b] + D[b, c] + 1e-9  # one boolean per triple
+np.argsort(v)[:5]        # indices of the 5 SMALLEST
+np.argsort(v)[::-1][:5]  # indices of the 5 LARGEST
+\end{lstlisting}
+\ret{Two index arrays pull one element \emph{per pair} --- 200{,}000 triples in one line, no loop (compute the distance matrix \emph{once}, then index into it). \texttt{argsort} returns \emph{indices}, not values --- and a stimulus is always maximally similar to itself, so exclude it from its own neighbor list.}
+
+\block{Comparing two RDMs}
+\begin{lstlisting}
+rho = spearmanr(D1[iu], D2[iu]).statistic
+\end{lstlisting}
+\ret{\texttt{.statistic} is where the number lives (\texttt{.pvalue} exists, but the pairs are not independent --- do not lean on it). Spearman = Pearson on \emph{ranks}: only the ordering of dissimilarities is meaningful. Never feed the whole matrix: that counts every pair twice and adds $n$ zeros.}
+
+\block{Condensed vs square}
+\begin{lstlisting}
+d = pdist(X, metric='euclidean')  # condensed (n*(n-1)/2,)
+D = squareform(d)                 # square (n, n), and back
+\end{lstlisting}
+\ret{\texttt{imshow} and \texttt{MDS} want \emph{square}; \texttt{linkage} wants \emph{condensed}: \texttt{linkage(squareform(D\_human, checks=False), method='average')}.}
+
+\columnbreak
+
+\block{Fitting a curve, and the straight line}
+\begin{lstlisting}
+popt, _ = curve_fit(f_exp, x, y, p0=[10, 1], maxfev=40000)
+y_hat   = f_exp(x, *popt)  # * unpacks the parameters back in
+coef  = np.polyfit(x, y, 1)  # slope and intercept
+y_hat = np.polyval(coef, x)  # the line at every x
+\end{lstlisting}
+\ret{\texttt{p0}: start near the right scale --- similarities run 0--10, so $a \approx 10$. \texttt{maxfev}: raise it, or hard fits die with ``Optimal parameters not found''. Wrap in \texttt{try/except RuntimeError} where a fit is \emph{allowed} to fail (2j says so --- that failure is a finding, not a bug).}
+
+\block{Goodness of fit}
+\[
+R^2 = 1 - \frac{\sum_i (y_i - \hat{y}_i)^2}{\sum_i (y_i - \bar{y})^2}
+\]
+\ret{$1$ = perfect \ $\cdot$\ $0$ = no better than predicting the mean \ $\cdot$\ negative = worse than that (a real outcome, not a bug). It is a \emph{ratio}: two $R^2$ values are comparable only against the same target --- binning first raises it with the curve unchanged.}
+
+\block{The scikit-learn pattern}
+\begin{lstlisting}
+est = PCA(n_components=50)
+Y   = est.fit_transform(X)     # items x features in
+est.explained_variance_ratio_  # exists only after .fit
+cum = np.cumsum(est.explained_variance_ratio_)
+np.argmax(cum >= 0.85)  # first True: components to 85%
+\end{lstlisting}
+\ret{Settings go in the constructor, data goes to \texttt{.fit}, learned results grow a \emph{trailing underscore} (not a typo). \texttt{MDS} takes a dissimilarity matrix: \texttt{metric='precomputed'}. Random methods differ between runs unless you set \texttt{random\_state} --- reproducible is not the same as meaningful.}
+
+\block{Per-group anything (groupby without groupby)}
+\begin{lstlisting}
+means = np.stack([F[obj == k].mean(axis=0)
+                  for k in range(51)])       # (51, 4096)
+\end{lstlisting}
+\ret{Four moves: mask $\rightarrow$ those rows $\rightarrow$ collapse \texttt{axis=0} $\rightarrow$ \texttt{np.stack}. Every ``for each object / category / cluster'' sentence is this template with a different word in step 3.}
+
+\block{NaNs --- pick one, and say which}
+\begin{lstlisting}
+np.isnan(A).sum()  # count them before trusting anything
+IT = it_raw[:, ~np.isnan(it_raw).any(axis=0)]     # DROP
+IT = np.where(np.isnan(it_raw),                   # IMPUTE
+              np.nanmean(it_raw, axis=0), it_raw)
+\end{lstlisting}
+\ret{Both are defensible; the notebook only demands you \emph{say which}. Ordering rule: check for zero-variance units \emph{before} z-scoring --- dividing by a std of 0 makes NaNs, and one NaN poisons everything downstream. Related clip: \texttt{np.sqrt(np.maximum(D2, 0))} --- floating point leaves tiny negatives where the true value is 0.}
+
+\block{\texttt{silhouette\_score} --- what goes in}
+\begin{lstlisting}
+silhouette_score(Y[:, :2], (cat == c).astype(int))
+\end{lstlisting}
+\ret{First argument: the 2-D \emph{coordinates} in the PC1--PC2 plane, \emph{not} the RDM --- it computes its own distances. Second: a binary labeling, this category against everything else. Near 1 = sits apart \ $\cdot$\ near 0 = on a boundary \ $\cdot$\ negative = closer to another group than its own. No relation to 3f's silhouette \emph{masks} --- the name is a coincidence.}
+
+\end{multicols}
+
+\vspace{1pt}\hrule\vspace{4pt}
+{\color{lightgray}\footnotesize Nothing on this sheet answers a graded question --- it is the syntax, so your time goes to the science. The worked versions live in the recitation decks and \texttt{bootcamp-notes.pdf}.}
+
+\end{document}

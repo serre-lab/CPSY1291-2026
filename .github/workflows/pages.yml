@@ -28,7 +28,7 @@ jobs:
             b=$(basename "$f" .md)
             npx --yes @marp-team/marp-cli@latest "$f" -o "_site/recitations/$b.html" --html --theme-set recitations/theme/cpsy1291-recitation.css
           done
-          cp -f recitations/handout-*.pdf recitations/bootcamp-notes.pdf _site/recitations/ 2>/dev/null || true
+          cp -f recitations/handout-*.pdf recitations/callsheet-*.pdf recitations/bootcamp-notes.pdf _site/recitations/ 2>/dev/null || true
           cp -f colab-setup.html _site/ 2>/dev/null || true
           for d in slides images demos figures; do
             [ -d "$d" ] && cp -R "$d" "_site/$d" || true
