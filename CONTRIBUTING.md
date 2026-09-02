@@ -1,11 +1,11 @@
 # Contributing
 
-Recitation materials for CPSY 1291, Fall 2026 (Brown University).
+Public course materials for CPSY 1291, Fall 2026 (Brown University).
 Maintainers: Thomas Serre (@tserre), Peisen Zhou (@PPPayson).
 
-- `recitation-NN-*.md` — one Marp deck per weekly 80-minute recitation.
-- `handout-NN-*.tex/.pdf` — printed handout paired with a week, where one exists.
-- `bootcamp-notes.tex/.pdf` — standalone Python/numpy notes for the early weeks.
+- `recitations/recitation-NN-*.md` — one Marp deck per weekly 80-minute recitation.
+- `recitations/handout-NN-*.tex/.pdf` — printed handout paired with a week, where one exists.
+- `recitations/bootcamp-notes.tex/.pdf` — standalone Python/numpy notes for the early weeks.
 - Every push to `main` rebuilds the decks and publishes to GitHub Pages automatically,
   and students may follow the published links at any time — finish an edit before pushing.
 
@@ -22,7 +22,7 @@ House rules for any change, by any contributor or tooling:
    course has decided to hand them out.
 5. Before pushing, rebuild what you touched
    (`npx @marp-team/marp-cli <deck>.md -o <deck>.html --html`) and run
-   `node build/check_overflow_bootcamp.js` — zero clipped slides is a hard gate.
+   `node recitations/build/check_overflow_bootcamp.js` — zero clipped slides is a hard gate.
 6. Handouts compile with lualatex, never pdflatex.
 7. Structural changes (adding/removing a week, changing the handout scheme) are
    Thomas's call — propose first.
