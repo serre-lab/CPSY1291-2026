@@ -104,7 +104,7 @@ np.argmax(cum >= 0.85)  # first True: components to 85%
 
 \block{Per-group anything (groupby without groupby)}
 \begin{lstlisting}
-means = np.stack([F[obj == k].mean(axis=0)
+means = np.stack([fc6[obj == k].mean(axis=0)
                   for k in range(51)])       # (51, 4096)
 \end{lstlisting}
 \ret{Four moves: mask $\rightarrow$ those rows $\rightarrow$ collapse \texttt{axis=0} $\rightarrow$ \texttt{np.stack}. Every ``for each object / category / cluster'' sentence is this template with a different word in step 3.}
@@ -120,7 +120,7 @@ IT = np.where(np.isnan(it_raw),                   # IMPUTE
 
 \block{\texttt{silhouette\_score} --- what goes in}
 \begin{lstlisting}
-silhouette_score(Y[:, :2], (cat == c).astype(int))
+silhouette_score(proj_fc6[:, :2], (cat == c).astype(int))
 \end{lstlisting}
 \ret{First argument: the 2-D \emph{coordinates} in the PC1--PC2 plane, \emph{not} the RDM --- it computes its own distances. Second: a binary labeling, this category against everything else. Near 1 = sits apart \ $\cdot$\ near 0 = on a boundary \ $\cdot$\ negative = closer to another group than its own. No relation to 3f's silhouette \emph{masks} --- the name is a coincidence.}
 
