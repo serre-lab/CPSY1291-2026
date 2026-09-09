@@ -84,7 +84,7 @@ y_hat   = f_exp(x, *popt)  # * unpacks the parameters back in
 coef  = np.polyfit(x, y, 1)  # slope and intercept
 y_hat = np.polyval(coef, x)  # the line at every x
 \end{lstlisting}
-\ret{\texttt{p0}: start near the right scale --- similarities run 0--10, so $a \approx 10$. \texttt{maxfev}: raise it, or hard fits die with ``Optimal parameters not found''. Wrap in \texttt{try/except RuntimeError} where a fit is \emph{allowed} to fail (2j says so --- that failure is a finding, not a bug).}
+\ret{\texttt{p0}: start near the right scale --- similarities run 0--10, so $a \approx 10$. \texttt{maxfev}: raise it, or hard fits die with ``Optimal parameters not found''. Wrap in \texttt{try/except RuntimeError} where a fit is \emph{allowed} to fail (2h says so --- that failure is a finding, not a bug).}
 
 \block{Goodness of fit}
 \[
