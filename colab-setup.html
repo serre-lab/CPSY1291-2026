@@ -21,12 +21,11 @@ shortcut inside your <code>cpsy1291</code> folder. The notebooks look for
 <h2>3. Open a notebook and run it</h2>
 <ol>
 <li>From Canvas, open the assignment notebook and choose <em>File &rarr; Save a copy in Drive</em>. Work in your copy.</li>
-<li>Run the first cell. Colab will ask permission to mount your Drive — approve it with your Brown account.</li>
-<li>The setup cell prints what it loaded. If it says it cannot find the data, re-check step 2's folder names.</li>
+<li>Run the first two cells. The first mounts your Drive: Colab will ask permission, so approve it with your Brown account. The second loads the data and prints what it found.</li>
+<li> If it says it cannot find the data, re-check step 2's folder names.</li>
 </ol>
 <div class="note"><strong>Two things that are normal, not broken:</strong> Part&nbsp;2's first cell upgrades scikit-learn
-and takes an extra half-minute on a fresh runtime — no restart needed. And Part&nbsp;4's t-SNE cell runs for several
-minutes; do not interrupt it.</div>
+and takes an extra half-minute on a fresh runtime — no restart needed. And Part&nbsp;4 fits t-SNE nineteen times across the notebook, about twenty minutes in total on a free runtime; do not interrupt those cells, and leave time for the final restart-and-run-all.</div>
 <h2>4. Before you submit</h2>
 <p><em>Runtime &rarr; Restart session and run all</em>, wait for every cell to finish, then
 <em>File &rarr; Download &rarr; Download .ipynb</em>, keeping the exact filename. Submission details are at the bottom of
