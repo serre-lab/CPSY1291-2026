@@ -30,6 +30,7 @@ jobs:
           done
           cp -f recitations/handout-*.pdf recitations/callsheet-*.pdf recitations/bootcamp-notes.pdf _site/recitations/ 2>/dev/null || true
           cp -f colab-setup.html _site/ 2>/dev/null || true
+          cp -f syllabus.pdf _site/ 2>/dev/null || true
           for d in slides images demos figures; do
             [ -d "$d" ] && cp -R "$d" "_site/$d" || true
           done
@@ -40,7 +41,10 @@ jobs:
             echo '</ul><h2>Recitations</h2><ul>'
             for f in _site/recitations/recitation-*.html; do b=$(basename "$f"); echo "<li><a href=\"recitations/$b\">${b%.html}</a></li>"; done
             for f in _site/recitations/*.pdf; do [ -f "$f" ] || continue; b=$(basename "$f"); echo "<li><a href=\"recitations/$b\">$b</a></li>"; done
-            echo '</ul><p><a href="colab-setup.html">Colab setup</a></p>'
+            echo '</ul><h2>Course</h2><ul>'
+            [ -f _site/syllabus.pdf ] && echo '<li><a href="syllabus.pdf">Syllabus (PDF)</a></li>'
+            echo '<li><a href="colab-setup.html">Colab setup</a></li>'
+            echo '</ul>'
           } > _site/index.html
       - uses: actions/upload-pages-artifact@v3
   deploy:
