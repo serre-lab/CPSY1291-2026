@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The braid: neuroscience and AI, 1943 to today — CPSY 1291</title>
+<style>
+  :root{
+    --sienna:#9C5A2E; --slate:#3E6D8E; --teal:#3F7A6B;
+    --cream:#FAF9F5; --ink:#1E293B; --muted:#5B6B7A; --rule:#E7E3DA;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%;background:var(--cream);color:var(--ink);
+    font-family:"Helvetica Neue",Arial,system-ui,sans-serif;overflow:hidden}
+  #wrap{height:100%;display:flex;flex-direction:column}
+  #stage{position:relative;flex:1;overflow:hidden}
+  svg{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+  svg.dragging{cursor:grabbing}
+
+  .strandLabel{font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+  .yearTick{font-size:12px;fill:var(--muted);font-variant-numeric:tabular-nums;font-weight:700}
+  .evt .lbl,.evt .stem{opacity:0;transition:opacity .5s ease}
+  .evt.on .lbl{opacity:1}
+  .evt.on .stem{opacity:.5}
+  .evt .stem{transition:opacity .5s ease}
+  .evt circle{opacity:.30;transition:opacity .5s ease, r .35s ease}
+  .evt .tie{opacity:.22;transition:opacity .5s ease}
+  .evt.on .tie{opacity:.5}
+  .evt.on circle{opacity:1}
+  /* Only the event dot grows on focus. The tie's end-caps stay small, or they
+     swallow the tie and read as three loose dots off the strands. */
+  .evt.on .dot{r:7.5}
+  /* A label the solver could not fit anywhere is dropped rather than overlapped,
+     and its stem goes with it — a leader line to nothing is worse than neither. */
+  .evt.on .lbl.nofit{opacity:0}
+  .evt.on .stem.nofit{opacity:0}
+  /* Cream halo: a stem or a ghost strand passing behind text never touches it. */
+  .lbl text{font-size:13px;fill:var(--ink);
+    paint-order:stroke;stroke:var(--cream);stroke-width:3.5px;stroke-linejoin:round}
+  .lbl .yr{font-weight:800;font-variant-numeric:tabular-nums}
+  .lbl .sub{font-size:12px;fill:var(--muted)}
+
+  /* Era caption: a card in screen space, docked per era by the layout solver to
+     whichever slot buries the least. No label is ever allowed under it. */
+  /* The year axis is pinned to the stage, so it stays put while the map zooms. */
+  #axis{position:absolute;left:0;right:0;bottom:0;height:30px;pointer-events:none;
+    border-top:1px solid var(--rule);background:linear-gradient(to top,var(--cream) 62%,transparent)}
+  #axis span{position:absolute;bottom:7px;transform:translateX(-50%);font-size:12px;font-weight:700;
+    color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+  #axis i{position:absolute;top:-1px;width:1px;height:7px;background:var(--rule)}
+  #cap{position:absolute;left:22px;top:18px;max-width:40%;pointer-events:none;
+    padding:14px 20px 16px;border-radius:12px;
+    background:color-mix(in srgb, var(--cream) 93%, transparent);
+    box-shadow:0 1px 0 var(--rule), 0 8px 24px -14px rgba(30,41,59,.35);
+    opacity:0;transform:translateY(-6px);transition:opacity .45s ease, transform .45s ease}
+  #cap.on{opacity:1;transform:none}
+  #cap h2{margin:0 0 8px;font-size:21px;line-height:1.2;color:var(--sienna);letter-spacing:-.01em}
+  #cap p{margin:0 0 5px;font-size:14.5px;line-height:1.45;color:var(--ink)}
+
+  #bar{display:flex;align-items:center;gap:9px;padding:9px 14px;border-top:1px solid var(--rule);
+    background:var(--cream);font-size:13px;color:var(--muted);flex-wrap:wrap}
+  #chapters{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+  .chip{font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;cursor:pointer;
+    border:2px solid var(--rule);background:#fff;color:var(--muted);white-space:nowrap;
+    font-family:inherit;transition:border-color .2s,color .2s}
+  .chip.on{border-color:var(--sienna);color:var(--sienna)}
+  .legend{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--ink);white-space:nowrap}
+  .legend i{width:22px;height:5px;border-radius:3px;display:inline-block;margin-left:12px}
+  .hint kbd{font-family:inherit;font-weight:700;background:#fff;border:1px solid var(--rule);
+    border-radius:5px;padding:1px 6px;color:var(--ink)}
+  button.nav{font-size:15px;font-weight:800;padding:5px 13px;border-radius:8px;
+    border:2px solid var(--slate);background:#fff;color:var(--slate);cursor:pointer;font-family:inherit}
+  button.nav:disabled{opacity:.3;cursor:default}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <svg id="tl" viewBox="0 0 2000 640" preserveAspectRatio="xMidYMid meet"
+         aria-label="Interactive timeline of neuroscience and artificial intelligence from 1943 to today, showing the two fields converging, splitting, and converging again"></svg>
+    <div id="axis"></div>
+    <div id="cap"><h2></h2><p class="l1"></p><p class="l2"></p></div>
+  </div>
+  <div id="bar">
+    <button class="nav" id="prev">←</button>
+    <button class="nav" id="next">→</button>
+    <div id="chapters"></div>
+    <span class="legend"><i style="background:var(--teal)"></i>Neuroscience<i style="background:var(--slate)"></i>Artificial intelligence</span>
+    <span class="hint"><kbd>←</kbd><kbd>→</kbd> step · <kbd>0</kbd> whole story · drag to pan · scroll to zoom</span>
+  </div>
+</div>
+<script>
+const VB_W = 2000, VB_H = 640;
+const Y0 = 1940, Y1 = 2028, X0 = 110, X1 = 1900;
+const x = y => X0 + (y - Y0) / (Y1 - Y0) * (X1 - X0);
+const yearAt = X => Y0 + (X - X0) / (X1 - X0) * (Y1 - Y0);
+const NEURO = 195, AI = 470, MID = (NEURO + AI) / 2;
+const STROKE = 5.5;                                   // strand width, data units
+
+// How far apart the two strands run at each year. 1 = fully apart, 0 = merged.
+const SEP = [
+  [1940,.05],[1943,.05],[1952,.10],[1956,.30],[1962,1],[1975,1],[1980,.60],
+  [1986,.14],[1992,.68],[2001,.88],[2012,.30],[2014,.10],[2018,.78],[2026,.50],[2028,.50]
+];
+function sepAt(yr){
+  for (let i=0;i<SEP.length-1;i++){
+    const [a,va]=SEP[i],[b,vb]=SEP[i+1];
+    if (yr>=a && yr<=b){ const t=(yr-a)/(b-a); return va+(vb-va)*(t*t*(3-2*t)); }
+  }
+  return SEP[SEP.length-1][1];
+}
+const strandY = (yr, which) => {
+  const half = (AI-NEURO)/2 * sepAt(yr);
+  return which==='neuro' ? MID - half : MID + half;
+};
+
+const EVENTS = [
+  {y:1943,key:1,s:'both', t:'McCulloch & Pitts', d:'a neuron as logic'},
+  {y:1949,s:'both', t:'Hebb',              d:'cells that fire together'},
+  {y:1956,key:1,s:'ai',   t:'Dartmouth',         d:'the field is named “AI”'},
+  {y:1958,s:'both', t:'Rosenblatt',        d:'the perceptron, in a psychology journal'},
+  {y:1962,key:1,s:'neuro',t:'Hubel & Wiesel',    d:'simple and complex cells'},
+  {y:1969,key:1,s:'ai',   t:'Minsky & Papert',   d:'Perceptrons'},
+  {y:1972,s:'neuro',t:'Gross',             d:'selectivity in IT cortex'},
+  {y:1980,s:'ai',   t:'Fukushima',         d:'Neocognitron'},
+  {y:1982,s:'both', t:'Hopfield · Marr',   d:'physics arrives; three levels'},
+  {y:1986,key:1,s:'both', t:'PDP volumes',       d:'backprop reaches psychology'},
+  {y:1989,s:'ai',   t:'LeCun',             d:'LeNet'},
+  {y:1999,s:'neuro',t:'Riesenhuber & Poggio', d:'HMAX'},
+  {y:2007,s:'neuro',t:'Serre, Oliva & Poggio', d:'a cortex-like model holds its own'},
+  {y:2012,key:1,s:'ai',   t:'AlexNet',           d:'16.4% vs 26.2% — the cliff'},
+  {y:2014,s:'both', t:'Yamins & DiCarlo',  d:'task-trained nets predict IT'},
+  {y:2017,s:'ai',   t:'Transformers',      d:'owes the brain nothing — so far'},
+  {y:2022,s:'ai',   t:'ChatGPT',           d:'scale as the strategy'},
+  {y:2024,key:1,s:'both', t:'Nobel Prize',       d:'to the field written off in 1969'},
+];
+
+const ERAS = [
+  {k:'All', a:1940, b:2028, title:'', lines:[]},
+  {k:'One community', a:1941, b:1963, title:'One community, not two · 1943–1958',
+   lines:['Same conferences, same funders, same people.',
+          'The perceptron was published in Psychological Review.']},
+  {k:'The split', a:1954, b:1982, title:'The split was a choice · 1956–1979',
+   lines:['“AI” was named partly against the brain-inspired tradition.',
+          'Neuroscience kept building the parts list deep learning would use.']},
+  {k:'The 1980s', a:1978, b:1994, title:'The decade that built deep learning · 1980s',
+   lines:['The reconvergence happened inside cognitive science.',
+          'Marr gave everyone a shared vocabulary for what a model is for.']},
+  {k:'Cortex → AlexNet', a:1988, b:2017, title:'From cat cortex to AlexNet — and back · 1989–2014',
+   lines:['One parent, two children: an engineering lane and a neuroscience lane.',
+          'By 2014 the loop closed — nets trained only to name objects predicted IT.']},
+  {k:'Second revolution', a:2013, b:2028, title:'The second revolution · 2017–today',
+   lines:['The transformer’s architecture owes little to neuroscience.',
+          'Whether the strands reconverge is the open question of this course.']},
+];
+
+const svg = document.getElementById('tl');
+const NS = 'http://www.w3.org/2000/svg';
+const mk = (n,a={}) => { const e=document.createElementNS(NS,n); for(const k in a) e.setAttribute(k,a[k]); return e; };
+// Sampled every quarter year, so every event year is a vertex of the polyline
+// and a dot placed at that year sits exactly on the drawn curve, not on a chord.
+const STEP = 0.25;
+const strandPath = which => {
+  let d='';
+  for (let yr=Y0; yr<=Y1+1e-9; yr+=STEP) d += (d?'L':'M') + x(yr).toFixed(2) + ' ' + strandY(yr,which).toFixed(2) + ' ';
+  return d;
+};
+
+// ---- static layer -------------------------------------------------------
+const gStatic = mk('g'); svg.appendChild(gStatic);
+gStatic.appendChild(mk('path',{d:strandPath('neuro'),fill:'none',stroke:'var(--teal)','stroke-width':STROKE,'stroke-linecap':'round','stroke-linejoin':'round',opacity:.9}));
+gStatic.appendChild(mk('path',{d:strandPath('ai'),fill:'none',stroke:'var(--slate)','stroke-width':STROKE,'stroke-linecap':'round','stroke-linejoin':'round',opacity:.9}));
+const gMarks  = mk('g'); svg.appendChild(gMarks);    // ties, stems, dots
+const gLabels = mk('g'); svg.appendChild(gLabels);   // text last: nothing draws over it
+
+// ---- events: dot in data space, label counter-scaled to stay readable ----
+const HALF = yr => (AI-NEURO)/2 * sepAt(yr);
+// Widest the strands get anywhere across a span of years, plus half a stroke.
+// A label clears this and it can never land on a curve, on a tie or on a cap.
+function envHalf(yA, yB){
+  const a = Math.max(Y0, Math.min(Y1, Math.min(yA,yB)));
+  const b = Math.max(Y0, Math.min(Y1, Math.max(yA,yB)));
+  let m = Math.max(HALF(a), HALF(b));
+  for (let yr=Math.ceil(a/STEP)*STEP; yr<b; yr+=STEP) m = Math.max(m, HALF(yr));
+  return m + STROKE/2;
+}
+// End-caps only help once the strands are far enough apart to show them; below
+// that the tie is shorter than the focused dot and the caps just make a blob.
+const CAPS_MIN = 13;
+
+// Which strand a label hangs off. A 'both' event sits on the mid-line, so its
+// label alternates sides to keep the two rows balanced.
+const SIDE = EVENTS.map((e,i) => e.s==='neuro' ? true : e.s==='ai' ? false : (i % 2 === 0));
+
+// Baselines of the two text lines, relative to the anchor where the stem ends.
+// The 'up' pair is derived from a real measurement below, so the block sits the
+// same distance from the anchor whichever way it hangs.
+const L1_DN = 15, L2_DN = 31;
+let L1_UP = -31, L2_UP = -15, DN_TOP = 5, DN_BOT = 35, UP_TOP = -35, UP_BOT = -5;
+
+const evNodes = EVENTS.map((e,i) => {
+  const cy  = e.s==='both' ? MID : strandY(e.y, e.s);
+  const col = e.s==='neuro' ? 'var(--teal)' : e.s==='ai' ? 'var(--slate)' : 'var(--sienna)';
+  const at  = `translate(${x(e.y).toFixed(2)},${cy.toFixed(2)})`;
+
+  const gm = mk('g',{class:'evt', transform:at});
+  if (e.s === 'both') {
+    const half = HALF(e.y);                    // exactly the strand offset at this year
+    gm.appendChild(mk('line',{class:'tie',x1:0,y1:(-half).toFixed(2),x2:0,y2:half.toFixed(2),
+      stroke:col,'stroke-width':2.5,'stroke-linecap':'round'}));
+    if (half >= CAPS_MIN){
+      gm.appendChild(mk('circle',{class:'cap',cx:0,cy:(-half).toFixed(2),r:3.5,fill:col}));
+      gm.appendChild(mk('circle',{class:'cap',cx:0,cy:half.toFixed(2),r:3.5,fill:col}));
+    }
+  }
+  const stem = mk('line',{class:'stem',x1:0,y1:0,x2:0,y2:0,stroke:col,'stroke-width':1.5});
+  gm.appendChild(stem);
+  gm.appendChild(mk('circle',{class:'dot',cx:0,cy:0,r:5,fill:col}));
+  gMarks.appendChild(gm);
+
+  const gl  = mk('g',{class:'evt', transform:at});
+  const lbl = mk('g',{class:'lbl'});          // counter-scaled: text only
+  const t1 = mk('text',{x:0,y:L1_DN,'text-anchor':'middle'});
+  const yr = mk('tspan',{class:'yr',fill:col}); yr.textContent = e.y + '  '; t1.appendChild(yr);
+  const nm = mk('tspan'); nm.textContent = e.t; t1.appendChild(nm);
+  lbl.appendChild(t1);
+  const t2 = mk('text',{x:0,y:L2_DN,'text-anchor':'middle',class:'sub'});
+  t2.textContent = e.d; lbl.appendChild(t2);
+  gl.appendChild(lbl);
+  gLabels.appendChild(gl);
+
+  return {gm, gl, lbl, stem, t1, t2, cy, pref:SIDE[i], up:SIDE[i],
+          bw:60, dx:0, dx0:0, dx1:0, anchorY:MID, a0:MID, a1:MID, fit:true};
+});
+
+// One measuring pass on the real glyphs: character counts are wrong by up to a
+// third on names like “Riesenhuber & Poggio”, which is what let labels collide.
+(function measure(){
+  let top = Infinity, bot = -Infinity;
+  evNodes.forEach(n => {
+    const b1 = n.t1.getBBox(), b2 = n.t2.getBBox();
+    n.bw = Math.max(b1.width, b2.width);
+    top = Math.min(top, b1.y); bot = Math.max(bot, b2.y + b2.height);
+  });
+  DN_TOP = top; DN_BOT = bot;
+  const shift = -(DN_TOP + DN_BOT);           // mirror the block about the anchor
+  L1_UP = L1_DN + shift; L2_UP = L2_DN + shift;
+  UP_TOP = DN_TOP + shift; UP_BOT = DN_BOT + shift;
+})();
+
+// ---- label placement ----------------------------------------------------
+// Everything below is measured in screen pixels for a given viewBox, so a lane
+// is the same distance from a strand at every zoom and on every window size.
+const CLEAR = 13;      // strand edge → nearest text edge
+const PITCH = 40;      // lane to lane
+const EDGE  = 8;       // frame margin
+const AXIS_PX = 36;    // reserved for the pinned year axis
+const LANES = 4;       // lanes hung off a strand
+const PINS  = 8;       // rows walked inward from the frame edge when none fit
+// Screen-pixel columns the map must stay out of. Non-zero when the caption card
+// takes a column of its own instead of floating over the braid.
+let PADL = 0, PADR = 0;
+
+const cap = document.getElementById('cap');
+const hit = (a,b,p=0) => !(a.x+a.w+p<=b.x || b.x+b.w+p<=a.x || a.y+a.h+p<=b.y || b.y+b.h+p<=a.y);
+
+// The caption card as a screen-space obstacle, or null when it is hidden. The
+// first fitting pass of an era ignores it, to find out where the labels want to
+// be before the card is docked.
+let ignoreCard = false, CAPR = null, RECT = {w:VB_W, h:VB_H};
+function measureRects(){
+  const R = svg.getBoundingClientRect();
+  RECT = {w:R.width||VB_W, h:R.height||VB_H};
+  const c = cap.getBoundingClientRect();
+  CAPR = {x:c.left-R.left, y:c.top-R.top, w:c.width, h:c.height};
+}
+const capBox = () => (ignoreCard || !cap.classList.contains('on')) ? null : CAPR;
+
+// Does a strand or a tie run through this box? Exact, unlike the envelope
+// bound: needed where a label is pinned to the frame rather than to a lane.
+function marksClear(b, vb, k, vis, self, pad=6){
+  const m = pad + STROKE/2/k;
+  for (let X=b.x; X<=b.x+b.w+5; X+=6){
+    const yr = yearAt(vb.x + X*k);
+    if (yr < Y0 || yr > Y1) continue;
+    for (const w of ['neuro','ai']){
+      const Y = (strandY(yr,w) - vb.y)/k;
+      if (Y > b.y - m && Y < b.y + b.h + m) return false;
+    }
+  }
+  for (const e of vis){
+    if (e.s !== 'both' || e === self) continue;   // its own tie is its stem
+    const X = (x(e.y)-vb.x)/k, half = HALF(e.y)/k, Y = (MID-vb.y)/k;
+    if (hit({x:X-3, y:Y-half, w:6, h:2*half}, b, pad)) return false;
+  }
+  return true;
+}
+
+// Greedy, left to right: each label takes the first free slot. A slot is free
+// when it clears the frame, the axis, the caption card and every label already
+// placed — on either side of the mid-line, not just its own.
+function layout(vis, vb){
+  const W = RECT.w, H = RECT.h, k = vb.w / W;
+  const midPx = (MID - vb.y) / k;
+  const box = capBox();
+  const placed = [];
+  vis.slice().sort((p,q) => p.y - q.y).forEach(e => {
+    const n = evNodes[EVENTS.indexOf(e)];
+    const cx = (x(e.y) - vb.x) / k, hw = n.bw / 2;
+    // Slide the block back on screen if it hangs off an edge, but never so far
+    // that the stem leaves the text it points at.
+    let dx = 0, room = Math.max(0, hw - 12);
+    if (cx - hw < PADL + EDGE)          dx = Math.min(PADL + EDGE - (cx - hw), room);
+    else if (cx + hw > W - PADR - EDGE) dx = Math.max((W - PADR - EDGE) - (cx + hw), -room);
+    const xL = cx + dx - hw, xR = cx + dx + hw;
+    const env = envHalf(yearAt(vb.x + xL*k), yearAt(vb.x + xR*k)) / k;
+    // A label's own side is part of what it means, so exhaust that side first:
+    // its lanes, then rows pinned inside the frame edge with a long stem. Only
+    // when nothing on that side works does it cross the mid-line.
+    const bh = up => up?UP_BOT-UP_TOP:DN_BOT-DN_TOP;
+    // On screen on all four sides, off the axis, off the card, off every label
+    // already placed. A label that cannot satisfy this is dropped, not clipped.
+    const free = b => b.y >= EDGE && b.y + b.h <= H - AXIS_PX
+                   && b.x >= PADL + EDGE - 0.5 && b.x + b.w <= W - PADR - EDGE + 0.5
+                   && !(box && hit(b, box, 7)) && !placed.some(p => hit(b, p, 3));
+    let got = null;
+    search:
+    for (const up of [n.pref, !n.pref]){
+      for (let lane=0; lane<LANES; lane++){
+        const anchor = midPx + (up?-1:1) * (env + CLEAR + lane*PITCH);
+        const b = {x:xL, w:xR-xL, y:anchor + (up?UP_TOP:DN_TOP), h:bh(up)};
+        if (!free(b)) continue;
+        got = {up, anchor, b}; break search;
+      }
+      // Zoomed in far enough that this side's strand has left the frame: walk
+      // rows inward from the edge until one is clear of everything.
+      for (let lane=0; lane<PINS; lane++){
+        const b = {x:xL, w:xR-xL, h:bh(up),
+                   y: up ? EDGE + lane*PITCH : H - AXIS_PX - bh(up) - lane*PITCH};
+        if (!free(b) || !marksClear(b, vb, k, vis, e)) continue;
+        got = {up, anchor: b.y - (up?UP_TOP:DN_TOP), b}; break search;
+      }
+    }
+    n.fit = !!got;
+    if (!got){   // still nothing: park it on its own side, closest in, and hide it
+      const anchor = midPx + (n.pref?-1:1) * (env + CLEAR);
+      got = {up:n.pref, anchor, b:{x:xL, w:xR-xL,
+        y:anchor + (n.pref?UP_TOP:DN_TOP), h:(n.pref?UP_BOT-UP_TOP:DN_BOT-DN_TOP)}};
+    } else placed.push(got.b);
+    n.box = got.b;
+    n.up = got.up; n.dx = dx; n.anchorY = vb.y + got.anchor * k;
+    n.t1.setAttribute('y', got.up ? L1_UP : L1_DN);
+    n.t2.setAttribute('y', got.up ? L2_UP : L2_DN);
+    n.lbl.classList.toggle('nofit', !n.fit);
+    n.stem.classList.toggle('nofit', !n.fit);
+  });
+}
+
+// ---- camera -------------------------------------------------------------
+let cur = {x:0,y:0,w:VB_W,h:VB_H}, anim=null, flyP=1;
+function applyVB(){
+  svg.setAttribute('viewBox', `${cur.x} ${cur.y} ${cur.w} ${cur.h}`);
+  // Counter-scale every text group against the RENDERED width, so a 13px font
+  // in user units lands as 13 real pixels no matter how far we have zoomed.
+  const px = svg.getBoundingClientRect().width || VB_W;
+  const k = cur.w / px;
+  const s = `scale(${k.toFixed(4)})`;
+  drawAxis();
+  evNodes.forEach(n => {
+    const aY = n.a0 + (n.a1 - n.a0) * flyP;          // data-space y of the anchor
+    const dx = (n.dx0 + (n.dx1 - n.dx0) * flyP) * k; // edge nudge, data units
+    const local = aY - n.cy;
+    n.lbl.setAttribute('transform', `translate(${dx.toFixed(2)},${local.toFixed(2)}) ${s}`);
+    n.stem.setAttribute('y1', local > 0 ? 9 : -9);
+    n.stem.setAttribute('y2', local.toFixed(2));
+    n.stem.setAttribute('x2', dx.toFixed(2));
+  });
+}
+const axis = document.getElementById('axis');
+function drawAxis(){
+  const span = (cur.w / (X1-X0)) * (Y1-Y0);          // years currently on screen
+  const step = span > 70 ? 10 : span > 34 ? 5 : span > 14 ? 2 : 1;
+  let html = '';
+  const from = Math.max(Y0, Math.ceil((Y0 + (cur.x-X0)/(X1-X0)*(Y1-Y0)) / step) * step);
+  for (let yr=from; yr<=Y1; yr+=step){
+    const pc = (x(yr) - cur.x) / cur.w * 100;
+    if (pc < 1 || pc > 99) continue;
+    html += `<i style="left:${pc}%"></i><span style="left:${pc}%">${yr}</span>`;
+  }
+  axis.innerHTML = html;
+}
+
+function fly(to, ms=700){
+  if (anim) cancelAnimationFrame(anim);
+  const from = {...cur}, t0 = performance.now();
+  const step = now => {
+    const p = Math.min(1,(now-t0)/ms);
+    const e = p<.5 ? 4*p*p*p : 1-Math.pow(-2*p+2,3)/2;   // easeInOutCubic
+    flyP = e;
+    cur = {x:from.x+(to.x-from.x)*e, y:from.y+(to.y-from.y)*e,
+           w:from.w+(to.w-from.w)*e, h:from.h+(to.h-from.h)*e};
+    applyVB();
+    if (p<1) anim = requestAnimationFrame(step); else { flyP = 1; anim = null; }
+  };
+  anim = requestAnimationFrame(step);
+}
+
+// Frame an era, lay the labels out, then reframe on what the labels actually
+// occupy. Three things force a wider view: text deeper than the frame is tall,
+// text hanging off either end, and a label the solver could not place at all.
+// The true vertical extent of everything on screen for a given camera: the two
+// strands across the YEARS ACTUALLY VISIBLE (not just the era's, which stops
+// short of the frame), a focused dot's radius on top of them, every tie, and
+// every label the solver placed.
+function contentBand(vb, vis, W){
+  const k = vb.w / W;
+  const env = envHalf(yearAt(vb.x), yearAt(vb.x + vb.w)) + 8;
+  let top = MID - env, bot = MID + env;
+  vis.forEach(e => {
+    const n = evNodes[EVENTS.indexOf(e)];
+    if (e.s === 'both'){                       // tie ends, with their caps
+      top = Math.min(top, MID - HALF(e.y) - 4);
+      bot = Math.max(bot, MID + HALF(e.y) + 4);
+    }
+    if (!n.fit) return;
+    top = Math.min(top, n.anchorY + (n.up?UP_TOP:DN_TOP)*k);
+    bot = Math.max(bot, n.anchorY + (n.up?UP_BOT:DN_BOT)*k);
+  });
+  return {top, bot};
+}
+// Sit that band centred between the top margin and the year axis. When it is
+// taller than the frame the overflow is shared evenly, so a strand that runs
+// past the edge does so at both ends rather than all at the bottom.
+function recentre(vb, vis, W, H){
+  const k = vb.w / W, b = contentBand(vb, vis, W);
+  const slack = (H - AXIS_PX - EDGE) - (b.bot - b.top)/k;
+  return b.top - (EDGE + slack/2) * k;
+}
+
+function fitEra(era, vis, W, H, aspect){
+  let w = Math.max(620, x(era.b) - x(era.a) + 160);
+  let vb = {x:(x(era.a)+x(era.b))/2 - w/2, y:MID - w*aspect/2, w, h:w*aspect};
+  for (let pass=0; pass<9; pass++){
+    layout(vis, vb);
+    const k = w/W, h = w*aspect;
+    // the strands themselves, plus the radius of a focused dot sitting on one
+    let up = envHalf(era.a, era.b) + 8, dn = up;
+    let l = x(era.a), r = x(era.b), all = true;
+    vis.forEach(e => {
+      const n = evNodes[EVENTS.indexOf(e)];
+      up = Math.max(up, MID - (n.anchorY + (n.up?UP_TOP:DN_TOP)*k));
+      dn = Math.max(dn, (n.anchorY + (n.up?UP_BOT:DN_BOT)*k) - MID);
+      l = Math.min(l, x(e.y) + (n.dx - n.bw/2)*k);
+      r = Math.max(r, x(e.y) + (n.dx + n.bw/2)*k);
+      all = all && n.fit;
+    });
+    const needH = up + dn + (EDGE + AXIS_PX)*k;
+    const band = w * (W - PADL - PADR) / W;          // data units the map may use
+    const needW = ((r-l) + 2*EDGE*k) * W / (W - PADL - PADR);
+    // Centre on the content: the axis eats the bottom, so the mid-line rides high.
+    vb = {x: l - (PADL + EDGE)*k - (band - (r-l) - 2*EDGE*k)/2,
+          y: MID - up - EDGE*k - (h-needH)/2, w, h};
+    if (needH <= h && needW <= w && all) break;
+    w = Math.min(3000, w * Math.min(1.6, Math.max(needH/h, needW/w, all?1:1.13) * 1.03));
+  }
+  layout(vis, vb);                       // converge against the final width
+  // One re-centring pass on what is really there, and one re-solve against it.
+  // Never more: the solver and the camera would chase each other. If the
+  // re-solve costs a label that had a home, the shift is given back.
+  const kept = vis.every(e => evNodes[EVENTS.indexOf(e)].fit), y0 = vb.y;
+  vb.y = recentre(vb, vis, W, H);
+  layout(vis, vb);
+  if (kept && vis.some(e => !evNodes[EVENTS.indexOf(e)].fit)){ vb.y = y0; layout(vis, vb); }
+  return vb;
+}
+
+// Where the card can dock: the four corners and the two mid-height edges, where
+// it floats over the braid; then two column dockings, where the map is inset so
+// the card covers nothing at all. Order is the preference order.
+const cardSpots = (W,H,cw,ch) => {
+  const xs = [22, (W-cw)/2, W-22-cw], ys = [18, (H-AXIS_PX-ch)/2, H-AXIS_PX-10-ch];
+  const out = [];
+  ys.forEach(y => xs.forEach(x => out.push({x,y})));
+  out.push({x:22, y:ys[1], padL:cw+40}, {x:W-22-cw, y:ys[1], padR:cw+40});
+  return out;
+};
+function dockAt(s){
+  cap.style.left = Math.round(Math.max(8, s.x)) + 'px';
+  cap.style.top  = Math.round(Math.max(8, s.y)) + 'px';
+  PADL = s.padL || 0; PADR = s.padR || 0;
+  measureRects();
+}
+// What a docking costs, judged on the layout it actually produced: a label with
+// nowhere left to go is worst, then one exiled across the mid-line, then a
+// buried dot, then a buried strand — and finally how far it forced the zoom out.
+function cardCost(vb, vis, W, grow){
+  const k = vb.w/W, r = capBox();
+  let cost = grow * 900;
+  vis.forEach(e => {
+    const n = evNodes[EVENTS.indexOf(e)];
+    if (!n.fit) cost += 4000;
+    if (n.up !== n.pref) cost += 260;
+    if (!r) return;
+    const X = (x(e.y)-vb.x)/k, half = e.s==='both' ? HALF(e.y)/k : 0;
+    if (hit({x:X-10, y:(n.cy-vb.y)/k-half-10, w:20, h:2*half+20}, r, 4)) cost += 400;
+  });
+  if (r) for (let X=Math.max(0,r.x); X<=r.x+r.w; X+=8){
+    const yr = yearAt(vb.x + X*k);
+    if (yr < Y0 || yr > Y1) continue;
+    for (const wc of ['neuro','ai']){
+      const Y = (strandY(yr,wc)-vb.y)/k;
+      if (Y > r.y-3 && Y < r.y+r.h+3) cost += 8;
+    }
+  }
+  return cost;
+}
+
+let idx = 0;
+function show(i){
+  idx = Math.max(0, Math.min(ERAS.length-1, i));
+  const era = ERAS[idx];
+  // The card is an obstacle, so its text and its size must be settled before a
+  // single label is placed.
+  cap.classList.toggle('on', idx!==0);
+  cap.querySelector('h2').textContent = era.title;
+  cap.querySelector('.l1').textContent = era.lines[0]||'';
+  cap.querySelector('.l2').textContent = era.lines[1]||'';
+
+  measureRects();
+  const W = RECT.w, H = RECT.h, aspect = H/W;
+  const vis = EVENTS.filter(e => idx===0 ? e.key : (e.y>=era.a && e.y<=era.b));
+  evNodes.forEach(n => { n.a0 = n.a1; n.dx0 = n.dx1; });   // fly from where they are
+
+  // Solve the era once with no card to get a baseline zoom, then solve it again
+  // for every docking spot and keep the cheapest. Judging the card on the
+  // finished layout is the only way to see what it really costs.
+  ignoreCard = true; PADL = PADR = 0;
+  let vb = fitEra(era, vis, W, H, aspect);
+  ignoreCard = false;
+  if (idx !== 0){
+    const w0 = vb.w, c = {width:CAPR.w, height:CAPR.h};
+    let best = null;
+    cardSpots(W, H, c.width, c.height).forEach((s,i) => {
+      dockAt(s);
+      const v = fitEra(era, vis, W, H, aspect);
+      const cost = cardCost(v, vis, W, v.w/w0 - 1) + i*3;
+      if (!best || cost < best.cost) best = {cost, s};
+    });
+    dockAt(best.s);
+    vb = fitEra(era, vis, W, H, aspect);
+  }
+  evNodes.forEach(n => { n.a1 = n.anchorY; n.dx1 = n.dx; });
+
+  fly(vb);
+  EVENTS.forEach((e,j) => {
+    const on = idx===0 ? !!e.key : (e.y>=era.a && e.y<=era.b);
+    evNodes[j].gm.classList.toggle('on', on);
+    evNodes[j].gl.classList.toggle('on', on);
+  });
+  [...document.querySelectorAll('.chip')].forEach((c,j)=>c.classList.toggle('on', j===idx));
+  document.getElementById('prev').disabled = idx===0;
+  document.getElementById('next').disabled = idx===ERAS.length-1;
+}
+
+// Re-solve at the current camera, without moving it: for free zoom, where the
+// lanes would otherwise keep the spacing they were given at era scale.
+function relayout(){
+  measureRects();
+  const era = ERAS[idx];
+  const vis = EVENTS.filter(e => idx===0 ? e.key : (e.y>=era.a && e.y<=era.b));
+  layout(vis, cur);
+  evNodes.forEach(n => { n.a0 = n.a1 = n.anchorY; n.dx0 = n.dx1 = n.dx; });
+  flyP = 1;
+}
+
+const chapters = document.getElementById('chapters');
+ERAS.forEach((e,i) => {
+  const b = document.createElement('button');
+  b.className='chip'; b.textContent=e.k; b.onclick=()=>show(i);
+  chapters.appendChild(b);
+});
+document.getElementById('prev').onclick = () => show(idx-1);
+document.getElementById('next').onclick = () => show(idx+1);
+addEventListener('keydown', ev => {
+  if (ev.key==='ArrowRight'||ev.key===' '){ show(idx+1); ev.preventDefault(); }
+  if (ev.key==='ArrowLeft'){ show(idx-1); ev.preventDefault(); }
+  if (ev.key==='0'||ev.key==='Home') show(0);
+});
+
+// free pan + zoom, so he can go anywhere mid-sentence
+let drag=null;
+svg.addEventListener('pointerdown', e => {
+  drag={px:e.clientX,py:e.clientY,vb:{...cur}};
+  svg.classList.add('dragging'); svg.setPointerCapture(e.pointerId);
+});
+svg.addEventListener('pointermove', e => {
+  if(!drag) return;
+  const r=svg.getBoundingClientRect(), k=cur.w/r.width;
+  cur={...drag.vb, x:drag.vb.x-(e.clientX-drag.px)*k, y:drag.vb.y-(e.clientY-drag.py)*k};
+  relayout();
+  applyVB();
+});
+addEventListener('pointerup', () => {
+  if (drag){ drag=null; svg.classList.remove('dragging'); }
+});
+svg.addEventListener('wheel', e => {
+  e.preventDefault();
+  if (anim){ cancelAnimationFrame(anim); anim=null; flyP=1; }
+  const r=svg.getBoundingClientRect();
+  const mx=cur.x+(e.clientX-r.left)/r.width*cur.w, my=cur.y+(e.clientY-r.top)/r.height*cur.h;
+  const f = e.deltaY>0 ? 1.12 : 1/1.12;
+  const w = Math.min(2600, Math.max(420, cur.w*f)), h = w*(cur.h/cur.w);
+  cur = {x:mx-(mx-cur.x)*(w/cur.w), y:my-(my-cur.y)*(h/cur.h), w, h};
+  relayout();
+  applyVB();
+}, {passive:false});
+
+addEventListener('resize', () => show(idx));
+show(0);
+</script>
+</body>
+</html>
