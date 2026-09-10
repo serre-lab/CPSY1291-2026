@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 380" width="900" height="380" role="img"
+     aria-label="The three-party Turing test: a judge on the left holds two simultaneous conversations, one with a person and one with a machine, and must say which is which">
+  <style>
+    .lbl  { font: 700 27px "Helvetica Neue", Arial, sans-serif; fill:#1E293B; }
+    .sub  { font: 400 21px "Helvetica Neue", Arial, sans-serif; fill:#5B6B7A; }
+    .qq   { font: 700 46px "Helvetica Neue", Arial, sans-serif; fill:#9C5A2E; }
+    .box  { fill:#FFFFFF; stroke:#E7E3DA; stroke-width:3; }
+    .wire { stroke-width:3; fill:none; stroke-dasharray:9 8; }
+  </style>
+  <rect width="900" height="380" fill="#FAF9F5"/>
+
+  <!-- judge -->
+  <rect class="box" x="40" y="128" width="210" height="124" rx="14"/>
+  <circle cx="99" cy="176" r="17" fill="#9C5A2E"/>
+  <path d="M74 216c0-16 11-26 25-26s25 10 25 26z" fill="#9C5A2E"/>
+  <text class="lbl" x="140" y="181">Judge</text>
+  <text class="sub" x="140" y="209">asks both</text>
+
+  <!-- wires -->
+  <path class="wire" stroke="#3F7A6B" d="M250 168 C 380 168, 420 86, 560 86"/>
+  <path class="wire" stroke="#3E6D8E" d="M250 212 C 380 212, 420 294, 560 294"/>
+
+  <!-- person -->
+  <rect class="box" x="560" y="34" width="300" height="104" rx="14"/>
+  <circle cx="614" cy="74" r="15" fill="#3F7A6B"/>
+  <path d="M591 112c0-15 10-24 23-24s23 9 23 24z" fill="#3F7A6B"/>
+  <text class="lbl" x="652" y="80">A person</text>
+  <text class="sub" x="652" y="108">typing back</text>
+
+  <!-- machine -->
+  <rect class="box" x="560" y="242" width="300" height="104" rx="14"/>
+  <rect x="597" y="272" width="36" height="30" rx="5" fill="#3E6D8E"/>
+  <circle cx="606" cy="284" r="4" fill="#FAF9F5"/><circle cx="624" cy="284" r="4" fill="#FAF9F5"/>
+  <path d="M615 262v10" stroke="#3E6D8E" stroke-width="3"/><circle cx="615" cy="259" r="4" fill="#3E6D8E"/>
+  <text class="lbl" x="652" y="288">A machine</text>
+  <text class="sub" x="652" y="316">typing back</text>
+
+  <text class="qq" x="392" y="205" text-anchor="middle">?</text>
+</svg>
