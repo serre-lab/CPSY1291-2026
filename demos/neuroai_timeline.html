@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The braid: neuroscience and AI, 1943 to today — CPSY 1291</title>
+<title>Neuroscience and AI: one history, 1943 to today</title>
 <style>
   :root{
     --sienna:#9C5A2E; --slate:#3E6D8E; --teal:#3F7A6B;
@@ -39,6 +39,14 @@
     paint-order:stroke;stroke:var(--cream);stroke-width:3.5px;stroke-linejoin:round}
   .lbl .yr{font-weight:800;font-variant-numeric:tabular-nums}
   .lbl .sub{font-size:12px;fill:var(--muted)}
+  .lbl.link{cursor:pointer}
+  .lbl.link:hover .nm{text-decoration:underline}
+  /* Strand names ride their own strand at the left edge of whatever is on screen,
+     so the legend is never off in the corner. */
+  .tag{position:absolute;left:14px;pointer-events:none;font-size:12px;font-weight:800;
+    letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+    padding:1px 6px;border-radius:5px;background:color-mix(in srgb, var(--cream) 88%, transparent)}
+  #tagN{color:var(--teal)} #tagA{color:var(--slate)}
 
   /* Era caption: a card in screen space, docked per era by the layout solver to
      whichever slot buries the least. No label is ever allowed under it. */
@@ -71,6 +79,23 @@
   button.nav{font-size:15px;font-weight:800;padding:5px 13px;border-radius:8px;
     border:2px solid var(--slate);background:#fff;color:var(--slate);cursor:pointer;font-family:inherit}
   button.nav:disabled{opacity:.3;cursor:default}
+
+  /* Sources panel: the literature behind the converge/diverge framing, not the
+     per-dot citations (each dot links to its own). Overlays the stage so it
+     works inside the slide iframe too. */
+  #src{position:absolute;inset:0;overflow:auto;padding:26px 44px 30px;
+    background:color-mix(in srgb, var(--cream) 97%, transparent);display:none;font-size:14px;line-height:1.5;color:var(--ink)}
+  #src.on{display:block}
+  #src h2{margin:0 0 4px;font-size:21px;color:var(--sienna);letter-spacing:-.01em}
+  #src .lead{margin:0 0 14px;color:var(--muted);max-width:70em}
+  #src h3{margin:16px 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  #src ol{margin:0;padding-left:1.4em;columns:2;column-gap:44px}
+  #src li{margin:0 0 7px;break-inside:avoid}
+  #src li b{font-weight:700}
+  #src li .g{color:var(--muted)}
+  #src a{color:var(--slate);text-decoration:none;border-bottom:1px solid var(--rule)}
+  #src a:hover{border-bottom-color:var(--slate)}
+  #src .close{position:absolute;top:18px;right:22px}
 </style>
 </head>
 <body>
@@ -79,14 +104,45 @@
     <svg id="tl" viewBox="0 0 2000 640" preserveAspectRatio="xMidYMid meet"
          aria-label="Interactive timeline of neuroscience and artificial intelligence from 1943 to today, showing the two fields converging, splitting, and converging again"></svg>
     <div id="axis"></div>
+    <span class="tag" id="tagN">Neuroscience</span><span class="tag" id="tagA">Artificial intelligence</span>
     <div id="cap"><h2></h2><p class="l1"></p><p class="l2"></p></div>
+    <div id="src" aria-label="Sources for the timeline's framing">
+      <button class="nav close" id="srcClose">×</button>
+      <h2>Sources for the framing</h2>
+      <p class="lead">Each dot links to its primary source. The works below are the histories and essays on which the framing rests: a common origin in cybernetics, followed by alternating periods of convergence and divergence. The six-phase periodisation used here is a synthesis; no single source states it in this form, and the final section lists those who would dispute it.</p>
+      <h3>The shared origin</h3>
+      <ol>
+        <li><b>Papert, S. (1988).</b> One AI or many? <i>Dædalus</i> 117(1):1–14. <a href="https://www.jstor.org/stable/20025136" target="_blank" rel="noopener">JSTOR</a> · <a href="https://gwern.net/doc/ai/1988-papert.pdf" target="_blank" rel="noopener">PDF</a><br><span class="g">Opens with “the standard version” of the history, told as a fairy tale — “two daughter sciences were born to the new science of cybernetics” — and then disputes it. The origin of the image drawn here, from a protagonist, with his own caveats.</span></li>
+        <li><b>Dreyfus, H. L. &amp; Dreyfus, S. E. (1988).</b> Making a mind versus modeling the brain: Artificial intelligence back at a branchpoint. <i>Dædalus</i> 117(1):15–43. <a href="https://www.jstor.org/stable/20025137" target="_blank" rel="noopener">JSTOR</a><br><span class="g">Two research programmes founded together in the early 1950s; one starved of funding by 1970; the winners’ account is a “retrospective illusion”; 1988 reopens the fork.</span></li>
+        <li><b>Heims, S. J. (1991).</b> <i>The Cybernetics Group.</i> MIT Press. <a href="https://doi.org/10.7551/mitpress/2260.001.0001" target="_blank" rel="noopener">doi</a><br><span class="g">The standard history of the Macy conferences: the “one community” phase was institutional, not incidental.</span></li>
+        <li><b>Abraham, T. H. (2016).</b> <i>Rebel Genius: Warren S. McCulloch’s Transdisciplinary Life in Science.</i> MIT Press. <a href="https://doi.org/10.7551/mitpress/9780262035095.001.0001" target="_blank" rel="noopener">doi</a><br><span class="g">The McCulloch biography; documents that the 1943 paper was largely ignored by neurophysiologists and taken up instead by von Neumann and automata theory.</span></li>
+        <li><b>Dupuy, J.-P. (2000).</b> <i>The Mechanization of the Mind: On the Origins of Cognitive Science.</i> Princeton University Press (reissued MIT Press, 2009).<br><span class="g">Cognitive science as the partly disowned heir of cybernetics.</span></li>
+      </ol>
+      <h3>The split: Dartmouth, Perceptrons, and the winters</h3>
+      <ol>
+        <li><b>Kline, R. R. (2011).</b> Cybernetics, automata studies, and the Dartmouth Conference on Artificial Intelligence. <i>IEEE Annals of the History of Computing</i> 33(4):5–16. <a href="https://doi.org/10.1109/MAHC.2010.44" target="_blank" rel="noopener">doi</a><br><span class="g">Archival evidence that McCarthy chose the name “artificial intelligence” to distance the field from cybernetics and from Wiener. Book-length treatment: Kline, <i>The Cybernetics Moment</i> (Johns Hopkins University Press, 2015).</span></li>
+        <li><b>Olazaran, M. (1996).</b> A sociological study of the official history of the perceptrons controversy. <i>Social Studies of Science</i> 26(3):611–659. <a href="https://doi.org/10.1177/030631296026003005" target="_blank" rel="noopener">doi</a><br><span class="g">The account in which <i>Perceptrons</i> ended neural-network research was written by the winners and rewritten when the networks returned. Essential context for 1969.</span></li>
+        <li><b>Haigh, T. (2023–2025).</b> Historical Reflections, <i>Communications of the ACM</i>: Conjoined twins: AI and the invention of computer science, 66(6):33–37 <a href="https://doi.org/10.1145/3593007" target="_blank" rel="noopener">doi</a> · There was no ‘first AI winter’, 66(12):35–39 <a href="https://doi.org/10.1145/3625833" target="_blank" rel="noopener">doi</a> · How the AI boom went bust, 67(2):22–26 <a href="https://doi.org/10.1145/3634901" target="_blank" rel="noopener">doi</a> · Between the booms: AI in winter, 67(11):18–23 <a href="https://doi.org/10.1145/3688379" target="_blank" rel="noopener">doi</a> · Artificial intelligence then and now, 68(2):24–29 <a href="https://doi.org/10.1145/3708554" target="_blank" rel="noopener">doi</a><br><span class="g">A historian’s periodisation: “AI” as a label founded partly in reaction to cybernetic claims, with neural networks outside it until the 2010s.</span></li>
+        <li><b>Cardon, D., Cointet, J.-P. &amp; Mazières, A. (2018).</b> Neurons spike back: The invention of inductive machines and the artificial intelligence controversy. <i>Réseaux</i> 211:173–220. <a href="https://doi.org/10.3917/res.211.0173" target="_blank" rel="noopener">doi</a><br><span class="g">Co-citation analysis, 1943–2018, of the alternation between symbolic and connectionist paradigms, with deep learning “reviving the spirit” of cybernetics. The closest scholarly treatment of the cycle, although its axis is symbolic versus connectionist within AI, and it attributes the 2010s revival to data and computation rather than to biology.</span></li>
+      </ol>
+      <h3>Reconvergence and the present divergence</h3>
+      <ol>
+        <li><b>Sejnowski, T. J. (2018).</b> <i>The Deep Learning Revolution.</i> MIT Press. <a href="https://doi.org/10.7551/mitpress/11474.001.0001" target="_blank" rel="noopener">doi</a><br><span class="g">The source of the phrase “deep learning revolution” for 2012, and a participant’s account of the 1980s.</span></li>
+        <li><b>Schmidhuber, J. (2015).</b> Deep learning in neural networks: An overview. <i>Neural Networks</i> 61:85–117. <a href="https://doi.org/10.1016/j.neunet.2014.09.003" target="_blank" rel="noopener">doi</a>; and (2022) Annotated history of modern AI and deep learning, <a href="https://arxiv.org/abs/2212.11279" target="_blank" rel="noopener">arXiv:2212.11279</a><br><span class="g">Argues that modern deep learning is “conceptually closer to the old field of cybernetics than to what’s been called AI since 1956.” Idiosyncratic on questions of priority.</span></li>
+        <li><b>Hassabis, D., Kumaran, D., Summerfield, C. &amp; Botvinick, M. (2017).</b> Neuroscience-inspired artificial intelligence. <i>Neuron</i> 95(2):245–258. <a href="https://doi.org/10.1016/j.neuron.2017.06.011" target="_blank" rel="noopener">doi</a><br><span class="g">“The fields of neuroscience and AI have a long and intertwined history. In more recent times, however, communication and collaboration between the two fields has become less commonplace.”</span></li>
+        <li><b>Zador, A. et al. (2023).</b> Catalyzing next-generation artificial intelligence through NeuroAI. <i>Nature Communications</i> 14:1597. <a href="https://doi.org/10.1038/s41467-023-37180-x" target="_blank" rel="noopener">doi</a> · <b>Doerig, A. et al. (2023).</b> The neuroconnectionist research programme. <i>Nature Reviews Neuroscience</i> 24:431–450. <a href="https://doi.org/10.1038/s41583-023-00705-w" target="_blank" rel="noopener">doi</a><br><span class="g">The present divergence stated programmatically, and the case for renewed exchange.</span></li>
+        <li><b>Arbib, M. A. (2025).</b> Artificial intelligence meets brain theory (again). <i>Biological Cybernetics</i> 119:16. <a href="https://doi.org/10.1007/s00422-025-01013-5" target="_blank" rel="noopener">doi</a><br><span class="g">A founder-generation figure places the 2024 NIH BRAIN NeuroAI workshop in a series of such meetings that began with cybernetics.</span></li>
+      </ol>
+      <h3>Objections to this framing</h3>
+      <p class="lead">Neural-network research did not stop in the 1970s (Grossberg, Kohonen, Amari, Fukushima, Widrow); the “split” is in part the winners’ account (Olazaran 1996; Papert 1988). Haigh (2023) argues that there was no first AI winter. The two fields may never have been one: McCulloch and Pitts were ignored by neurophysiologists (Abraham 2016). Neuroscience’s contribution to modern AI has been described as thin and decades old (Ullman, <i>Science</i> 363:692–693, 2019; Zador et al. 2023), on which view 2012–2014 was neuroscience adopting AI’s tools rather than a reconvergence of ideas. The present divergence is a claim about vision models and neural rather than behavioural fit; the alignment of language models with brain recordings still improves with scale (Antonello, Vaidya &amp; Huth, NeurIPS 2023).</p>
+    </div>
   </div>
   <div id="bar">
     <button class="nav" id="prev">←</button>
     <button class="nav" id="next">→</button>
     <div id="chapters"></div>
-    <span class="legend"><i style="background:var(--teal)"></i>Neuroscience<i style="background:var(--slate)"></i>Artificial intelligence</span>
-    <span class="hint"><kbd>←</kbd><kbd>→</kbd> step · <kbd>0</kbd> whole story · drag to pan · scroll to zoom</span>
+    <span class="hint"><kbd>←</kbd><kbd>→</kbd> step · <kbd>0</kbd> all years · drag to pan · scroll to zoom</span>
+    <button class="chip" id="srcBtn">Sources</button>
   </div>
 </div>
 <script>
@@ -115,43 +171,104 @@ const strandY = (yr, which) => {
 };
 
 const EVENTS = [
-  {y:1943,key:1,s:'both', t:'McCulloch & Pitts', d:'a neuron as logic'},
-  {y:1949,s:'both', t:'Hebb',              d:'cells that fire together'},
-  {y:1956,key:1,s:'ai',   t:'Dartmouth workshop', d:'the field is named “AI”'},
-  {y:1958,s:'both', t:'Rosenblatt',        d:'the perceptron, in a psychology journal'},
-  {y:1962,key:1,s:'neuro',t:'Hubel & Wiesel',    d:'simple and complex cells'},
-  {y:1969,key:1,s:'ai',   t:'Minsky & Papert',   d:'Perceptrons'},
-  {y:1972,s:'neuro',t:'Gross',             d:'selectivity in IT cortex'},
-  {y:1980,s:'ai',   t:'Fukushima',         d:'Neocognitron'},
-  {y:1982,s:'both', t:'Hopfield · Marr',   d:'physics arrives; three levels'},
-  {y:1986,key:1,s:'both', t:'PDP volumes',       d:'backprop reaches psychology'},
-  {y:1989,s:'ai',   t:'LeCun',             d:'LeNet'},
-  {y:1999,s:'neuro',t:'Riesenhuber & Poggio', d:'HMAX'},
-  {y:2007,s:'neuro',t:'Serre, Oliva & Poggio', d:'a cortex-like model holds its own'},
-  {y:2012,key:1,s:'ai',   t:'AlexNet',           d:'16.4% vs 26.2% — the cliff'},
-  {y:2014,s:'both', t:'Yamins & DiCarlo',  d:'task-trained nets predict IT'},
-  {y:2017,s:'ai',   t:'Transformers',      d:'owes the brain nothing — so far'},
-  {y:2022,s:'ai',   t:'ChatGPT',           d:'scale as the strategy'},
-  {y:2024,key:1,s:'both', t:'Nobel Prize',       d:'to the field written off in 1969'},
+  // y year · s strand (neuro | ai | both) · key: shown in the all-years overview ·
+  // t name · d gloss · c citation (hover) · u primary source (click)
+  {y:1943,key:1,s:'both', t:'McCulloch & Pitts', d:'a neuron as logic',
+   c:'McCulloch & Pitts, Bull. Math. Biophys. 5:115–133 (1943)', u:'https://doi.org/10.1007/BF02478259'},
+  {y:1948,s:'both', t:'Wiener',            d:'control and communication in animal and machine',
+   c:'Wiener, Cybernetics: or Control and Communication in the Animal and the Machine, MIT Press (1948)', u:'https://doi.org/10.7551/mitpress/11810.001.0001'},
+  {y:1949,s:'both', t:'Hebb',              d:'cells that fire together',
+   c:'Hebb, The Organization of Behavior, Wiley (1949)', u:'https://doi.org/10.4324/9781410612403'},
+  {y:1950,s:'ai',   t:'Turing',            d:'“can machines think?”',
+   c:'Turing, Computing machinery and intelligence, Mind 59:433–460 (1950)', u:'https://doi.org/10.1093/mind/LIX.236.433'},
+  {y:1956,key:1,s:'ai',   t:'Dartmouth workshop', d:'the field is named “AI”',
+   c:'McCarthy, Minsky, Rochester & Shannon, A proposal for the Dartmouth summer research project on artificial intelligence (1955); repr. AI Magazine 27(4) (2006)', u:'http://www-formal.stanford.edu/jmc/history/dartmouth/dartmouth.html'},
+  {y:1958,key:1,s:'both', t:'Rosenblatt',        d:'the perceptron, in a psychology journal',
+   c:'Rosenblatt, The perceptron: a probabilistic model for information storage and organization in the brain, Psychol. Rev. 65:386–408 (1958)', u:'https://doi.org/10.1037/h0042519'},
+  {y:1959,s:'neuro',t:'Lettvin',           d:'what the frog’s eye tells the frog’s brain',
+   c:'Lettvin, Maturana, McCulloch & Pitts, What the frog’s eye tells the frog’s brain, Proc. IRE 47:1940–1951 (1959)', u:'https://doi.org/10.1109/JRPROC.1959.287207'},
+  {y:1961,s:'neuro',t:'Barlow',            d:'efficient coding',
+   c:'Barlow, Possible principles underlying the transformations of sensory messages, in Rosenblith (ed.) Sensory Communication, MIT Press (1961)', u:'https://doi.org/10.7551/mitpress/9780262518420.003.0013'},
+  {y:1962,key:1,s:'neuro',t:'Hubel & Wiesel',    d:'simple and complex cells',
+   c:'Hubel & Wiesel, Receptive fields, binocular interaction and functional architecture in the cat’s visual cortex, J. Physiol. 160:106–154 (1962)', u:'https://doi.org/10.1113/jphysiol.1962.sp006837'},
+  {y:1969,key:1,s:'ai',   t:'Minsky & Papert',   d:'Perceptrons',
+   c:'Minsky & Papert, Perceptrons: An Introduction to Computational Geometry, MIT Press (1969)', u:'https://doi.org/10.7551/mitpress/11301.001.0001'},
+  {y:1972,s:'neuro',t:'Gross',             d:'selectivity in IT cortex',
+   c:'Gross, Rocha-Miranda & Bender, Visual properties of neurons in inferotemporal cortex of the macaque, J. Neurophysiol. 35:96–111 (1972)', u:'https://doi.org/10.1152/jn.1972.35.1.96'},
+  {y:1972,s:'neuro',t:'Rescorla & Wagner', d:'learning driven by prediction error',
+   c:'Rescorla & Wagner, A theory of Pavlovian conditioning, in Black & Prokasy (eds.) Classical Conditioning II, Appleton-Century-Crofts (1972)', u:''},
+  {y:1973,s:'ai',   t:'Lighthill report',  d:'the first AI winter',
+   c:'Lighthill, Artificial Intelligence: A General Survey, Science Research Council (1973)', u:'http://www.chilton-computing.org.uk/inf/literature/reports/lighthill_report/p001.htm'},
+  {y:1976,s:'both', t:'Marr & Poggio',     d:'levels of analysis: four, reduced to three in 1982',
+   c:'Marr & Poggio, From understanding computation to understanding neural circuitry, MIT AI Memo 357 (1976)', u:'https://dspace.mit.edu/handle/1721.1/5782'},
+  {y:1980,s:'both', t:'Fukushima',         d:'Neocognitron: Hubel & Wiesel, stacked',
+   c:'Fukushima, Neocognitron: a self-organizing neural network model for a mechanism of pattern recognition unaffected by shift in position, Biol. Cybern. 36:193–202 (1980)', u:'https://doi.org/10.1007/BF00344251'},
+  {y:1982,s:'both', t:'Hopfield',          d:'attractor networks; statistical physics arrives',
+   c:'Hopfield, Neural networks and physical systems with emergent collective computational abilities, PNAS 79:2554–2558 (1982)', u:'https://doi.org/10.1073/pnas.79.8.2554'},
+  {y:1985,s:'both', t:'Boltzmann machines', d:'learning in stochastic networks',
+   c:'Ackley, Hinton & Sejnowski, A learning algorithm for Boltzmann machines, Cognit. Sci. 9:147–169 (1985)', u:'https://doi.org/10.1207/s15516709cog0901_7'},
+  {y:1986,key:1,s:'both', t:'PDP volumes',       d:'backprop reaches psychology',
+   c:'Rumelhart, McClelland & the PDP Research Group, Parallel Distributed Processing, MIT Press (1986); Rumelhart, Hinton & Williams, Nature 323:533–536 (1986)', u:'https://doi.org/10.7551/mitpress/5236.001.0001'},
+  {y:1988,s:'ai',   t:'Sutton',            d:'temporal-difference learning',
+   c:'Sutton, Learning to predict by the methods of temporal differences, Mach. Learn. 3:9–44 (1988)', u:'https://doi.org/10.1007/BF00115009'},
+  {y:1989,s:'ai',   t:'LeCun',             d:'LeNet',
+   c:'LeCun et al., Backpropagation applied to handwritten zip code recognition, Neural Comput. 1:541–551 (1989)', u:'https://doi.org/10.1162/neco.1989.1.4.541'},
+  {y:1990,s:'both', t:'Elman',             d:'recurrent networks learn sequential structure',
+   c:'Elman, Finding structure in time, Cognit. Sci. 14:179–211 (1990)', u:'https://doi.org/10.1207/s15516709cog1402_1'},
+  {y:1996,s:'neuro',t:'Olshausen & Field', d:'sparse coding: V1 receptive fields from natural images',
+   c:'Olshausen & Field, Emergence of simple-cell receptive field properties by learning a sparse code for natural images, Nature 381:607–609 (1996)', u:'https://doi.org/10.1038/381607a0'},
+  {y:1997,s:'ai',   t:'LSTM',              d:'long short-term memory',
+   c:'Hochreiter & Schmidhuber, Long short-term memory, Neural Comput. 9:1735–1780 (1997)', u:'https://doi.org/10.1162/neco.1997.9.8.1735'},
+  {y:1997,s:'ai',   t:'Deep Blue',         d:'search defeats the world chess champion',
+   c:'Campbell, Hoane & Hsu, Deep Blue, Artif. Intell. 134:57–83 (2002)', u:'https://doi.org/10.1016/S0004-3702(01)00129-1'},
+  {y:1997,key:1,s:'both', t:'Schultz, Dayan & Montague', d:'dopamine encodes a reward-prediction error',
+   c:'Schultz, Dayan & Montague, A neural substrate of prediction and reward, Science 275:1593–1599 (1997)', u:'https://doi.org/10.1126/science.275.5306.1593'},
+  {y:1999,s:'neuro',t:'HMAX',              d:'cortex-constrained recognition, competitive until 2012',
+   c:'Riesenhuber & Poggio, Hierarchical models of object recognition in cortex, Nat. Neurosci. 2:1019–1025 (1999)', u:'https://doi.org/10.1038/14819'},
+  {y:1999,s:'neuro',t:'Rao & Ballard',     d:'predictive coding',
+   c:'Rao & Ballard, Predictive coding in the visual cortex, Nat. Neurosci. 2:79–87 (1999)', u:'https://doi.org/10.1038/4580'},
+  {y:2006,s:'ai',   t:'Deep belief nets',  d:'layer-wise pretraining revives depth',
+   c:'Hinton, Osindero & Teh, A fast learning algorithm for deep belief nets, Neural Comput. 18:1527–1554 (2006)', u:'https://doi.org/10.1162/neco.2006.18.7.1527'},
+  {y:2012,key:1,s:'ai',   t:'AlexNet',           d:'ImageNet top-5 error: 16.4% against 26.2%',
+   c:'Krizhevsky, Sutskever & Hinton, ImageNet classification with deep convolutional neural networks, NeurIPS 25 (2012)', u:'https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html'},
+  {y:2014,key:1,s:'both', t:'Yamins & DiCarlo',  d:'task-trained networks predict IT responses',
+   c:'Yamins et al., Performance-optimized hierarchical models predict neural responses in higher visual cortex, PNAS 111:8619–8624 (2014)', u:'https://doi.org/10.1073/pnas.1403112111'},
+  {y:2015,s:'ai',   t:'DQN',               d:'deep reinforcement learning: Atari from pixels',
+   c:'Mnih et al., Human-level control through deep reinforcement learning, Nature 518:529–533 (2015)', u:'https://doi.org/10.1038/nature14236'},
+  {y:2015,s:'ai',   t:'ResNet',            d:'residual connections; 152 layers',
+   c:'He, Zhang, Ren & Sun, Deep residual learning for image recognition, CVPR 2016 (arXiv Dec 2015)', u:'https://doi.org/10.1109/CVPR.2016.90'},
+  {y:2016,s:'ai',   t:'AlphaGo',           d:'deep networks, reinforcement learning and tree search',
+   c:'Silver et al., Mastering the game of Go with deep neural networks and tree search, Nature 529:484–489 (2016)', u:'https://doi.org/10.1038/nature16961'},
+  {y:2017,s:'ai',   t:'Transformers',      d:'attention; no cortical ancestry',
+   c:'Vaswani et al., Attention is all you need, NeurIPS 30 (2017)', u:'https://arxiv.org/abs/1706.03762'},
+  {y:2020,s:'ai',   t:'GPT-3 · scaling laws', d:'scale as the strategy',
+   c:'Brown et al., Language models are few-shot learners, NeurIPS 33 (2020); Kaplan et al., Scaling laws for neural language models, arXiv:2001.08361 (2020)', u:'https://arxiv.org/abs/2005.14165'},
+  {y:2022,s:'ai',   t:'ChatGPT',           d:'the second revolution goes public',
+   c:'OpenAI, Introducing ChatGPT, 30 Nov 2022', u:'https://openai.com/index/chatgpt/'},
+  {y:2024,key:1,s:'both', t:'Nobel Prize',       d:'in Physics, to Hopfield and Hinton',
+   c:'The Nobel Prize in Physics 2024: Hopfield & Hinton, “for foundational discoveries and inventions that enable machine learning with artificial neural networks”', u:'https://www.nobelprize.org/prizes/physics/2024/summary/'},
 ];
 
 const ERAS = [
   {k:'All', a:1940, b:2028, title:'', lines:[]},
   {k:'One community', a:1941, b:1963, title:'One community, not two · 1943–1958',
-   lines:['Same conferences, same funders, same people.',
+   lines:['The same meetings, funders and people: the Macy conferences on cybernetics.',
           'The perceptron was published in Psychological Review.']},
   {k:'The split', a:1954, b:1982, title:'The split was a choice · 1956–1979',
-   lines:['“AI” was named partly against the brain-inspired tradition.',
-          'Neuroscience kept building the parts list deep learning would use.']},
+   lines:['McCarthy chose the name “artificial intelligence” partly to keep the new field clear of cybernetics; Minsky and Papert made the technical case against perceptrons.',
+          'Neuroscience, meanwhile, assembled the components deep learning would later use: efficient coding, the simple/complex-cell hierarchy, high-level selectivity.']},
   {k:'The 1980s', a:1978, b:1994, title:'The decade that built deep learning · 1980s',
-   lines:['Fukushima stacks Hubel & Wiesel; Hopfield brings the physicists; the PDP volumes are a psychology project.',
-          'The 2024 Nobel Prize in Physics went to Hopfield and Hinton for this decade’s work.']},
-  {k:'First revolution', a:1988, b:2017, title:'The first revolution: from cat cortex to AlexNet — and back · 1989–2014',
-   lines:['1999–2007: HMAX, a cortex-like model, holds its own. 2012: AlexNet wins ImageNet, 16.4% error against 26.2%.',
-          'By 2014 the loop closed — nets trained only to name objects predicted IT better than anything built for it.']},
-  {k:'Second revolution', a:2013, b:2028, title:'The second revolution · 2017–today',
-   lines:['Transformers owe the brain almost nothing, and scale becomes the strategy.',
-          'As models climb the benchmarks they become worse models of visual cortex. That is the open question of this course.']},
+   lines:['Marr and Poggio define the levels of analysis; Fukushima stacks Hubel and Wiesel’s hierarchy; Hopfield brings statistical physics; Boltzmann machines and the PDP volumes are cognitive-science projects.',
+          'The 2024 Nobel Prize in Physics recognised Hopfield and Hinton for this decade’s work.']},
+  {k:'Cortex → AlexNet', a:1988, b:2012, title:'From cat cortex to AlexNet · 1989–2011',
+   lines:['LeNet and HMAX descend from the same parent, the Neocognitron.',
+          'Cortex-constrained models remained competitive with computer vision until large datasets and GPUs arrived.']},
+  {k:'First revolution', a:2010, b:2018, title:'First revolution: convolutional nets · 2012–2017',
+   lines:['AlexNet wins ImageNet in 2012 with 16.4% top-5 error against 26.2% for the runner-up; the architecture is Hubel and Wiesel’s hierarchy, stacked deep.',
+          'By 2014, networks trained only to classify objects predicted responses in inferotemporal cortex better than models built for that purpose.']},
+  {k:'Second revolution', a:2016, b:2028, title:'Second revolution: transformers, scale · 2017–today',
+   lines:['Transformers were not designed to reproduce cortical circuitry, and scale becomes the strategy.',
+          'As models improve on benchmarks, their fit to visual cortex worsens. Whether the two fields converge again is an open question.']},
 ];
 
 const svg = document.getElementById('tl');
@@ -222,10 +339,14 @@ const evNodes = EVENTS.map((e,i) => {
   const lbl = mk('g',{class:'lbl'});          // counter-scaled: text only
   const t1 = mk('text',{x:0,y:L1_DN,'text-anchor':'middle'});
   const yr = mk('tspan',{class:'yr',fill:col}); yr.textContent = e.y + '  '; t1.appendChild(yr);
-  const nm = mk('tspan'); nm.textContent = e.t; t1.appendChild(nm);
+  const nm = mk('tspan',{class:'nm'}); nm.textContent = e.t; t1.appendChild(nm);
   lbl.appendChild(t1);
   const t2 = mk('text',{x:0,y:L2_DN,'text-anchor':'middle',class:'sub'});
   t2.textContent = e.d; lbl.appendChild(t2);
+  if (e.c){ const tt = mk('title'); tt.textContent = e.c + (e.u ? ' — click to open' : ''); lbl.appendChild(tt);
+            const tt2 = mk('title'); tt2.textContent = e.c; gm.appendChild(tt2); }
+  if (e.u){ lbl.classList.add('link');
+            lbl.addEventListener('click', ev => { if (!dragMoved) window.open(e.u, '_blank', 'noopener'); }); }
   gl.appendChild(lbl);
   gLabels.appendChild(gl);
 
@@ -366,6 +487,7 @@ function applyVB(){
   const k = cur.w / px;
   const s = `scale(${k.toFixed(4)})`;
   drawAxis();
+  placeTags();
   evNodes.forEach(n => {
     const aY = n.a0 + (n.a1 - n.a0) * flyP;          // data-space y of the anchor
     const dx = (n.dx0 + (n.dx1 - n.dx0) * flyP) * k; // edge nudge, data units
@@ -375,6 +497,14 @@ function applyVB(){
     n.stem.setAttribute('y2', local.toFixed(2));
     n.stem.setAttribute('x2', dx.toFixed(2));
   });
+}
+const tagN = document.getElementById('tagN'), tagA = document.getElementById('tagA');
+function placeTags(){
+  const r = svg.getBoundingClientRect(); if (!r.height) return;
+  const yr = Math.max(Y0, Math.min(Y1, yearAt(cur.x + cur.w*0.012)));
+  const py = v => (v - cur.y) / cur.h * r.height;
+  tagN.style.top = (py(strandY(yr,'neuro')) - 22) + 'px';
+  tagA.style.top = (py(strandY(yr,'ai')) + 8) + 'px';
 }
 const axis = document.getElementById('axis');
 function drawAxis(){
@@ -588,13 +718,15 @@ addEventListener('keydown', ev => {
 });
 
 // free pan + zoom, so he can go anywhere mid-sentence
-let drag=null;
+let drag=null, dragMoved=false;
 svg.addEventListener('pointerdown', e => {
+  dragMoved=false;
   drag={px:e.clientX,py:e.clientY,vb:{...cur}};
   svg.classList.add('dragging'); svg.setPointerCapture(e.pointerId);
 });
 svg.addEventListener('pointermove', e => {
   if(!drag) return;
+  if (Math.hypot(e.clientX-drag.px, e.clientY-drag.py) > 4) dragMoved=true;
   const r=svg.getBoundingClientRect(), k=cur.w/r.width;
   cur={...drag.vb, x:drag.vb.x-(e.clientX-drag.px)*k, y:drag.vb.y-(e.clientY-drag.py)*k};
   relayout();
@@ -615,8 +747,18 @@ svg.addEventListener('wheel', e => {
   applyVB();
 }, {passive:false});
 
+const srcEl = document.getElementById('src');
+const toggleSrc = on => { srcEl.classList.toggle('on', on); document.getElementById('srcBtn').classList.toggle('on', on); };
+document.getElementById('srcBtn').onclick = () => toggleSrc(!srcEl.classList.contains('on'));
+document.getElementById('srcClose').onclick = () => toggleSrc(false);
+addEventListener('keydown', ev => { if (ev.key==='Escape') toggleSrc(false); });
+
 addEventListener('resize', () => show(idx));
-show(0);
+// Deep link: #era=3 opens on that chapter (0 = all years), so a lecture can embed
+// the braid already zoomed to its own decade.
+const hashEra = () => { const m = /era=(\d+)/.exec(location.hash); return m ? +m[1] : 0; };
+addEventListener('hashchange', () => show(hashEra()));
+show(hashEra());
 </script>
 </body>
 </html>
