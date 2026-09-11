@@ -29,7 +29,8 @@
   .evt.on circle{opacity:1}
   /* Only the event dot grows on focus. The tie's end-caps stay small, or they
      swallow the tie and read as three loose dots off the strands. */
-  .evt.on .dot{r:7.5}
+  /* Marker radii are set per frame in applyVB, in screen pixels, so a dot is the
+     same size in the overview and inside an era. */
   /* A label the solver could not fit anywhere is dropped rather than overlapped,
      and its stem goes with it — a leader line to nothing is worse than neither. */
   .evt.on .lbl.nofit{opacity:0}
@@ -47,6 +48,12 @@
     letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
     padding:1px 6px;border-radius:5px;background:color-mix(in srgb, var(--cream) 88%, transparent)}
   #tagN{color:var(--teal)} #tagA{color:var(--slate)}
+  .tag{z-index:2} .tag.off{display:none}
+  @media (max-width:1100px){
+    #cap{max-width:46%;padding:10px 14px 12px}
+    #cap h2{font-size:16px;margin-bottom:5px} #cap p{font-size:12.5px;line-height:1.35}
+    .hint{display:none} .chip{padding:4px 8px;font-size:11px} #bar{padding:6px 10px;gap:6px}
+  }
 
   /* Era caption: a card in screen space, docked per era by the layout solver to
      whichever slot buries the least. No label is ever allowed under it. */
@@ -155,8 +162,8 @@ const STROKE = 5.5;                                   // strand width, data unit
 
 // How far apart the two strands run at each year. 1 = fully apart, 0 = merged.
 const SEP = [
-  [1940,.05],[1943,.05],[1952,.10],[1956,.30],[1962,1],[1975,1],[1980,.60],
-  [1986,.14],[1992,.68],[2001,.88],[2012,.30],[2014,.10],[2018,.78],[2026,.50],[2028,.50]
+  [1940,.05],[1943,.05],[1952,.10],[1956,.30],[1964,1],[1975,1],[1980,.60],
+  [1986,.14],[1992,.68],[2001,.88],[2012,.30],[2014,.10],[2017,.38],[2021,.66],[2026,.46],[2028,.46]
 ];
 function sepAt(yr){
   for (let i=0;i<SEP.length-1;i++){
@@ -173,100 +180,102 @@ const strandY = (yr, which) => {
 const EVENTS = [
   // y year · s strand (neuro | ai | both) · key: shown in the all-years overview ·
   // t name · d gloss · c citation (hover) · u primary source (click)
-  {y:1943,key:1,s:'both', t:'McCulloch & Pitts', d:'a neuron as logic',
+  {y:1943,key:1,s:'both', t:'McCulloch & Pitts', d:'the formal neuron',
    c:'McCulloch & Pitts, Bull. Math. Biophys. 5:115–133 (1943)', u:'https://doi.org/10.1007/BF02478259'},
-  {y:1948,s:'both', t:'Wiener',            d:'control and communication in animal and machine',
+  {y:1943,s:'both', t:'Rosenblueth, Wiener & Bigelow', d:'cybernetics: behaviour as feedback',
+   c:'Rosenblueth, Wiener & Bigelow, Behavior, purpose and teleology, Philosophy of Science 10:18–24 (1943)', u:'https://doi.org/10.1086/286788'},
+  {y:1948,s:'both', t:'Wiener · Cybernetics', d:'control and communication',
    c:'Wiener, Cybernetics: or Control and Communication in the Animal and the Machine, MIT Press (1948)', u:'https://doi.org/10.7551/mitpress/11810.001.0001'},
-  {y:1949,s:'both', t:'Hebb',              d:'cells that fire together',
+  {y:1949,s:'both', t:'Hebb',              d:'the Hebbian learning rule',
    c:'Hebb, The Organization of Behavior, Wiley (1949)', u:'https://doi.org/10.4324/9781410612403'},
   {y:1950,s:'ai',   t:'Turing',            d:'“can machines think?”',
    c:'Turing, Computing machinery and intelligence, Mind 59:433–460 (1950)', u:'https://doi.org/10.1093/mind/LIX.236.433'},
-  {y:1956,key:1,s:'ai',   t:'Dartmouth workshop', d:'the field is named “AI”',
+  {y:1956,key:1,s:'ai',   t:'Dartmouth workshop', d:'the term “artificial intelligence”',
    c:'McCarthy, Minsky, Rochester & Shannon, A proposal for the Dartmouth summer research project on artificial intelligence (1955); repr. AI Magazine 27(4) (2006)', u:'http://www-formal.stanford.edu/jmc/history/dartmouth/dartmouth.html'},
-  {y:1958,key:1,s:'both', t:'Rosenblatt',        d:'the perceptron, in a psychology journal',
+  {y:1958,key:1,s:'both', t:'Rosenblatt',        d:'the perceptron, in Psychological Review',
    c:'Rosenblatt, The perceptron: a probabilistic model for information storage and organization in the brain, Psychol. Rev. 65:386–408 (1958)', u:'https://doi.org/10.1037/h0042519'},
-  {y:1959,s:'neuro',t:'Lettvin',           d:'what the frog’s eye tells the frog’s brain',
+  {y:1959,s:'neuro',t:'Lettvin',           d:'feature detectors',
    c:'Lettvin, Maturana, McCulloch & Pitts, What the frog’s eye tells the frog’s brain, Proc. IRE 47:1940–1951 (1959)', u:'https://doi.org/10.1109/JRPROC.1959.287207'},
   {y:1961,s:'neuro',t:'Barlow',            d:'efficient coding',
    c:'Barlow, Possible principles underlying the transformations of sensory messages, in Rosenblith (ed.) Sensory Communication, MIT Press (1961)', u:'https://doi.org/10.7551/mitpress/9780262518420.003.0013'},
   {y:1962,key:1,s:'neuro',t:'Hubel & Wiesel',    d:'simple and complex cells',
    c:'Hubel & Wiesel, Receptive fields, binocular interaction and functional architecture in the cat’s visual cortex, J. Physiol. 160:106–154 (1962)', u:'https://doi.org/10.1113/jphysiol.1962.sp006837'},
-  {y:1969,key:1,s:'ai',   t:'Minsky & Papert',   d:'Perceptrons',
+  {y:1969,key:1,s:'ai',   t:'Minsky & Papert',   d:'limits of the perceptron',
    c:'Minsky & Papert, Perceptrons: An Introduction to Computational Geometry, MIT Press (1969)', u:'https://doi.org/10.7551/mitpress/11301.001.0001'},
-  {y:1972,s:'neuro',t:'Gross',             d:'selectivity in IT cortex',
+  {y:1972,s:'neuro',t:'Gross',             d:'object selectivity in IT',
    c:'Gross, Rocha-Miranda & Bender, Visual properties of neurons in inferotemporal cortex of the macaque, J. Neurophysiol. 35:96–111 (1972)', u:'https://doi.org/10.1152/jn.1972.35.1.96'},
-  {y:1972,s:'neuro',t:'Rescorla & Wagner', d:'learning driven by prediction error',
+  {y:1972,s:'neuro',t:'Rescorla & Wagner', d:'learning from prediction error',
    c:'Rescorla & Wagner, A theory of Pavlovian conditioning, in Black & Prokasy (eds.) Classical Conditioning II, Appleton-Century-Crofts (1972)', u:''},
   {y:1973,s:'ai',   t:'Lighthill report',  d:'the first AI winter',
    c:'Lighthill, Artificial Intelligence: A General Survey, Science Research Council (1973)', u:'http://www.chilton-computing.org.uk/inf/literature/reports/lighthill_report/p001.htm'},
-  {y:1976,s:'neuro',t:'Marr & Poggio',     d:'levels of analysis: four, reduced to three in 1982',
+  {y:1976,s:'neuro',t:'Marr & Poggio',     d:'levels of analysis',
    c:'Marr & Poggio, From understanding computation to understanding neural circuitry, MIT AI Memo 357 (1976)', u:'https://dspace.mit.edu/handle/1721.1/5782'},
-  {y:1980,s:'both', t:'Fukushima',         d:'Neocognitron: Hubel & Wiesel, stacked',
+  {y:1980,s:'both', t:'Fukushima',         d:'the Neocognitron',
    c:'Fukushima, Neocognitron: a self-organizing neural network model for a mechanism of pattern recognition unaffected by shift in position, Biol. Cybern. 36:193–202 (1980)', u:'https://doi.org/10.1007/BF00344251'},
-  {y:1982,s:'both', t:'Hopfield',          d:'attractor networks; statistical physics arrives',
+  {y:1982,s:'both', t:'Hopfield',          d:'attractor networks',
    c:'Hopfield, Neural networks and physical systems with emergent collective computational abilities, PNAS 79:2554–2558 (1982)', u:'https://doi.org/10.1073/pnas.79.8.2554'},
   {y:1985,s:'both', t:'Boltzmann machines', d:'learning in stochastic networks',
    c:'Ackley, Hinton & Sejnowski, A learning algorithm for Boltzmann machines, Cognit. Sci. 9:147–169 (1985)', u:'https://doi.org/10.1207/s15516709cog0901_7'},
-  {y:1986,key:1,s:'both', t:'PDP volumes',       d:'backprop reaches psychology',
+  {y:1986,key:1,s:'both', t:'PDP volumes',       d:'backpropagation, popularised',
    c:'Rumelhart, McClelland & the PDP Research Group, Parallel Distributed Processing, MIT Press (1986); Rumelhart, Hinton & Williams, Nature 323:533–536 (1986)', u:'https://doi.org/10.7551/mitpress/5236.001.0001'},
   {y:1988,s:'ai',   t:'Sutton',            d:'temporal-difference learning',
    c:'Sutton, Learning to predict by the methods of temporal differences, Mach. Learn. 3:9–44 (1988)', u:'https://doi.org/10.1007/BF00115009'},
-  {y:1989,s:'ai',   t:'LeCun',             d:'LeNet',
+  {y:1989,s:'ai',   t:'LeCun',             d:'convolutional networks',
    c:'LeCun et al., Backpropagation applied to handwritten zip code recognition, Neural Comput. 1:541–551 (1989)', u:'https://doi.org/10.1162/neco.1989.1.4.541'},
-  {y:1990,s:'both', t:'Elman',             d:'recurrent networks learn sequential structure',
+  {y:1990,s:'both', t:'Elman',             d:'recurrent networks',
    c:'Elman, Finding structure in time, Cognit. Sci. 14:179–211 (1990)', u:'https://doi.org/10.1207/s15516709cog1402_1'},
-  {y:1996,s:'neuro',t:'Olshausen & Field', d:'sparse coding: V1 receptive fields from natural images',
+  {y:1996,s:'neuro',t:'Olshausen & Field', d:'sparse coding',
    c:'Olshausen & Field, Emergence of simple-cell receptive field properties by learning a sparse code for natural images, Nature 381:607–609 (1996)', u:'https://doi.org/10.1038/381607a0'},
   {y:1997,s:'ai',   t:'LSTM',              d:'long short-term memory',
    c:'Hochreiter & Schmidhuber, Long short-term memory, Neural Comput. 9:1735–1780 (1997)', u:'https://doi.org/10.1162/neco.1997.9.8.1735'},
-  {y:1997,s:'ai',   t:'Deep Blue',         d:'search defeats the world chess champion',
+  {y:1997,s:'ai',   t:'Deep Blue',         d:'search defeats Kasparov',
    c:'Campbell, Hoane & Hsu, Deep Blue, Artif. Intell. 134:57–83 (2002)', u:'https://doi.org/10.1016/S0004-3702(01)00129-1'},
-  {y:1997,key:1,s:'both', t:'Schultz, Dayan & Montague', d:'dopamine encodes a reward-prediction error',
+  {y:1997,key:1,s:'both', t:'Schultz, Dayan & Montague', d:'dopamine as prediction error',
    c:'Schultz, Dayan & Montague, A neural substrate of prediction and reward, Science 275:1593–1599 (1997)', u:'https://doi.org/10.1126/science.275.5306.1593'},
-  {y:1999,s:'both', t:'HMAX',              d:'cortex-constrained recognition, competitive until 2012',
+  {y:1999,s:'both', t:'HMAX',              d:'cortex-constrained recognition',
    c:'Riesenhuber & Poggio, Hierarchical models of object recognition in cortex, Nat. Neurosci. 2:1019–1025 (1999)', u:'https://doi.org/10.1038/14819'},
   {y:1999,s:'neuro',t:'Rao & Ballard',     d:'predictive coding',
    c:'Rao & Ballard, Predictive coding in the visual cortex, Nat. Neurosci. 2:79–87 (1999)', u:'https://doi.org/10.1038/4580'},
-  {y:2006,s:'ai',   t:'Deep belief nets',  d:'layer-wise pretraining revives depth',
+  {y:2006,s:'ai',   t:'Deep belief nets',  d:'layer-wise pretraining',
    c:'Hinton, Osindero & Teh, A fast learning algorithm for deep belief nets, Neural Comput. 18:1527–1554 (2006)', u:'https://doi.org/10.1162/neco.2006.18.7.1527'},
-  {y:2012,key:1,s:'ai',   t:'AlexNet',           d:'ImageNet top-5 error: 16.4% against 26.2%',
+  {y:2012,key:1,s:'ai',   t:'AlexNet',           d:'ImageNet: 16.4% vs 26.2%',
    c:'Krizhevsky, Sutskever & Hinton, ImageNet classification with deep convolutional neural networks, NeurIPS 25 (2012)', u:'https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html'},
-  {y:2014,key:1,s:'both', t:'Yamins & DiCarlo',  d:'task-trained networks predict IT responses',
+  {y:2014,key:1,s:'both', t:'Yamins & DiCarlo',  d:'CNNs predict IT responses',
    c:'Yamins et al., Performance-optimized hierarchical models predict neural responses in higher visual cortex, PNAS 111:8619–8624 (2014)', u:'https://doi.org/10.1073/pnas.1403112111'},
-  {y:2015,s:'ai',   t:'DQN',               d:'deep reinforcement learning: Atari from pixels',
+  {y:2015,s:'ai',   t:'DQN',               d:'Atari from pixels',
    c:'Mnih et al., Human-level control through deep reinforcement learning, Nature 518:529–533 (2015)', u:'https://doi.org/10.1038/nature14236'},
-  {y:2015,s:'ai',   t:'ResNet',            d:'residual connections; 152 layers',
+  {y:2015,s:'ai',   t:'ResNet',            d:'residual connections',
    c:'He, Zhang, Ren & Sun, Deep residual learning for image recognition, CVPR 2016 (arXiv Dec 2015)', u:'https://doi.org/10.1109/CVPR.2016.90'},
-  {y:2016,s:'ai',   t:'AlphaGo',           d:'deep networks, reinforcement learning and tree search',
+  {y:2016,s:'ai',   t:'AlphaGo',           d:'deep RL plus tree search',
    c:'Silver et al., Mastering the game of Go with deep neural networks and tree search, Nature 529:484–489 (2016)', u:'https://doi.org/10.1038/nature16961'},
-  {y:2017,s:'ai',   t:'Transformers',      d:'attention; no cortical ancestry',
+  {y:2017,s:'ai',   t:'Transformers',      d:'attention',
    c:'Vaswani et al., Attention is all you need, NeurIPS 30 (2017)', u:'https://arxiv.org/abs/1706.03762'},
   {y:2020,s:'ai',   t:'GPT-3 · scaling laws', d:'scale as the strategy',
    c:'Brown et al., Language models are few-shot learners, NeurIPS 33 (2020); Kaplan et al., Scaling laws for neural language models, arXiv:2001.08361 (2020)', u:'https://arxiv.org/abs/2005.14165'},
-  {y:2022,s:'ai',   t:'ChatGPT',           d:'the second revolution goes public',
+  {y:2022,s:'ai',   t:'ChatGPT',           d:'the second revolution, public',
    c:'OpenAI, Introducing ChatGPT, 30 Nov 2022', u:'https://openai.com/index/chatgpt/'},
-  {y:2024,key:1,s:'both', t:'Nobel Prize',       d:'in Physics, to Hopfield and Hinton',
+  {y:2024,key:1,s:'both', t:'Nobel Prize',       d:'Physics, to Hopfield and Hinton',
    c:'The Nobel Prize in Physics 2024: Hopfield & Hinton, “for foundational discoveries and inventions that enable machine learning with artificial neural networks”', u:'https://www.nobelprize.org/prizes/physics/2024/summary/'},
 ];
 
 const ERAS = [
   {k:'All', a:1940, b:2028, title:'', lines:[]},
-  {k:'One community', a:1941, b:1963, title:'One community, not two · 1943–1958',
-   lines:['The same meetings, funders and people: the Macy conferences on cybernetics.',
+  {k:'One community', a:1941, b:1958.5, title:'One community, not two · 1943–1958',
+   lines:['Cybernetics: the same meetings, funders and people, from the Macy conferences of 1946–1953.',
           'The perceptron was published in Psychological Review.']},
-  {k:'The split', a:1954, b:1982, title:'The split was a choice · 1956–1979',
+  {k:'The split', a:1955, b:1979, title:'The split was a choice · 1956–1979',
    lines:['McCarthy chose the name “artificial intelligence” partly to keep the new field clear of cybernetics; Minsky and Papert made the technical case against perceptrons.',
           'Neuroscience, meanwhile, assembled the components deep learning would later use: efficient coding, the simple/complex-cell hierarchy, high-level selectivity.']},
-  {k:'The 1980s', a:1978, b:1994, title:'The decade that built deep learning · 1980s',
+  {k:'The 1980s', a:1979, b:1991, title:'The decade that built deep learning · 1980s',
    lines:['Marr and Poggio define the levels of analysis; Fukushima stacks Hubel and Wiesel’s hierarchy; Hopfield brings statistical physics; Boltzmann machines and the PDP volumes are cognitive-science projects.',
           'The 2024 Nobel Prize in Physics recognised Hopfield and Hinton for this decade’s work.']},
-  {k:'Cortex → AlexNet', a:1988, b:2012, title:'From cat cortex to AlexNet · 1989–2011',
+  {k:'Cortex → AlexNet', a:1989, b:2013, title:'From cat cortex to AlexNet · 1989–2011',
    lines:['LeNet and HMAX descend from the same parent, the Neocognitron.',
           'Cortex-constrained models remained competitive with computer vision until large datasets and GPUs arrived.']},
-  {k:'First revolution', a:2010, b:2018, title:'First revolution: convolutional nets · 2012–2017',
+  {k:'First revolution', a:2011, b:2016.5, title:'First revolution: convolutional nets · 2012–2017',
    lines:['AlexNet wins ImageNet in 2012 with 16.4% top-5 error against 26.2% for the runner-up; the architecture is Hubel and Wiesel’s hierarchy, stacked deep.',
           'By 2014, networks trained only to classify objects predicted responses in inferotemporal cortex better than models built for that purpose.']},
-  {k:'Second revolution', a:2016, b:2028, title:'Second revolution: transformers, scale · 2017–today',
+  {k:'Second revolution', a:2016.5, b:2028, title:'Second revolution: transformers, scale · 2017–today',
    lines:['Transformers were not designed to reproduce cortical circuitry, and scale becomes the strategy.',
           'As models improve on benchmarks, their fit to visual cortex worsens. Whether the two fields converge again is an open question.']},
 ];
@@ -307,7 +316,10 @@ const CAPS_MIN = 13;
 
 // Which strand a label hangs off. A 'both' event sits on the mid-line, so its
 // label alternates sides to keep the two rows balanced.
-const SIDE = EVENTS.map((e,i) => e.s==='neuro' ? true : e.s==='ai' ? false : (i % 2 === 0));
+// Shared events alternate sides by their own count, so adding or removing any
+// event does not flip every later one.
+let nBoth = 0;
+const SIDE = EVENTS.map(e => e.s==='neuro' ? true : e.s==='ai' ? false : (nBoth++ % 2 === 0));
 
 // Baselines of the two text lines, relative to the anchor where the stem ends.
 // The 'up' pair is derived from a real measurement below, so the block sits the
@@ -332,7 +344,8 @@ const evNodes = EVENTS.map((e,i) => {
   }
   const stem = mk('line',{class:'stem',x1:0,y1:0,x2:0,y2:0,stroke:col,'stroke-width':1.5});
   gm.appendChild(stem);
-  gm.appendChild(mk('circle',{class:'dot',cx:0,cy:0,r:5,fill:col}));
+  const dot = mk('circle',{class:'dot',cx:0,cy:0,r:5,fill:col});
+  gm.appendChild(dot);
   gMarks.appendChild(gm);
 
   const gl  = mk('g',{class:'evt', transform:at});
@@ -350,7 +363,7 @@ const evNodes = EVENTS.map((e,i) => {
   gl.appendChild(lbl);
   gLabels.appendChild(gl);
 
-  return {gm, gl, lbl, stem, t1, t2, cy, pref:SIDE[i], up:SIDE[i],
+  return {gm, gl, lbl, stem, dot, caps:[...gm.querySelectorAll('.cap')], tie:gm.querySelector('.tie'), half: e.s==='both' ? HALF(e.y) : 0, t1, t2, cy, pref:SIDE[i], up:SIDE[i],
           bw:60, dx:0, dx0:0, dx1:0, anchorY:MID, a0:MID, a1:MID, fit:true};
 });
 
@@ -424,8 +437,12 @@ function layout(vis, vb){
   const W = RECT.w, H = RECT.h, k = vb.w / W;
   const midPx = (MID - vb.y) / k;
   const box = capBox();
+  const tags = tagBoxes(vb, W, H).filter(t => !t.off);
   const placed = [];
-  vis.slice().sort((p,q) => p.y - q.y).forEach(e => {
+  // Crossings (both strands) and overview events claim their slots first: if
+  // anything has to be dropped in a crowded decade, it is never one of those.
+  const pri = e => (e.s==='both' ? 2 : 0) + (e.key ? 1 : 0);
+  vis.slice().sort((p,q) => (pri(q) - pri(p)) || (p.y - q.y)).forEach(e => {
     const n = evNodes[EVENTS.indexOf(e)];
     const cx = (x(e.y) - vb.x) / k, hw = n.bw / 2;
     // Slide the block back on screen if it hangs off an edge, but never so far
@@ -443,23 +460,33 @@ function layout(vis, vb){
     // already placed. A label that cannot satisfy this is dropped, not clipped.
     const free = b => b.y >= EDGE && b.y + b.h <= H - AXIS_PX
                    && b.x >= PADL + EDGE - 0.5 && b.x + b.w <= W - PADR - EDGE + 0.5
-                   && !(box && hit(b, box, 7)) && !placed.some(p => hit(b, p, 3));
-    let got = null;
+                   && !(box && hit(b, box, 7)) && !tags.some(t => hit(b, t, 6)) && !placed.some(p => hit(b, p, 3));
+    let got = null, off = 0;
+    // Before climbing to the next lane, try sliding sideways by a label width:
+    // same-year neighbours then sit side by side instead of stacking, and the
+    // stem leans rather than lengthens.
+    const slide = (xR - xL) + 10;
     search:
     for (const up of [n.pref, !n.pref]){
       for (let lane=0; lane<LANES; lane++){
-        const anchor = midPx + (up?-1:1) * (env + CLEAR + lane*PITCH);
-        const b = {x:xL, w:xR-xL, y:anchor + (up?UP_TOP:DN_TOP), h:bh(up)};
-        if (!free(b)) continue;
-        got = {up, anchor, b}; break search;
+        for (const o of [0, slide, -slide]){
+          // The strand envelope under the box moves with the box.
+          const envO = o ? envHalf(yearAt(vb.x + (xL+o)*k), yearAt(vb.x + (xR+o)*k)) / k : env;
+          const anchor = midPx + (up?-1:1) * (envO + CLEAR + lane*PITCH);
+          const b = {x:xL+o, w:xR-xL, y:anchor + (up?UP_TOP:DN_TOP), h:bh(up)};
+          if (!free(b)) continue;
+          got = {up, anchor, b}; off = o; break search;
+        }
       }
       // Zoomed in far enough that this side's strand has left the frame: walk
       // rows inward from the edge until one is clear of everything.
       for (let lane=0; lane<PINS; lane++){
-        const b = {x:xL, w:xR-xL, h:bh(up),
-                   y: up ? EDGE + lane*PITCH : H - AXIS_PX - bh(up) - lane*PITCH};
-        if (!free(b) || !marksClear(b, vb, k, vis, e)) continue;
-        got = {up, anchor: b.y - (up?UP_TOP:DN_TOP), b}; break search;
+        for (const o of [0, slide, -slide]){
+          const b = {x:xL+o, w:xR-xL, h:bh(up),
+                     y: up ? EDGE + lane*PITCH : H - AXIS_PX - bh(up) - lane*PITCH};
+          if (!free(b) || !marksClear(b, vb, k, vis, e)) continue;
+          got = {up, anchor: b.y - (up?UP_TOP:DN_TOP), b}; off = o; break search;
+        }
       }
     }
     n.fit = !!got;
@@ -469,7 +496,7 @@ function layout(vis, vb){
         y:anchor + (n.pref?UP_TOP:DN_TOP), h:(n.pref?UP_BOT-UP_TOP:DN_BOT-DN_TOP)}};
     } else placed.push(got.b);
     n.box = got.b;
-    n.up = got.up; n.dx = dx; n.anchorY = vb.y + got.anchor * k;
+    n.up = got.up; n.dx = dx + off; n.anchorY = vb.y + got.anchor * k;
     n.t1.setAttribute('y', got.up ? L1_UP : L1_DN);
     n.t2.setAttribute('y', got.up ? L2_UP : L2_DN);
     n.lbl.classList.toggle('nofit', !n.fit);
@@ -493,18 +520,35 @@ function applyVB(){
     const dx = (n.dx0 + (n.dx1 - n.dx0) * flyP) * k; // edge nudge, data units
     const local = aY - n.cy;
     n.lbl.setAttribute('transform', `translate(${dx.toFixed(2)},${local.toFixed(2)}) ${s}`);
-    n.stem.setAttribute('y1', local > 0 ? 9 : -9);
+    // A crossing's stem leaves from its cap on the strand nearest the label, so
+    // a label that slid sideways gets a short lean, not a diagonal across the braid.
+    const y1 = n.half ? (local > 0 ? n.half : -n.half) : (local > 0 ? 9 : -9);
+    n.stem.setAttribute('y1', y1);
     n.stem.setAttribute('y2', local.toFixed(2));
     n.stem.setAttribute('x2', dx.toFixed(2));
+    // Screen-constant marker sizes: 4.5 px dot (6 px when its era is on), 2.5 px caps.
+    const on = n.gm.classList.contains('on');
+    n.dot.setAttribute('r', ((on ? 6 : 4.5) * k).toFixed(2));
+    n.caps.forEach(c => c.setAttribute('r', (2.5 * k).toFixed(2)));
+    n.stem.setAttribute('stroke-width', (1.2 * k).toFixed(2));
+    if (n.tie) n.tie.setAttribute('stroke-width', (2 * k).toFixed(2));
   });
 }
 const tagN = document.getElementById('tagN'), tagA = document.getElementById('tagA');
+// Where the strand names sit for a given camera, in stage pixels. Shared by the
+// renderer and the label solver, which treats them as obstacles.
+function tagBoxes(vb, W, H){
+  const yr = Math.max(Y0, Math.min(Y1, yearAt(vb.x + vb.w*0.012)));
+  const py = v => (v - vb.y) / vb.h * H;
+  const yN = py(strandY(yr,'neuro')) - 22, yA = py(strandY(yr,'ai')) + 8;
+  const inside = y => y >= 6 && y <= H - AXIS_PX - 22;   // a strand off-screen takes its name with it
+  return [{x:14, y:yN, w:tagN.offsetWidth||120, h:20, off:!inside(yN)}, {x:14, y:yA, w:tagA.offsetWidth||190, h:20, off:!inside(yA)}];
+}
 function placeTags(){
   const r = svg.getBoundingClientRect(); if (!r.height) return;
-  const yr = Math.max(Y0, Math.min(Y1, yearAt(cur.x + cur.w*0.012)));
-  const py = v => (v - cur.y) / cur.h * r.height;
-  tagN.style.top = (py(strandY(yr,'neuro')) - 22) + 'px';
-  tagA.style.top = (py(strandY(yr,'ai')) + 8) + 'px';
+  const [bN, bA] = tagBoxes(cur, r.width, r.height);
+  tagN.style.top = bN.y + 'px'; tagN.classList.toggle('off', bN.off);
+  tagA.style.top = bA.y + 'px'; tagA.classList.toggle('off', bA.off);
 }
 const axis = document.getElementById('axis');
 function drawAxis(){
@@ -568,7 +612,7 @@ function recentre(vb, vis, W, H){
 }
 
 function fitEra(era, vis, W, H, aspect){
-  let w = Math.max(620, x(era.b) - x(era.a) + 160);
+  let w = Math.max(460, x(era.b) - x(era.a) + 160);
   let vb = {x:(x(era.a)+x(era.b))/2 - w/2, y:MID - w*aspect/2, w, h:w*aspect};
   for (let pass=0; pass<9; pass++){
     layout(vis, vb);
@@ -611,7 +655,7 @@ const cardSpots = (W,H,cw,ch) => {
   const xs = [22, (W-cw)/2, W-22-cw], ys = [18, (H-AXIS_PX-ch)/2, H-AXIS_PX-10-ch];
   const out = [];
   ys.forEach(y => xs.forEach(x => out.push({x,y})));
-  out.push({x:22, y:ys[1], padL:cw+40}, {x:W-22-cw, y:ys[1], padR:cw+40});
+  if (W >= 1100) out.push({x:22, y:ys[1], padL:cw+40}, {x:W-22-cw, y:ys[1], padR:cw+40});
   return out;
 };
 function dockAt(s){
