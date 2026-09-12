@@ -331,6 +331,9 @@ const SIDE = EVENTS.map(e => e.s==='neuro' ? true : e.s==='ai' ? false : (nBoth+
 // same distance from the anchor whichever way it hangs.
 const L1_DN = 15, L2_DN = 31;
 let L1_UP = -31, L2_UP = -15, DN_TOP = 5, DN_BOT = 35, UP_TOP = -35, UP_BOT = -5;
+// How far past the anchor the stem runs to meet the ink, in screen px: cap
+// height sits ~3.5 px below the em-box top; descenders ~1 px above its bottom.
+const STEM_IN_DN = 3.5, STEM_IN_UP = 1;
 
 const evNodes = EVENTS.map((e,i) => {
   const cy  = e.s==='both' ? MID : strandY(e.y, e.s);
@@ -435,6 +438,60 @@ function marksClear(b, vb, k, vis, self, pad=6){
   return true;
 }
 
+// A leader line must read as one clean stroke from dot to text. Beyond a slide
+// this steep it reads as a rule, not a pointer; the relaxed limit is only used
+// when nothing on the label's own side fits under the strict one, and the
+// last one only to keep a label on screen that would otherwise be dropped.
+const LEAN_MAX = 35, LEAN_RELAX = 60, LEAN_LAST = 75;   // degrees from vertical
+const lean = (x0,y0,x1,y1) => Math.atan2(Math.abs(x1-x0), Math.abs(y1-y0)) * 180/Math.PI;
+// Segment against a padded box (Liang–Barsky) and against another segment.
+function segRect(a, b, r, pad=0){
+  let t0=0, t1=1; const dx=b.x-a.x, dy=b.y-a.y;
+  const X0=r.x-pad, X1=r.x+r.w+pad, Y0=r.y-pad, Y1=r.y+r.h+pad;
+  for (const [p,q] of [[-dx, a.x-X0],[dx, X1-a.x],[-dy, a.y-Y0],[dy, Y1-a.y]]){
+    if (p===0){ if (q<0) return false; continue; }
+    const t=q/p;
+    if (p<0){ if (t>t1) return false; if (t>t0) t0=t; } else { if (t<t0) return false; if (t<t1) t1=t; }
+  }
+  return t0<=t1;
+}
+function segSeg(p,p2,q,q2){
+  const d = (a,b,c) => (b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+  const d1=d(q,q2,p), d2=d(q,q2,p2), d3=d(p,p2,q), d4=d(p,p2,q2);
+  return ((d1>0&&d2<0)||(d1<0&&d2>0)) && ((d3>0&&d4<0)||(d3<0&&d4>0));
+}
+// Is the stem from the marker (x0,y0) to the anchor (x1,y1) clear? It may not
+// run through a label already placed, cross another stem, the card or a
+// crossing's tie, and once it has left its own dot it may not touch
+// a strand — except that a label exiled across the mid-line may cross the
+// other strand once, squarely; it may never ride along it.
+function stemClear(x0,y0,x1,y1, vb, k, vis, self, placed, stems, box, exiled){
+  const a = {x:x0,y:y0}, b = {x:x1,y:y1};
+  if (placed.some(p => segRect(a, b, p, 2))) return false;
+  if (stems.some(s => segSeg(a, b, s[0], s[1]))) return false;
+  if (box && segRect(a, b, box, 4)) return false;
+  // Past the marker itself: a same-year crossing's tie ends on this very dot.
+  const half = STROKE/2/k, zone = half + 7, L = Math.hypot(x1-x0, y1-y0), mid = (MID-vb.y)/k;
+  const a2 = L > zone ? {x:x0+(x1-x0)*zone/L, y:y0+(y1-y0)*zone/L} : b;
+  for (const e of vis){
+    if (e.s !== 'both' || e === self) continue;
+    const X = (x(e.y)-vb.x)/k, h = HALF(e.y)/k, Y = (MID-vb.y)/k;
+    if (segRect(a2, b, {x:X-3, y:Y-h, w:6, h:2*h}, 2)) return false;
+  }
+  let run = 0;
+  for (let d=zone; d<=L; d+=5){
+    const t=d/L, X=x0+(x1-x0)*t, Y=y0+(y1-y0)*t;
+    const yr = yearAt(vb.x + X*k); if (yr<Y0 || yr>Y1) continue;
+    const h = HALF(yr)/k;
+    for (const [w,sy] of [['neuro', mid-h],['ai', mid+h]]){
+      if (Math.abs(sy - Y) >= half + 1) continue;
+      if (!exiled || self.s === 'both' || w === self.s) return false;
+      run += 5; if (run > 2.4*STROKE/k) return false;
+    }
+  }
+  return true;
+}
+
 // Greedy, left to right: each label takes the first free slot. A slot is free
 // when it clears the frame, the axis, the caption card and every label already
 // placed — on either side of the mid-line, not just its own.
@@ -443,11 +500,45 @@ function layout(vis, vb){
   const midPx = (MID - vb.y) / k;
   const box = capBox();
   const tags = tagBoxes(vb, W, H).filter(t => !t.off);
-  const placed = [];
-  // Crossings (both strands) and overview events claim their slots first: if
-  // anything has to be dropped in a crowded decade, it is never one of those.
-  const pri = e => (e.s==='both' ? 2 : 0) + (e.key ? 1 : 0);
-  vis.slice().sort((p,q) => (pri(q) - pri(p)) || (p.y - q.y)).forEach(e => {
+  const placed = [], stems = [];        // boxes and leader lines already committed
+  const bh = up => up?UP_BOT-UP_TOP:DN_BOT-DN_TOP;
+  // On screen on all four sides, off the axis, off the card, off every label
+  // already placed and under no committed stem. A label that cannot satisfy
+  // this is dropped, not clipped.
+  const free = b => b.y >= EDGE && b.y + b.h <= H - AXIS_PX
+                 && b.x >= PADL + EDGE - 0.5 && b.x + b.w <= W - PADR - EDGE + 0.5
+                 && !(box && hit(b, box, 7)) && !tags.some(t => hit(b, t, 6)) && !placed.some(p => hit(b, p, 3))
+                 && !stems.some(st => segRect(st[0], st[1], b, 2));
+  // Where a stem leaves: the dot, or for a crossing the cap on the label's side.
+  const stemY = (n, up) => n.half ? midPx + (up?-1:1) * n.half/k : (n.cy - vb.y)/k;
+  // The slot for a box of half-width hw centred at c, on one side, in one row:
+  // a lane hung off the strand envelope under the box, or a row pinned inside
+  // the frame edge for when that strand has left the frame.
+  // A pinned row hangs its text toward the marker (sy): the anchor sits on
+  // the box edge facing the dot, so the stem meets the text, never runs
+  // through it — even when the strand has left the frame on the far side.
+  const slot = (c, hw, up, row, sy) => {
+    const pinned = row >= LANES, lane = pinned ? row-LANES : row;
+    if (!pinned){
+      const envO = envHalf(yearAt(vb.x + (c-hw)*k), yearAt(vb.x + (c+hw)*k)) / k;
+      const anchor = midPx + (up?-1:1) * (envO + CLEAR + lane*PITCH);
+      return {b:{x:c-hw, w:2*hw, y:anchor + (up?UP_TOP:DN_TOP), h:bh(up)}, anchor, pinned, up, side:up};
+    }
+    const b = {x:c-hw, w:2*hw, h:bh(up), y: up ? EDGE + lane*PITCH : H - AXIS_PX - bh(up) - lane*PITCH};
+    const tUp = sy > b.y + b.h/2;
+    return {b, anchor: tUp ? b.y + b.h - UP_BOT : b.y - DN_TOP, pinned, up: tUp, side:up};
+  };
+  const commit = (n, got, cx) => {
+    n.fit = true; n.box = got.b; n.up = got.up; n.dx = got.b.x + got.b.w/2 - cx; n.anchorY = vb.y + got.anchor * k;
+    n.t1.setAttribute('y', got.up ? L1_UP : L1_DN);
+    n.t2.setAttribute('y', got.up ? L2_UP : L2_DN);
+    n.lbl.classList.remove('nofit'); n.stem.classList.remove('nofit');
+    got.b.cx = cx; placed.push(got.b);
+    stems.push([{x:cx, y:stemY(n, got.side)}, {x:cx + n.dx, y:got.anchor}]);
+  };
+
+  // Everything one label needs to find itself a slot.
+  const solver = e => {
     const n = evNodes[EVENTS.indexOf(e)];
     const cx = (x(e.y) - vb.x) / k, hw = n.bw / 2;
     // Slide the block back on screen if it hangs off an edge, but never so far
@@ -457,56 +548,163 @@ function layout(vis, vb){
     else if (cx + hw > W - PADR - EDGE) dx = Math.max((W - PADR - EDGE) - (cx + hw), -room);
     const xL = cx + dx - hw, xR = cx + dx + hw;
     const env = envHalf(yearAt(vb.x + xL*k), yearAt(vb.x + xR*k)) / k;
-    // A label's own side is part of what it means, so exhaust that side first:
-    // its lanes, then rows pinned inside the frame edge with a long stem. Only
-    // when nothing on that side works does it cross the mid-line.
-    const bh = up => up?UP_BOT-UP_TOP:DN_BOT-DN_TOP;
-    // On screen on all four sides, off the axis, off the card, off every label
-    // already placed. A label that cannot satisfy this is dropped, not clipped.
-    const free = b => b.y >= EDGE && b.y + b.h <= H - AXIS_PX
-                   && b.x >= PADL + EDGE - 0.5 && b.x + b.w <= W - PADR - EDGE + 0.5
-                   && !(box && hit(b, box, 7)) && !tags.some(t => hit(b, t, 6)) && !placed.some(p => hit(b, p, 3));
-    let got = null, off = 0;
-    // Before climbing to the next lane, try sliding sideways by a label width:
-    // same-year neighbors then sit side by side instead of stacking, and the
-    // stem leans rather than lengthens.
-    const slides = [0, (xR-xL)/2 + 6, -((xR-xL)/2 + 6), (xR-xL) + 10, -((xR-xL) + 10)];
-    search:
-    for (const up of [n.pref, !n.pref]){
-      for (let lane=0; lane<LANES; lane++){
-        for (const o of slides){
-          // The strand envelope under the box moves with the box.
-          const envO = o ? envHalf(yearAt(vb.x + (xL+o)*k), yearAt(vb.x + (xR+o)*k)) / k : env;
-          const anchor = midPx + (up?-1:1) * (envO + CLEAR + lane*PITCH);
-          const b = {x:xL+o, w:xR-xL, y:anchor + (up?UP_TOP:DN_TOP), h:bh(up)};
-          if (!free(b)) continue;
-          got = {up, anchor, b}; off = o; break search;
+    const h1 = hw + 6, h2 = 2*hw + 10;
+    const nearLbl = q => Math.abs(q.cx - cx) < n.bw;
+    const roomAt = (b, sign) => {        // free px beside the straight slot at this height
+      const bc = b.x + b.w/2;
+      let r = sign > 0 ? (W - PADR - EDGE) - bc : bc - (PADL + EDGE);
+      placed.concat(box ? [box] : [], tags).forEach(q => {
+        if (q.y + q.h <= b.y - 3 || b.y + b.h + 3 <= q.y) return;
+        const qc = q.x + q.w/2;
+        if (sign > 0 && qc > bc) r = Math.min(r, q.x - bc);
+        if (sign < 0 && qc < bc) r = Math.min(r, bc - (q.x + q.w));
+      });
+      return r;
+    };
+    // One pass down a side. Straight first, always: offset 0 in lane 0, then
+    // lane 1, and so on. A sideways slide is allowed only when what blocks the
+    // straight slot is a near neighbour — a label whose dot sits within one
+    // label width, so the next lane would only stack the two over one x — or
+    // a fixed obstacle (frame, card, strand name). A label blocked by a farther
+    // label takes the next lane straight, so one slide never cascades down the
+    // row. Among the slides the smallest lean wins; a tie goes to the side
+    // with more room. A slot under the strict lean is taken at once; the first
+    // slot that only passes the relaxed lean is kept, and used if no lane
+    // fits strictly. Rows pinned to the frame edge come last, for when this
+    // side's strand has left the frame.
+    const side = (up, straightOnly=false, cap=LEAN_RELAX) => {
+      const exiled = up !== n.pref, sy = stemY(n, up);
+      let relaxed = null;
+      const test = (c, o) => {
+        if (!free(c.b)) return false;
+        const L = lean(cx, sy, cx+dx+o, c.anchor);
+        if (L > cap || (L > LEAN_MAX && relaxed)) return false;
+        if (c.pinned && !marksClear(c.b, vb, k, vis, e)) return false;
+        if (!stemClear(cx, sy, cx+dx+o, c.anchor, vb, k, vis, e, placed, stems, box, exiled)) return false;
+        if (L <= LEAN_MAX) return true;
+        relaxed = {up:c.up, side:up, anchor:c.anchor, b:c.b}; return false;
+      };
+      for (let row=0; row<LANES+PINS; row++){
+        if (row === LANES && relaxed) return relaxed;
+        const c0 = slot(cx+dx, hw, up, row, sy);
+        if (test(c0, 0)) return {up:c0.up, side:up, anchor:c0.anchor, b:c0.b};
+        if (straightOnly) continue;
+        // What is in the way of the straight slot: labels over the box, or
+        // labels the straight stem would run through.
+        const p0 = {x:cx, y:sy}, p1 = {x:cx+dx, y:c0.anchor};
+        const blk = placed.filter(q => hit(c0.b, q, 3) || segRect(p0, p1, q, 2));
+        if (blk.some(q => !nearLbl(q))) continue;
+        const cands = [];
+        if (blk.length){                 // the smallest slides that clear the neighbours
+          cands.push(Math.max(...blk.map(q => q.x + q.w + 3 - c0.b.x)));
+          cands.push(Math.min(...blk.map(q => q.x - 3 - (c0.b.x + c0.b.w))));
+        }
+        cands.push(h1/2, -h1/2, h1, -h1, h2, -h2);
+        const roomy = roomAt(c0.b, 1) >= roomAt(c0.b, -1) ? 1 : -1;
+        const key = o => Math.abs(o) - (Math.sign(o) === roomy ? 10 : 0);
+        for (const o of [...new Set(cands)].filter(o => o).sort((p,q) => key(p) - key(q))){
+          const c = slot(cx+dx+o, hw, up, row, sy);
+          if (test(c, o)) return {up:c.up, side:up, anchor:c.anchor, b:c.b};
         }
       }
-      // Zoomed in far enough that this side's strand has left the frame: walk
-      // rows inward from the edge until one is clear of everything.
-      for (let lane=0; lane<PINS; lane++){
-        for (const o of slides){
-          const b = {x:xL+o, w:xR-xL, h:bh(up),
-                     y: up ? EDGE + lane*PITCH : H - AXIS_PX - bh(up) - lane*PITCH};
-          if (!free(b) || !marksClear(b, vb, k, vis, e)) continue;
-          got = {up, anchor: b.y - (up?UP_TOP:DN_TOP), b}; off = o; break search;
-        }
-      }
-    }
-    n.fit = !!got;
-    if (!got){   // still nothing: park it on its own side, closest in, and hide it
+      return relaxed;
+    };
+    // Still nothing: park it on its own side, closest in, and hide it.
+    const drop = () => {
+      n.fit = false;
       const anchor = midPx + (n.pref?-1:1) * (env + CLEAR);
-      got = {up:n.pref, anchor, b:{x:xL, w:xR-xL,
-        y:anchor + (n.pref?UP_TOP:DN_TOP), h:(n.pref?UP_BOT-UP_TOP:DN_BOT-DN_TOP)}};
-    } else placed.push(got.b);
-    n.box = got.b;
-    n.up = got.up; n.dx = dx + off; n.anchorY = vb.y + got.anchor * k;
-    n.t1.setAttribute('y', got.up ? L1_UP : L1_DN);
-    n.t2.setAttribute('y', got.up ? L2_UP : L2_DN);
-    n.lbl.classList.toggle('nofit', !n.fit);
-    n.stem.classList.toggle('nofit', !n.fit);
+      n.box = {x:xL, w:xR-xL, y:anchor + (n.pref?UP_TOP:DN_TOP), h:bh(n.pref)};
+      n.up = n.pref; n.dx = dx; n.anchorY = vb.y + anchor * k;
+      n.t1.setAttribute('y', n.pref ? L1_UP : L1_DN);
+      n.t2.setAttribute('y', n.pref ? L2_UP : L2_DN);
+      n.lbl.classList.add('nofit'); n.stem.classList.add('nofit');
+    };
+    return {e, n, cx, hw, side, drop};
+  };
+
+  // Strand labels whose dots sit under each other's text can never all hang
+  // straight from the same strand: the second one's stem would run through
+  // the first. They are laid side by side as a group, centred so the outer
+  // stems lean equally, at the shallowest lane where every stem stays under
+  // the lean limit: the stems open into a V instead of one label being
+  // stacked over another or dropped.
+  const pair = (ms, sides) => {
+    const m = ms.slice().sort((p,q) => p.cx - q.cx);
+    // A crossing still to be placed at this same year will want a straight
+    // stem through the middle of the V: leave it a corridor between the two.
+    const mid = m.reduce((s,q) => s + q.cx, 0)/m.length;
+    const xf = vis.filter(f => f.s === 'both' && !done.has(f)).map(f => (x(f.y)-vb.x)/k).find(X => Math.abs(X - mid) < 20);
+    const gap = xf === undefined || m.length > 2 ? 3 : 14;
+    const Wg = m.reduce((s,q) => s + 2*q.hw, 0) + gap*(m.length-1);
+    let run = 0; m.forEach(q => { q.pos = run + q.hw; run += 2*q.hw + gap; });   // centre_i = left + pos_i
+    const o = m.map(q => q.pos - q.cx);                                          // lean_i = left + o_i
+    let left = gap === 3 ? -(Math.max(...o) + Math.min(...o))/2                   // equal and opposite leans
+                         : xf - (2*m[0].hw + gap/2);                               // corridor on the crossing
+    left = Math.max(PADL + EDGE, Math.min(W - PADR - EDGE - Wg, left));
+    m.forEach(q => { q.c = left + q.pos; });
+    for (const up of sides){
+      let relaxed = null;
+      for (let row=0; row<LANES+PINS; row++){
+        if (row === LANES && relaxed) return relaxed;
+        const cs = m.map(q => slot(q.c, q.hw, up, row, stemY(q.n, up)));
+        let worst = 0, ok = true;
+        for (let i=0; i<m.length && ok; i++){
+          const q = m[i], c = cs[i], others = cs.filter((_,j) => j!==i).map(o => o.b), sy = stemY(q.n, up);
+          ok = free(c.b) && !others.some(o => hit(c.b, o, 3)) && (!c.pinned || marksClear(c.b, vb, k, vis, q.e));
+          if (!ok) break;
+          const L = lean(q.cx, sy, q.c, c.anchor); worst = Math.max(worst, L);
+          ok = L <= LEAN_RELAX && stemClear(q.cx, sy, q.c, c.anchor, vb, k, vis, q.e, placed.concat(others), stems, box, up !== q.n.pref);
+        }
+        if (!ok) continue;
+        const res = m.map((q,i) => ({q, got:{up:cs[i].up, side:up, anchor:cs[i].anchor, b:cs[i].b}}));
+        if (worst <= LEAN_MAX) return res;
+        if (!relaxed) relaxed = res;
+      }
+      if (relaxed) return relaxed;
+    }
+    return null;
+  };
+
+  // Crossings (both strands) and overview events claim their slots first: if
+  // anything has to be dropped in a crowded decade, it is never one of those.
+  // The exception is a crossing with a strand label's dot under its text: its
+  // own label can hang from either strand, so it waits until the strand labels
+  // around it are settled, then takes whichever side lets it hang straight.
+  // Only after that may a strand label cross the mid-line — a label's own
+  // side is part of what it means, and an exile must not take a slot a
+  // crossing still needs.
+  const pri = e => (e.s==='both' ? 2 : 0) + (e.key ? 1 : 0);
+  const order = vis.slice().sort((p,q) => (pri(q) - pri(p)) || (p.y - q.y));
+  const done = new Set(), later = [], exiles = [];
+  const under = (S, f, sameSide) => f !== S.e && !done.has(f)
+        && (!sameSide || evNodes[EVENTS.indexOf(f)].pref === S.n.pref)
+        && Math.abs((x(f.y)-vb.x)/k - S.cx) < Math.max(S.hw, evNodes[EVENTS.indexOf(f)].bw/2) + 3;
+  const place = (S, sides) => { for (const [up, st, cap] of sides){ const got = S.side(up, st, cap); if (got){ commit(S.n, got, S.cx); return true; } } return false; };
+  // Before a label is dropped, a steep lean is the lesser evil.
+  const last = S => place(S, [[S.n.pref, false, LEAN_LAST], [!S.n.pref, false, LEAN_LAST]]) || S.drop();
+  order.forEach(e => {
+    if (done.has(e)) return;
+    const S = solver(e);
+    if (e.s === 'both'){
+      if (order.some(f => f.s !== 'both' && under(S, f, false))) later.push(S);
+      else { done.add(e); if (!place(S, [[S.n.pref], [!S.n.pref]])) last(S); }
+      return;
+    }
+    done.add(e);
+    // Twins: strand labels, still unplaced, wanting the same side, whose dots
+    // sit under this label (or this dot under theirs): lay them out together,
+    // at most three abreast.
+    const twins = order.filter(f => f.s !== 'both' && under(S, f, true)).slice(0, 2);
+    if (twins.length){
+      const res = pair([S, ...twins.map(solver)], [S.n.pref]);
+      if (res){ res.forEach(r => commit(r.q.n, r.got, r.q.cx)); twins.forEach(f => done.add(f)); return; }
+    }
+    if (!place(S, [[S.n.pref]])) exiles.push(S);
   });
+  // The deferred crossings: straight on either strand before any slide.
+  later.forEach(S => { done.add(S.e); if (!place(S, [[S.n.pref, true], [!S.n.pref, true], [S.n.pref], [!S.n.pref]])) last(S); });
+  // Strand labels with no room on their own side: across the mid-line, or dropped.
+  exiles.forEach(S => { if (!place(S, [[!S.n.pref]])) last(S); });
 }
 
 // ---- camera -------------------------------------------------------------
@@ -529,7 +727,10 @@ function applyVB(){
     // a label that slid sideways gets a short lean, not a diagonal across the braid.
     const y1 = n.half ? (local > 0 ? n.half : -n.half) : 0;
     n.stem.setAttribute('y1', y1);
-    n.stem.setAttribute('y2', local.toFixed(2));
+    // The anchor is the top of the em box, a few pixels above the tallest
+    // glyph; run the stem on to the ink so its tip disappears under the cream
+    // halo and reads as touching the text, not floating short of it.
+    n.stem.setAttribute('y2', (local + (local > 0 ? STEM_IN_DN : -STEM_IN_UP) * k).toFixed(2));
     n.stem.setAttribute('x2', dx.toFixed(2));
     // Screen-constant marker sizes: 4.5 px dot (6 px when its era is on), 2.5 px caps.
     const on = n.gm.classList.contains('on');
@@ -573,7 +774,9 @@ function fly(to, ms=700){
   if (anim) cancelAnimationFrame(anim);
   const from = {...cur}, t0 = performance.now();
   const step = now => {
-    const p = Math.min(1,(now-t0)/ms);
+    // The first frame's timestamp can predate t0 after a long synchronous
+    // layout, which would run the easing backwards through zero.
+    const p = Math.max(0, Math.min(1,(now-t0)/ms));
     const e = p<.5 ? 4*p*p*p : 1-Math.pow(-2*p+2,3)/2;   // easeInOutCubic
     flyP = e;
     cur = {x:from.x+(to.x-from.x)*e, y:from.y+(to.y-from.y)*e,
@@ -619,6 +822,10 @@ function recenter(vb, vis, W, H){
 function fitEra(era, vis, W, H, aspect){
   let w = Math.max(460, x(era.b) - x(era.a) + 160);
   let vb = {x:(x(era.a)+x(era.b))/2 - w/2, y:MID - w*aspect/2, w, h:w*aspect};
+  // Zooming out frees room for labels, but a label the solver cannot place
+  // for lack of a legal stem stays unplaced at any zoom: once a wider frame
+  // has stopped helping, keep the tightest frame that did best.
+  let best = null, stale = 0;
   for (let pass=0; pass<9; pass++){
     layout(vis, vb);
     const k = w/W, h = w*aspect;
@@ -639,7 +846,12 @@ function fitEra(era, vis, W, H, aspect){
     // Centre on the content: the axis eats the bottom, so the mid-line rides high.
     vb = {x: l - (PADL + EDGE)*k - (band - (r-l) - 2*EDGE*k)/2,
           y: MID - up - EDGE*k - (h-needH)/2, w, h};
-    if (needH <= h && needW <= w && all) break;
+    if (needH <= h && needW <= w){
+      if (all) break;
+      const nHid = vis.filter(e => !evNodes[EVENTS.indexOf(e)].fit).length;
+      if (!best || nHid < best.nHid){ best = {nHid, vb:{...vb}, w}; stale = 0; }
+      else if (++stale >= 2){ w = best.w; vb = {...best.vb}; break; }
+    }
     w = Math.min(3000, w * Math.min(1.6, Math.max(needH/h, needW/w, all?1:1.13) * 1.03));
   }
   layout(vis, vb);                       // converge against the final width
@@ -678,7 +890,7 @@ function cardCost(vb, vis, W, grow){
   vis.forEach(e => {
     const n = evNodes[EVENTS.indexOf(e)];
     if (!n.fit) cost += 4000;
-    if (n.up !== n.pref) cost += 260;
+    if (n.up !== n.pref && e.s !== 'both') cost += 260;   // a crossing may hang from either strand
     if (!r) return;
     const X = (x(e.y)-vb.x)/k, half = e.s==='both' ? HALF(e.y)/k : 0;
     if (hit({x:X-10, y:(n.cy-vb.y)/k-half-10, w:20, h:2*half+20}, r, 4)) cost += 400;
