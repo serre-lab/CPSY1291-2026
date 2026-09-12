@@ -4,6 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NeuroAI: a history</title>
+<meta name="description" content="Neuroscience and AI, 1943–today: an interactive history of convergence and divergence. Every event links to its primary source.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Neuroscience and AI: a history of convergence and divergence, 1943–today">
+<meta property="og:description" content="An interactive timeline of the two fields since cybernetics: one community, then cycles of divergence and reconvergence. Every event links to its source.">
+<meta property="og:url" content="https://serre-lab.github.io/CPSY1291-2026/demos/neuroai_timeline.html">
+<meta property="og:image" content="https://serre-lab.github.io/CPSY1291-2026/demos/neuroai_timeline_preview.png">
+<meta property="og:image:width" content="3200">
+<meta property="og:image:height" content="1600">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Neuroscience and AI: a history of convergence and divergence, 1943–today">
+<meta name="twitter:description" content="An interactive timeline of the two fields since cybernetics. Arrow keys step through the eras; every dot links to its source.">
+<meta name="twitter:image" content="https://serre-lab.github.io/CPSY1291-2026/demos/neuroai_timeline_preview.png">
 <style>
   :root{
     --sienna:#9C5A2E; --slate:#3E6D8E; --teal:#3F7A6B;
@@ -66,7 +78,7 @@
   #axis span{position:absolute;bottom:7px;transform:translateX(-50%);font-size:12px;font-weight:700;
     color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
   #axis i{position:absolute;top:-1px;width:1px;height:7px;background:var(--rule)}
-  #cap{position:absolute;left:22px;top:18px;width:max-content;max-width:56%;pointer-events:none;
+  #cap{position:absolute;left:22px;top:18px;width:max-content;max-width:46%;pointer-events:none;
     padding:14px 20px 16px;border-radius:12px;
     background:color-mix(in srgb, var(--cream) 93%, transparent);
     box-shadow:0 1px 0 var(--rule), 0 8px 24px -14px rgba(30,41,59,.35);
@@ -198,7 +210,7 @@ const EVENTS = [
    c:'Turing, Computing machinery and intelligence, Mind 59:433–460 (1950)', u:'https://doi.org/10.1093/mind/LIX.236.433'},
   {y:1956,key:1,s:'ai',   t:'McCarthy et al.', d:'the Dartmouth workshop names “AI”',
    c:'McCarthy, Minsky, Rochester & Shannon, A proposal for the Dartmouth summer research project on artificial intelligence (1955); repr. AI Magazine 27(4) (2006)', u:'http://www-formal.stanford.edu/jmc/history/dartmouth/dartmouth.html'},
-  {y:1958,key:1,s:'both', t:'Rosenblatt',        d:'the perceptron, in Psychological Review',
+  {y:1958,key:1,s:'both', t:'Rosenblatt',        d:'the perceptron',
    c:'Rosenblatt, The perceptron: a probabilistic model for information storage and organization in the brain, Psychol. Rev. 65:386–408 (1958)', u:'https://doi.org/10.1037/h0042519'},
   {y:1959,s:'neuro',t:'Lettvin',           d:'feature detectors',
    c:'Lettvin, Maturana, McCulloch & Pitts, What the frog’s eye tells the frog’s brain, Proc. IRE 47:1940–1951 (1959)', u:'https://doi.org/10.1109/JRPROC.1959.287207'},
@@ -220,7 +232,7 @@ const EVENTS = [
    c:'Fukushima, Neocognitron: a self-organizing neural network model for a mechanism of pattern recognition unaffected by shift in position, Biol. Cybern. 36:193–202 (1980)', u:'https://doi.org/10.1007/BF00344251'},
   {y:1982,s:'ai',   t:'Hopfield',          d:'attractor networks',
    c:'Hopfield, Neural networks and physical systems with emergent collective computational abilities, PNAS 79:2554–2558 (1982)', u:'https://doi.org/10.1073/pnas.79.8.2554'},
-  {y:1985,s:'ai',   t:'Ackley, Hinton & Sejnowski', d:'Boltzmann machines',
+  {y:1985,s:'both', t:'Ackley, Hinton & Sejnowski', d:'Boltzmann machines',
    c:'Ackley, Hinton & Sejnowski, A learning algorithm for Boltzmann machines, Cognit. Sci. 9:147–169 (1985)', u:'https://doi.org/10.1207/s15516709cog0901_7'},
   {y:1986,key:1,s:'both', t:'Rumelhart & McClelland',       d:'PDP: backpropagation, popularized',
    c:'Rumelhart, McClelland & the PDP Research Group, Parallel Distributed Processing, MIT Press (1986); Rumelhart, Hinton & Williams, Nature 323:533–536 (1986)', u:'https://doi.org/10.7551/mitpress/5236.001.0001'},
@@ -244,7 +256,7 @@ const EVENTS = [
    c:'Rao & Ballard, Predictive coding in the visual cortex, Nat. Neurosci. 2:79–87 (1999)', u:'https://doi.org/10.1038/4580'},
   {y:2006,s:'ai',   t:'Hinton, Osindero & Teh',  d:'deep belief nets',
    c:'Hinton, Osindero & Teh, A fast learning algorithm for deep belief nets, Neural Comput. 18:1527–1554 (2006)', u:'https://doi.org/10.1162/neco.2006.18.7.1527'},
-  {y:2007,key:1,s:'both', t:'Serre, Kreiman, … & Poggio', d:'HMAX v2: a cortex model vs computer vision',
+  {y:2007,key:1,s:'both', t:'Serre, Kreiman, … & Poggio', d:'HMAX v2 vs computer vision',
    c:'Serre, Kreiman, Kouh, Cadieu, Knoblich & Poggio, A quantitative theory of immediate visual recognition, Prog. Brain Res. 165:33–56 (2007); Serre, Wolf, Bileschi, Riesenhuber & Poggio, IEEE TPAMI 29:411–426 (2007); Serre, Oliva & Poggio, PNAS 104:6424–6429 (2007)', u:'https://doi.org/10.1016/s0079-6123(06)65004-8'},
   {y:2012,key:1,s:'ai',   t:'Krizhevsky, Sutskever & Hinton',           d:'AlexNet: the first revolution',
    c:'Krizhevsky, Sutskever & Hinton, ImageNet classification with deep convolutional neural networks, NeurIPS 25 (2012)', u:'https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html'},
@@ -256,12 +268,16 @@ const EVENTS = [
    c:'He, Zhang, Ren & Sun, Deep residual learning for image recognition, CVPR 2016 (arXiv Dec 2015)', u:'https://doi.org/10.1109/CVPR.2016.90'},
   {y:2016,s:'ai',   t:'Silver et al.',           d:'AlphaGo: deep RL plus tree search',
    c:'Silver et al., Mastering the game of Go with deep neural networks and tree search, Nature 529:484–489 (2016)', u:'https://doi.org/10.1038/nature16961'},
+  {y:2017,s:'neuro',t:'Jun et al.',         d:'Neuropixels: hundreds of neurons per probe',
+   c:'Jun et al., Fully integrated silicon probes for high-density recording of neural activity, Nature 551:232–236 (2017)', u:'https://doi.org/10.1038/nature24636'},
   {y:2017,s:'ai',   t:'Vaswani et al.',      d:'transformers: attention',
    c:'Vaswani et al., Attention is all you need, NeurIPS 30 (2017)', u:'https://arxiv.org/abs/1706.03762'},
   {y:2020,s:'ai',   t:'Brown et al. · Kaplan et al.', d:'GPT-3; scaling laws',
    c:'Brown et al., Language models are few-shot learners, NeurIPS 33 (2020); Kaplan et al., Scaling laws for neural language models, arXiv:2001.08361 (2020)', u:'https://arxiv.org/abs/2005.14165'},
   {y:2019,s:'both', t:'Bashivan, Kar & DiCarlo', d:'AI-synthesized images control V4 neurons',
    c:'Bashivan, Kar & DiCarlo, Neural population control via deep image synthesis, Science 364:eaav9436 (2019)', u:'https://doi.org/10.1126/science.aav9436'},
+  {y:2020,s:'ai',   t:'Mildenhall et al.',  d:'NeRF: neural scene representations',
+   c:'Mildenhall, Srinivasan, Tancik, Barron, Ramamoorthi & Ng, NeRF: representing scenes as neural radiance fields for view synthesis, ECCV 2020; Commun. ACM 65(1):99–106 (2022)', u:'https://doi.org/10.1145/3503250'},
   {y:2021,s:'ai',   t:'Caron et al.',              d:'DINO: self-supervised vision transformers',
    c:'Caron et al., Emerging properties in self-supervised vision transformers, ICCV 2021 — built on the vision transformer of Dosovitskiy et al., ICLR 2021 (arXiv 2010.11929); scaled up as DINOv2, Oquab et al., TMLR 2024 (arXiv 2304.07193)', u:'https://doi.org/10.1109/ICCV48922.2021.00951'},
   {y:2022,s:'ai',   t:'OpenAI',           d:'ChatGPT: the second revolution, public',
@@ -275,25 +291,26 @@ const EVENTS = [
 ];
 
 const ERAS = [
-  {k:'All', a:1940, b:2028, title:'Neuroscience and AI: a history of convergence and divergence, 1943–today', lines:[]},
+  {k:'All', a:1940, b:2028, title:'Neuroscience and AI: a history of convergence and divergence, 1943–today',
+   lines:['Brown ties mark results that crossed between the two fields. A period with such crossings is a convergence; a period without is a divergence.']},
   {k:'Cybernetics', a:1941, b:1958.5, title:'Cybernetics: one community · 1943–1958',
-   lines:['Cybernetics: the same meetings, funders and people, from the Macy conferences of 1946–1953.',
-          'The perceptron was published in Psychological Review.']},
+   lines:['The same meetings, funders and people: the Macy conferences on cybernetics, 1946–1953.',
+          'The founding documents belonged to both fields: a logical neuron, a theory of control in animal and machine, a learning machine published in Psychological Review.']},
   {k:'Divergence I', a:1955, b:1979, title:'The first divergence: AI splits from cybernetics · 1956–1979',
    lines:['McCarthy chose the name “artificial intelligence” partly to keep the new field clear of cybernetics; Minsky and Papert made the technical case against perceptrons.',
-          'Neuroscience, meanwhile, assembled the components deep learning would later use: efficient coding, the simple/complex-cell hierarchy, high-level selectivity.']},
+          'For two decades nothing crossed: AI built symbolic systems while neuroscience described feature detectors and the cortical hierarchy.']},
   {k:'Reconvergence I', a:1979, b:1991, title:'The first reconvergence: connectionism · 1980–1990',
-   lines:['Marr and Poggio define the levels of analysis; Fukushima stacks Hubel and Wiesel’s hierarchy; Hopfield brings statistical physics; Boltzmann machines and the PDP volumes are cognitive-science projects.',
-          'The 2024 Nobel Prize in Physics recognized Hopfield and Hinton for this decade’s work.']},
+   lines:['Results cross again: the Neocognitron stacks Hubel and Wiesel’s hierarchy into a recognition machine; Boltzmann machines and the PDP volumes are cognitive-science projects.',
+          'The 2024 Nobel Prize in Physics recognized this decade’s work.']},
   {k:'Divergence II', a:1989, b:2013, title:'The second divergence: parallel tracks · 1989–2011',
-   lines:['LeNet and HMAX descend from the same parent, the Neocognitron.',
-          'Cortex-constrained models (HMAX, 1999–2007) remained competitive with computer vision until large datasets and GPUs arrived.']},
+   lines:['LeNet and HMAX descend from the same parent but grow up in separate communities, on separate benchmarks.',
+          'The one crossing runs the other way — TD learning found in dopamine neurons (1997) — until HMAX v2 (2007) competes with computer vision.']},
   {k:'Reconvergence II', a:2011, b:2016.5, title:'The second reconvergence: the deep learning revolution · 2012–2016',
    lines:['AlexNet wins ImageNet in 2012 with 16.4% top-5 error against 26.2% for the runner-up; the architecture is Hubel and Wiesel’s hierarchy, stacked deep.',
-          'By 2014, networks trained only to classify objects predicted responses in inferotemporal cortex better than models built for that purpose.']},
+          'By 2014 a network trained only to classify objects is the best model of inferotemporal cortex: AI’s models become neuroscience’s models.']},
   {k:'Divergence III?', a:2016.5, b:2028, title:'A third divergence? Transformers and scale · 2017–today',
-   lines:['Transformers were not designed to reproduce cortical circuitry, and scale becomes the strategy.',
-          'As models improve on benchmarks, their fit to visual cortex worsens. Whether the two fields converge again is an open question.']},
+   lines:['Transformers were not designed to reproduce cortical circuitry, and scale becomes the strategy; as models improve on benchmarks, their fit to visual cortex worsens.',
+          'Yet results still cross — synthesized images that control neurons, foundation models of cortex — so whether this is a divergence remains open.']},
 ];
 
 const svg = document.getElementById('tl');
@@ -377,13 +394,12 @@ const evNodes = EVENTS.map((e,i) => {
   t2.textContent = e.d; lbl.appendChild(t2);
   if (e.c){ const tt = mk('title'); tt.textContent = e.c + (e.u ? ' — click to open' : ''); lbl.appendChild(tt);
             const tt2 = mk('title'); tt2.textContent = e.c; gm.appendChild(tt2); }
-  if (e.u){ lbl.classList.add('link');
-            lbl.addEventListener('click', ev => { if (!dragMoved) window.open(e.u, '_blank', 'noopener'); }); }
+  if (e.u){ lbl.classList.add('link'); lbl.dataset.u = e.u; }   // opened on pointer-up, below
   gl.appendChild(lbl);
   gLabels.appendChild(gl);
 
   return {gm, gl, lbl, stem, dot, caps:[...gm.querySelectorAll('.cap')], tie:gm.querySelector('.tie'), half: e.s==='both' ? HALF(e.y) : 0, t1, t2, cy, pref:SIDE[i], up:SIDE[i],
-          bw:60, dx:0, dx0:0, dx1:0, anchorY:MID, a0:MID, a1:MID, fit:true};
+          bw:60, dx:0, dx0:0, dx1:0, anchorY:MID, a0:MID, a1:MID, fit:true, lean:0};
 });
 
 // One measuring pass on the real glyphs: character counts are wrong by up to a
@@ -590,6 +606,7 @@ function layout(vis, vb, variant=0){
     n.t2.setAttribute('y', got.up ? L2_UP : L2_DN);
     n.lbl.classList.remove('nofit'); n.stem.classList.remove('nofit');
     got.b.cx = cx; placed.push(got.b);
+    n.lean = got.nostem ? 0 : lean(cx, stemY(n, got.side), cx + n.dx, got.anchor);
     if (!got.nostem) stems.push([{x:cx, y:stemY(n, got.side)}, {x:cx + n.dx, y:got.anchor}]);
   };
 
@@ -680,7 +697,7 @@ function layout(vis, vb, variant=0){
     };
     // Still nothing: park it on its own side, closest in, and hide it.
     const drop = () => {
-      n.fit = false;
+      n.fit = false; n.lean = 0;
       const anchor = midPx + (n.pref?-1:1) * (env + CLEAR);
       n.box = {x:xL, w:xR-xL, y:anchor + (n.pref?UP_TOP:DN_TOP), h:bh(n.pref)};
       n.up = n.pref; n.dx = dx; n.anchorY = vb.y + anchor * k;
@@ -784,7 +801,9 @@ function layout(vis, vb, variant=0){
   // the gap it takes a lane further out, and only as the very last resort is
   // it hidden.
   // The greedy order is the one thing that can be varied when a crowded
-  // decade defeats it: left to right, then landmarks first, then right to left.
+  // decade defeats it: left to right, then landmarks first, then right to left;
+  // and, last, letting a crossing keep a straight stem over the strand label
+  // under it, which then finds a lane of its own.
   const pri = e => (e.s==='both' ? 2 : 0) + (variant === 1 && e.key ? 1 : 0);
   const dir = variant === 2 ? -1 : 1;
   const order = vis.slice().sort((p,q) => (pri(q) - pri(p)) || dir*(p.y - q.y));
@@ -813,6 +832,7 @@ function layout(vis, vb, variant=0){
     const S = solver(e);
     if (!onScreen(S)){ done.add(e); S.drop(); return; }
     if (e.s === 'both'){
+      if (variant === 3 && place(S, [[S.n.pref, true], [!S.n.pref, true]])){ done.add(e); return; }
       if (order.some(f => f.s !== 'both' && under(S, f, false))) later.push(S);
       // Straight on either strand before any slide: a crossing belongs to both.
       else { done.add(e); if (!place(S, [[S.n.pref, true], [!S.n.pref, true], [S.n.pref], [!S.n.pref]])) last(S); }
@@ -840,15 +860,22 @@ function layout(vis, vb, variant=0){
 
 // One layout, or up to three when the first leaves a label with no home:
 // the greedy solver is order-dependent, and a second order often finds room
-// the first could not. The best of what was tried is what stays.
+// the first could not. When every label has a home but one hangs on a stem
+// past the strict lean, the crossing-first order is tried instead. The best
+// of what was tried is what stays: fewest hidden, then fewest steep stems,
+// then least slid.
 function solve(vis, vb){
   let best = null, last = -1;
-  for (let v=0; v<3; v++){
+  const vs = [0];
+  for (let i=0; i<vs.length; i++){
+    const v = vs[i];
     layout(vis, vb, v); last = v;
     const nHid = vis.filter(e => !evNodes[EVENTS.indexOf(e)].fit).length;
+    const nLean = vis.filter(e => evNodes[EVENTS.indexOf(e)].lean > LEAN_MAX).length;
     const slid = vis.reduce((s,e) => s + Math.abs(evNodes[EVENTS.indexOf(e)].dx), 0);
-    if (!best || nHid < best.nHid || (nHid === best.nHid && slid < best.slid)) best = {v, nHid, slid};
-    if (nHid === 0) break;
+    if (!best || nHid < best.nHid || (nHid === best.nHid && (nLean < best.nLean || (nLean === best.nLean && slid < best.slid)))) best = {v, nHid, nLean, slid};
+    if (nHid === 0 && nLean === 0) break;
+    if (v === 0) vs.push(...(nHid ? [1, 2] : [3]));
   }
   if (best.v !== last) layout(vis, vb, best.v);
   return best.nHid;
@@ -1061,14 +1088,18 @@ function dockAt(s){
   PADL = s.padL || 0; PADR = s.padR || 0; PADT = s.padT || 0;
   measureRects();
 }
-// What the card buries where it sits: a dot or a tie, then a strand.
+// What the card buries where it sits: a dot or a tie, then a strand. An
+// in-era strand under the card costs more than a modest zoom out, so a top
+// strip or a corner over ghost strands is taken when one exists; a ghost
+// strand or a ghost dot stays cheap, or the card would flee into the gap
+// between the strands, over the lanes the labels need.
 function buryCost(vb, vis, W, r){
   const k = vb.w/W;
   let cost = 0;
   EVENTS.forEach(e => {                      // a ghost of another era counts too, for less
     const n = evNodes[EVENTS.indexOf(e)];
     const X = (x(e.y)-vb.x)/k, half = e.s==='both' ? HALF(e.y)/k : 0;
-    if (hit({x:X-10, y:(n.cy-vb.y)/k-half-10, w:20, h:2*half+20}, r, 4)) cost += vis.includes(e) ? 400 : 40;
+    if (hit({x:X-10, y:(n.cy-vb.y)/k-half-10, w:20, h:2*half+20}, r, 4)) cost += vis.includes(e) ? 600 : 40;
   });
   const era = ERAS[idx];
   for (let X=Math.max(0,r.x); X<=r.x+r.w; X+=8){
@@ -1077,20 +1108,21 @@ function buryCost(vb, vis, W, r){
     const own = idx && yr >= era.a && yr <= era.b;   // the era's own strand, or a ghost
     for (const wc of ['neuro','ai']){
       const Y = (strandY(yr,wc)-vb.y)/k;
-      if (Y > r.y-3 && Y < r.y+r.h+3) cost += own ? 12 : 4;
+      if (Y > r.y-3 && Y < r.y+r.h+3) cost += own ? 20 : 4;
     }
   }
   return cost;
 }
 // What a docking costs, judged on the layout it actually produced: a label with
-// nowhere left to go is worst, then a buried dot, then a buried strand — and
-// finally how far it forced the zoom out.
+// nowhere left to go is worst, then a buried dot, then a stem the card forced
+// past the strict lean, then a buried strand — and finally how far it forced
+// the zoom out.
 function cardCost(vb, vis, W, grow){
   const r = capBox();
   let cost = grow * 1200 + (r ? buryCost(vb, vis, W, r) : 0);
   vis.forEach(e => {
     const n = evNodes[EVENTS.indexOf(e)];
-    if (!n.fit) cost += 4000;
+    if (!n.fit) cost += 4000; else if (n.lean > LEAN_MAX) cost += 300;
   });
   return cost;
 }
@@ -1122,17 +1154,18 @@ function show(i){
     let best = null;
     // The title of the all-years view stays at the top left, floating or as a strip.
     let spots = cardSpots(W, H, c.width, c.height).map((s,i) => ({s, i})).filter(({s,i}) => idx !== 0 || i === 0 || s.padT);
-    // Solving every docking is slow; a spot that would sit on labels, dots or
-    // strands of the card-free layout is screened out first, keeping the four
-    // cheapest floats and the strip.
-    const k0 = vb.w/W, screen = ({s}) => {
+    // Refitting a crowded era for every docking is slow: there each float is
+    // first judged by one solve at the card-free camera with the card in the
+    // way, which already shows what it hides and what it bends, and only the
+    // four cheapest floats and the strip are refitted. A small era can afford
+    // every docking, and the screen is only an estimate: it has missed the
+    // one docking that placed every label on a small screen.
+    const screen = ({s}) => {
       if (s.padT) return -1;
-      const r = {x:Math.max(8,s.x), y:Math.max(8,s.y), w:c.width, h:c.height};
-      let cost = buryCost(vb, vis, W, r);
-      vis.forEach(e => { const n = evNodes[EVENTS.indexOf(e)]; if (n.fit && hit(n.box, r, 7)) cost += 300; });
-      return cost;
+      dockAt(s); solve(vis, vb);
+      return cardCost(vb, vis, W, 0);
     };
-    spots = spots.map(o => ({...o, pre:screen(o)})).sort((p,q) => p.pre - q.pre).slice(0, 5);
+    spots = spots.map(o => ({...o, pre:screen(o)})).sort((p,q) => p.pre - q.pre).slice(0, vis.length > 8 ? 5 : 10);
     spots.forEach(({s,i}) => {
       dockAt(s);
       const v = fitEra(era, vis, W, H, aspect);
@@ -1163,13 +1196,21 @@ function relayout(){
   const vis = EVENTS.filter(e => idx===0 ? e.key : (e.y>=era.a && e.y<=era.b));
   // A floating card whose spot the braid has drifted under steps to another
   // floating spot — only when that clearly buries less, so it does not hop
-  // about while the map moves; a top-strip docking covers nothing and stays.
+  // about while the map moves, and never onto a marker of the era: a card in
+  // the gap over a tie is worse than one over a strand. A top-strip docking
+  // stays where it is, but the strip itself is gone: the camera is the
+  // user's now, and a braid dragged under the card is no reason to hide
+  // the labels there.
+  PADT = 0;
   if (idx !== 0 && dockSpot && !dockSpot.padT){
-    const W = RECT.w, H = RECT.h, c = {w:CAPR.w, h:CAPR.h};
+    const W = RECT.w, H = RECT.h, c = {w:CAPR.w, h:CAPR.h}, k = cur.w/W;
     const at = s => ({x:Math.max(8,s.x), y:Math.max(8,s.y), w:c.w, h:c.h});
+    const clear = r => !vis.some(e => { const n = evNodes[EVENTS.indexOf(e)], X = (x(e.y)-cur.x)/k, half = n.half/k;
+      return hit({x:X-10, y:(n.cy-cur.y)/k-half-10, w:20, h:2*half+20}, r, 4); });
     const now = buryCost(cur, vis, W, at(dockSpot));
     let best = null;
-    cardSpots(W, H, c.w, c.h).filter(s => !s.padT).forEach((s,i) => {
+    cardSpots(W, H, c.w, c.h).forEach((s,i) => {
+      if (s.padT || !clear(at(s))) return;
       const cost = buryCost(cur, vis, W, at(s)) + i*3;
       if (!best || cost < best.cost) best = {cost, s};
     });
@@ -1195,7 +1236,16 @@ addEventListener('keydown', ev => {
 });
 
 // free pan + zoom, so he can go anywhere mid-sentence
-let drag=null, dragMoved=false;
+// The camera moves on every notch and every pointer move; the labels keep the
+// anchors they have and only counter-scale, then settle in one re-solve once
+// the wheel or the pointer has been still for a moment. Re-solving per notch
+// made the labels flicker between homes while zooming. A chapter flight in
+// progress owns the labels: a settle that lands during one is skipped.
+let drag=null, dragMoved=false, settleT=null;
+const settle = () => {
+  clearTimeout(settleT);
+  settleT = setTimeout(() => { settleT = null; if (!anim){ relayout(); applyVB(); } }, 120);
+};
 svg.addEventListener('pointerdown', e => {
   dragMoved=false;
   drag={px:e.clientX,py:e.clientY,vb:{...cur}};
@@ -1206,11 +1256,18 @@ svg.addEventListener('pointermove', e => {
   if (Math.hypot(e.clientX-drag.px, e.clientY-drag.py) > 4) dragMoved=true;
   const r=svg.getBoundingClientRect(), k=cur.w/r.width;
   cur={...drag.vb, x:drag.vb.x-(e.clientX-drag.px)*k, y:drag.vb.y-(e.clientY-drag.py)*k};
-  relayout();
   applyVB();
+  settle();
 });
-addEventListener('pointerup', () => {
-  if (drag){ drag=null; svg.classList.remove('dragging'); }
+addEventListener('pointerup', ev => {
+  if (!drag) return;
+  drag=null; svg.classList.remove('dragging');
+  // The drag handler captures the pointer, so a click never reaches the label
+  // itself; resolve it here from whatever is under the pointer on release.
+  if (dragMoved) return;
+  const hit = document.elementFromPoint(ev.clientX, ev.clientY);
+  const lbl = hit && hit.closest && hit.closest('.lbl.link');
+  if (lbl && lbl.dataset.u) window.open(lbl.dataset.u, '_blank', 'noopener');
 });
 svg.addEventListener('wheel', e => {
   e.preventDefault();
@@ -1220,8 +1277,8 @@ svg.addEventListener('wheel', e => {
   const f = e.deltaY>0 ? 1.12 : 1/1.12;
   const w = Math.min(2600, Math.max(420, cur.w*f)), h = w*(cur.h/cur.w);
   cur = {x:mx-(mx-cur.x)*(w/cur.w), y:my-(my-cur.y)*(h/cur.h), w, h};
-  relayout();
   applyVB();
+  settle();
 }, {passive:false});
 
 const srcEl = document.getElementById('src');
