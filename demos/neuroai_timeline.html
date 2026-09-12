@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Neuroscience and AI: one history, 1943 to today</title>
+<title>NeuroAI: a history</title>
 <style>
   :root{
     --sienna:#9C5A2E; --slate:#3E6D8E; --teal:#3F7A6B;
@@ -51,7 +51,7 @@
   .tag{z-index:2} .tag.off{display:none}
   @media (max-width:1100px){
     #cap{max-width:46%;padding:10px 14px 12px}
-    #cap h2{font-size:16px;margin-bottom:5px} #cap p{font-size:12.5px;line-height:1.35}
+    #cap h2{font-size:14px;margin-bottom:5px} #cap p{font-size:12.5px;line-height:1.35}
     .hint{display:none} .chip{padding:4px 8px;font-size:11px} #bar{padding:6px 10px;gap:6px}
   }
 
@@ -63,14 +63,16 @@
   #axis span{position:absolute;bottom:7px;transform:translateX(-50%);font-size:12px;font-weight:700;
     color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
   #axis i{position:absolute;top:-1px;width:1px;height:7px;background:var(--rule)}
-  #cap{position:absolute;left:22px;top:18px;max-width:40%;pointer-events:none;
+  #cap{position:absolute;left:22px;top:18px;max-width:46%;pointer-events:none;
     padding:14px 20px 16px;border-radius:12px;
     background:color-mix(in srgb, var(--cream) 93%, transparent);
     box-shadow:0 1px 0 var(--rule), 0 8px 24px -14px rgba(30,41,59,.35);
     opacity:0;transform:translateY(-6px);transition:opacity .45s ease, transform .45s ease}
   #cap.on{opacity:1;transform:none}
-  #cap h2{margin:0 0 8px;font-size:21px;line-height:1.2;color:var(--sienna);letter-spacing:-.01em}
+  #cap h2{margin:0 0 7px;font-size:16px;line-height:1.25;color:var(--sienna);letter-spacing:-.005em;white-space:nowrap}
   #cap p{margin:0 0 5px;font-size:14.5px;line-height:1.45;color:var(--ink)}
+  #cap p:empty{display:none}
+  #cap h2:last-child{margin-bottom:0}
 
   #bar{display:flex;align-items:center;gap:9px;padding:9px 14px;border-top:1px solid var(--rule);
     background:var(--cream);font-size:13px;color:var(--muted);flex-wrap:wrap}
@@ -79,6 +81,7 @@
     border:2px solid var(--rule);background:#fff;color:var(--muted);white-space:nowrap;
     font-family:inherit;transition:border-color .2s,color .2s}
   .chip.on{border-color:var(--sienna);color:var(--sienna)}
+  .chip.src{margin-left:10px;border-style:dashed}
   .legend{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--ink);white-space:nowrap}
   .legend i{width:22px;height:5px;border-radius:3px;display:inline-block;margin-left:12px}
   .hint kbd{font-family:inherit;font-weight:700;background:#fff;border:1px solid var(--rule);
@@ -148,8 +151,8 @@
     <button class="nav" id="prev">←</button>
     <button class="nav" id="next">→</button>
     <div id="chapters"></div>
+    <button class="chip src" id="srcBtn">Sources &amp; further reading</button>
     <span class="hint"><kbd>←</kbd><kbd>→</kbd> step · <kbd>0</kbd> all years · drag to pan · scroll to zoom</span>
-    <button class="chip" id="srcBtn">Sources</button>
   </div>
 </div>
 <script>
@@ -182,15 +185,13 @@ const EVENTS = [
   // t name · d gloss · c citation (hover) · u primary source (click)
   {y:1943,key:1,s:'both', t:'McCulloch & Pitts', d:'the formal neuron',
    c:'McCulloch & Pitts, Bull. Math. Biophys. 5:115–133 (1943)', u:'https://doi.org/10.1007/BF02478259'},
-  {y:1943,s:'both', t:'Rosenblueth, Wiener & Bigelow', d:'cybernetics: behavior as feedback',
-   c:'Rosenblueth, Wiener & Bigelow, Behavior, purpose and teleology, Philosophy of Science 10:18–24 (1943)', u:'https://doi.org/10.1086/286788'},
-  {y:1948,s:'both', t:'Wiener · Cybernetics', d:'control and communication',
+  {y:1948,s:'both', t:'Wiener', d:'Cybernetics',
    c:'Wiener, Cybernetics: or Control and Communication in the Animal and the Machine, MIT Press (1948)', u:'https://doi.org/10.7551/mitpress/11810.001.0001'},
   {y:1949,s:'both', t:'Hebb',              d:'the Hebbian learning rule',
    c:'Hebb, The Organization of Behavior, Wiley (1949)', u:'https://doi.org/10.4324/9781410612403'},
   {y:1950,s:'ai',   t:'Turing',            d:'“can machines think?”',
    c:'Turing, Computing machinery and intelligence, Mind 59:433–460 (1950)', u:'https://doi.org/10.1093/mind/LIX.236.433'},
-  {y:1956,key:1,s:'ai',   t:'Dartmouth workshop', d:'the term “artificial intelligence”',
+  {y:1956,key:1,s:'ai',   t:'McCarthy et al.', d:'the Dartmouth workshop names “AI”',
    c:'McCarthy, Minsky, Rochester & Shannon, A proposal for the Dartmouth summer research project on artificial intelligence (1955); repr. AI Magazine 27(4) (2006)', u:'http://www-formal.stanford.edu/jmc/history/dartmouth/dartmouth.html'},
   {y:1958,key:1,s:'both', t:'Rosenblatt',        d:'the perceptron, in Psychological Review',
    c:'Rosenblatt, The perceptron: a probabilistic model for information storage and organization in the brain, Psychol. Rev. 65:386–408 (1958)', u:'https://doi.org/10.1037/h0042519'},
@@ -206,76 +207,80 @@ const EVENTS = [
    c:'Gross, Rocha-Miranda & Bender, Visual properties of neurons in inferotemporal cortex of the macaque, J. Neurophysiol. 35:96–111 (1972)', u:'https://doi.org/10.1152/jn.1972.35.1.96'},
   {y:1972,s:'neuro',t:'Rescorla & Wagner', d:'learning from prediction error',
    c:'Rescorla & Wagner, A theory of Pavlovian conditioning, in Black & Prokasy (eds.) Classical Conditioning II, Appleton-Century-Crofts (1972)', u:''},
-  {y:1973,s:'ai',   t:'Lighthill report',  d:'the first AI winter',
+  {y:1973,s:'ai',   t:'Lighthill',  d:'the report; the first AI winter',
    c:'Lighthill, Artificial Intelligence: A General Survey, Science Research Council (1973)', u:'http://www.chilton-computing.org.uk/inf/literature/reports/lighthill_report/p001.htm'},
-  {y:1976,s:'neuro',t:'Marr & Poggio',     d:'levels of analysis',
+  {y:1976,key:1,s:'neuro',t:'Marr & Poggio',     d:'levels of analysis',
    c:'Marr & Poggio, From understanding computation to understanding neural circuitry, MIT AI Memo 357 (1976)', u:'https://dspace.mit.edu/handle/1721.1/5782'},
   {y:1980,s:'both', t:'Fukushima',         d:'the Neocognitron',
    c:'Fukushima, Neocognitron: a self-organizing neural network model for a mechanism of pattern recognition unaffected by shift in position, Biol. Cybern. 36:193–202 (1980)', u:'https://doi.org/10.1007/BF00344251'},
-  {y:1982,s:'both', t:'Hopfield',          d:'attractor networks',
+  {y:1982,s:'ai',   t:'Hopfield',          d:'attractor networks',
    c:'Hopfield, Neural networks and physical systems with emergent collective computational abilities, PNAS 79:2554–2558 (1982)', u:'https://doi.org/10.1073/pnas.79.8.2554'},
-  {y:1985,s:'both', t:'Boltzmann machines', d:'learning in stochastic networks',
+  {y:1985,s:'ai',   t:'Ackley, Hinton & Sejnowski', d:'Boltzmann machines',
    c:'Ackley, Hinton & Sejnowski, A learning algorithm for Boltzmann machines, Cognit. Sci. 9:147–169 (1985)', u:'https://doi.org/10.1207/s15516709cog0901_7'},
-  {y:1986,key:1,s:'both', t:'PDP volumes',       d:'backpropagation, popularized',
+  {y:1986,key:1,s:'ai',   t:'Rumelhart & McClelland',       d:'PDP: backpropagation, popularized',
    c:'Rumelhart, McClelland & the PDP Research Group, Parallel Distributed Processing, MIT Press (1986); Rumelhart, Hinton & Williams, Nature 323:533–536 (1986)', u:'https://doi.org/10.7551/mitpress/5236.001.0001'},
   {y:1988,s:'ai',   t:'Sutton',            d:'temporal-difference learning',
    c:'Sutton, Learning to predict by the methods of temporal differences, Mach. Learn. 3:9–44 (1988)', u:'https://doi.org/10.1007/BF00115009'},
   {y:1989,s:'ai',   t:'LeCun',             d:'convolutional networks',
    c:'LeCun et al., Backpropagation applied to handwritten zip code recognition, Neural Comput. 1:541–551 (1989)', u:'https://doi.org/10.1162/neco.1989.1.4.541'},
-  {y:1990,s:'both', t:'Elman',             d:'recurrent networks',
+  {y:1990,s:'ai',   t:'Elman',             d:'recurrent networks',
    c:'Elman, Finding structure in time, Cognit. Sci. 14:179–211 (1990)', u:'https://doi.org/10.1207/s15516709cog1402_1'},
   {y:1996,s:'neuro',t:'Olshausen & Field', d:'sparse coding',
    c:'Olshausen & Field, Emergence of simple-cell receptive field properties by learning a sparse code for natural images, Nature 381:607–609 (1996)', u:'https://doi.org/10.1038/381607a0'},
-  {y:1997,s:'ai',   t:'LSTM',              d:'long short-term memory',
+  {y:1997,s:'ai',   t:'Hochreiter & Schmidhuber',              d:'LSTM',
    c:'Hochreiter & Schmidhuber, Long short-term memory, Neural Comput. 9:1735–1780 (1997)', u:'https://doi.org/10.1162/neco.1997.9.8.1735'},
-  {y:1997,s:'ai',   t:'Deep Blue',         d:'search defeats Kasparov',
+  {y:1997,s:'ai',   t:'Campbell, Hoane & Hsu',         d:'Deep Blue defeats Kasparov',
    c:'Campbell, Hoane & Hsu, Deep Blue, Artif. Intell. 134:57–83 (2002)', u:'https://doi.org/10.1016/S0004-3702(01)00129-1'},
   {y:1997,key:1,s:'both', t:'Schultz, Dayan & Montague', d:'dopamine as prediction error',
    c:'Schultz, Dayan & Montague, A neural substrate of prediction and reward, Science 275:1593–1599 (1997)', u:'https://doi.org/10.1126/science.275.5306.1593'},
-  {y:1999,s:'both', t:'HMAX',              d:'cortex-constrained recognition',
-   c:'Riesenhuber & Poggio, Hierarchical models of object recognition in cortex, Nat. Neurosci. 2:1019–1025 (1999)', u:'https://doi.org/10.1038/14819'},
+  {y:1999,key:1,s:'both', t:'Riesenhuber & Poggio',              d:'HMAX: cortex-constrained recognition',
+   c:'Riesenhuber & Poggio, Hierarchical models of object recognition in cortex, Nat. Neurosci. 2:1019–1025 (1999); extended to natural images in Serre, Wolf, Bileschi, Riesenhuber & Poggio, IEEE TPAMI 29:411–426 (2007) and to rapid categorization in Serre, Oliva & Poggio, PNAS 104:6424–6429 (2007)', u:'https://doi.org/10.1038/14819'},
   {y:1999,s:'neuro',t:'Rao & Ballard',     d:'predictive coding',
    c:'Rao & Ballard, Predictive coding in the visual cortex, Nat. Neurosci. 2:79–87 (1999)', u:'https://doi.org/10.1038/4580'},
-  {y:2006,s:'ai',   t:'Deep belief nets',  d:'layer-wise pretraining',
+  {y:2006,s:'ai',   t:'Hinton, Osindero & Teh',  d:'deep belief nets',
    c:'Hinton, Osindero & Teh, A fast learning algorithm for deep belief nets, Neural Comput. 18:1527–1554 (2006)', u:'https://doi.org/10.1162/neco.2006.18.7.1527'},
-  {y:2012,key:1,s:'ai',   t:'AlexNet',           d:'the first revolution: deep CNNs',
+  {y:2012,key:1,s:'ai',   t:'Krizhevsky, Sutskever & Hinton',           d:'AlexNet: the first revolution',
    c:'Krizhevsky, Sutskever & Hinton, ImageNet classification with deep convolutional neural networks, NeurIPS 25 (2012)', u:'https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html'},
   {y:2014,key:1,s:'both', t:'Yamins & DiCarlo',  d:'CNNs predict IT responses',
    c:'Yamins et al., Performance-optimized hierarchical models predict neural responses in higher visual cortex, PNAS 111:8619–8624 (2014)', u:'https://doi.org/10.1073/pnas.1403112111'},
-  {y:2015,s:'ai',   t:'DQN',               d:'Atari from pixels',
+  {y:2015,s:'ai',   t:'Mnih et al.',               d:'DQN: Atari from pixels',
    c:'Mnih et al., Human-level control through deep reinforcement learning, Nature 518:529–533 (2015)', u:'https://doi.org/10.1038/nature14236'},
-  {y:2015,s:'ai',   t:'ResNet',            d:'residual connections',
+  {y:2015,s:'ai',   t:'He et al.',            d:'ResNet: residual connections',
    c:'He, Zhang, Ren & Sun, Deep residual learning for image recognition, CVPR 2016 (arXiv Dec 2015)', u:'https://doi.org/10.1109/CVPR.2016.90'},
-  {y:2016,s:'ai',   t:'AlphaGo',           d:'deep RL plus tree search',
+  {y:2016,s:'ai',   t:'Silver et al.',           d:'AlphaGo: deep RL plus tree search',
    c:'Silver et al., Mastering the game of Go with deep neural networks and tree search, Nature 529:484–489 (2016)', u:'https://doi.org/10.1038/nature16961'},
-  {y:2017,s:'ai',   t:'Transformers',      d:'attention',
+  {y:2017,s:'ai',   t:'Vaswani et al.',      d:'transformers: attention',
    c:'Vaswani et al., Attention is all you need, NeurIPS 30 (2017)', u:'https://arxiv.org/abs/1706.03762'},
-  {y:2020,s:'ai',   t:'GPT-3 · scaling laws', d:'scale as the strategy',
+  {y:2020,s:'ai',   t:'Brown et al. · Kaplan et al.', d:'GPT-3; scaling laws',
    c:'Brown et al., Language models are few-shot learners, NeurIPS 33 (2020); Kaplan et al., Scaling laws for neural language models, arXiv:2001.08361 (2020)', u:'https://arxiv.org/abs/2005.14165'},
-  {y:2022,s:'ai',   t:'ChatGPT',           d:'the second revolution, public',
+  {y:2020,s:'ai',   t:'Dosovitskiy et al.',               d:'ViT: transformers reach vision',
+   c:'Dosovitskiy et al., An image is worth 16×16 words: transformers for image recognition at scale, ICLR 2021 (arXiv Oct 2020)', u:'https://arxiv.org/abs/2010.11929'},
+  {y:2021,s:'ai',   t:'Caron et al.',              d:'DINO: self-supervised ViTs',
+   c:'Caron et al., Emerging properties in self-supervised vision transformers, ICCV 2021; scaled up as DINOv2, Oquab et al., TMLR 2024 (arXiv 2304.07193)', u:'https://doi.org/10.1109/ICCV48922.2021.00951'},
+  {y:2022,s:'ai',   t:'OpenAI',           d:'ChatGPT: the second revolution, public',
    c:'OpenAI, Introducing ChatGPT, 30 Nov 2022', u:'https://openai.com/index/chatgpt/'},
-  {y:2024,key:1,s:'both', t:'Nobel Prize',       d:'Physics, to Hopfield and Hinton',
+  {y:2024,key:1,s:'ai',   t:'Hopfield & Hinton',       d:'Nobel Prize in Physics',
    c:'The Nobel Prize in Physics 2024: Hopfield & Hinton, “for foundational discoveries and inventions that enable machine learning with artificial neural networks”', u:'https://www.nobelprize.org/prizes/physics/2024/summary/'},
 ];
 
 const ERAS = [
-  {k:'All', a:1940, b:2028, title:'', lines:[]},
-  {k:'One community', a:1941, b:1958.5, title:'One community, not two · 1943–1958',
+  {k:'All', a:1940, b:2028, title:'Neuroscience and AI: a history of convergence and divergence, 1943–today', lines:[]},
+  {k:'Cybernetics', a:1941, b:1958.5, title:'Cybernetics: one community · 1943–1958',
    lines:['Cybernetics: the same meetings, funders and people, from the Macy conferences of 1946–1953.',
           'The perceptron was published in Psychological Review.']},
-  {k:'The split', a:1955, b:1979, title:'The split was a choice · 1956–1979',
+  {k:'Divergence I', a:1955, b:1979, title:'The first divergence: AI splits from cybernetics · 1956–1979',
    lines:['McCarthy chose the name “artificial intelligence” partly to keep the new field clear of cybernetics; Minsky and Papert made the technical case against perceptrons.',
           'Neuroscience, meanwhile, assembled the components deep learning would later use: efficient coding, the simple/complex-cell hierarchy, high-level selectivity.']},
-  {k:'The 1980s', a:1979, b:1991, title:'The decade that built deep learning · 1980s',
+  {k:'Reconvergence I', a:1979, b:1991, title:'The first reconvergence: connectionism · 1980–1990',
    lines:['Marr and Poggio define the levels of analysis; Fukushima stacks Hubel and Wiesel’s hierarchy; Hopfield brings statistical physics; Boltzmann machines and the PDP volumes are cognitive-science projects.',
           'The 2024 Nobel Prize in Physics recognized Hopfield and Hinton for this decade’s work.']},
-  {k:'Cortex → AlexNet', a:1989, b:2013, title:'From cat cortex to AlexNet · 1989–2011',
+  {k:'Divergence II', a:1989, b:2013, title:'The second divergence: parallel tracks · 1989–2011',
    lines:['LeNet and HMAX descend from the same parent, the Neocognitron.',
-          'Cortex-constrained models remained competitive with computer vision until large datasets and GPUs arrived.']},
-  {k:'First revolution', a:2011, b:2016.5, title:'First revolution: convolutional nets · 2012–2017',
+          'Cortex-constrained models (HMAX, 1999–2007) remained competitive with computer vision until large datasets and GPUs arrived.']},
+  {k:'Reconvergence II', a:2011, b:2016.5, title:'The second reconvergence: the deep learning revolution · 2012–2016',
    lines:['AlexNet wins ImageNet in 2012 with 16.4% top-5 error against 26.2% for the runner-up; the architecture is Hubel and Wiesel’s hierarchy, stacked deep.',
           'By 2014, networks trained only to classify objects predicted responses in inferotemporal cortex better than models built for that purpose.']},
-  {k:'Second revolution', a:2016.5, b:2028, title:'Second revolution: transformers, scale · 2017–today',
+  {k:'Divergence III?', a:2016.5, b:2028, title:'A third divergence? Transformers and scale · 2017–today',
    lines:['Transformers were not designed to reproduce cortical circuitry, and scale becomes the strategy.',
           'As models improve on benchmarks, their fit to visual cortex worsens. Whether the two fields converge again is an open question.']},
 ];
@@ -695,7 +700,7 @@ function show(i){
   const era = ERAS[idx];
   // The card is an obstacle, so its text and its size must be settled before a
   // single label is placed.
-  cap.classList.toggle('on', idx!==0);
+  cap.classList.toggle('on', !!era.title);
   cap.querySelector('h2').textContent = era.title;
   cap.querySelector('.l1').textContent = era.lines[0]||'';
   cap.querySelector('.l2').textContent = era.lines[1]||'';
