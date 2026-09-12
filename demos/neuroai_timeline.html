@@ -140,7 +140,7 @@ if (top === self && /github\.io$/.test(location.host) && !/^\/neuroai-history/.t
     <div id="src" aria-label="Sources for the timeline's framing">
       <button class="nav close" id="srcClose">×</button>
       <h2>Sources for the framing</h2>
-      <p class="lead">Each dot links to its primary source. The works below are the histories and essays on which the framing rests: a common origin in cybernetics, followed by alternating periods of convergence and divergence. The six-phase periodization used here is a synthesis; no single source states it in this form, and the final section lists those who would dispute it.</p>
+      <p class="lead">Each dot links to its primary source. The works below are the histories and essays on which the framing rests: a common origin in cybernetics, followed by alternating periods of convergence and divergence. The six-phase periodization used here is a synthesis; no single source states it in this form, and the final section lists those who would dispute it. The selection leans toward vision, the author’s own field; the same story could be told through memory, navigation, motor control, audition or language.</p>
       <h3>The shared origin</h3>
       <ol>
         <li><b>Papert, S. (1988).</b> One AI or many? <i>Dædalus</i> 117(1):1–14. <a href="https://www.jstor.org/stable/20025136" target="_blank" rel="noopener">JSTOR</a> · <a href="https://gwern.net/doc/ai/1988-papert.pdf" target="_blank" rel="noopener">PDF</a><br><span class="g">Opens with “the standard version” of the history, told as a fairy tale — “two daughter sciences were born to the new science of cybernetics” — and then disputes it. The origin of the image drawn here, from a protagonist, with his own caveats.</span></li>
@@ -249,6 +249,8 @@ const EVENTS = [
    c:'LeCun et al., Backpropagation applied to handwritten zip code recognition, Neural Comput. 1:541–551 (1989)', u:'https://doi.org/10.1162/neco.1989.1.4.541'},
   {y:1990,s:'ai',   t:'Elman',             d:'recurrent networks',
    c:'Elman, Finding structure in time, Cognit. Sci. 14:179–211 (1990)', u:'https://doi.org/10.1207/s15516709cog1402_1'},
+  {y:1995,s:'neuro',t:'McClelland, McNaughton & O’Reilly', d:'complementary learning systems: replay',
+   c:'McClelland, McNaughton & O’Reilly, Why there are complementary learning systems in the hippocampus and neocortex, Psychol. Rev. 102:419–457 (1995) — the theory behind experience replay in DQN (2015)', u:'https://doi.org/10.1037/0033-295X.102.3.419'},
   {y:1996,s:'neuro',t:'Olshausen & Field', d:'sparse coding',
    c:'Olshausen & Field, Emergence of simple-cell receptive field properties by learning a sparse code for natural images, Nature 381:607–609 (1996)', u:'https://doi.org/10.1038/381607a0'},
   {y:1997,s:'ai',   t:'Hochreiter & Schmidhuber',              d:'LSTM',
@@ -261,12 +263,16 @@ const EVENTS = [
    c:'Riesenhuber & Poggio, Hierarchical models of object recognition in cortex, Nat. Neurosci. 2:1019–1025 (1999)', u:'https://doi.org/10.1038/14819'},
   {y:1999,s:'neuro',t:'Rao & Ballard',     d:'predictive coding',
    c:'Rao & Ballard, Predictive coding in the visual cortex, Nat. Neurosci. 2:79–87 (1999)', u:'https://doi.org/10.1038/4580'},
+  {y:2005,s:'neuro',t:'Boyden et al.',     d:'optogenetics',
+   c:'Boyden, Zhang, Bamberg, Nagel & Deisseroth, Millisecond-timescale, genetically targeted optical control of neural activity, Nat. Neurosci. 8:1263–1268 (2005)', u:'https://doi.org/10.1038/nn1525'},
   {y:2006,s:'ai',   t:'Hinton, Osindero & Teh',  d:'deep belief nets',
    c:'Hinton, Osindero & Teh, A fast learning algorithm for deep belief nets, Neural Comput. 18:1527–1554 (2006)', u:'https://doi.org/10.1162/neco.2006.18.7.1527'},
   {y:2007,key:1,s:'both', t:'Serre, Kreiman, … & Poggio', d:'HMAX v2 vs computer vision',
    c:'Serre, Kreiman, Kouh, Cadieu, Knoblich & Poggio, A quantitative theory of immediate visual recognition, Prog. Brain Res. 165:33–56 (2007); Serre, Wolf, Bileschi, Riesenhuber & Poggio, IEEE TPAMI 29:411–426 (2007); Serre, Oliva & Poggio, PNAS 104:6424–6429 (2007)', u:'https://doi.org/10.1016/s0079-6123(06)65004-8'},
   {y:2012,key:1,s:'ai',   t:'Krizhevsky, Sutskever & Hinton',           d:'AlexNet: the first revolution',
    c:'Krizhevsky, Sutskever & Hinton, ImageNet classification with deep convolutional neural networks, NeurIPS 25 (2012)', u:'https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html'},
+  {y:2013,s:'neuro',t:'Chen et al.',        d:'GCaMP6: calcium imaging of neural populations',
+   c:'Chen et al., Ultrasensitive fluorescent proteins for imaging neuronal activity, Nature 499:295–300 (2013)', u:'https://doi.org/10.1038/nature12354'},
   {y:2014,key:1,s:'both', t:'Yamins & DiCarlo',  d:'CNNs predict IT responses',
    c:'Yamins et al., Performance-optimized hierarchical models predict neural responses in higher visual cortex, PNAS 111:8619–8624 (2014)', u:'https://doi.org/10.1073/pnas.1403112111'},
   {y:2015,s:'ai',   t:'Mnih et al.',               d:'DQN: Atari from pixels',
@@ -281,8 +287,6 @@ const EVENTS = [
    c:'Vaswani et al., Attention is all you need, NeurIPS 30 (2017)', u:'https://arxiv.org/abs/1706.03762'},
   {y:2020,s:'ai',   t:'Brown et al. · Kaplan et al.', d:'GPT-3; scaling laws',
    c:'Brown et al., Language models are few-shot learners, NeurIPS 33 (2020); Kaplan et al., Scaling laws for neural language models, arXiv:2001.08361 (2020)', u:'https://arxiv.org/abs/2005.14165'},
-  {y:2019,s:'both', t:'Bashivan, Kar & DiCarlo', d:'AI-synthesized images control V4 neurons',
-   c:'Bashivan, Kar & DiCarlo, Neural population control via deep image synthesis, Science 364:eaav9436 (2019)', u:'https://doi.org/10.1126/science.aav9436'},
   {y:2020,s:'ai',   t:'Mildenhall et al.',  d:'NeRF: neural scene representations',
    c:'Mildenhall, Srinivasan, Tancik, Barron, Ramamoorthi & Ng, NeRF: representing scenes as neural radiance fields for view synthesis, ECCV 2020; Commun. ACM 65(1):99–106 (2022)', u:'https://doi.org/10.1145/3503250'},
   {y:2021,s:'ai',   t:'Caron et al.',              d:'DINO: self-supervised vision transformers',
@@ -317,7 +321,7 @@ const ERAS = [
           'By 2014 a network trained only to classify objects is the best model of inferotemporal cortex: AI’s models become neuroscience’s models.']},
   {k:'Divergence III?', a:2016.5, b:2028, title:'A third divergence? Transformers and scale · 2017–today',
    lines:['Transformers were not designed to reproduce cortical circuitry, and scale becomes the strategy; there is a growing sense that better AI no longer means better models of the brain.',
-          'Yet results still cross — synthesized images that control neurons, foundation models of cortex — so whether this is a divergence remains open.']},
+          'Neuroscience’s landmarks of the period are instruments and data — optogenetics, calcium imaging, Neuropixels, MICrONS — more than theory; results still cross (foundation models of cortex), so whether this is a divergence remains open.']},
 ];
 
 const svg = document.getElementById('tl');
@@ -433,7 +437,9 @@ const LGAP  = 8;       // label to label, side by side
 const EDGE  = 8;       // frame margin
 const AXIS_PX = 36;    // reserved for the pinned year axis
 const LANES = 5;       // lanes hung off a strand, outward
-const INNER = 3;       // lanes hung off a strand's inner edge, into the gap
+const INNER = 4;       // lanes hung off a strand's inner edge, into the gap: a
+                       // wide label over a sloping strand loses the first two
+                       // to the slope, and two labels can still need to pass
 const PINS  = 3;       // rows walked inward from the frame edge when none fit
 // Screen-pixel margins the map must stay out of. Non-zero when the caption card
 // takes a strip of its own (a top row) instead of floating over the braid.
@@ -940,7 +946,7 @@ function tagBoxes(vb, W, H){
       X = card.x + card.w + 14;
     }
   };
-  return [at('neuro', -22, tagN.offsetWidth||120), at('ai', 8, tagA.offsetWidth||190)];
+  return [at('neuro', -27, tagN.offsetWidth||120), at('ai', 13, tagA.offsetWidth||190)];
 }
 function placeTags(){
   const r = svg.getBoundingClientRect(); if (!r.height) return;
@@ -1013,12 +1019,24 @@ function recenter(vb, vis, W, H){
 
 function fitEra(era, vis, W, H, aspect){
   let w = Math.max(460, x(era.b) - x(era.a) + 160);
-  let vb = {x:(x(era.a)+x(era.b))/2 - w/2, y:MID - w*aspect/2, w, h:w*aspect};
+  // Nothing lies beyond the ends of the braid: a frame that would show empty
+  // years past either end slides back onto the data instead — and is judged
+  // there, since sliding a frame changes what its labels can do.
+  const x0 = x(Y0) - 30, x1 = x(Y1) + 30;
+  const onData = vb => { if (vb.w < x1 - x0){ if (vb.x + vb.w > x1) vb.x = x1 - vb.w; if (vb.x < x0) vb.x = x0; } return vb; };
+  let vb = onData({x:(x(era.a)+x(era.b))/2 - w/2, y:MID - w*aspect/2, w, h:w*aspect});
   // Zooming out frees room for labels, but a label the solver cannot place
   // for lack of a legal stem stays unplaced at any zoom: once a wider frame
-  // has stopped helping, keep the tightest frame that did best.
+  // has stopped helping, keep the tightest frame that did best. A label on a
+  // stem past the strict lean is not settled either: a frame is only tight
+  // enough to keep when every stem is under it, and otherwise the best frame
+  // is the one with the fewest hidden, then the fewest steep.
+  // Each pass judges the frame the pass before it built, and what it keeps
+  // is that frame, as judged — not the recentred one it builds next, which
+  // no pass has laid out yet.
   let best = null, stale = 0, good = null;
   for (let pass=0; pass<12; pass++){
+    const judged = {...vb};
     solve(vis, vb);
     const k = w/W, h = w*aspect;
     // the strands themselves, plus the radius of a focused dot sitting on one
@@ -1033,45 +1051,42 @@ function fitEra(era, vis, W, H, aspect){
       dn = Math.max(dn, (n.anchorY + (n.up?UP_BOT:DN_BOT)*k) - MID);
       l = Math.min(l, x(e.y) + (n.dx - n.bw/2)*k);
       r = Math.max(r, x(e.y) + (n.dx + n.bw/2)*k);
-      all = all && n.fit;
+      all = all && n.fit && n.lean <= LEAN_MAX;
     });
     const needH = up + dn + (PADT + EDGE + AXIS_PX)*k;
     const band = w * (W - PADL - PADR) / W;          // data units the map may use
     const needW = ((r-l) + 2*EDGE*k) * W / (W - PADL - PADR);
     // Centre on the content: the axis eats the bottom, so the mid-line rides high.
-    vb = {x: l - (PADL + EDGE)*k - (band - (r-l) - 2*EDGE*k)/2,
-          y: MID - up - (PADT + EDGE)*k - (h-needH)/2, w, h};
+    vb = onData({x: l - (PADL + EDGE)*k - (band - (r-l) - 2*EDGE*k)/2,
+                 y: MID - up - (PADT + EDGE)*k - (h-needH)/2, w, h});
     if (needH <= h && needW <= w){
       if (all){
         // Everything fits: the growth steps overshoot, so try a notch tighter,
         // up to three times, and keep the tightest frame that still fits all.
         if ((good && good.n >= 3) || w <= 460){ w = good ? good.w : w; if (good) vb = {...good.vb}; break; }
-        good = {w, vb:{...vb}, n:(good ? good.n : 0) + 1};
+        good = {w:judged.w, vb:judged, n:(good ? good.n : 0) + 1};
         w = Math.max(460, w * 0.93); continue;
       }
       if (good){ w = good.w; vb = {...good.vb}; break; }
       const nHid = vis.filter(e => !evNodes[EVENTS.indexOf(e)].fit).length;
-      if (!best || nHid < best.nHid){ best = {nHid, vb:{...vb}, w}; stale = 0; }
+      const nLean = vis.filter(e => evNodes[EVENTS.indexOf(e)].lean > LEAN_MAX).length;
+      if (!best || nHid < best.nHid || (nHid === best.nHid && nLean < best.nLean)){ best = {nHid, nLean, vb:judged, w:judged.w}; stale = 0; }
       else if (++stale >= 2){ w = best.w; vb = {...best.vb}; break; }
     } else if (good){ w = good.w; vb = {...good.vb}; break; }
     w = Math.min(3000, w * Math.min(1.6, Math.max(needH/h, needW/w, all?1:1.13) * 1.03));
   }
   if (good && (w !== good.w)){ w = good.w; vb = {...good.vb}; }
-  // Nothing lies beyond the ends of the braid: a frame that would show empty
-  // years past either end slides back onto the data instead.
-  const x0 = x(Y0) - 30, x1 = x(Y1) + 30;
-  if (vb.w < x1 - x0){
-    if (vb.x + vb.w > x1) vb.x = x1 - vb.w;
-    if (vb.x < x0) vb.x = x0;
-  }
+  onData(vb);
   solve(vis, vb);                        // converge against the final width
   // One re-centring pass on what is really there, and one re-solve against it.
   // Never more: the solver and the camera would chase each other. If the
-  // re-solve costs a label that had a home, the shift is given back.
-  const kept = vis.every(e => evNodes[EVENTS.indexOf(e)].fit), y0 = vb.y;
+  // re-solve costs a label its home, or a stem its strict lean, the shift is
+  // given back.
+  const cost = () => vis.reduce((s,e) => { const n = evNodes[EVENTS.indexOf(e)]; return s + (n.fit ? 0 : 1000) + (n.lean > LEAN_MAX ? 1 : 0); }, 0);
+  const c0 = cost(), y0 = vb.y;
   vb.y = recenter(vb, vis, W, H);
   solve(vis, vb);
-  if (kept && vis.some(e => !evNodes[EVENTS.indexOf(e)].fit)){ vb.y = y0; solve(vis, vb); }
+  if (cost() > c0){ vb.y = y0; solve(vis, vb); }
   return vb;
 }
 
