@@ -4,18 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NeuroAI: a history</title>
+<script>
+// The page's public home is the standalone site. A copy served from the course
+// site bounces direct visitors there, but keeps working inside the lecture iframe.
+if (top === self && /github\.io$/.test(location.host) && !/^\/neuroai-history/.test(location.pathname))
+  location.replace('https://serre-lab.github.io/neuroai-history/' + location.hash);
+</script>
 <meta name="description" content="Neuroscience and AI, 1943–today: an interactive history of convergence and divergence. Every event links to its primary source.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Neuroscience and AI: a history of convergence and divergence, 1943–today">
 <meta property="og:description" content="An interactive timeline of the two fields since cybernetics: one community, then cycles of divergence and reconvergence. Every event links to its source.">
-<meta property="og:url" content="https://serre-lab.github.io/CPSY1291-2026/demos/neuroai_timeline.html">
-<meta property="og:image" content="https://serre-lab.github.io/CPSY1291-2026/demos/neuroai_timeline_preview.png">
+<meta property="og:url" content="https://serre-lab.github.io/neuroai-history/">
+<meta property="og:image" content="https://serre-lab.github.io/neuroai-history/preview.png">
 <meta property="og:image:width" content="3200">
 <meta property="og:image:height" content="1600">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Neuroscience and AI: a history of convergence and divergence, 1943–today">
 <meta name="twitter:description" content="An interactive timeline of the two fields since cybernetics. Arrow keys step through the eras; every dot links to its source.">
-<meta name="twitter:image" content="https://serre-lab.github.io/CPSY1291-2026/demos/neuroai_timeline_preview.png">
+<meta name="twitter:image" content="https://serre-lab.github.io/neuroai-history/preview.png">
 <style>
   :root{
     --sienna:#9C5A2E; --slate:#3E6D8E; --teal:#3F7A6B;
