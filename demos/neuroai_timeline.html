@@ -66,14 +66,14 @@
   #axis span{position:absolute;bottom:7px;transform:translateX(-50%);font-size:12px;font-weight:700;
     color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
   #axis i{position:absolute;top:-1px;width:1px;height:7px;background:var(--rule)}
-  #cap{position:absolute;left:22px;top:18px;max-width:46%;pointer-events:none;
+  #cap{position:absolute;left:22px;top:18px;width:max-content;max-width:56%;pointer-events:none;
     padding:14px 20px 16px;border-radius:12px;
     background:color-mix(in srgb, var(--cream) 93%, transparent);
     box-shadow:0 1px 0 var(--rule), 0 8px 24px -14px rgba(30,41,59,.35);
     opacity:0;transform:translateY(-6px);transition:opacity .45s ease, transform .45s ease, left .45s ease, top .45s ease}
   #cap.on{opacity:1;transform:none}
   #cap h2{margin:0 0 7px;font-size:16px;line-height:1.25;color:var(--sienna);letter-spacing:-.005em;white-space:nowrap}
-  #cap p{margin:0 0 5px;font-size:14.5px;line-height:1.45;color:var(--ink)}
+  #cap p{margin:0 0 5px;font-size:14.5px;line-height:1.45;color:var(--ink);text-wrap:pretty}
   #cap p:empty{display:none}
   #cap h2:last-child{margin-bottom:0}
 
@@ -192,7 +192,7 @@ const EVENTS = [
    c:'McCulloch & Pitts, Bull. Math. Biophys. 5:115–133 (1943)', u:'https://doi.org/10.1007/BF02478259'},
   {y:1948,s:'both', t:'Wiener', d:'Cybernetics',
    c:'Wiener, Cybernetics: or Control and Communication in the Animal and the Machine, MIT Press (1948)', u:'https://doi.org/10.7551/mitpress/11810.001.0001'},
-  {y:1949,s:'both', t:'Hebb',              d:'the Hebbian learning rule',
+  {y:1949,s:'neuro',t:'Hebb',              d:'the Hebbian learning rule',
    c:'Hebb, The Organization of Behavior, Wiley (1949)', u:'https://doi.org/10.4324/9781410612403'},
   {y:1950,s:'ai',   t:'Turing',            d:'“can machines think?”',
    c:'Turing, Computing machinery and intelligence, Mind 59:433–460 (1950)', u:'https://doi.org/10.1093/mind/LIX.236.433'},
@@ -222,7 +222,7 @@ const EVENTS = [
    c:'Hopfield, Neural networks and physical systems with emergent collective computational abilities, PNAS 79:2554–2558 (1982)', u:'https://doi.org/10.1073/pnas.79.8.2554'},
   {y:1985,s:'ai',   t:'Ackley, Hinton & Sejnowski', d:'Boltzmann machines',
    c:'Ackley, Hinton & Sejnowski, A learning algorithm for Boltzmann machines, Cognit. Sci. 9:147–169 (1985)', u:'https://doi.org/10.1207/s15516709cog0901_7'},
-  {y:1986,key:1,s:'ai',   t:'Rumelhart & McClelland',       d:'PDP: backpropagation, popularized',
+  {y:1986,key:1,s:'both', t:'Rumelhart & McClelland',       d:'PDP: backpropagation, popularized',
    c:'Rumelhart, McClelland & the PDP Research Group, Parallel Distributed Processing, MIT Press (1986); Rumelhart, Hinton & Williams, Nature 323:533–536 (1986)', u:'https://doi.org/10.7551/mitpress/5236.001.0001'},
   {y:1988,s:'ai',   t:'Sutton',            d:'temporal-difference learning',
    c:'Sutton, Learning to predict by the methods of temporal differences, Mach. Learn. 3:9–44 (1988)', u:'https://doi.org/10.1007/BF00115009'},
@@ -244,7 +244,7 @@ const EVENTS = [
    c:'Rao & Ballard, Predictive coding in the visual cortex, Nat. Neurosci. 2:79–87 (1999)', u:'https://doi.org/10.1038/4580'},
   {y:2006,s:'ai',   t:'Hinton, Osindero & Teh',  d:'deep belief nets',
    c:'Hinton, Osindero & Teh, A fast learning algorithm for deep belief nets, Neural Comput. 18:1527–1554 (2006)', u:'https://doi.org/10.1162/neco.2006.18.7.1527'},
-  {y:2007,key:1,s:'both', t:'Serre et al.',      d:'a cortex model competes with computer vision',
+  {y:2007,key:1,s:'both', t:'Serre, Kreiman, … & Poggio', d:'HMAX v2: a cortex model vs computer vision',
    c:'Serre, Kreiman, Kouh, Cadieu, Knoblich & Poggio, A quantitative theory of immediate visual recognition, Prog. Brain Res. 165:33–56 (2007); Serre, Wolf, Bileschi, Riesenhuber & Poggio, IEEE TPAMI 29:411–426 (2007); Serre, Oliva & Poggio, PNAS 104:6424–6429 (2007)', u:'https://doi.org/10.1016/s0079-6123(06)65004-8'},
   {y:2012,key:1,s:'ai',   t:'Krizhevsky, Sutskever & Hinton',           d:'AlexNet: the first revolution',
    c:'Krizhevsky, Sutskever & Hinton, ImageNet classification with deep convolutional neural networks, NeurIPS 25 (2012)', u:'https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html'},
@@ -260,14 +260,18 @@ const EVENTS = [
    c:'Vaswani et al., Attention is all you need, NeurIPS 30 (2017)', u:'https://arxiv.org/abs/1706.03762'},
   {y:2020,s:'ai',   t:'Brown et al. · Kaplan et al.', d:'GPT-3; scaling laws',
    c:'Brown et al., Language models are few-shot learners, NeurIPS 33 (2020); Kaplan et al., Scaling laws for neural language models, arXiv:2001.08361 (2020)', u:'https://arxiv.org/abs/2005.14165'},
-  {y:2020,s:'ai',   t:'Dosovitskiy et al.',               d:'ViT: transformers reach vision',
-   c:'Dosovitskiy et al., An image is worth 16×16 words: transformers for image recognition at scale, ICLR 2021 (arXiv Oct 2020)', u:'https://arxiv.org/abs/2010.11929'},
-  {y:2021,s:'ai',   t:'Caron et al.',              d:'DINO: self-supervised ViTs',
-   c:'Caron et al., Emerging properties in self-supervised vision transformers, ICCV 2021; scaled up as DINOv2, Oquab et al., TMLR 2024 (arXiv 2304.07193)', u:'https://doi.org/10.1109/ICCV48922.2021.00951'},
+  {y:2019,s:'both', t:'Bashivan, Kar & DiCarlo', d:'AI-synthesized images control V4 neurons',
+   c:'Bashivan, Kar & DiCarlo, Neural population control via deep image synthesis, Science 364:eaav9436 (2019)', u:'https://doi.org/10.1126/science.aav9436'},
+  {y:2021,s:'ai',   t:'Caron et al.',              d:'DINO: self-supervised vision transformers',
+   c:'Caron et al., Emerging properties in self-supervised vision transformers, ICCV 2021 — built on the vision transformer of Dosovitskiy et al., ICLR 2021 (arXiv 2010.11929); scaled up as DINOv2, Oquab et al., TMLR 2024 (arXiv 2304.07193)', u:'https://doi.org/10.1109/ICCV48922.2021.00951'},
   {y:2022,s:'ai',   t:'OpenAI',           d:'ChatGPT: the second revolution, public',
    c:'OpenAI, Introducing ChatGPT, 30 Nov 2022', u:'https://openai.com/index/chatgpt/'},
   {y:2024,key:1,s:'ai',   t:'Hopfield & Hinton',       d:'Nobel Prize in Physics',
    c:'The Nobel Prize in Physics 2024: Hopfield & Hinton, “for foundational discoveries and inventions that enable machine learning with artificial neural networks”', u:'https://www.nobelprize.org/prizes/physics/2024/summary/'},
+  {y:2025,s:'neuro',t:'MICrONS Consortium', d:'a cubic millimetre of cortex: wiring and function',
+   c:'The MICrONS Consortium, Functional connectomics spanning multiple areas of mouse visual cortex, Nature 640:435–447 (2025)', u:'https://doi.org/10.1038/s41586-025-08790-w'},
+  {y:2025,s:'both', t:'Wang et al.',        d:'a foundation model of mouse visual cortex',
+   c:'Wang, Fahey et al., Foundation model of neural activity predicts response to new stimulus types, Nature 640:470–477 (2025)', u:'https://doi.org/10.1038/s41586-025-08829-y'},
 ];
 
 const ERAS = [
