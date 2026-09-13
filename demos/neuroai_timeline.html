@@ -76,14 +76,14 @@ if (top === self && /github\.io$/.test(location.host) && !/^\/neuroai-history/.t
     .chip{padding:4px 8px;font-size:11px} #bar{padding:6px 10px;gap:6px}
   }
 
-  /* Era caption: a card in screen space, docked per era by the layout solver to
-     whichever slot buries the least. No label is ever allowed under it. */
   /* The year axis is pinned to the stage, so it stays put while the map zooms. */
   #axis{position:absolute;left:0;right:0;bottom:0;height:30px;pointer-events:none;
     border-top:1px solid var(--rule);background:linear-gradient(to top,var(--cream) 62%,transparent)}
   #axis span{position:absolute;bottom:7px;transform:translateX(-50%);font-size:12px;font-weight:700;
     color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
   #axis i{position:absolute;top:-1px;width:1px;height:7px;background:var(--rule)}
+  /* Era caption: a card in screen space, docked per era by the layout solver to
+     whichever slot buries the least. No label is ever allowed under it. */
   #cap{position:absolute;left:22px;top:18px;width:max-content;max-width:46%;pointer-events:none;
     padding:14px 20px 16px;border-radius:12px;
     background:color-mix(in srgb, var(--cream) 93%, transparent);
@@ -190,7 +190,7 @@ const SEP = [
   // One community until Dartmouth: the fork opens at 1956 and is complete by
   // the mid-1960s, before Perceptrons. Rosenblatt 1958 is the last shared event.
   [1940,.05],[1943,.05],[1955,.06],[1956,.08],[1958,.18],[1965,1],[1975,1],[1980,.60],
-  [1986,.14],[1992,.68],[2001,.88],[2012,.30],[2014,.10],[2017,.38],[2021,.66],[2026,.46],[2028,.46]
+  [1986,.14],[1992,.68],[2001,.88],[2012,.30],[2014,.10],[2017,.38],[2021,.66],[2026,.66],[2028,.66]
 ];
 function sepAt(yr){
   for (let i=0;i<SEP.length-1;i++){
@@ -672,7 +672,7 @@ function layout(vis, vb, variant=0){
       };
       // Lanes outside the strand and lanes in the gap are one ladder, walked
       // nearest the dot first: the shortest stem that clears wins, whichever
-      // side of the strand it is on. Rows pinned to the frame edge come last.
+      // side of the strand it is on.
       // An inner lane belongs to the label's own strand. A crossing may take
       // one too: its label then sits on its own tie, which runs behind the
       // text — but never over the dot at the tie's centre.
@@ -985,9 +985,6 @@ function fly(to, ms=700){
   anim = requestAnimationFrame(step);
 }
 
-// Frame an era, lay the labels out, then reframe on what the labels actually
-// occupy. Three things force a wider view: text deeper than the frame is tall,
-// text hanging off either end, and a label the solver could not place at all.
 // The true vertical extent of everything on screen for a given camera: the two
 // strands across the YEARS ACTUALLY VISIBLE (not just the era's, which stops
 // short of the frame), a focused dot's radius on top of them, every tie, and
@@ -1008,7 +1005,7 @@ function contentBand(vb, vis, W){
   });
   return {top, bot};
 }
-// Sit that band centerd between the top margin and the year axis. When it is
+// Sit that band centred between the top margin and the year axis. When it is
 // taller than the frame the overflow is shared evenly, so a strand that runs
 // past the edge does so at both ends rather than all at the bottom.
 function recenter(vb, vis, W, H){
@@ -1017,6 +1014,9 @@ function recenter(vb, vis, W, H){
   return b.top - (PADT + EDGE + slack/2) * k;
 }
 
+// Frame an era, lay the labels out, then reframe on what the labels actually
+// occupy. Three things force a wider view: text deeper than the frame is tall,
+// text hanging off either end, and a label the solver could not place at all.
 function fitEra(era, vis, W, H, aspect){
   let w = Math.max(460, x(era.b) - x(era.a) + 160);
   // Nothing lies beyond the ends of the braid: a frame that would show empty
@@ -1180,8 +1180,8 @@ function show(i){
     // first judged by one solve at the card-free camera with the card in the
     // way, which already shows what it hides and what it bends, and only the
     // four cheapest floats and the strip are refitted. A small era can afford
-    // every docking, and the screen is only an estimate: it has missed the
-    // one docking that placed every label on a small screen.
+    // every docking: the screen is only an estimate, and on a narrow window it
+    // can miss the one docking that places every label.
     const screen = ({s}) => {
       if (s.padT) return -1;
       dockAt(s); solve(vis, vb);
@@ -1257,7 +1257,7 @@ addEventListener('keydown', ev => {
   if (ev.key==='0'||ev.key==='Home') show(0);
 });
 
-// free pan + zoom, so he can go anywhere mid-sentence
+// Free pan and zoom, so the map can be taken anywhere mid-lecture.
 // The camera moves on every notch and every pointer move; the labels keep the
 // anchors they have and only counter-scale, then settle in one re-solve once
 // the wheel or the pointer has been still for a moment. Re-solving per notch
