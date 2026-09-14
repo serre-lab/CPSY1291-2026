@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Human judgments vs raw trained network — CPSY 1291</title>
+<style>
+:root{
+  --paper:#FAF9F5; --ink:#1E293B; --body:#334155; --muted:#5B6B7A;
+  --rule:#E7E3DA; --slate:#3E6D8E; --focus:#0969da;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--body);
+  font:22px/1.35 "Helvetica Neue",Arial,system-ui,sans-serif}
+body{min-height:100vh}
+a{color:#80431c}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1680px;margin:0 auto;padding:16px 18px 20px}
+h1{margin:0 0 4px;font-size:30px;line-height:1.2;color:var(--ink)}
+.lede{margin:0 0 12px;font-size:18px;color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:0 0 12px}
+.toolbar label{font-size:18px;color:var(--ink);font-weight:600}
+select,button{font:inherit;font-size:18px;color:var(--ink);background:var(--paper);
+  border:1px solid #64748b;border-radius:4px;padding:6px 12px;min-height:42px}
+button{cursor:pointer}
+button:disabled{opacity:.45;cursor:default}
+.stage{display:grid;grid-template-columns:1fr 1fr 260px;gap:18px;align-items:stretch;
+  min-height:560px}
+.panel{min-width:0;display:flex;flex-direction:column}
+.panel h2{margin:0 0 6px;font-size:22px;color:var(--ink)}
+.panel .note{margin:0 0 8px;font-size:15px;color:var(--muted)}
+.svg-frame{flex:1;border:1px solid var(--rule);background:var(--paper);position:relative;min-height:480px}
+.svg-frame svg{display:block;width:100%;height:100%;min-height:480px}
+.preview{display:flex;flex-direction:column;gap:10px}
+.preview-frame{width:240px;height:240px;border:2px solid var(--ink);background:var(--paper);
+  overflow:hidden;line-height:0}
+.preview-frame canvas{display:block;width:240px;height:240px}
+.meta{font-size:18px;color:var(--ink)}
+.meta .muted{color:var(--muted);font-size:16px}
+.values{font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0,0,0,0);white-space:nowrap;border:0}
+details{margin-top:14px;font-size:16px}
+details summary{cursor:pointer;font-weight:600;color:var(--ink)}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+th,td{border-bottom:1px solid var(--rule);padding:4px 8px;text-align:left}
+th{color:var(--ink)}
+.legend{display:none!important}
+.legend{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:10px;font-size:14px;color:var(--ink)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.footer{margin-top:10px;font-size:14px;color:var(--muted)}
+html.embed, .embed body{overflow:hidden}
+html.embed .wrap{max-width:none;padding:8px 12px;height:755px;width:1680px}
+html.embed h1{font-size:26px}
+html.embed .lede,.embed .standalone{display:none}
+html.embed .stage{min-height:0;height:calc(755px - 120px);gap:14px}
+html.embed .svg-frame, html.embed .svg-frame svg{min-height:0;height:100%}
+html.embed .preview-frame{width:200px;height:200px}
+html.embed .preview-frame canvas{width:200px;height:200px}
+@media (max-width:1100px){
+  .stage{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
+  .preview{grid-column:1/-1;flex-direction:row;align-items:center}
+}
+@media (max-width:720px){
+  .stage{grid-template-columns:1fr}
+  .wrap{padding:12px}
+}
+html.embed .wrap{width:100%;height:100vh;padding:8px 10px}
+html.embed h1,html.embed .note,html.embed .footer,html.embed #coords,html.embed #sub{display:none}
+html.embed .stage{height:calc(100vh - 76px);min-height:0;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 240px;grid-template-rows:none}
+html.embed .preview{grid-column:auto;flex-direction:column;align-items:flex-start}
+html.embed .svg-frame{height:auto;min-height:0;flex:1}
+html.embed .svg-frame svg{height:100%;min-height:0}
+html.embed .panel{min-height:0}
+html.embed .panel h2{font-size:26px}
+html.embed .toolbar label,html.embed select,html.embed button{font-size:24px}
+</style>
+<script>if(new URLSearchParams(location.search).has('embed'))document.documentElement.classList.add('embed');</script>
+</head>
+<body>
+<div class="wrap">
+  <h1>Human judgments vs raw trained network</h1>
+  <p class="lede standalone">Same 120 animal photographs. Left: nonmetric MDS of human pairwise ratings.
+  Right: nonmetric MDS of <em>raw</em> ImageNet-trained ResNet-18 late representations (no transform fitted to humans).
+  Axes are arbitrary; panels are not aligned to share coordinates.</p>
+
+  <div class="toolbar" role="group" aria-label="Stimulus selection">
+    <label for="pick">Stimulus</label>
+    <select id="pick" aria-describedby="status"></select>
+    <button type="button" id="prev" aria-label="Previous stimulus">Previous</button>
+    <button type="button" id="next" aria-label="Next stimulus">Next</button>
+    <span id="status" class="values" aria-live="polite"></span><span class="values">New MDS fits to A1 data</span>
+  </div>
+
+  <div class="stage">
+    <section class="panel" aria-labelledby="h-human">
+      <h2 id="h-human">Human similarity</h2>
+      <p class="note">D = 10 − rating · nonmetric MDS · stress <span id="stress-h">—</span></p>
+      <div class="svg-frame"><svg id="svg-h" role="img" aria-labelledby="h-human"></svg></div>
+    </section>
+    <section class="panel" aria-labelledby="h-net">
+      <h2 id="h-net">Raw trained network</h2>
+      <p class="note">1 − correlation · late layer · stress <span id="stress-n">—</span></p>
+      <div class="svg-frame"><svg id="svg-n" role="img" aria-labelledby="h-net"></svg></div>
+    </section>
+    <aside class="preview" aria-label="Selected photograph">
+      <div class="preview-frame"><canvas id="preview" width="240" height="240" aria-hidden="true"></canvas></div>
+      <div class="meta">
+        <div id="label">—</div>
+        <div class="muted" id="sub">—</div>
+      </div>
+      <div class="values" id="coords"></div>
+      <p class="values standalone">Hover to preview an image in both maps; click to keep the selection. Arrow keys also move the selection.</p>
+    </aside>
+  </div>
+
+  <div class="legend" id="legend" aria-label="Taxon colors" hidden></div>
+
+  <div class="sr-only" id="live" aria-live="polite"></div>
+  <details class="standalone">
+    <summary>Accessible values and download</summary>
+    <p>Coordinates are display-normalized separately per panel (centered, unit radius). They are not published figure coordinates.</p>
+    <p><a id="csv-link" href="#">Download coordinate CSV</a>
+      · Spearman ρ(human D, network D) = <span id="rho">—</span></p>
+
+    <table>
+      <caption>Selected stimulus coordinates</caption>
+      <thead><tr><th>Map</th><th>x</th><th>y</th></tr></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </details>
+
+  <p class="footer">Peterson et al. <i>Cognitive Science</i> 2018 · A1 ResNet-18 ImageNet-trained late readout · recomputed teaching maps, not Fig. 3a published coordinates · Escape exits when embedded</p>
+</div>
+
+<script src="L01_similarity_data.js"></script>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const mk=(n,a={})=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+
+let DATA=null, atlasImg=null, idx=0, hover=-1;
+
+async function boot(){
+  DATA=window.L01_SIMILARITY_DATA;
+  if(!DATA) throw new Error('Failed to load L01_similarity_data.js');
+  document.getElementById('stress-h').textContent=DATA.provenance.stress.human.toFixed(3);
+  document.getElementById('stress-n').textContent=DATA.provenance.stress.network.toFixed(3);
+  document.getElementById('rho').textContent=DATA.provenance.spearman_human_vs_network_D.toFixed(3);
+  const csv=document.getElementById('csv-link');
+  csv.href=DATA.csv;
+  csv.setAttribute('download','similarity_coordinates.csv');
+
+  const pick=document.getElementById('pick');
+  DATA.items.forEach(it=>{
+    const o=document.createElement('option');
+    o.value=String(it.i);
+    o.textContent=`${it.i}: ${it.label} (${it.taxon})`;
+    pick.appendChild(o);
+  });
+  const leg=document.getElementById('legend');
+  Object.entries(DATA.colors).forEach(([g,c])=>{
+    const s=document.createElement('span');
+    s.innerHTML=`<i style="background:${c}"></i>${g}`;
+    leg.appendChild(s);
+  });
+
+  atlasImg=new Image();
+  atlasImg.decoding='async';
+  await new Promise((resolve,reject)=>{
+    atlasImg.onload=resolve; atlasImg.onerror=reject; atlasImg.src=DATA.atlas.src;
+  });
+
+  idx=DATA.defaultIndex|0;
+  pick.value=String(idx);
+  buildPanel('svg-h','human');
+  buildPanel('svg-n','network');
+  select(idx,false);
+
+  pick.addEventListener('change',()=>select(+pick.value,true));
+  document.getElementById('prev').onclick=()=>select((idx+DATA.n-1)%DATA.n,true);
+  document.getElementById('next').onclick=()=>select((idx+1)%DATA.n,true);
+  const resizePlots=()=>{buildPanel('svg-h','human');buildPanel('svg-n','network');paintSelection();};
+  addEventListener('resize',resizePlots);
+  const observer=new ResizeObserver(()=>requestAnimationFrame(resizePlots));
+  document.querySelectorAll('.svg-frame').forEach(e=>observer.observe(e));
+  addEventListener('keydown',e=>{
+    if(e.key==='Escape' && window.parent!==window){
+      window.parent.postMessage({type:'cpsy-exit-interactive'},'*');
+      return;
+    }
+    if(e.key==='ArrowLeft'){e.preventDefault();select((idx+DATA.n-1)%DATA.n,true);}
+    if(e.key==='ArrowRight'){e.preventDefault();select((idx+1)%DATA.n,true);}
+  });
+}
+
+function panelSize(svg){
+  const r=svg.parentElement.getBoundingClientRect();
+  const w=Math.max(200,Math.floor(r.width));
+  const h=Math.max(200,Math.floor(r.height));
+  return {w,h};
+}
+
+function buildPanel(svgId, key){
+  const svg=document.getElementById(svgId);
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const {w,h}=panelSize(svg);
+  svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  const pad=28;
+  const s=Math.min(w,h)/2-pad;
+  const cx=w/2, cy=h/2;
+  const gAxes=mk('g');
+  gAxes.appendChild(mk('line',{x1:pad,y1:cy,x2:w-pad,y2:cy,stroke:'#E7E3DA','stroke-width':1}));
+  gAxes.appendChild(mk('line',{x1:cx,y1:pad,x2:cx,y2:h-pad,stroke:'#E7E3DA','stroke-width':1}));
+  // component axis hints (scalars), not whole-vector labels
+  gAxes.appendChild(mk('text',{x:w-pad-4,y:cy-6,'text-anchor':'end','font-size':14,fill:'#5B6B7A','font-style':'italic'})).textContent='MDS 1';
+  gAxes.appendChild(mk('text',{x:cx+6,y:pad+14,'font-size':14,fill:'#5B6B7A','font-style':'italic'})).textContent='MDS 2';
+  svg.appendChild(gAxes);
+
+  const g=mk('g',{id:svgId+'-pts'});
+  DATA.items.forEach(it=>{
+    const [x,y]=it[key];
+    const px=cx+x*s, py=cy-y*s;
+    const c=mk('circle',{
+      cx:px, cy:py, r:6.5, fill:'#64748B', stroke:'#FAF9F5','stroke-width':1.5,
+      'data-i':String(it.i), class:'pt', style:'cursor:pointer'
+    });
+    c.addEventListener('pointerenter',()=>{hover=it.i;showPreview(hover);paintSelection();});
+    c.addEventListener('pointerleave',()=>{hover=-1;showPreview(idx);paintSelection();});
+    c.addEventListener('click',()=>select(it.i,true));
+    g.appendChild(c);
+  });
+  svg.appendChild(g);
+
+  // optional connector drawn in paintSelection via overlays
+  const link=mk('circle',{id:svgId+'-sel', r:11, fill:'none', stroke:'#1E293B','stroke-width':2.5, visibility:'hidden'});
+  svg.appendChild(link);
+  svg._map={cx,cy,s,key};
+}
+
+function paintSelection(){
+  const show=hover>=0?hover:idx;
+  ['svg-h','svg-n'].forEach(id=>{
+    const svg=document.getElementById(id);
+    const map=svg._map; if(!map) return;
+    const it=DATA.items[show];
+    const [x,y]=it[map.key];
+    const px=map.cx+x*map.s, py=map.cy-y*map.s;
+    const ring=document.getElementById(id+'-sel');
+    ring.setAttribute('cx',px); ring.setAttribute('cy',py); ring.setAttribute('visibility','visible');
+    svg.querySelectorAll('circle.pt').forEach(c=>{
+      const i=+c.getAttribute('data-i');
+      const on=i===show;
+      c.setAttribute('r', on?8:6.5);
+      c.setAttribute('fill',on?'#3E6D8E':'#64748B');
+      c.setAttribute('opacity', (hover>=0 && i!==hover && i!==idx)?0.35:1);
+    });
+  });
+}
+
+function drawPreview(i){
+  const canvas=document.getElementById('preview');
+  const embed=document.documentElement.classList.contains('embed');
+  const size=embed?200:240;
+  if(canvas.width!==size){canvas.width=size; canvas.height=size;}
+  const ctx=canvas.getContext('2d');
+  const cell=DATA.atlas.cell, cols=DATA.atlas.cols;
+  const col=i%cols, row=Math.floor(i/cols);
+  ctx.fillStyle='#FAF9F5';
+  ctx.fillRect(0,0,size,size);
+  ctx.drawImage(atlasImg, col*cell, row*cell, cell, cell, 0, 0, size, size);
+}
+
+function showPreview(i){
+  const it=DATA.items[i];
+  document.getElementById('label').textContent=it.label;
+  document.getElementById('sub').textContent=`${it.taxon} · ${it.id} · index ${it.i}`;
+  document.getElementById('coords').innerHTML=
+    `Human (<i>x</i><sub>1</sub>, <i>x</i><sub>2</sub>) = (${it.human[0].toFixed(3)}, ${it.human[1].toFixed(3)})<br>`+
+    `Network (<i>x</i><sub>1</sub>, <i>x</i><sub>2</sub>) = (${it.network[0].toFixed(3)}, ${it.network[1].toFixed(3)})`;
+  document.getElementById('status').textContent=`${it.label} · ${i+1} / ${DATA.n}`;
+  document.getElementById('table-body').innerHTML=
+    `<tr><td>Human</td><td>${it.human[0]}</td><td>${it.human[1]}</td></tr>`+
+    `<tr><td>Network</td><td>${it.network[0]}</td><td>${it.network[1]}</td></tr>`;
+  document.getElementById('live').textContent=`Selected ${it.label}, ${it.taxon}.`;
+  drawPreview(i);
+  document.getElementById('preview').dataset.imageId=it.id;
+}
+function select(i,fromUser){
+  idx=((i%DATA.n)+DATA.n)%DATA.n;hover=-1;
+  document.getElementById('pick').value=String(idx);
+  showPreview(idx);paintSelection();
+}
+
+boot().catch(err=>{
+  document.body.innerHTML=`<p style="padding:24px;font:20px system-ui">Could not load explorer data: ${err.message}</p>`;
+});
+</script>
+</body>
+</html>

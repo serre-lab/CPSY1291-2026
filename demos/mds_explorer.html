@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MDS and hierarchical clustering — CPSY 1291</title>
+<style>
+:root{
+  --paper:#FAF9F5; --ink:#1E293B; --body:#334155; --muted:#5B6B7A;
+  --rule:#E7E3DA; --slate:#3E6D8E; --focus:#0969da;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--paper);color:var(--body);
+  font:22px/1.35 "Helvetica Neue",Arial,system-ui,sans-serif}
+a{color:#80431c}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1680px;margin:0 auto;padding:16px 18px 20px}
+h1{margin:0 0 4px;font-size:30px;line-height:1.2;color:var(--ink)}
+.lede{margin:0 0 12px;font-size:18px;color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:0 0 10px}
+.toolbar .ctl{display:inline-flex;align-items:center;gap:8px}
+.toolbar label{font-size:18px;color:var(--ink);font-weight:600;white-space:nowrap}
+select,button,input[type=range]{font:inherit;font-size:18px;color:var(--ink);background:var(--paper)}
+select,button{border:1px solid #64748b;border-radius:4px;padding:5px 10px;min-height:40px}
+button{cursor:pointer}
+input[type=range]{width:180px;accent-color:var(--slate)}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--slate)}
+output{font-variant-numeric:tabular-nums;min-width:2ch;display:inline-block;color:var(--ink);font-weight:600}
+.seg{display:inline-flex;border:1px solid #64748b;border-radius:4px;overflow:hidden}
+.seg button{border:0;border-radius:0;min-height:38px;padding:4px 12px}
+.seg button+button{border-left:1px solid #64748b}
+.seg button[aria-pressed=true]{background:var(--slate);color:#fff}
+.stage{display:grid;grid-template-columns:700px minmax(0,1fr);gap:18px;align-items:stretch;
+  min-height:600px}
+.panel{min-width:0;display:flex;flex-direction:column}
+.panel h2{margin:0 0 4px;font-size:22px;color:var(--ink);display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.panel h2 .sub{font-size:16px;font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+.svg-frame{flex:1;border:1px solid var(--rule);background:var(--paper);position:relative;min-height:560px}
+.svg-frame svg{display:block;width:100%;height:100%;min-height:560px}
+.status{margin:8px 0 0;font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums;min-height:1.4em}
+.status .muted{color:var(--muted)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.footer{margin-top:8px;font-size:14px;color:var(--muted)}
+.leaf-hit{cursor:pointer}
+.pt{cursor:pointer}
+html.embed, .embed body{overflow:hidden}
+html.embed .wrap{max-width:none;width:100%;height:100vh;padding:8px 10px;display:flex;flex-direction:column}
+html.embed h1,html.embed .lede,html.embed .footer,html.embed .standalone{display:none}
+html.embed .stage{flex:1;min-height:0;gap:14px}
+html.embed .svg-frame, html.embed .svg-frame svg{min-height:0;height:100%}
+html.embed .panel{min-height:0}
+html.embed .panel h2{font-size:24px}
+html.embed .toolbar label,html.embed select,html.embed button{font-size:20px}
+html.embed .status{font-size:19px}
+</style>
+<script>if(new URLSearchParams(location.search).has('embed'))document.documentElement.classList.add('embed');</script>
+</head>
+<body>
+<div class="wrap">
+  <h1>Multidimensional scaling and hierarchical clustering</h1>
+  <p class="lede">The same 120 animal photographs and the same dissimilarity matrix feed both panels. Left: a nonmetric MDS
+  embedding in 1, 2 or 3 dimensions. Right: the dendrogram from agglomerative clustering; the slider cuts the tree and
+  colours both views by cluster. All fits were precomputed in Python; the page only draws.</p>
+
+  <div class="toolbar" role="group" aria-label="Explorer controls">
+    <span class="ctl"><label for="source">Source</label>
+      <select id="source"></select></span>
+    <span class="ctl"><label id="dims-label">Dimensions</label>
+      <span class="seg" role="group" aria-labelledby="dims-label" id="dims">
+        <button type="button" data-k="1" aria-pressed="false">1</button>
+        <button type="button" data-k="2" aria-pressed="true">2</button>
+        <button type="button" data-k="3" aria-pressed="false">3</button>
+      </span></span>
+    <span class="ctl" id="axes-ctl" hidden><label id="axes-label">Axes</label>
+      <span class="seg" role="group" aria-labelledby="axes-label" id="axes">
+        <button type="button" data-pair="0,1" aria-pressed="true">1–2</button>
+        <button type="button" data-pair="0,2" aria-pressed="false">1–3</button>
+        <button type="button" data-pair="1,2" aria-pressed="false">2–3</button>
+      </span></span>
+    <span class="ctl"><label for="linkage">Linkage</label>
+      <select id="linkage">
+        <option value="average">average</option>
+        <option value="single">single</option>
+        <option value="complete">complete</option>
+      </select></span>
+    <span class="ctl"><label for="clusters">Clusters</label>
+      <input type="range" id="clusters" min="1" max="12" value="4" step="1" aria-describedby="status">
+      <output for="clusters" id="clusters-out">4</output></span>
+    <span class="ctl"><input type="checkbox" id="images" checked><label for="images">Show images</label></span>
+    <span class="ctl"><label for="highlight">Highlight</label>
+      <select id="highlight" aria-describedby="status"><option value="-1">none</option></select></span>
+  </div>
+
+  <div class="stage">
+    <section class="panel" aria-labelledby="h-map">
+      <h2 id="h-map"><span>MDS map</span><span class="sub" id="stress-line"></span></h2>
+      <div class="svg-frame"><svg id="svg-map" role="img" aria-labelledby="h-map" aria-describedby="status"></svg></div>
+    </section>
+    <section class="panel" aria-labelledby="h-tree">
+      <h2 id="h-tree"><span>Dendrogram</span><span class="sub" id="cut-line-text"></span></h2>
+      <div class="svg-frame"><svg id="svg-tree" role="img" aria-labelledby="h-tree" aria-describedby="status"></svg></div>
+    </section>
+  </div>
+
+  <p class="status" id="status" aria-live="polite"></p>
+  <div class="sr-only" id="live" aria-live="polite"></div>
+
+  <p class="footer">Peterson, Abbott &amp; Griffiths, <i>Cognitive Science</i> 2018 (human ratings, D = 10 − rating) ·
+  A1 ResNet-18 ImageNet-trained late readout (1 − correlation) · nonmetric MDS via scikit-learn, linkage via SciPy ·
+  MDS axes are arbitrary · Escape exits when embedded</p>
+</div>
+
+<script src="mds_explorer_data.js"></script>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const mk=(n,a={})=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const PALETTE=['#3E6D8E','#C2691C','#3F7A6B','#B5396B','#7A5AA8','#C9A227',
+               '#8A5A3C','#D08AB0','#5B8C3E','#C94A3A','#2F9BB0','#7B8794'];
+const GREY='#9AA3AD';
+
+let DATA=null;
+const state={source:'human',k:2,pair:[0,1],linkage:'average',clusters:4,images:true,hover:-1};
+let clus=null;   // {label:int[], nodeCluster:int[], cutHeight, sizes}
+let mapPos=[];   // per item {x,y,r} in map pixels
+let leafX=[];    // per item leaf x in tree pixels
+
+function boot(){
+  DATA=window.MDS_EXPLORER_DATA;
+  if(!DATA) throw new Error('mds_explorer_data.js did not load');
+  // optional presets: ?source=resnet&k=3&pair=0,2&linkage=single&clusters=6&images=0&hover=28
+  const q=new URLSearchParams(location.search);
+  if(q.has('source')&&DATA.sources[q.get('source')]) state.source=q.get('source');
+  if(['1','2','3'].includes(q.get('k'))) state.k=+q.get('k');
+  if(['0,1','0,2','1,2'].includes(q.get('pair'))) state.pair=q.get('pair').split(',').map(Number);
+  if(['average','single','complete'].includes(q.get('linkage'))) state.linkage=q.get('linkage');
+  if(q.has('clusters')) state.clusters=Math.min(12,Math.max(1,+q.get('clusters')||4));
+  if(q.get('images')==='0') state.images=false;
+  if(q.has('hover')&&+q.get('hover')>=0&&+q.get('hover')<DATA.n) state.hover=+q.get('hover');
+  document.querySelectorAll('#dims button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.k===state.k?'true':'false'));
+  document.querySelectorAll('#axes button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.pair===state.pair.join(',')?'true':'false'));
+  document.getElementById('linkage').value=state.linkage;
+  document.getElementById('clusters').value=state.clusters;
+  document.getElementById('clusters-out').value=state.clusters;
+  document.getElementById('images').checked=state.images;
+  const src=document.getElementById('source');
+  Object.entries(DATA.sources).forEach(([key,s])=>{
+    const o=document.createElement('option'); o.value=key; o.textContent=s.label; src.appendChild(o);
+  });
+  src.value=state.source;
+  src.addEventListener('change',()=>{state.source=src.value;update();});
+  document.querySelectorAll('#dims button').forEach(b=>b.addEventListener('click',()=>{
+    state.k=+b.dataset.k; setPressed('#dims',b); update();
+  }));
+  document.querySelectorAll('#axes button').forEach(b=>b.addEventListener('click',()=>{
+    state.pair=b.dataset.pair.split(',').map(Number); setPressed('#axes',b); update();
+  }));
+  const lk=document.getElementById('linkage');
+  lk.addEventListener('change',()=>{state.linkage=lk.value;update();});
+  const cl=document.getElementById('clusters');
+  cl.addEventListener('input',()=>{state.clusters=+cl.value;document.getElementById('clusters-out').value=cl.value;update();});
+  const hl=document.getElementById('highlight');
+  DATA.items.forEach(it=>{const o=document.createElement('option');o.value=String(it.i);o.textContent=`${it.i}: ${it.label}`;hl.appendChild(o);});
+  hl.value=String(state.hover);
+  hl.addEventListener('change',()=>setHover(+hl.value));
+  const im=document.getElementById('images');
+  im.addEventListener('change',()=>{state.images=im.checked;update();});
+  addEventListener('keydown',e=>{
+    if(e.key==='Escape' && window.parent!==window){
+      window.parent.postMessage({type:'cpsy-exit-interactive'},'*');
+    }
+  });
+  const ro=new ResizeObserver(()=>requestAnimationFrame(update));
+  document.querySelectorAll('.svg-frame').forEach(e=>ro.observe(e));
+  update();
+}
+function setPressed(sel,btn){
+  document.querySelectorAll(sel+' button').forEach(b=>b.setAttribute('aria-pressed',b===btn?'true':'false'));
+}
+
+// ---------- clustering from the linkage matrix (union of the first n-c merges) ----------
+function cutTree(Z,leaves,c){
+  const n=DATA.n, parent=new Array(2*n-1).fill(-1);
+  const nMerge=Math.max(0,n-c);
+  for(let m=0;m<nMerge;m++){const [a,b]=Z[m]; parent[a]=n+m; parent[b]=n+m;}
+  const root=i=>{while(parent[i]>=0)i=parent[i];return i;};
+  // number clusters left-to-right in dendrogram order
+  const idOf=new Map(), label=new Array(n);
+  leaves.forEach(i=>{const r=root(i); if(!idOf.has(r)) idOf.set(r,idOf.size); label[i]=idOf.get(r);});
+  const nodeCluster=new Array(n-1).fill(-1);
+  for(let m=0;m<nMerge;m++) nodeCluster[m]=idOf.get(root(n+m));
+  const sizes=new Array(idOf.size).fill(0); label.forEach(l=>sizes[l]++);
+  let cutHeight, tied=false;
+  if(c<=1) cutHeight=Z[n-2][2]*1.04;
+  else if(c>=n) cutHeight=Z[0][2]/2;
+  else {cutHeight=(Z[n-c-1][2]+Z[n-c][2])/2; tied=Z[n-c-1][2]===Z[n-c][2];}
+  return {label,nodeCluster,cutHeight,sizes,tied};
+}
+const colorOf=i=>PALETTE[clus.label[i]%PALETTE.length];
+
+// ---------- main update ----------
+function update(){
+  const S=DATA.sources[state.source];
+  const C=S.clustering[state.linkage];
+  clus=cutTree(C.linkage,C.leaves,state.clusters);
+  document.getElementById('axes-ctl').hidden=state.k!==3;
+  const st=S.mds;
+  document.getElementById('stress-line').innerHTML=
+    ['1','2','3'].map(k=>{const s=`k = ${k}: ${st[k].stress.toFixed(3)}`;return +k===state.k?`<b>${s}</b>`:s;}).join(' · ')+' (stress)';
+  document.getElementById('cut-line-text').textContent=
+    `${state.linkage} linkage · cut at height ${clus.cutHeight.toFixed(2)} → ${state.clusters} cluster${state.clusters>1?'s':''}`+
+    (clus.tied?' (tied merge heights: cut by merge order)':'');
+  drawMap();
+  drawTree();
+  paintHover();
+  writeStatus();
+}
+
+function writeStatus(){
+  const S=DATA.sources[state.source];
+  const sizes=clus.sizes.map((s,j)=>`<span style="color:${PALETTE[j%PALETTE.length]}">●</span>${s}`).join(' ');
+  let hov='';
+  if(state.hover>=0){const it=DATA.items[state.hover];hov=` · <b>${it.label}</b> (${it.taxon}, cluster ${clus.label[state.hover]+1})`;}
+  document.getElementById('status').innerHTML=
+    `${S.label} · ${S.dissimilarity} · MDS k = ${state.k}, stress ${S.mds[String(state.k)].stress.toFixed(3)} · `+
+    `<span class="muted">cluster sizes</span> ${sizes}${hov}`;
+  document.getElementById('live').textContent=
+    `${S.label}, ${state.k} dimensions, stress ${S.mds[String(state.k)].stress.toFixed(3)}, ${state.linkage} linkage, `+
+    `${state.clusters} clusters with sizes ${clus.sizes.join(', ')}.`+
+    (state.hover>=0?` Hovering ${DATA.items[state.hover].label}, cluster ${clus.label[state.hover]+1}.`:'');
+}
+
+function frameSize(svg){
+  const r=svg.parentElement.getBoundingClientRect();
+  return {w:Math.max(200,Math.floor(r.width)),h:Math.max(200,Math.floor(r.height))};
+}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+
+// stack items along x so thumbnails of width `size` do not overlap; rows alternate above/below
+function stackRows(order,xs,size){
+  const rowsRight=[], row=new Array(xs.length);
+  order.forEach(i=>{
+    let r=0; while(r<rowsRight.length && xs[i]-rowsRight[r]<size+2) r++;
+    if(r===rowsRight.length) rowsRight.push(-Infinity);
+    rowsRight[r]=xs[i]; row[i]=r;
+  });
+  return {row,nRows:rowsRight.length};
+}
+
+// ---------- MDS map ----------
+function drawMap(){
+  const svg=document.getElementById('svg-map'); clear(svg);
+  const {w,h}=frameSize(svg); svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  const S=DATA.sources[state.source], coords=S.mds[String(state.k)].coords;
+  const n=DATA.n, g=mk('g'); mapPos=new Array(n);
+  const hit=(el,i)=>{
+    el.classList.add('pt'); el.dataset.i=i;
+    el.addEventListener('pointerenter',()=>setHover(i));
+    el.addEventListener('pointerleave',()=>setHover(+document.getElementById('highlight').value));
+  };
+  const axisText=(x,y,t,anchor='start')=>{const e=mk('text',{x,y,'font-size':15,fill:'#5B6B7A','font-style':'italic','text-anchor':anchor});e.textContent=t;return e;};
+
+  if(state.k===1){
+    const pad=40, cy=h/2;
+    const raw=coords.map(c=>c[0]), xmin=Math.min(...raw), xmax=Math.max(...raw);
+    const xs=raw.map(v=>pad+(v-xmin)/Math.max(1e-6,xmax-xmin)*(w-2*pad));
+    const order=[...Array(n).keys()].sort((a,b)=>xs[a]-xs[b]);
+    // choose the largest marker size whose stack fits the frame
+    let size=state.images?44:16, st;
+    for(;;){ st=stackRows(order,xs,size); const need=Math.ceil(st.nRows/2)*(size+3)+8;
+      if(need<=cy-30||size<=12)break; size-=2; }
+    svg.appendChild(mk('line',{x1:pad,y1:cy,x2:w-pad,y2:cy,stroke:'#9AA3AD','stroke-width':1.5}));
+    svg.appendChild(axisText(w-16,h-12,'MDS 1 (number line; stacked to avoid overlap)','end'));
+    order.forEach(i=>{
+      const r=st.row[i], tier=Math.floor(r/2), up=(r%2===0);
+      const y=up?cy-12-tier*(size+3)-size/2:cy+12+tier*(size+3)+size/2;
+      g.appendChild(mk('line',{x1:xs[i],y1:cy,x2:xs[i],y2:y,stroke:'#D7D2C6','stroke-width':1}));
+      g.appendChild(mk('circle',{cx:xs[i],cy:cy,r:2.2,fill:colorOf(i)}));
+      mapPos[i]={x:xs[i],y,r:size/2};
+      g.appendChild(marker(i,xs[i],y,size,hit));
+    });
+  } else {
+    const [ax,ay]=state.k===2?[0,1]:state.pair;
+    const az=state.k===3?[0,1,2].find(d=>d!==ax&&d!==ay):-1;
+    // fit the point cloud's bounding box to the frame with one scale for both axes
+    const maxR=state.images?(az>=0?28:22):(az>=0?14:8);
+    const pad=26+maxR;
+    const xs=coords.map(c=>c[ax]), ys=coords.map(c=>c[ay]);
+    const xmin=Math.min(...xs), xmax=Math.max(...xs), ymin=Math.min(...ys), ymax=Math.max(...ys);
+    const s=Math.min((w-2*pad)/Math.max(1e-6,xmax-xmin),(h-2*pad)/Math.max(1e-6,ymax-ymin));
+    const cx=w/2-s*(xmin+xmax)/2, cy=h/2+s*(ymin+ymax)/2;   // data origin in pixels
+    const gx=Math.min(Math.max(cx,24),w-24), gy=Math.min(Math.max(cy,24),h-24);
+    svg.appendChild(mk('line',{x1:12,y1:gy,x2:w-12,y2:gy,stroke:'#E7E3DA'}));
+    svg.appendChild(mk('line',{x1:gx,y1:12,x2:gx,y2:h-12,stroke:'#E7E3DA'}));
+    svg.appendChild(axisText(w-16,h-12,`MDS ${ax+1}`,'end'));
+    svg.appendChild(axisText(gx+6,24,`MDS ${ay+1}`));
+    if(az>=0) svg.appendChild(axisText(16,h-12,`marker size = MDS ${az+1} (small → large)`));
+    // draw small markers first so large ones sit on top? Reverse: large behind, small in front.
+    const order=[...Array(n).keys()];
+    if(az>=0) order.sort((a,b)=>coords[b][az]-coords[a][az]);
+    order.forEach(i=>{
+      const x=cx+coords[i][ax]*s, y=cy-coords[i][ay]*s;
+      let size=state.images?36:15;
+      if(az>=0){const t=(coords[i][az]+1)/2; size=state.images?20+t*36:8+t*20;}
+      mapPos[i]={x,y,r:size/2};
+      g.appendChild(marker(i,x,y,size,hit));
+    });
+  }
+  svg.appendChild(g);
+  const ring=mk('circle',{id:'map-ring',r:10,fill:'none',stroke:'#1E293B','stroke-width':2.5,visibility:'hidden','pointer-events':'none'});
+  svg.appendChild(ring);
+}
+function marker(i,x,y,size,hit){
+  const c=colorOf(i);
+  if(state.images){
+    const gg=mk('g');
+    gg.appendChild(mk('rect',{x:x-size/2-2,y:y-size/2-2,width:size+4,height:size+4,fill:c,rx:2}));
+    gg.appendChild(mk('image',{x:x-size/2,y:y-size/2,width:size,height:size,href:DATA.items[i].thumb,preserveAspectRatio:'xMidYMid slice'}));
+    gg.appendChild(mk('title')).textContent=DATA.items[i].label;
+    hit(gg,i); return gg;
+  }
+  const e=mk('circle',{cx:x,cy:y,r:size/2,fill:c,stroke:'#FAF9F5','stroke-width':1.2});
+  e.appendChild(mk('title')).textContent=DATA.items[i].label;
+  hit(e,i); return e;
+}
+
+// ---------- dendrogram ----------
+function drawTree(){
+  const svg=document.getElementById('svg-tree'); clear(svg);
+  const {w,h}=frameSize(svg); svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  const S=DATA.sources[state.source], C=S.clustering[state.linkage];
+  const Z=C.linkage, leaves=C.leaves, n=DATA.n;
+  const left=52, right=14, top=22;
+  const step=(w-left-right)/n;
+  const nRows=state.images?4:1;
+  const thumb=state.images?Math.min(30,Math.floor(nRows*step)-3):Math.max(4,Math.floor(step)-2);
+  const thumbArea=nRows*(thumb+2)+8, leaderH=8;
+  const y0=h-thumbArea-leaderH;           // baseline of the tree (distance 0)
+  const maxD=Math.max(Z[n-2][2],clus.cutHeight)*1.05;
+  const yOf=d=>y0-(d/maxD)*(y0-top);
+
+  const pos=new Array(2*n-1); leafX=new Array(n);
+  leaves.forEach((i,j)=>{const x=left+(j+0.5)*step; pos[i]={x,y:y0}; leafX[i]=x;});
+
+  // axis
+  const ax=mk('g');
+  ax.appendChild(mk('line',{x1:left-6,y1:top,x2:left-6,y2:y0,stroke:'#9AA3AD'}));
+  const nice=niceStep(maxD);
+  for(let d=0;d<=maxD;d+=nice){
+    const y=yOf(d);
+    ax.appendChild(mk('line',{x1:left-10,y1:y,x2:left-6,y2:y,stroke:'#9AA3AD'}));
+    const t=mk('text',{x:left-13,y:y+5,'font-size':13,fill:'#5B6B7A','text-anchor':'end'});
+    t.textContent=+d.toFixed(2); ax.appendChild(t);
+  }
+  const lab=mk('text',{x:14,y:(top+y0)/2,'font-size':14,fill:'#5B6B7A','font-style':'italic',transform:`rotate(-90 14 ${(top+y0)/2})`,'text-anchor':'middle'});
+  lab.textContent='merge height (dissimilarity)'; ax.appendChild(lab);
+  svg.appendChild(ax);
+
+  // branches
+  const gb=mk('g',{fill:'none','stroke-linejoin':'round'});
+  Z.forEach((row,m)=>{
+    const [a,b,d]=row, pa=pos[a], pb=pos[b], y=yOf(d);
+    const cl=clus.nodeCluster[m];
+    const col=cl>=0?PALETTE[cl%PALETTE.length]:GREY;
+    gb.appendChild(mk('path',{d:`M${pa.x},${pa.y}V${y}H${pb.x}V${pb.y}`,stroke:col,'stroke-width':cl>=0?1.6:1.2}));
+    pos[n+m]={x:(pa.x+pb.x)/2,y};
+  });
+  svg.appendChild(gb);
+
+  // cut line
+  const yc=yOf(clus.cutHeight);
+  svg.appendChild(mk('line',{x1:left-2,y1:yc,x2:w-right,y2:yc,stroke:'#C94A3A','stroke-width':1.5,'stroke-dasharray':'6 4'}));
+  const ct=mk('text',{x:w-right,y:yc<top+20?yc+15:yc-5,'font-size':13,fill:'#C94A3A','text-anchor':'end'});
+  ct.textContent=`cut: ${state.clusters} cluster${state.clusters>1?'s':''}`; svg.appendChild(ct);
+
+  // leaves: thumbnails in staggered rows, or ticks
+  const gl=mk('g');
+  leaves.forEach((i,j)=>{
+    const x=leafX[i], c=colorOf(i);
+    if(state.images){
+      const r=j%nRows, ty=y0+leaderH+r*(thumb+2);
+      gl.appendChild(mk('line',{x1:x,y1:y0,x2:x,y2:ty,stroke:'#D7D2C6','stroke-width':1}));
+      const gg=mk('g',{class:'leaf-hit','data-i':i});
+      gg.appendChild(mk('rect',{x:x-thumb/2-1.5,y:ty-1.5,width:thumb+3,height:thumb+3,fill:c,rx:1.5}));
+      gg.appendChild(mk('image',{x:x-thumb/2,y:ty,width:thumb,height:thumb,href:DATA.items[i].thumb,preserveAspectRatio:'xMidYMid slice'}));
+      gg.appendChild(mk('title')).textContent=DATA.items[i].label;
+      gg.addEventListener('pointerenter',()=>setHover(i)); gg.addEventListener('pointerleave',()=>setHover(+document.getElementById('highlight').value));
+      gl.appendChild(gg);
+    } else {
+      const e=mk('rect',{x:x-step/2+0.5,y:y0+2,width:Math.max(1,step-1),height:8,fill:c,class:'leaf-hit','data-i':i});
+      e.appendChild(mk('title')).textContent=DATA.items[i].label;
+      e.addEventListener('pointerenter',()=>setHover(i)); e.addEventListener('pointerleave',()=>setHover(+document.getElementById('highlight').value));
+      gl.appendChild(e);
+    }
+  });
+  svg.appendChild(gl);
+  // hover marker at the leaf
+  const mkr=mk('g',{id:'tree-mark',visibility:'hidden','pointer-events':'none'});
+  mkr.appendChild(mk('line',{id:'tree-mark-line',x1:0,y1:top,x2:0,y2:y0,stroke:'#1E293B','stroke-width':1.5,'stroke-dasharray':'3 3'}));
+  mkr.appendChild(mk('circle',{id:'tree-mark-dot',cx:0,cy:y0,r:5,fill:'#1E293B'}));
+  svg.appendChild(mkr);
+  svg._geom={y0,top};
+}
+function niceStep(maxD){
+  const raw=maxD/6, p=Math.pow(10,Math.floor(Math.log10(raw))), m=raw/p;
+  return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p;
+}
+
+// ---------- hover linking ----------
+function setHover(i){state.hover=i;paintHover();writeStatus();}
+function paintHover(){
+  const i=state.hover;
+  const ring=document.getElementById('map-ring');
+  const mark=document.getElementById('tree-mark');
+  document.querySelectorAll('#svg-map .pt').forEach(el=>el.setAttribute('opacity',(i>=0&&+el.dataset.i!==i)?0.35:1));
+  document.querySelectorAll('#svg-tree .leaf-hit').forEach(el=>el.setAttribute('opacity',(i>=0&&+el.dataset.i!==i)?0.4:1));
+  if(i<0){ring.setAttribute('visibility','hidden');mark.setAttribute('visibility','hidden');return;}
+  const p=mapPos[i];
+  const hit=document.querySelector(`#svg-map .pt[data-i="${i}"]`);
+  if(hit) hit.parentNode.appendChild(hit);   // raise above neighbours
+  ring.setAttribute('cx',p.x);ring.setAttribute('cy',p.y);ring.setAttribute('r',p.r+5);ring.setAttribute('visibility','visible');
+  const x=leafX[i];
+  const ln=document.getElementById('tree-mark-line');ln.setAttribute('x1',x);ln.setAttribute('x2',x);
+  document.getElementById('tree-mark-dot').setAttribute('cx',x);
+  mark.setAttribute('visibility','visible');
+}
+
+try{boot();}catch(err){
+  document.body.innerHTML=`<p style="padding:24px;font:20px system-ui">Could not load explorer data: ${err.message}</p>`;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Geometry steps: vectors, scaling, addition, projection</title>
+  <style>
+    :root {
+      --paper: #FAF9F5;
+      --text: #334155;
+      --blue: #3E6D8E;
+      --magenta: #B5396B;
+      --green: #3F7A6B;
+      --muted: #64748b;
+      --border: #d4d0c8;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--paper);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", Times, serif;
+      font-size: 18px;
+      line-height: 1.45;
+      overflow-x: hidden;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.25rem 1.25rem 2.5rem;
+    }
+
+    h1 {
+      font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+      font-weight: 700;
+      margin: 0 0 0.35rem;
+      letter-spacing: -0.01em;
+    }
+
+    .lede {
+      margin: 0 0 1.25rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+      align-items: flex-end;
+      margin-bottom: 1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-width: min(100%, 14rem);
+    }
+
+    .field label {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    select, button {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 1rem;
+      color: var(--text);
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.45rem 0.7rem;
+      min-height: 2.5rem;
+    }
+
+    select { cursor: pointer; width: 100%; }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    button {
+      cursor: pointer;
+      background: var(--paper);
+    }
+
+    button:hover:not(:disabled) {
+      border-color: var(--blue);
+    }
+
+    button:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .notation-key {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 0.9rem;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--paper);
+      margin-bottom: 1rem;
+    }
+
+    .notation-key .vec {
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    .notation-key .comp {
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (min-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr minmax(220px, 280px);
+        align-items: start;
+      }
+    }
+
+    .plot-panel {
+      min-width: 0;
+    }
+
+    .svg-frame {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--paper);
+      overflow: hidden;
+    }
+
+    .svg-frame svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      vertical-align: middle;
+    }
+
+    .side {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      min-width: 0;
+    }
+
+    .explain {
+      margin: 0;
+      padding: 0.85rem 1rem;
+      border-left: 3px solid var(--blue);
+      background: rgba(62, 109, 142, 0.06);
+      min-height: 4.5rem;
+    }
+
+    .results {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 0.95rem;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--paper);
+    }
+
+    .results h2 {
+      font-family: Georgia, "Times New Roman", Times, serif;
+      font-size: 0.95rem;
+      margin: 0 0 0.4rem;
+      font-weight: 700;
+    }
+
+    .results p {
+      margin: 0.25rem 0;
+    }
+
+    .step-meta {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .vec {
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    .comp {
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .sub {
+      font-size: 0.75em;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .legend {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 0.88rem;
+      color: var(--text);
+      margin: 0;
+      padding: 0.65rem 0.85rem;
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+      background: rgba(250, 249, 245, 0.8);
+      min-height: 2.5rem;
+    }
+
+    /* SVG text defaults */
+    .svg-label {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 22px;
+      fill: var(--text);
+    }
+
+    .svg-vec {
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    .svg-comp {
+      font-style: italic;
+      font-weight: 400;
+      font-size: 18px;
+    }
+  @media (min-width: 800px) { .svg-frame svg { max-height: calc(100vh - 380px); } }
+  input[type="range"]{background:transparent}
+</style>
+<script>if(new URLSearchParams(location.search).has('embed'))document.documentElement.classList.add('embedded');</script>
+<style>
+html.embedded, .embedded body{font-size:26px}
+.embedded .wrap{padding:0;max-width:none}
+.embedded h1,.embedded .lede,.embedded .notation-key,.embedded .toolbar>.field:first-child,.embedded .side,.embedded .legend{display:none}
+.embedded .toolbar{justify-content:center;margin:0 0 8px;gap:0}
+.embedded .field{min-width:0}.embedded .field label{display:none}
+.embedded button{font-size:26px;padding:8px 12px;min-height:46px}
+.embedded .step-meta{text-align:center;font-size:24px;margin:4px 0 8px}
+.embedded .layout{display:block}.embedded .svg-frame{border:0;background:transparent}
+.embedded .svg-frame svg{height:calc(100vh - 120px);max-height:none;width:100%}
+</style></head>
+<body>
+  <div class="wrap">
+    <h1>Vectors: coordinates and operations</h1>
+    <p class="lede">Toy coordinates on the plane. Choose a scene, then step through the construction.</p>
+
+    <div class="notation-key" aria-label="Notation key">
+      Notation:
+      <span class="vec">x</span>, <span class="vec">y</span>, <span class="vec">w</span> = whole vectors;
+      <span class="comp">x<sub>1</sub></span>, <span class="comp">x<sub>2</sub></span> = scalar components.
+    </div>
+
+    <div class="toolbar">
+      <div class="field">
+        <label for="scene-select">Scene</label>
+        <select id="scene-select">
+          <option value="coordinates">Coordinates</option>
+          <option value="scaling">Scaling</option>
+          <option value="addition">Addition</option>
+          <option value="projection">Projection</option>
+        </select>
+      </div>
+      <div class="field">
+        <label id="step-controls-label">Steps</label>
+        <div class="btn-row" role="group" aria-labelledby="step-controls-label">
+          <button type="button" id="btn-prev">Previous step</button>
+          <button type="button" id="btn-next">Next step</button>
+          <button type="button" id="btn-replay">Replay</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="step-meta" id="step-meta" aria-live="polite">Step 1 of 3</p>
+
+    <div class="layout">
+      <div class="plot-panel">
+        <div class="svg-frame">
+          <svg id="plot" viewBox="0 0 900 530" role="img" aria-labelledby="svg-title svg-desc">
+            <title id="svg-title">Vector geometry plot</title>
+            <desc id="svg-desc">Interactive plot of toy vector geometry on Cartesian axes.</desc>
+            <defs>
+              <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#3E6D8E" />
+              </marker>
+              <marker id="arrow-magenta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#B5396B" />
+              </marker>
+              <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#3F7A6B" />
+              </marker>
+              <marker id="arrow-blue-outline" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="none" stroke="#3E6D8E" stroke-width="1.2" />
+              </marker>
+            </defs>
+            <g id="scene-root"></g>
+          </svg>
+        </div>
+        <p class="legend" id="legend" aria-live="polite"></p>
+      </div>
+
+      <aside class="side">
+        <p class="explain" id="explain" aria-live="polite"></p>
+        <div class="results" id="results" aria-live="polite">
+          <h2>Exact values</h2>
+          <div id="results-body"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+(function () {
+  "use strict";
+
+  const COLORS = {
+    text: "#334155",
+    blue: "#3E6D8E",
+    magenta: "#B5396B",
+    green: "#3F7A6B",
+    guide: "#64748B",
+  };
+
+  const VB = { w: 650, h: 530 };
+  const ORIGIN = { x: 90, y: 440 };
+  const UNIT = 65; // equal x/y scaling (SVG units per toy unit)
+
+  const reduceMotion = () =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const durationMs = () => (reduceMotion() ? 0 : 500);
+
+  // --- SVG helpers ---
+  const NS = "http://www.w3.org/2000/svg";
+
+  function el(name, attrs, parent) {
+    const node = document.createElementNS(NS, name);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        if (attrs[k] !== null && attrs[k] !== undefined) {
+          node.setAttribute(k, String(attrs[k]));
+        }
+      });
+    }
+    if (parent) parent.appendChild(node);
+    return node;
+  }
+
+  function toSvg(tx, ty) {
+    return {
+      x: ORIGIN.x + tx * UNIT,
+      y: ORIGIN.y - ty * UNIT,
+    };
+  }
+
+  function vecHTML(name) {
+    return '<span class="vec">' + name + "</span>";
+  }
+
+  function compHTML(base, sub) {
+    return '<span class="comp">' + base + "<sub>" + sub + "</sub></span>";
+  }
+
+  // --- Animation manager ---
+  let animToken = 0;
+  const running = new Set();
+
+  function cancelAnimations() {
+    animToken += 1;
+    running.forEach(function (cancel) { cancel(); });
+    running.clear();
+  }
+
+  function animateProp(obj, prop, from, to, ms, onUpdate) {
+    return new Promise(function (resolve) {
+      const token = animToken;
+      if (ms <= 0 || from === to) {
+        obj[prop] = to;
+        if (onUpdate) onUpdate(to);
+        resolve();
+        return;
+      }
+      const t0 = performance.now();
+      let raf = 0;
+      function frame(now) {
+        if (token !== animToken) {
+          resolve();
+          return;
+        }
+        const t = Math.min(1, (now - t0) / ms);
+        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        const v = from + (to - from) * eased;
+        obj[prop] = v;
+        if (onUpdate) onUpdate(v);
+        if (t < 1) {
+          raf = requestAnimationFrame(frame);
+        } else {
+          running.delete(cancel);
+          resolve();
+        }
+      }
+      function cancel() {
+        if (raf) cancelAnimationFrame(raf);
+      }
+      running.add(cancel);
+      raf = requestAnimationFrame(frame);
+    });
+  }
+
+  function animatePoint(pt, toX, toY, ms, onUpdate) {
+    const fromX = pt.x;
+    const fromY = pt.y;
+    const token = animToken;
+    return new Promise(function (resolve) {
+      if (ms <= 0) {
+        pt.x = toX;
+        pt.y = toY;
+        if (onUpdate) onUpdate(pt);
+        resolve();
+        return;
+      }
+      const t0 = performance.now();
+      let raf = 0;
+      function frame(now) {
+        if (token !== animToken) {
+          resolve();
+          return;
+        }
+        const t = Math.min(1, (now - t0) / ms);
+        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        pt.x = fromX + (toX - fromX) * eased;
+        pt.y = fromY + (toY - fromY) * eased;
+        if (onUpdate) onUpdate(pt);
+        if (t < 1) {
+          raf = requestAnimationFrame(frame);
+        } else {
+          running.delete(cancel);
+          resolve();
+        }
+      }
+      function cancel() {
+        if (raf) cancelAnimationFrame(raf);
+      }
+      running.add(cancel);
+      raf = requestAnimationFrame(frame);
+    });
+  }
+
+  // --- Axes ---
+  function drawAxes(g, maxX, maxY) {
+    maxX=7; maxY=4; // Fixed limits and equal scales across the worked examples.
+    const xEnd = toSvg(maxX + 0.45, 0);
+    const yEnd = toSvg(0, maxY + 0.45);
+    const xStart = toSvg(-0.35, 0);
+    const yStart = toSvg(0, -0.35);
+
+    el("line", {
+      x1: xStart.x, y1: ORIGIN.y, x2: xEnd.x - 8, y2: ORIGIN.y,
+      stroke: COLORS.text, "stroke-width": 1.75,
+    }, g);
+    el("polygon", {
+      points: xEnd.x + "," + ORIGIN.y + " " + (xEnd.x - 10) + "," + (ORIGIN.y - 4) + " " + (xEnd.x - 10) + "," + (ORIGIN.y + 4),
+      fill: COLORS.text,
+    }, g);
+    el("line", {
+      x1: ORIGIN.x, y1: yStart.y, x2: ORIGIN.x, y2: yEnd.y + 8,
+      stroke: COLORS.text, "stroke-width": 1.75,
+    }, g);
+    el("polygon", {
+      points: ORIGIN.x + "," + yEnd.y + " " + (ORIGIN.x - 4) + "," + (yEnd.y + 10) + " " + (ORIGIN.x + 4) + "," + (yEnd.y + 10),
+      fill: COLORS.text,
+    }, g);
+
+    for (const i of [1]) {
+      const p = toSvg(i, 0);
+      el("line", {
+        x1: p.x, y1: ORIGIN.y - 5, x2: p.x, y2: ORIGIN.y + 5,
+        stroke: COLORS.text, "stroke-width": 1.25,
+      }, g);
+      el("text", {
+        x: p.x, y: ORIGIN.y + 24,
+        class: "svg-label", "text-anchor": "middle", "font-size": "18",
+        fill: COLORS.text,
+      }, g).textContent = String(i);
+    }
+    for (const j of [1]) {
+      const p = toSvg(0, j);
+      el("line", {
+        x1: ORIGIN.x - 5, y1: p.y, x2: ORIGIN.x + 5, y2: p.y,
+        stroke: COLORS.text, "stroke-width": 1.25,
+      }, g);
+      el("text", {
+        x: ORIGIN.x - 14, y: p.y + 6,
+        class: "svg-label", "text-anchor": "end", "font-size": "18",
+        fill: COLORS.text,
+      }, g).textContent = String(j);
+    }
+
+    el("text", {
+      x: xEnd.x - 4, y: ORIGIN.y + 28,
+      class: "svg-label", "font-size": "22", fill: COLORS.text,
+      "font-style": "italic", "font-weight": "400",
+    }, g).textContent = "x₁";
+
+    el("text", {
+      x: ORIGIN.x + 12, y: yEnd.y + 8,
+      class: "svg-label", "font-size": "22", fill: COLORS.text,
+      "font-style": "italic", "font-weight": "400",
+    }, g).textContent = "x₂";
+
+    el("circle", {
+      cx: ORIGIN.x, cy: ORIGIN.y, r: 3.5, fill: COLORS.text,
+    }, g);
+  }
+
+  function drawVector(g, x0, y0, x1, y1, color, markerId, opts) {
+    opts = opts || {};
+    const a = toSvg(x0, y0);
+    const b = toSvg(x1, y1);
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const len = Math.hypot(dx, dy) || 1;
+    // shorten so arrowhead sits at endpoint visually
+    const shorten = opts.shorten != null ? opts.shorten : 0;
+    const bx = b.x - (dx / len) * shorten;
+    const by = b.y - (dy / len) * shorten;
+    const line = el("line", {
+      x1: a.x, y1: a.y, x2: bx, y2: by,
+      stroke: color,
+      "stroke-width": opts.width || 2.75,
+      "stroke-dasharray": opts.dash || null,
+      "marker-end": markerId ? "url(#" + markerId + ")" : null,
+      opacity: opts.opacity != null ? opts.opacity : 1,
+    }, g);
+    return line;
+  }
+
+  function drawPoint(g, tx, ty, color, r) {
+    const p = toSvg(tx, ty);
+    return el("circle", {
+      cx: p.x, cy: p.y, r: r || 5, fill: color,
+    }, g);
+  }
+
+  function labelAt(g, tx, ty, ox, oy, htmlLike, color) {
+    // htmlLike is plain text or we use tspans; here we pass a builder
+    const p = toSvg(tx, ty);
+    const text = el("text", {
+      x: p.x + ox, y: p.y + oy,
+      class: "svg-label",
+      fill: color || COLORS.text,
+      "font-size": "22",
+    }, g);
+    return text;
+  }
+
+  function addVecTspan(textEl, name, color) {
+    const t = el("tspan", {
+      class: "svg-vec",
+      "font-weight": "700",
+      "font-style": "normal",
+      fill: color || null,
+    }, textEl);
+    t.textContent = name;
+    return t;
+  }
+
+  // --- Scene definitions ---
+  const scenes = {
+    coordinates: {
+      id: "coordinates",
+      title: "Coordinates",
+      steps: [
+        {
+          explain: "Read the two scalar components of " + vecHTML("x") + " from the two bars: " + compHTML("x", "1") + " = 3 and " + compHTML("x", "2") + " = 1.",
+          legend: "Component bars measure each scalar separately before forming the point.",
+        },
+        {
+          explain: "Convert the pair (" + compHTML("x", "1") + ", " + compHTML("x", "2") + ") into a single point in the plane using dashed guides.",
+          legend: "Dashed guides meet at the coordinate point (3, 1).",
+        },
+        {
+          explain: "Draw the vector " + vecHTML("x") + " from the origin to that same point.",
+          legend: vecHTML("x") + " = (3, 1) from the origin to the point.",
+        },
+      ],
+      results: function () {
+        return (
+          "<p>" + vecHTML("x") + " = (3, 1)</p>" +
+          "<p>" + compHTML("x", "1") + " = 3, " + compHTML("x", "2") + " = 1</p>"
+        );
+      },
+    },
+    scaling: {
+      id: "scaling",
+      title: "Scaling",
+      steps: [
+        {
+          explain: "Start with " + vecHTML("x") + " = (3, 1).",
+          legend: "Reference vector along its ray.",
+        },
+        {
+          explain: "Scale by 2: the tip moves along the same ray from " + vecHTML("x") + " to 2" + vecHTML("x") + ".",
+          legend: "Endpoint travels along the ray; original " + vecHTML("x") + " stays for reference.",
+        },
+        {
+          explain: "Result: 2" + vecHTML("x") + " = (6, 2), twice as long, same direction.",
+          legend: "Outlined shorter arrow is the original " + vecHTML("x") + ".",
+        },
+      ],
+      results: function () {
+        return (
+          "<p>" + vecHTML("x") + " = (3, 1)</p>" +
+          "<p>2" + vecHTML("x") + " = (6, 2)</p>"
+        );
+      },
+    },
+    addition: {
+      id: "addition",
+      title: "Addition",
+      steps: [
+        {
+          explain: "Place " + vecHTML("x") + " = (3, 1) and " + vecHTML("y") + " = (1, 3) from the origin.",
+          legend: "Both vectors drawn from the origin.",
+        },
+        {
+          explain: "Translate a copy of " + vecHTML("y") + " so it starts at the tip of " + vecHTML("x") + ", without changing its direction or length.",
+          legend: "Dashed magenta " + vecHTML("y") + "′ is the translated copy of " + vecHTML("y") + ".",
+        },
+        {
+          explain: "The tip of the translated " + vecHTML("y") + " is the sum " + vecHTML("x") + " + " + vecHTML("y") + " = (4, 4).",
+          legend: "Green arrow shows the resultant from the origin.",
+        },
+        {
+          explain: "The mean point is halfway: ((" + vecHTML("x") + " + " + vecHTML("y") + ") / 2) = (2, 2).",
+          legend: "The mean is halfway from the origin to the sum.",
+        },
+      ],
+      results: function (step) {
+        let html =
+          "<p>" + vecHTML("x") + " = (3, 1)</p>" +
+          "<p>" + vecHTML("y") + " = (1, 3)</p>";
+        if (step >= 2) {
+          html += "<p>" + vecHTML("x") + " + " + vecHTML("y") + " = (4, 4)</p>";
+        }
+        if (step >= 3) {
+          html += "<p>mean = (2, 2)</p>";
+        }
+        return html;
+      },
+    },
+    projection: {
+      id: "projection",
+      title: "Projection",
+      steps: [
+        {
+          explain: "Draw " + vecHTML("x") + " = (3, 1) and the unit direction " + vecHTML("w") + " = (1, 1)/√2 ≈ (0.707, 0.707).",
+          legend: vecHTML("w") + " is true unit length; dashed line continues toward (3, 3).",
+        },
+        {
+          explain: "Drop a perpendicular from the tip of " + vecHTML("x") + " onto the line of " + vecHTML("w") + ", landing at " + vecHTML("p") + " = (2, 2).",
+          legend: "Dashed drop is orthogonal to the " + vecHTML("w") + "-line.",
+        },
+        {
+          explain: "The projected vector is " + vecHTML("p") + " = (" + vecHTML("w") + "<sup>T</sup>" + vecHTML("x") + ")" + vecHTML("w") + ", with scalar score " + vecHTML("w") + "<sup>T</sup>" + vecHTML("x") + " = 2√2.",
+          legend: "Exact score 2√2 ≈ 2.828; " + vecHTML("p") + " = (2, 2).",
+        },
+      ],
+      results: function (step) {
+        let html =
+          "<p>" + vecHTML("x") + " = (3, 1)</p>" +
+          "<p>" + vecHTML("w") + " = (1, 1)/√2</p>";
+        if (step >= 1) {
+          html += "<p>" + vecHTML("p") + " = (2, 2)</p>";
+        }
+        if (step >= 2) {
+          html += "<p>" + vecHTML("w") + "<sup>T</sup>" + vecHTML("x") + " = 2√2</p>";
+          html += "<p>" + vecHTML("p") + " = (" + vecHTML("w") + "<sup>T</sup>" + vecHTML("x") + ")" + vecHTML("w") + "</p>";
+        }
+        return html;
+      },
+    },
+  };
+
+
+  Object.assign(scenes, {
+    difference: {title:'Difference', steps:[
+      {explain:'Start with '+vecHTML('x')+' = (3, 1) and '+vecHTML('y')+' = (1, 3).',legend:'The same two vectors used for addition.'},
+      {explain:vecHTML('y')+' − '+vecHTML('x')+' = (−2, 2) moves from the tip of '+vecHTML('x')+' to the tip of '+vecHTML('y')+'.',legend:'Subtract corresponding components; the displacement starts at x.'}
+    ],results:()=>'<p>'+vecHTML('y')+' − '+vecHTML('x')+' = (−2, 2)</p>'},
+    dot_product: {title:'Dot product', steps:[
+      {explain:vecHTML('x')+' = (3, 1); '+vecHTML('w')+' = (1, 1).',legend:'w is not yet a unit vector.'},
+      {explain:vecHTML('w')+'ᵀ'+vecHTML('x')+' = 1 × 3 + 1 × 1 = 4.',legend:'φ is the angle between the two vectors; the next example normalizes w.'}
+    ],results:()=>'<p>'+vecHTML('w')+'ᵀ'+vecHTML('x')+' = 4</p>'},
+    euclidean: {title:'Euclidean distance',steps:[
+      {explain:'A = (3, 1) and B = (1, 3).',legend:'The same endpoints used for the vector difference.'},
+      {explain:'The horizontal and vertical differences have magnitude 2.',legend:'Dashed legs are coordinate differences.'},
+      {explain:'The straight-line distance is √(2² + 2²) = √8.',legend:'The segment length equals the norm of the difference vector.'}
+    ],results:()=>'<p>d(A, B) = √8 ≈ 2.828</p>'}
+  });
+  for(const id of ['difference','dot_product','euclidean']){
+    const option=document.createElement('option');option.value=id;option.textContent=scenes[id].title;document.getElementById('scene-select').append(option);
+  }
+
+  // --- Render state ---
+  const root = document.getElementById("scene-root");
+  const select = document.getElementById("scene-select");
+  const btnPrev = document.getElementById("btn-prev");
+  const btnNext = document.getElementById("btn-next");
+  const btnReplay = document.getElementById("btn-replay");
+  const explainEl = document.getElementById("explain");
+  const legendEl = document.getElementById("legend");
+  const resultsBody = document.getElementById("results-body");
+  const stepMeta = document.getElementById("step-meta");
+  const svgTitle = document.getElementById("svg-title");
+  const svgDesc = document.getElementById("svg-desc");
+
+  let sceneId = "coordinates";
+  let step = 0;
+  let busy = false;
+
+  // Mutable geometry state per scene (for animation)
+  const geo = {
+    reveal: 0,
+    // coordinates
+    bar1: 0,
+    bar2: 0,
+    guideX: 0,
+    guideY: 0,
+    vecT: 0,
+    // scaling
+    scale: 1,
+    // addition
+    yOrigin: { x: 1, y: 3 }, // start of y (or translated copy)
+    showSum: 0,
+    showMean: 0,
+    hideOriginY: false,
+    // projection
+    showDrop: 0,
+    showP: 0,
+  };
+
+  function clearRoot() {
+    while (root.firstChild) root.removeChild(root.firstChild);
+  }
+
+  function setBusy(v) {
+    busy = v;
+    updateButtons();
+  }
+
+  function updateButtons() {
+    const n = scenes[sceneId].steps.length;
+    btnPrev.disabled = busy || step <= 0;
+    btnNext.disabled = busy || step >= n - 1;
+    btnReplay.disabled = busy;
+    select.disabled = false;
+  }
+
+  function updateChrome() {
+    const sc = scenes[sceneId];
+    const n = sc.steps.length;
+    const st = sc.steps[step];
+    stepMeta.textContent = "Step " + (step + 1) + " of " + n + " — " + sc.title;
+    explainEl.innerHTML = st.explain;
+    legendEl.innerHTML = st.legend;
+    resultsBody.innerHTML = sc.results(step);
+    svgTitle.textContent = sc.title + " geometry plot";
+    svgDesc.textContent =
+      "Step " + (step + 1) + " of " + n + ". " +
+      explainEl.textContent;
+    updateButtons();
+  }
+
+  // --- Scene painters (static snapshot of geo) ---
+  function paintCoordinates() {
+    clearRoot();
+    const g = el("g", {}, root);
+    if (geo.bar1 > .001 || geo.bar2 > .001) {
+      for (const [i,value,name] of [[0,geo.bar1,"x₁ = 3"],[1,geo.bar2,"x₂ = 1"]]) {
+        const bx=130+i*190;
+        el("rect",{x:bx,y:390-value*75,width:65,height:value*75,fill:COLORS.blue},g);
+        el("text",{x:bx+32,y:430,"text-anchor":"middle",class:"svg-label","font-style":"italic"},g).textContent=name;
+      }
+    }
+    if (geo.guideX > .001 || geo.vecT > .001) drawAxes(g,4,3);
+
+    // guides
+    if (geo.guideX > 0.001 || geo.guideY > 0.001) {
+      const px = toSvg(geo.guideX, 0);
+      const py = toSvg(0, geo.guideY);
+      const pt = toSvg(geo.guideX, geo.guideY);
+      el("line", {
+        x1: px.x, y1: px.y, x2: pt.x, y2: pt.y,
+        stroke: COLORS.guide, "stroke-width": 1.5, "stroke-dasharray": "6 5",
+      }, g);
+      el("line", {
+        x1: py.x, y1: py.y, x2: pt.x, y2: pt.y,
+        stroke: COLORS.guide, "stroke-width": 1.5, "stroke-dasharray": "6 5",
+      }, g);
+      if (geo.guideX > 2.5 && geo.vecT < 0.95) {
+        drawPoint(g, 3, 1, COLORS.blue, 5);
+        const lab = labelAt(g, 3, 1, 14, -14, null, COLORS.blue);
+        lab.textContent = "(3, 1)";
+      }
+    }
+
+    // vector
+    if (geo.vecT > 0.001) {
+      const tx = 3 * geo.vecT;
+      const ty = 1 * geo.vecT;
+      drawVector(g, 0, 0, tx, ty, COLORS.blue, "arrow-blue");
+      if (geo.vecT > 0.95) {
+        drawPoint(g, 3, 1, COLORS.blue, 5);
+        const lab = labelAt(g, 3, 1, 16, -18, null, COLORS.blue);
+        addVecTspan(lab, "x", COLORS.blue);
+        el("tspan", {"font-weight":"400"}, lab).textContent=" = (3, 1)";
+      }
+    }
+  }
+
+  function paintScaling() {
+    clearRoot();
+    const g = el("g", {}, root);
+    drawAxes(g, 7, 3);
+
+    const sx = 3 * geo.scale;
+    const sy = 1 * geo.scale;
+    const showRef = geo.scale > 1.02;
+
+    if (!showRef) {
+      drawVector(g, 0, 0, 3, 1, COLORS.blue, "arrow-blue");
+      drawPoint(g, 3, 1, COLORS.blue, 5);
+      const lab = labelAt(g, 3, 1, 14, -16, null, COLORS.blue);
+      addVecTspan(lab, "x", COLORS.blue);
+      return;
+    }
+
+    drawVector(g, 0, 0, sx, sy, COLORS.green, "arrow-green", { width: 3 });
+    // Original vector retains its true endpoint at (3,1).
+    const refEnd = 1;
+    drawVector(g, 0, 0, 3 * refEnd, 1 * refEnd, COLORS.blue, "arrow-blue-outline", {
+      width: 2.2,
+      shorten: 0,
+    });
+    const tip = toSvg(3, 1);
+    el("circle", {
+      cx: tip.x, cy: tip.y, r: 5,
+      fill: "#fff", stroke: COLORS.blue, "stroke-width": 2,
+    }, g);
+    const lab = labelAt(g, 3, 1, -30, -14, null, COLORS.blue);
+    addVecTspan(lab, "x", COLORS.blue);
+
+    drawPoint(g, sx, sy, COLORS.green, 5);
+    const lab2 = labelAt(g, sx, sy, 14, -14, null, COLORS.green);
+    el("tspan", { "font-weight": "400", fill: COLORS.green }, lab2).textContent = "2";
+    addVecTspan(lab2, "x", COLORS.green);
+  }
+
+  function paintAddition() {
+    clearRoot();
+    const g = el("g", {}, root);
+    drawAxes(g, 5, 5);
+
+    // x always
+    drawVector(g, 0, 0, 3, 1, COLORS.blue, "arrow-blue");
+    drawPoint(g, 3, 1, COLORS.blue, 5);
+    const labx = labelAt(g, 3, 1, 12, 22, null, COLORS.blue);
+    addVecTspan(labx, "x", COLORS.blue);
+
+    // origin y (if visible)
+    if (!geo.hideOriginY) {
+      drawVector(g, 0, 0, 1, 3, COLORS.magenta, "arrow-magenta");
+      drawPoint(g, 1, 3, COLORS.magenta, 5);
+      const laby = labelAt(g, 1, 3, -28, -12, null, COLORS.magenta);
+      addVecTspan(laby, "y", COLORS.magenta);
+    }
+
+    // translated y: from geo.yOrigin to geo.yOrigin+(1,3)
+    const yx = geo.yOrigin.x;
+    const yy = geo.yOrigin.y;
+    const tipX = yx + 1;
+    const tipY = yy + 3;
+    const showTranslated = step >= 1 || yx > 0.02 || yy > 0.02;
+    if (showTranslated) {
+      drawVector(g, yx, yy, tipX, tipY, COLORS.magenta, "arrow-magenta", {
+        dash: "7 5",
+        width: 2.5,
+      });
+      drawPoint(g, tipX, tipY, COLORS.magenta, 5);
+      // Label above the tip, away from the sum diagonal
+      const labyt = labelAt(g, tipX, tipY, 10, -16, null, COLORS.magenta);
+      addVecTspan(labyt, "y", COLORS.magenta);
+      el("tspan", {
+        "font-size": "16", "font-weight": "400", fill: COLORS.magenta,
+      }, labyt).textContent = "′";
+    }
+
+    if (geo.showSum > 0.01) {
+      const sx = 4 * geo.showSum;
+      const sy = 4 * geo.showSum;
+      drawVector(g, 0, 0, sx, sy, COLORS.green, "arrow-green", { width: 3 });
+      if (geo.showSum > 0.95) {
+        drawPoint(g, 4, 4, COLORS.green, 5);
+        const labs = labelAt(g, 4, 4, 14, 8, null, COLORS.green);
+        addVecTspan(labs, "x", COLORS.green);
+        el("tspan", { fill: COLORS.green, "font-weight": "700" }, labs).textContent = "+";
+        addVecTspan(labs, "y", COLORS.green);
+      }
+    }
+
+    if (geo.showMean > 0.5) {
+      drawPoint(g, 2, 2, COLORS.green, 5);
+      const labm = labelAt(g, .15, 4.7, 0, 0, null, COLORS.green);
+      labm.textContent = "mean (2, 2)";
+    }
+  }
+
+  function paintProjection() {
+    clearRoot();
+    const g = el("g", {}, root);
+    drawAxes(g, 7, 4);
+
+    const wLen = Math.SQRT1_2; // 1/sqrt(2)
+
+    // dashed continuation of w direction to (3,3)
+    const o = toSvg(0, 0);
+    const far = toSvg(3, 3);
+    el("line", {
+      x1: o.x, y1: o.y, x2: far.x, y2: far.y,
+      stroke: COLORS.guide, "stroke-width": 1.5, "stroke-dasharray": "6 5",
+    }, g);
+
+    // unit w at true length
+    drawVector(g, 0, 0, wLen, wLen, COLORS.magenta, "arrow-magenta");
+    // w label above-left
+    const labw = labelAt(g, wLen, wLen, -25, -18, null, COLORS.magenta);
+    addVecTspan(labw, "w", COLORS.magenta);
+
+    // x
+    drawVector(g, 0, 0, 3, 1, COLORS.blue, "arrow-blue");
+    const labx = labelAt(g, 3, 1, 14, 20, null, COLORS.blue);
+    addVecTspan(labx, "x", COLORS.blue);
+
+    // perpendicular drop
+    if (geo.showDrop > 0.01) {
+      const xTip = toSvg(3, 1);
+      const pPt = toSvg(2, 2);
+      // interpolate drop visibility by shortening from x toward p
+      const dx = pPt.x - xTip.x;
+      const dy = pPt.y - xTip.y;
+      el("line", {
+        x1: xTip.x, y1: xTip.y,
+        x2: xTip.x + dx * geo.showDrop,
+        y2: xTip.y + dy * geo.showDrop,
+        stroke: COLORS.guide, "stroke-width": 1.75, "stroke-dasharray": "5 4",
+      }, g);
+
+      // optional right-angle marker at p when fully shown
+      if (geo.showDrop > 0.95) {
+        // direction along w: (1,1), perpendicular toward x: from p to x is (1,-1)
+        const s = 12;
+        const corner = toSvg(2, 2);
+        // along w toward origin-ish: direction (-1,-1) in screen... in toy: left-down along line is toward origin (-1,-1) toy = screen left+down
+        const along = { x: -s / Math.SQRT2, y: s / Math.SQRT2 }; // screen delta for toy (-1,-1)? toy (-ε,-ε) -> svg (-εU, +εU)
+        // toy step along -w: (-a,-a) -> svg delta (-aU, +aU)
+        // toy step along (x-p)=(1,-1) -> svg (+U, +U)
+        const a = 11;
+        const p1 = { x: corner.x - a, y: corner.y + a }; // toward origin along w-line
+        const p2 = { x: p1.x + a, y: p1.y + a }; // then toward x direction
+        const p3 = { x: corner.x + a, y: corner.y + a };
+        el("polyline", {
+          points: p1.x + "," + p1.y + " " + p2.x + "," + p2.y + " " + p3.x + "," + p3.y,
+          fill: "none", stroke: COLORS.text, "stroke-width": 1.25,
+        }, g);
+      }
+    }
+
+    if (geo.showP > 0.01) {
+      const px = 2 * geo.showP;
+      const py = 2 * geo.showP;
+      drawVector(g, 0, 0, px, py, COLORS.green, "arrow-green", { width: 3 });
+      if (geo.showP > 0.95) {
+
+        const labp = labelAt(g, 2, 2, -28, -18, null, COLORS.green);
+        addVecTspan(labp, "p", COLORS.green);
+      }
+      drawVector(g, 0, 0, wLen, wLen, COLORS.magenta, "arrow-magenta");
+      }
+  }
+
+
+  function paintRelated(){
+    clearRoot();const g=el('g',{},root);drawAxes(g,7,4);
+    if(sceneId==='difference'){
+      drawVector(g,0,0,3,1,COLORS.blue,'arrow-blue');drawVector(g,0,0,1,3,COLORS.magenta,'arrow-magenta');
+      addVecTspan(labelAt(g,3,1,14,20), 'x',COLORS.blue);
+      addVecTspan(labelAt(g,1,3,-22,-18), 'y',COLORS.magenta);
+      if(step>=1){drawVector(g,3,1,3-2*geo.reveal,1+2*geo.reveal,COLORS.green,'arrow-green');
+        const label=labelAt(g,2,2,28,0);addVecTspan(label,'y',COLORS.green);el('tspan',{},label).textContent=' − ';addVecTspan(label,'x',COLORS.green);}
+    }else if(sceneId==='dot_product'){
+      drawVector(g,0,0,3,1,COLORS.blue,'arrow-blue');drawVector(g,0,0,1,1,COLORS.magenta,'arrow-magenta');
+      addVecTspan(labelAt(g,3,1,14,20),'x',COLORS.blue);addVecTspan(labelAt(g,1,1,-25,-18),'w',COLORS.magenta);
+      if(step>=1){const a=Math.atan2(1,3),b=Math.PI/4,r=.65*UNIT;const p=[ORIGIN.x+r*Math.cos(a),ORIGIN.y-r*Math.sin(a)],q=[ORIGIN.x+r*Math.cos(b),ORIGIN.y-r*Math.sin(b)];
+        el('path',{d:`M${p} A${r},${r} 0 0 0 ${q}`,fill:'none',stroke:COLORS.text,'stroke-width':1.5,opacity:geo.reveal},g);
+        labelAt(g,1.22,.64,0,0).textContent='φ';}
+    }else{
+      drawPoint(g,3,1,COLORS.blue,5);drawPoint(g,1,3,COLORS.magenta,5);
+      labelAt(g,3,1,14,20).textContent='A';labelAt(g,1,3,-22,-18).textContent='B';
+      if(step>=1){const a=toSvg(3,1),b=toSvg(3,3),c=toSvg(1,3);el('polyline',{points:`${a.x},${a.y} ${b.x},${b.y} ${c.x},${c.y}`,fill:'none',stroke:COLORS.guide,'stroke-width':1.5,'stroke-dasharray':'6 5'},g);labelAt(g,3,2,14,0).textContent='2';labelAt(g,2,3,0,-16).textContent='2';}
+      if(step>=2){const a=toSvg(3,1),b=toSvg(3-2*geo.reveal,1+2*geo.reveal);el('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:COLORS.blue,'stroke-width':3},g);labelAt(g,1.4,1.5,-12,18).textContent='√8';}
+    }
+  }
+
+  function paint() {
+    document.getElementById("plot").setAttribute("viewBox", "0 0 650 530");
+    if (sceneId === "coordinates") paintCoordinates();
+    else if (sceneId === "scaling") paintScaling();
+    else if (sceneId === "addition") paintAddition();
+    else if (sceneId === "projection") paintProjection();
+    else paintRelated();
+  }
+
+  function resetGeoInstant() {
+    geo.reveal=0;
+    geo.bar1 = 0;
+    geo.bar2 = 0;
+    geo.guideX = 0;
+    geo.guideY = 0;
+    geo.vecT = 0;
+    geo.scale = 1;
+    geo.yOrigin = { x: 0, y: 0 };
+    geo.showSum = 0;
+    geo.showMean = 0;
+    geo.hideOriginY = false;
+    geo.showDrop = 0;
+    geo.showP = 0;
+  }
+
+  // Apply target state for a step without animation (for scrubbing backward)
+  function applyStepState(targetStep) {
+    resetGeoInstant();
+    geo.reveal=targetStep>0?1:0;
+    if (sceneId === "coordinates") {
+      if (targetStep >= 0) { geo.bar1 = 3; geo.bar2 = 1; }
+      if (targetStep >= 1) { geo.guideX = 3; geo.guideY = 1; geo.bar1 = 0; geo.bar2 = 0; }
+      if (targetStep >= 2) { geo.vecT = 1; geo.guideX = 3; geo.guideY = 1; }
+    } else if (sceneId === "scaling") {
+      geo.scale = targetStep === 0 ? 1 : 2;
+    } else if (sceneId === "addition") {
+      if (targetStep === 0) {
+        geo.yOrigin = { x: 0, y: 0 };
+        geo.hideOriginY = false;
+      } else if (targetStep === 1) {
+        geo.yOrigin = { x: 3, y: 1 };
+        geo.hideOriginY = true;
+      } else if (targetStep === 2) {
+        geo.yOrigin = { x: 3, y: 1 };
+        geo.hideOriginY = true;
+        geo.showSum = 1;
+      } else {
+        geo.yOrigin = { x: 3, y: 1 };
+        geo.hideOriginY = true;
+        geo.showSum = 1;
+        geo.showMean = 1;
+      }
+    } else if (sceneId === "projection") {
+      if (targetStep >= 1) geo.showDrop = 1;
+      if (targetStep >= 2) { geo.showDrop = 1; geo.showP = 1; }
+    }
+  }
+
+  async function animateToStep(fromStep, toStep) {
+    const transitionToken = animToken;
+    const ms = durationMs();
+    setBusy(true);
+
+    if (sceneId === "coordinates") {
+      if (toStep === 0) {
+        applyStepState(-1);
+        paint();
+        geo.bar1 = 0; geo.bar2 = 0;
+        await Promise.all([
+          animateProp(geo, "bar1", 0, 3, ms, paint),
+          animateProp(geo, "bar2", 0, 1, ms, paint),
+        ]);
+      } else if (toStep === 1 && fromStep < toStep) {
+        // fade bars by zeroing while growing guides
+        await Promise.all([
+          animateProp(geo, "bar1", geo.bar1, 0, ms, paint),
+          animateProp(geo, "bar2", geo.bar2, 0, ms, paint),
+          animateProp(geo, "guideX", 0, 3, ms, paint),
+          animateProp(geo, "guideY", 0, 1, ms, paint),
+        ]);
+      } else if (toStep === 2 && fromStep < toStep) {
+        geo.guideX = 3; geo.guideY = 1;
+        await animateProp(geo, "vecT", 0, 1, ms, paint);
+      } else {
+        applyStepState(toStep);
+        paint();
+      }
+    } else if (sceneId === "scaling") {
+      if (toStep > fromStep) {
+        const from = fromStep === 0 ? 1 : geo.scale;
+        await animateProp(geo, "scale", from, 2, ms, paint);
+      } else {
+        applyStepState(toStep);
+        paint();
+      }
+    } else if (sceneId === "addition") {
+      if (toStep === 1 && fromStep === 0) {
+        geo.hideOriginY = false;
+        geo.yOrigin = { x: 0, y: 0 };
+        paint();
+        await animatePoint(geo.yOrigin, 3, 1, ms, function () {
+          // keep origin y visible until near end
+          if (geo.yOrigin.x > 2.5) geo.hideOriginY = true;
+          paint();
+        });
+        if (transitionToken !== animToken) return;
+        geo.hideOriginY = true;
+        paint();
+      } else if (toStep === 2 && fromStep < toStep) {
+        geo.yOrigin = { x: 3, y: 1 };
+        geo.hideOriginY = true;
+        await animateProp(geo, "showSum", 0, 1, ms, paint);
+      } else if (toStep === 3 && fromStep < toStep) {
+        geo.showSum = 1;
+        await animateProp(geo, "showMean", 0, 1, ms, paint);
+      } else {
+        applyStepState(toStep);
+        paint();
+      }
+    } else if (sceneId === "projection") {
+      if (toStep === 1 && fromStep < toStep) {
+        await animateProp(geo, "showDrop", 0, 1, ms, paint);
+      } else if (toStep === 2 && fromStep < toStep) {
+        geo.showDrop = 1;
+        await animateProp(geo, "showP", 0, 1, ms, paint);
+      } else {
+        applyStepState(toStep);
+        paint();
+      }
+    }
+
+    if (["difference","dot_product","euclidean"].includes(sceneId)) {
+      await animateProp(geo,"reveal",0,1,ms,paint);
+    }
+    if (transitionToken === animToken) setBusy(false);
+  }
+
+  async function goToStep(newStep, opts) {
+    opts = opts || {};
+    const sc = scenes[sceneId];
+    newStep = Math.max(0, Math.min(sc.steps.length - 1, newStep));
+    const from = step;
+    cancelAnimations();
+    setBusy(false);
+
+    if (opts.instant || newStep < from || reduceMotion()) {
+      step = newStep;
+      applyStepState(step);
+      paint();
+      updateChrome();
+      return;
+    }
+
+    if (newStep === from && opts.replay) {
+      // replay current step animation from previous state
+      const prev = Math.max(0, from - 1);
+      applyStepState(from === 0 ? -1 : prev);
+      if (from === 0) {
+        // special: reset to empty then animate into step 0
+        if (sceneId === "coordinates") {
+          resetGeoInstant();
+        } else {
+          applyStepState(-1);
+          // for non-coord, step 0 baseline
+          if (sceneId === "scaling") geo.scale = 1;
+          if (sceneId === "addition") {
+            geo.yOrigin = { x: 0, y: 0 };
+            geo.hideOriginY = false;
+          }
+          if (sceneId === "projection") {
+            geo.showDrop = 0;
+            geo.showP = 0;
+          }
+        }
+      }
+      paint();
+      step = newStep;
+      updateChrome();
+      await animateToStep(from === 0 ? -1 : prev, newStep);
+      return;
+    }
+
+    if (newStep === from) {
+      updateChrome();
+      return;
+    }
+
+    // When jumping forward by more than 1, instant-fill intermediate then animate last
+    if (newStep > from + 1) {
+      applyStepState(newStep - 1);
+      paint();
+      step = newStep;
+      updateChrome();
+      await animateToStep(newStep - 1, newStep);
+      return;
+    }
+
+    step = newStep;
+    updateChrome();
+    await animateToStep(from, newStep);
+  }
+
+  function loadScene(id, stepIndex) {
+    cancelAnimations();
+    if (!scenes[id]) id = "coordinates";
+    sceneId = id;
+    select.value = id;
+    step = 0;
+    resetGeoInstant();
+    applyStepState(0);
+    setBusy(false);
+    applyStepState(stepIndex || 0);
+    step = stepIndex || 0;
+    paint();
+    updateChrome();
+    const hash = "#" + id;
+    if (location.hash !== hash) {
+      history.replaceState(null, "", hash);
+    }
+  }
+
+  // --- Events ---
+  select.addEventListener("change", function () {
+    loadScene(select.value, 0);
+  });
+
+  btnPrev.addEventListener("click", function () {
+    if (busy || step <= 0) return;
+    goToStep(step - 1, { instant: true });
+  });
+
+  btnNext.addEventListener("click", function () {
+    if (busy || step >= scenes[sceneId].steps.length - 1) return;
+    goToStep(step + 1);
+  });
+
+  btnReplay.addEventListener("click", function () {
+    if (busy) return;
+    goToStep(step, { replay: true });
+  });
+
+  window.addEventListener("hashchange", function () {
+    const id = (location.hash || "#coordinates").slice(1);
+    if (id !== sceneId && scenes[id]) loadScene(id, 0);
+  });
+
+  // Honor reduced motion changes instantly
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  function onMotionChange() {
+    cancelAnimations();
+    applyStepState(step);
+    paint();
+    setBusy(false);
+    updateChrome();
+  }
+  if (mq.addEventListener) mq.addEventListener("change", onMotionChange);
+  else if (mq.addListener) mq.addListener(onMotionChange);
+
+  window.cpsyGeometry={show:(id,index)=>loadScene(id,index),state:()=>({sceneId,step,origin:ORIGIN,unit:UNIT})};
+
+  // Init from hash
+  const initial = (location.hash || "#coordinates").slice(1);
+  loadScene(scenes[initial] ? initial : "coordinates", 0);
+})();
+  </script>
+<script>document.addEventListener('keydown',e=>{if(e.key==='Escape'&&window.parent!==window){window.parent.postMessage({type:'cpsy-exit-interactive'},'*');}});</script></body>
+</html>

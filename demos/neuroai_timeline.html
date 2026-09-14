@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuroAI: a history</title>
+<script>
+// The page's public home is the standalone site. A copy served from the course
+// site bounces direct visitors there, but keeps working inside the lecture iframe.
+if (top === self && /github\.io$/.test(location.host) && !/^\/neuroai-history/.test(location.pathname))
+  location.replace('https://serre-lab.github.io/neuroai-history/' + location.hash);
+</script>
+<meta name="description" content="Neuroscience and AI, 1943–today: an interactive history of convergence and divergence. Every event links to its primary source.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Neuroscience and AI: a history of convergence and divergence, 1943–today">
+<meta property="og:description" content="An interactive timeline of the two fields since cybernetics: one community, then cycles of divergence and reconvergence. Every event links to its source.">
+<meta property="og:url" content="https://serre-lab.github.io/neuroai-history/">
+<meta property="og:image" content="https://serre-lab.github.io/neuroai-history/preview.png">
+<meta property="og:image:width" content="3200">
+<meta property="og:image:height" content="1600">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Neuroscience and AI: a history of convergence and divergence, 1943–today">
+<meta name="twitter:description" content="An interactive timeline of the two fields since cybernetics. Arrow keys step through the eras; every dot links to its source.">
+<meta name="twitter:image" content="https://serre-lab.github.io/neuroai-history/preview.png">
+<style>
+  :root{
+    --sienna:#9C5A2E; --slate:#3E6D8E; --teal:#3F7A6B;
+    --cream:#FAF9F5; --ink:#1E293B; --muted:#5B6B7A; --rule:#E7E3DA;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%;background:var(--cream);color:var(--ink);
+    font-family:"Helvetica Neue",Arial,system-ui,sans-serif;overflow:hidden}
+  #wrap{height:100%;display:flex;flex-direction:column}
+  #stage{position:relative;flex:1;overflow:hidden}
+  svg{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+  svg.dragging{cursor:grabbing}
+
+  .strandLabel{font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+  .yearTick{font-size:12px;fill:var(--muted);font-variant-numeric:tabular-nums;font-weight:700}
+  .evt .lbl,.evt .stem{opacity:0;transition:opacity .5s ease}
+  .evt.on .lbl{opacity:1}
+  .evt.on .stem{opacity:.5}
+  .evt .stem{transition:opacity .5s ease}
+  .evt circle{opacity:.30;transition:opacity .5s ease, r .35s ease}
+  .evt .tie{opacity:.22;transition:opacity .5s ease}
+  .evt.on .tie{opacity:.5}
+  .evt.on circle{opacity:1}
+  /* Only the event dot grows on focus. The tie's end-caps stay small, or they
+     swallow the tie and read as three loose dots off the strands. */
+  /* Marker radii are set per frame in applyVB, in screen pixels, so a dot is the
+     same size in the overview and inside an era. */
+  /* A label the solver could not fit anywhere is dropped rather than overlapped,
+     and its stem goes with it — a leader line to nothing is worse than neither. */
+  .evt.on .lbl.nofit{opacity:0}
+  .evt.on .stem.nofit{opacity:0}
+  /* Cream halo: a stem or a ghost strand passing behind text never touches it. */
+  .lbl text{font-size:13px;fill:var(--ink);
+    paint-order:stroke;stroke:var(--cream);stroke-width:3.5px;stroke-linejoin:round}
+  .lbl .yr{font-weight:800;font-variant-numeric:tabular-nums}
+  .lbl .sub{font-size:12px;fill:var(--muted)}
+  .lbl.link{cursor:pointer}
+  .lbl.link:hover .nm{text-decoration:underline}
+  /* Strand names ride their own strand at the left edge of whatever is on screen,
+     so the legend is never off in the corner. */
+  .tag{position:absolute;left:14px;pointer-events:none;font-size:12px;font-weight:800;
+    letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+    padding:1px 6px;border-radius:5px;background:color-mix(in srgb, var(--cream) 88%, transparent)}
+  #tagN{color:var(--teal)} #tagA{color:var(--slate)}
+  .tag{z-index:2} .tag.off{display:none}
+  /* The keyboard hint would wrap the bar onto a second row and take that row
+     from the map: below a wide desktop it goes. */
+  @media (max-width:1450px){ .hint{display:none} }
+  @media (max-width:1100px){
+    #cap{max-width:46%;padding:10px 14px 12px}
+    #cap h2{font-size:14px;margin-bottom:5px} #cap p{font-size:12.5px;line-height:1.35}
+    .chip{padding:4px 8px;font-size:11px} #bar{padding:6px 10px;gap:6px}
+  }
+
+  /* The year axis is pinned to the stage, so it stays put while the map zooms. */
+  #axis{position:absolute;left:0;right:0;bottom:0;height:30px;pointer-events:none;
+    border-top:1px solid var(--rule);background:linear-gradient(to top,var(--cream) 62%,transparent)}
+  #axis span{position:absolute;bottom:7px;transform:translateX(-50%);font-size:12px;font-weight:700;
+    color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+  #axis i{position:absolute;top:-1px;width:1px;height:7px;background:var(--rule)}
+  /* Era caption: a card in screen space, docked per era by the layout solver to
+     whichever slot buries the least. No label is ever allowed under it. */
+  #cap{position:absolute;left:22px;top:18px;width:max-content;max-width:46%;pointer-events:none;
+    padding:14px 20px 16px;border-radius:12px;
+    background:color-mix(in srgb, var(--cream) 93%, transparent);
+    box-shadow:0 1px 0 var(--rule), 0 8px 24px -14px rgba(30,41,59,.35);
+    opacity:0;transform:translateY(-6px);transition:opacity .45s ease, transform .45s ease, left .45s ease, top .45s ease}
+  #cap.on{opacity:1;transform:none}
+  #cap h2{margin:0 0 7px;font-size:16px;line-height:1.25;color:var(--sienna);letter-spacing:-.005em;white-space:nowrap}
+  #cap p{margin:0 0 5px;font-size:14.5px;line-height:1.45;color:var(--ink);text-wrap:balance}
+  #cap p:empty{display:none}
+  #cap h2:last-child{margin-bottom:0}
+
+  #bar{display:flex;align-items:center;gap:9px;padding:9px 14px;border-top:1px solid var(--rule);
+    background:var(--cream);font-size:13px;color:var(--muted);flex-wrap:wrap}
+  #chapters{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+  .chip{font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;cursor:pointer;
+    border:2px solid var(--rule);background:#fff;color:var(--muted);white-space:nowrap;
+    font-family:inherit;transition:border-color .2s,color .2s}
+  .chip.on{border-color:var(--sienna);color:var(--sienna)}
+  .chip.src{margin-left:10px;border-style:dashed}
+  .legend{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--ink);white-space:nowrap}
+  .legend i{width:22px;height:5px;border-radius:3px;display:inline-block;margin-left:12px}
+  .hint kbd{font-family:inherit;font-weight:700;background:#fff;border:1px solid var(--rule);
+    border-radius:5px;padding:1px 6px;color:var(--ink)}
+  button.nav{font-size:15px;font-weight:800;padding:5px 13px;border-radius:8px;
+    border:2px solid var(--slate);background:#fff;color:var(--slate);cursor:pointer;font-family:inherit}
+  button.nav:disabled{opacity:.3;cursor:default}
+
+  /* Sources panel: the literature behind the converge/diverge framing, not the
+     per-dot citations (each dot links to its own). Overlays the stage so it
+     works inside the slide iframe too. */
+  #src{position:absolute;inset:0;z-index:5;overflow:auto;padding:26px 44px 30px;
+    background:color-mix(in srgb, var(--cream) 97%, transparent);display:none;font-size:14px;line-height:1.5;color:var(--ink)}
+  #src.on{display:block}
+  #src h2{margin:0 0 4px;font-size:21px;color:var(--sienna);letter-spacing:-.01em}
+  #src .lead{margin:0 0 14px;color:var(--muted);max-width:70em}
+  #src h3{margin:16px 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  #src ol{margin:0;padding-left:1.4em;columns:2;column-gap:44px}
+  #src li{margin:0 0 7px;break-inside:avoid}
+  #src li b{font-weight:700}
+  #src li .g{color:var(--muted)}
+  #src a{color:var(--slate);text-decoration:none;border-bottom:1px solid var(--rule)}
+  #src a:hover{border-bottom-color:var(--slate)}
+  #src .close{position:absolute;top:18px;right:22px}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <svg id="tl" viewBox="0 0 2000 640" preserveAspectRatio="xMidYMid meet"
+         aria-label="Interactive timeline of neuroscience and artificial intelligence from 1943 to today, showing the two fields converging, splitting, and converging again"></svg>
+    <div id="axis"></div>
+    <span class="tag" id="tagN">Neuroscience</span><span class="tag" id="tagA">Artificial intelligence</span>
+    <div id="cap"><h2></h2><p class="l1"></p><p class="l2"></p></div>
+    <div id="src" aria-label="Sources for the timeline's framing">
+      <button class="nav close" id="srcClose">×</button>
+      <h2>Sources for the framing</h2>
+      <p class="lead">Each dot links to its primary source. The works below are the histories and essays on which the framing rests: a common origin in cybernetics, followed by alternating periods of convergence and divergence. The six-phase periodization used here is a synthesis; no single source states it in this form, and the final section lists those who would dispute it. The selection leans toward vision, the author’s own field; the same story could be told through memory, navigation, motor control, audition or language.</p>
+      <h3>The shared origin</h3>
+      <ol>
+        <li><b>Papert, S. (1988).</b> One AI or many? <i>Dædalus</i> 117(1):1–14. <a href="https://www.jstor.org/stable/20025136" target="_blank" rel="noopener">JSTOR</a> · <a href="https://gwern.net/doc/ai/1988-papert.pdf" target="_blank" rel="noopener">PDF</a><br><span class="g">Opens with “the standard version” of the history, told as a fairy tale — “two daughter sciences were born to the new science of cybernetics” — and then disputes it. The origin of the image drawn here, from a protagonist, with his own caveats.</span></li>
+        <li><b>Dreyfus, H. L. &amp; Dreyfus, S. E. (1988).</b> Making a mind versus modeling the brain: Artificial intelligence back at a branchpoint. <i>Dædalus</i> 117(1):15–43. <a href="https://www.jstor.org/stable/20025137" target="_blank" rel="noopener">JSTOR</a><br><span class="g">Two research programs founded together in the early 1950s; one starved of funding by 1970; the winners’ account is a “retrospective illusion”; 1988 reopens the fork.</span></li>
+        <li><b>Heims, S. J. (1991).</b> <i>The Cybernetics Group.</i> MIT Press. <a href="https://doi.org/10.7551/mitpress/2260.001.0001" target="_blank" rel="noopener">doi</a><br><span class="g">The standard history of the Macy conferences: the “one community” phase was institutional, not incidental.</span></li>
+        <li><b>Abraham, T. H. (2016).</b> <i>Rebel Genius: Warren S. McCulloch’s Transdisciplinary Life in Science.</i> MIT Press. <a href="https://doi.org/10.7551/mitpress/9780262035095.001.0001" target="_blank" rel="noopener">doi</a><br><span class="g">The McCulloch biography; documents that the 1943 paper was largely ignored by neurophysiologists and taken up instead by von Neumann and automata theory.</span></li>
+        <li><b>Dupuy, J.-P. (2000).</b> <i>The Mechanization of the Mind: On the Origins of Cognitive Science.</i> Princeton University Press (reissued MIT Press, 2009).<br><span class="g">Cognitive science as the partly disowned heir of cybernetics.</span></li>
+      </ol>
+      <h3>The split: Dartmouth, Perceptrons, and the winters</h3>
+      <ol>
+        <li><b>Kline, R. R. (2011).</b> Cybernetics, automata studies, and the Dartmouth Conference on Artificial Intelligence. <i>IEEE Annals of the History of Computing</i> 33(4):5–16. <a href="https://doi.org/10.1109/MAHC.2010.44" target="_blank" rel="noopener">doi</a><br><span class="g">Archival evidence that McCarthy chose the name “artificial intelligence” to distance the field from cybernetics and from Wiener. Book-length treatment: Kline, <i>The Cybernetics Moment</i> (Johns Hopkins University Press, 2015).</span></li>
+        <li><b>Olazaran, M. (1996).</b> A sociological study of the official history of the perceptrons controversy. <i>Social Studies of Science</i> 26(3):611–659. <a href="https://doi.org/10.1177/030631296026003005" target="_blank" rel="noopener">doi</a><br><span class="g">The account in which <i>Perceptrons</i> ended neural-network research was written by the winners and rewritten when the networks returned. Essential context for 1969.</span></li>
+        <li><b>Haigh, T. (2023–2025).</b> Historical Reflections, <i>Communications of the ACM</i>: Conjoined twins: AI and the invention of computer science, 66(6):33–37 <a href="https://doi.org/10.1145/3593007" target="_blank" rel="noopener">doi</a> · There was no ‘first AI winter’, 66(12):35–39 <a href="https://doi.org/10.1145/3625833" target="_blank" rel="noopener">doi</a> · How the AI boom went bust, 67(2):22–26 <a href="https://doi.org/10.1145/3634901" target="_blank" rel="noopener">doi</a> · Between the booms: AI in winter, 67(11):18–23 <a href="https://doi.org/10.1145/3688379" target="_blank" rel="noopener">doi</a> · Artificial intelligence then and now, 68(2):24–29 <a href="https://doi.org/10.1145/3708554" target="_blank" rel="noopener">doi</a><br><span class="g">A historian’s periodization: “AI” as a label founded partly in reaction to cybernetic claims, with neural networks outside it until the 2010s.</span></li>
+        <li><b>Cardon, D., Cointet, J.-P. &amp; Mazières, A. (2018).</b> Neurons spike back: The invention of inductive machines and the artificial intelligence controversy. <i>Réseaux</i> 211:173–220. <a href="https://doi.org/10.3917/res.211.0173" target="_blank" rel="noopener">doi</a><br><span class="g">Co-citation analysis, 1943–2018, of the alternation between symbolic and connectionist paradigms, with deep learning “reviving the spirit” of cybernetics. The closest scholarly treatment of the cycle, although its axis is symbolic versus connectionist within AI, and it attributes the 2010s revival to data and computation rather than to biology.</span></li>
+      </ol>
+      <h3>Reconvergence and the present divergence</h3>
+      <ol>
+        <li><b>Sejnowski, T. J. (2018).</b> <i>The Deep Learning Revolution.</i> MIT Press. <a href="https://doi.org/10.7551/mitpress/11474.001.0001" target="_blank" rel="noopener">doi</a><br><span class="g">The source of the phrase “deep learning revolution” for 2012, and a participant’s account of the 1980s.</span></li>
+        <li><b>Schmidhuber, J. (2015).</b> Deep learning in neural networks: An overview. <i>Neural Networks</i> 61:85–117. <a href="https://doi.org/10.1016/j.neunet.2014.09.003" target="_blank" rel="noopener">doi</a>; and (2022) Annotated history of modern AI and deep learning, <a href="https://arxiv.org/abs/2212.11279" target="_blank" rel="noopener">arXiv:2212.11279</a><br><span class="g">Argues that neural networks and deep learning “are conceptually closer to the old field of cybernetics than what was traditionally called AI.” Idiosyncratic on questions of priority.</span></li>
+        <li><b>Hassabis, D., Kumaran, D., Summerfield, C. &amp; Botvinick, M. (2017).</b> Neuroscience-inspired artificial intelligence. <i>Neuron</i> 95(2):245–258. <a href="https://doi.org/10.1016/j.neuron.2017.06.011" target="_blank" rel="noopener">doi</a><br><span class="g">“The fields of neuroscience and artificial intelligence (AI) have a long and intertwined history. In more recent times, however, communication and collaboration between the two fields has become less commonplace.”</span></li>
+        <li><b>Zador, A. et al. (2023).</b> Catalyzing next-generation artificial intelligence through NeuroAI. <i>Nature Communications</i> 14:1597. <a href="https://doi.org/10.1038/s41467-023-37180-x" target="_blank" rel="noopener">doi</a> · <b>Doerig, A. et al. (2023).</b> The neuroconnectionist research programme. <i>Nature Reviews Neuroscience</i> 24:431–450. <a href="https://doi.org/10.1038/s41583-023-00705-w" target="_blank" rel="noopener">doi</a><br><span class="g">The present divergence stated programmatically, and the case for renewed exchange.</span></li>
+        <li><b>Linsley, D., Feng, P. &amp; Serre, T. (2026).</b> Better artificial intelligence does not mean better models of biology. <i>Trends in Cognitive Sciences</i> 30:599–610. <a href="https://doi.org/10.1016/j.tics.2025.11.016" target="_blank" rel="noopener">doi</a><br><span class="g">The case that the present period is a divergence: as vision models improve on benchmarks, their alignment with primate neural and behavioral data has stopped improving or declined.</span></li>
+        <li><b>Arbib, M. A. (2025).</b> Artificial intelligence meets brain theory (again). <i>Biological Cybernetics</i> 119:16. <a href="https://doi.org/10.1007/s00422-025-01013-5" target="_blank" rel="noopener">doi</a><br><span class="g">A founder-generation figure places the 2024 NIH BRAIN NeuroAI workshop in a series of such meetings that began with cybernetics.</span></li>
+      </ol>
+      <h3>Objections to this framing</h3>
+      <p class="lead">Neural-network research did not stop in the 1970s (Grossberg, Kohonen, Amari, Fukushima, Widrow); the “split” is in part the winners’ account (Olazaran 1996; Papert 1988). Haigh (2023) argues that there was no first AI winter. The two fields may never have been one: McCulloch and Pitts were ignored by neurophysiologists (Abraham 2016). Neuroscience’s contribution to modern AI has been described as thin and decades old (Ullman, <i>Science</i> 363:692–693, 2019; Zador et al. 2023), on which view 2012–2014 was neuroscience adopting AI’s tools rather than a reconvergence of ideas. The present divergence is a claim about vision models and neural rather than behavioral fit; the alignment of language models with brain recordings still improves with scale (Antonello, Vaidya &amp; Huth, NeurIPS 2023).</p>
+    </div>
+  </div>
+  <div id="bar">
+    <button class="nav" id="prev">←</button>
+    <button class="nav" id="next">→</button>
+    <div id="chapters"></div>
+    <button class="chip src" id="srcBtn">Sources &amp; further reading</button>
+    <span class="hint"><kbd>←</kbd><kbd>→</kbd> step · <kbd>0</kbd> all years · drag to pan · scroll to zoom</span>
+  </div>
+</div>
+<script>
+const VB_W = 2000, VB_H = 640;
+const Y0 = 1940, Y1 = 2028, X0 = 110, X1 = 1900;
+const x = y => X0 + (y - Y0) / (Y1 - Y0) * (X1 - X0);
+const yearAt = X => Y0 + (X - X0) / (X1 - X0) * (Y1 - Y0);
+const NEURO = 195, AI = 470, MID = (NEURO + AI) / 2;
+const STROKE = 5.5;                                   // strand width, data units
+
+// How far apart the two strands run at each year. 1 = fully apart, 0 = merged.
+const SEP = [
+  // One community until Dartmouth: the fork opens at 1956 and is complete by
+  // the mid-1960s, before Perceptrons. Rosenblatt 1958 is the last shared event.
+  [1940,.05],[1943,.05],[1955,.06],[1956,.08],[1958,.18],[1965,1],[1975,1],[1980,.60],
+  [1986,.14],[1992,.68],[2001,.88],[2012,.30],[2014,.10],[2017,.38],[2021,.66],[2026,.66],[2028,.66]
+];
+function sepAt(yr){
+  for (let i=0;i<SEP.length-1;i++){
+    const [a,va]=SEP[i],[b,vb]=SEP[i+1];
+    if (yr>=a && yr<=b){ const t=(yr-a)/(b-a); return va+(vb-va)*(t*t*(3-2*t)); }
+  }
+  return SEP[SEP.length-1][1];
+}
+const strandY = (yr, which) => {
+  const half = (AI-NEURO)/2 * sepAt(yr);
+  return which==='neuro' ? MID - half : MID + half;
+};
+
+const EVENTS = [
+  // y year · s strand (neuro | ai | both) · key: shown in the all-years overview ·
+  // t name · d gloss · c citation (hover) · u primary source (click)
+  {y:1943,key:1,s:'both', t:'McCulloch & Pitts', d:'the formal neuron',
+   c:'McCulloch & Pitts, Bull. Math. Biophys. 5:115–133 (1943)', u:'https://doi.org/10.1007/BF02478259'},
+  {y:1948,s:'both', t:'Wiener', d:'Cybernetics',
+   c:'Wiener, Cybernetics: or Control and Communication in the Animal and the Machine, MIT Press (1948)', u:'https://doi.org/10.7551/mitpress/11810.001.0001'},
+  {y:1949,s:'neuro',t:'Hebb',              d:'the Hebbian learning rule',
+   c:'Hebb, The Organization of Behavior, Wiley (1949)', u:'https://doi.org/10.4324/9781410612403'},
+  {y:1950,s:'ai',   t:'Turing',            d:'“can machines think?”',
+   c:'Turing, Computing machinery and intelligence, Mind 59:433–460 (1950)', u:'https://doi.org/10.1093/mind/LIX.236.433'},
+  {y:1956,key:1,s:'ai',   t:'McCarthy et al.', d:'the Dartmouth workshop names “AI”',
+   c:'McCarthy, Minsky, Rochester & Shannon, A proposal for the Dartmouth summer research project on artificial intelligence (1955); repr. AI Magazine 27(4) (2006)', u:'http://www-formal.stanford.edu/jmc/history/dartmouth/dartmouth.html'},
+  {y:1958,key:1,s:'both', t:'Rosenblatt',        d:'the perceptron',
+   c:'Rosenblatt, The perceptron: a probabilistic model for information storage and organization in the brain, Psychol. Rev. 65:386–408 (1958)', u:'https://doi.org/10.1037/h0042519'},
+  {y:1959,s:'neuro',t:'Lettvin',           d:'feature detectors',
+   c:'Lettvin, Maturana, McCulloch & Pitts, What the frog’s eye tells the frog’s brain, Proc. IRE 47:1940–1951 (1959)', u:'https://doi.org/10.1109/JRPROC.1959.287207'},
+  {y:1961,s:'neuro',t:'Barlow',            d:'efficient coding',
+   c:'Barlow, Possible principles underlying the transformations of sensory messages, in Rosenblith (ed.) Sensory Communication, MIT Press (1961)', u:'https://doi.org/10.7551/mitpress/9780262518420.003.0013'},
+  {y:1962,key:1,s:'neuro',t:'Hubel & Wiesel',    d:'simple and complex cells',
+   c:'Hubel & Wiesel, Receptive fields, binocular interaction and functional architecture in the cat’s visual cortex, J. Physiol. 160:106–154 (1962)', u:'https://doi.org/10.1113/jphysiol.1962.sp006837'},
+  {y:1969,key:1,s:'ai',   t:'Minsky & Papert',   d:'limits of the perceptron',
+   c:'Minsky & Papert, Perceptrons: An Introduction to Computational Geometry, MIT Press (1969)', u:'https://doi.org/10.7551/mitpress/11301.001.0001'},
+  {y:1972,s:'neuro',t:'Gross',             d:'object selectivity in IT',
+   c:'Gross, Rocha-Miranda & Bender, Visual properties of neurons in inferotemporal cortex of the macaque, J. Neurophysiol. 35:96–111 (1972)', u:'https://doi.org/10.1152/jn.1972.35.1.96'},
+  {y:1972,s:'neuro',t:'Rescorla & Wagner', d:'learning from prediction error',
+   c:'Rescorla & Wagner, A theory of Pavlovian conditioning, in Black & Prokasy (eds.) Classical Conditioning II, Appleton-Century-Crofts (1972)', u:''},
+  {y:1973,s:'ai',   t:'Lighthill',  d:'the report; the first AI winter',
+   c:'Lighthill, Artificial Intelligence: A General Survey, Science Research Council (1973)', u:'http://www.chilton-computing.org.uk/inf/literature/reports/lighthill_report/p001.htm'},
+  {y:1976,key:1,s:'neuro',t:'Marr & Poggio',     d:'levels of analysis',
+   c:'Marr & Poggio, From understanding computation to understanding neural circuitry, MIT AI Memo 357 (1976)', u:'https://dspace.mit.edu/handle/1721.1/5782'},
+  {y:1980,s:'both', t:'Fukushima',         d:'the Neocognitron',
+   c:'Fukushima, Neocognitron: a self-organizing neural network model for a mechanism of pattern recognition unaffected by shift in position, Biol. Cybern. 36:193–202 (1980)', u:'https://doi.org/10.1007/BF00344251'},
+  {y:1982,s:'ai',   t:'Hopfield',          d:'attractor networks',
+   c:'Hopfield, Neural networks and physical systems with emergent collective computational abilities, PNAS 79:2554–2558 (1982)', u:'https://doi.org/10.1073/pnas.79.8.2554'},
+  {y:1985,s:'both', t:'Ackley, Hinton & Sejnowski', d:'Boltzmann machines',
+   c:'Ackley, Hinton & Sejnowski, A learning algorithm for Boltzmann machines, Cognit. Sci. 9:147–169 (1985)', u:'https://doi.org/10.1207/s15516709cog0901_7'},
+  {y:1986,key:1,s:'both', t:'Rumelhart & McClelland',       d:'PDP: backpropagation, popularized',
+   c:'Rumelhart, McClelland & the PDP Research Group, Parallel Distributed Processing, MIT Press (1986); Rumelhart, Hinton & Williams, Nature 323:533–536 (1986)', u:'https://doi.org/10.7551/mitpress/5236.001.0001'},
+  {y:1988,s:'ai',   t:'Sutton',            d:'temporal-difference learning',
+   c:'Sutton, Learning to predict by the methods of temporal differences, Mach. Learn. 3:9–44 (1988)', u:'https://doi.org/10.1007/BF00115009'},
+  {y:1989,s:'ai',   t:'LeCun',             d:'convolutional networks',
+   c:'LeCun et al., Backpropagation applied to handwritten zip code recognition, Neural Comput. 1:541–551 (1989)', u:'https://doi.org/10.1162/neco.1989.1.4.541'},
+  {y:1990,s:'ai',   t:'Elman',             d:'recurrent networks',
+   c:'Elman, Finding structure in time, Cognit. Sci. 14:179–211 (1990)', u:'https://doi.org/10.1207/s15516709cog1402_1'},
+  {y:1995,s:'neuro',t:'McClelland, McNaughton & O’Reilly', d:'complementary learning systems: replay',
+   c:'McClelland, McNaughton & O’Reilly, Why there are complementary learning systems in the hippocampus and neocortex, Psychol. Rev. 102:419–457 (1995) — the theory behind experience replay in DQN (2015)', u:'https://doi.org/10.1037/0033-295X.102.3.419'},
+  {y:1996,s:'neuro',t:'Olshausen & Field', d:'sparse coding',
+   c:'Olshausen & Field, Emergence of simple-cell receptive field properties by learning a sparse code for natural images, Nature 381:607–609 (1996)', u:'https://doi.org/10.1038/381607a0'},
+  {y:1997,s:'ai',   t:'Hochreiter & Schmidhuber',              d:'LSTM',
+   c:'Hochreiter & Schmidhuber, Long short-term memory, Neural Comput. 9:1735–1780 (1997)', u:'https://doi.org/10.1162/neco.1997.9.8.1735'},
+  {y:1997,s:'ai',   t:'Campbell, Hoane & Hsu',         d:'Deep Blue defeats Kasparov',
+   c:'Campbell, Hoane & Hsu, Deep Blue, Artif. Intell. 134:57–83 (2002)', u:'https://doi.org/10.1016/S0004-3702(01)00129-1'},
+  {y:1997,key:1,s:'both', t:'Schultz, Dayan & Montague', d:'dopamine as prediction error',
+   c:'Schultz, Dayan & Montague, A neural substrate of prediction and reward, Science 275:1593–1599 (1997)', u:'https://doi.org/10.1126/science.275.5306.1593'},
+  {y:1999,key:1,s:'neuro',t:'Riesenhuber & Poggio', d:'HMAX: a model of the ventral stream',
+   c:'Riesenhuber & Poggio, Hierarchical models of object recognition in cortex, Nat. Neurosci. 2:1019–1025 (1999)', u:'https://doi.org/10.1038/14819'},
+  {y:1999,s:'neuro',t:'Rao & Ballard',     d:'predictive coding',
+   c:'Rao & Ballard, Predictive coding in the visual cortex, Nat. Neurosci. 2:79–87 (1999)', u:'https://doi.org/10.1038/4580'},
+  {y:2005,s:'neuro',t:'Boyden et al.',     d:'optogenetics',
+   c:'Boyden, Zhang, Bamberg, Nagel & Deisseroth, Millisecond-timescale, genetically targeted optical control of neural activity, Nat. Neurosci. 8:1263–1268 (2005)', u:'https://doi.org/10.1038/nn1525'},
+  {y:2006,s:'ai',   t:'Hinton, Osindero & Teh',  d:'deep belief nets',
+   c:'Hinton, Osindero & Teh, A fast learning algorithm for deep belief nets, Neural Comput. 18:1527–1554 (2006)', u:'https://doi.org/10.1162/neco.2006.18.7.1527'},
+  {y:2007,key:1,s:'both', t:'Serre, Kreiman, … & Poggio', d:'HMAX v2 vs computer vision',
+   c:'Serre, Kreiman, Kouh, Cadieu, Knoblich & Poggio, A quantitative theory of immediate visual recognition, Prog. Brain Res. 165:33–56 (2007); Serre, Wolf, Bileschi, Riesenhuber & Poggio, IEEE TPAMI 29:411–426 (2007); Serre, Oliva & Poggio, PNAS 104:6424–6429 (2007)', u:'https://doi.org/10.1016/s0079-6123(06)65004-8'},
+  {y:2012,key:1,s:'ai',   t:'Krizhevsky, Sutskever & Hinton',           d:'AlexNet: the first revolution',
+   c:'Krizhevsky, Sutskever & Hinton, ImageNet classification with deep convolutional neural networks, NeurIPS 25 (2012)', u:'https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html'},
+  {y:2013,s:'neuro',t:'Chen et al.',        d:'GCaMP6: calcium imaging of neural populations',
+   c:'Chen et al., Ultrasensitive fluorescent proteins for imaging neuronal activity, Nature 499:295–300 (2013)', u:'https://doi.org/10.1038/nature12354'},
+  {y:2014,key:1,s:'both', t:'Yamins & DiCarlo',  d:'CNNs predict IT responses',
+   c:'Yamins et al., Performance-optimized hierarchical models predict neural responses in higher visual cortex, PNAS 111:8619–8624 (2014)', u:'https://doi.org/10.1073/pnas.1403112111'},
+  {y:2015,s:'ai',   t:'Mnih et al.',               d:'DQN: Atari from pixels',
+   c:'Mnih et al., Human-level control through deep reinforcement learning, Nature 518:529–533 (2015)', u:'https://doi.org/10.1038/nature14236'},
+  {y:2015,s:'ai',   t:'He et al.',            d:'ResNet: residual connections',
+   c:'He, Zhang, Ren & Sun, Deep residual learning for image recognition, CVPR 2016 (arXiv Dec 2015)', u:'https://doi.org/10.1109/CVPR.2016.90'},
+  {y:2016,s:'ai',   t:'Silver et al.',           d:'AlphaGo: deep RL plus tree search',
+   c:'Silver et al., Mastering the game of Go with deep neural networks and tree search, Nature 529:484–489 (2016)', u:'https://doi.org/10.1038/nature16961'},
+  {y:2017,s:'neuro',t:'Jun et al.',         d:'Neuropixels: hundreds of neurons per probe',
+   c:'Jun et al., Fully integrated silicon probes for high-density recording of neural activity, Nature 551:232–236 (2017)', u:'https://doi.org/10.1038/nature24636'},
+  {y:2017,s:'ai',   t:'Vaswani et al.',      d:'transformers: attention',
+   c:'Vaswani et al., Attention is all you need, NeurIPS 30 (2017)', u:'https://arxiv.org/abs/1706.03762'},
+  {y:2020,s:'ai',   t:'Brown et al. · Kaplan et al.', d:'GPT-3; scaling laws',
+   c:'Brown et al., Language models are few-shot learners, NeurIPS 33 (2020); Kaplan et al., Scaling laws for neural language models, arXiv:2001.08361 (2020)', u:'https://arxiv.org/abs/2005.14165'},
+  {y:2020,s:'ai',   t:'Mildenhall et al.',  d:'NeRF: neural scene representations',
+   c:'Mildenhall, Srinivasan, Tancik, Barron, Ramamoorthi & Ng, NeRF: representing scenes as neural radiance fields for view synthesis, ECCV 2020; Commun. ACM 65(1):99–106 (2022)', u:'https://doi.org/10.1145/3503250'},
+  {y:2021,s:'ai',   t:'Caron et al.',              d:'DINO: self-supervised vision transformers',
+   c:'Caron et al., Emerging properties in self-supervised vision transformers, ICCV 2021 — built on the vision transformer of Dosovitskiy et al., ICLR 2021 (arXiv 2010.11929); scaled up as DINOv2, Oquab et al., TMLR 2024 (arXiv 2304.07193)', u:'https://doi.org/10.1109/ICCV48922.2021.00951'},
+  {y:2022,s:'ai',   t:'OpenAI',           d:'ChatGPT: the second revolution, public',
+   c:'OpenAI, Introducing ChatGPT, 30 Nov 2022', u:'https://openai.com/index/chatgpt/'},
+  {y:2024,key:1,s:'ai',   t:'Hopfield & Hinton',       d:'Nobel Prize in Physics',
+   c:'The Nobel Prize in Physics 2024: Hopfield & Hinton, “for foundational discoveries and inventions that enable machine learning with artificial neural networks”', u:'https://www.nobelprize.org/prizes/physics/2024/summary/'},
+  {y:2025,s:'neuro',t:'MICrONS Consortium', d:'a cubic millimetre of cortex: wiring and function',
+   c:'The MICrONS Consortium, Functional connectomics spanning multiple areas of mouse visual cortex, Nature 640:435–447 (2025)', u:'https://doi.org/10.1038/s41586-025-08790-w'},
+  {y:2025,s:'both', t:'Wang et al.',        d:'a foundation model of mouse visual cortex',
+   c:'Wang, Fahey et al., Foundation model of neural activity predicts response to new stimulus types, Nature 640:470–477 (2025)', u:'https://doi.org/10.1038/s41586-025-08829-y'},
+];
+
+const ERAS = [
+  {k:'All', a:1940, b:2028, title:'Neuroscience and AI: a history of convergence and divergence, 1943–today',
+   lines:['Brown ties mark results that crossed between the two fields. A period with such crossings is a convergence; a period without is a divergence.']},
+  {k:'Cybernetics', a:1941, b:1958.5, title:'Cybernetics: one community · 1943–1958',
+   lines:['The same meetings, funders and people: the Macy conferences on cybernetics, 1946–1953.',
+          'Its founding documents belonged to both fields: the logical neuron, cybernetics, the perceptron in Psychological Review.']},
+  {k:'Divergence I', a:1955, b:1979, title:'The first divergence: AI splits from cybernetics · 1956–1979',
+   lines:['McCarthy chose the name “artificial intelligence” partly to keep the new field clear of cybernetics; Minsky and Papert made the technical case against perceptrons.',
+          'For two decades nothing crossed: AI built symbolic systems while neuroscience described feature detectors and the cortical hierarchy.']},
+  {k:'Reconvergence I', a:1979, b:1991, title:'The first reconvergence: connectionism · 1980–1990',
+   lines:['Results cross again: the Neocognitron stacks Hubel and Wiesel’s hierarchy into a recognition machine; Boltzmann machines and the PDP volumes are cognitive-science projects.',
+          'The 2024 Nobel Prize in Physics recognized this decade’s work.']},
+  {k:'Divergence II', a:1989, b:2013, title:'The second divergence: parallel tracks · 1989–2011',
+   lines:['LeNet and HMAX descend from the same parent but grow up in separate communities, on separate benchmarks.',
+          'The one crossing runs the other way — TD learning found in dopamine neurons (1997) — until HMAX v2 (2007) competes with computer vision.']},
+  {k:'Reconvergence II', a:2011, b:2016.5, title:'The second reconvergence: the deep learning revolution · 2012–2016',
+   lines:['AlexNet wins ImageNet in 2012 with 16.4% top-5 error against 26.2% for the runner-up; the architecture is Hubel and Wiesel’s hierarchy, stacked deep.',
+          'By 2014 a network trained only to classify objects is the best model of inferotemporal cortex: AI’s models become neuroscience’s models.']},
+  {k:'Divergence III?', a:2016.5, b:2028, title:'A third divergence? Transformers and scale · 2017–today',
+   lines:['Transformers were not designed to reproduce cortical circuitry, and scale becomes the strategy; there is a growing sense that better AI no longer means better models of the brain.',
+          'Neuroscience’s landmarks of the period are instruments and data — optogenetics, calcium imaging, Neuropixels, MICrONS — more than theory; results still cross (foundation models of cortex), so whether this is a divergence remains open.']},
+];
+
+const svg = document.getElementById('tl');
+const NS = 'http://www.w3.org/2000/svg';
+const mk = (n,a={}) => { const e=document.createElementNS(NS,n); for(const k in a) e.setAttribute(k,a[k]); return e; };
+// Sampled every quarter year, so every event year is a vertex of the polyline
+// and a dot placed at that year sits exactly on the drawn curve, not on a chord.
+const STEP = 0.25;
+const strandPath = which => {
+  let d='';
+  for (let yr=Y0; yr<=Y1+1e-9; yr+=STEP) d += (d?'L':'M') + x(yr).toFixed(2) + ' ' + strandY(yr,which).toFixed(2) + ' ';
+  return d;
+};
+
+// ---- static layer -------------------------------------------------------
+const gStatic = mk('g'); svg.appendChild(gStatic);
+gStatic.appendChild(mk('path',{d:strandPath('neuro'),fill:'none',stroke:'var(--teal)','stroke-width':STROKE,'stroke-linecap':'round','stroke-linejoin':'round',opacity:.9}));
+gStatic.appendChild(mk('path',{d:strandPath('ai'),fill:'none',stroke:'var(--slate)','stroke-width':STROKE,'stroke-linecap':'round','stroke-linejoin':'round',opacity:.9}));
+const gMarks  = mk('g'); svg.appendChild(gMarks);    // ties, stems, dots
+const gLabels = mk('g'); svg.appendChild(gLabels);   // text last: nothing draws over it
+
+// ---- events: dot in data space, label counter-scaled to stay readable ----
+const HALF = yr => (AI-NEURO)/2 * sepAt(yr);
+// Widest the strands get anywhere across a span of years, plus half a stroke.
+// A label clears this and it can never land on a curve, on a tie or on a cap.
+function envHalf(yA, yB){
+  const a = Math.max(Y0, Math.min(Y1, Math.min(yA,yB)));
+  const b = Math.max(Y0, Math.min(Y1, Math.max(yA,yB)));
+  let m = Math.max(HALF(a), HALF(b));
+  for (let yr=Math.ceil(a/STEP)*STEP; yr<b; yr+=STEP) m = Math.max(m, HALF(yr));
+  return m + STROKE/2;
+}
+// End-caps only help once the strands are far enough apart to show them; below
+// that the tie is shorter than the focused dot and the caps just make a blob.
+const CAPS_MIN = 13;
+
+// Which strand a label hangs off. A 'both' event sits on the mid-line, so its
+// label alternates sides to keep the two rows balanced.
+// Shared events alternate sides by their own count, so adding or removing any
+// event does not flip every later one.
+let nBoth = 0;
+const SIDE = EVENTS.map(e => e.s==='neuro' ? true : e.s==='ai' ? false : (nBoth++ % 2 === 0));
+
+// Baselines of the two text lines, relative to the anchor where the stem ends.
+// The 'up' pair is derived from a real measurement below, so the block sits the
+// same distance from the anchor whichever way it hangs.
+const L1_DN = 15, L2_DN = 31;
+let L1_UP = -31, L2_UP = -15, DN_TOP = 5, DN_BOT = 35, UP_TOP = -35, UP_BOT = -5;
+// How far past the anchor the stem runs to meet the ink, in screen px: cap
+// height sits ~3.5 px below the em-box top; descenders ~1 px above its bottom.
+const STEM_IN_DN = 3.5, STEM_IN_UP = 1;
+
+const evNodes = EVENTS.map((e,i) => {
+  const cy  = e.s==='both' ? MID : strandY(e.y, e.s);
+  const col = e.s==='neuro' ? 'var(--teal)' : e.s==='ai' ? 'var(--slate)' : 'var(--sienna)';
+  const at  = `translate(${x(e.y).toFixed(2)},${cy.toFixed(2)})`;
+
+  const gm = mk('g',{class:'evt', transform:at});
+  if (e.s === 'both') {
+    const half = HALF(e.y);                    // exactly the strand offset at this year
+    gm.appendChild(mk('line',{class:'tie',x1:0,y1:(-half).toFixed(2),x2:0,y2:half.toFixed(2),
+      stroke:col,'stroke-width':2.5,'stroke-linecap':'round'}));
+    if (half >= CAPS_MIN){
+      gm.appendChild(mk('circle',{class:'cap',cx:0,cy:(-half).toFixed(2),r:3.5,fill:col}));
+      gm.appendChild(mk('circle',{class:'cap',cx:0,cy:half.toFixed(2),r:3.5,fill:col}));
+    }
+  }
+  const stem = mk('line',{class:'stem',x1:0,y1:0,x2:0,y2:0,stroke:col,'stroke-width':1.5});
+  gm.appendChild(stem);
+  const dot = mk('circle',{class:'dot',cx:0,cy:0,r:5,fill:col});
+  gm.appendChild(dot);
+  gMarks.appendChild(gm);
+
+  const gl  = mk('g',{class:'evt', transform:at});
+  const lbl = mk('g',{class:'lbl'});          // counter-scaled: text only
+  const t1 = mk('text',{x:0,y:L1_DN,'text-anchor':'middle'});
+  const yr = mk('tspan',{class:'yr',fill:col}); yr.textContent = e.y + '  '; t1.appendChild(yr);
+  const nm = mk('tspan',{class:'nm'}); nm.textContent = e.t; t1.appendChild(nm);
+  lbl.appendChild(t1);
+  const t2 = mk('text',{x:0,y:L2_DN,'text-anchor':'middle',class:'sub'});
+  t2.textContent = e.d; lbl.appendChild(t2);
+  if (e.c){ const tt = mk('title'); tt.textContent = e.c + (e.u ? ' — click to open' : ''); lbl.appendChild(tt);
+            const tt2 = mk('title'); tt2.textContent = e.c; gm.appendChild(tt2); }
+  if (e.u){ lbl.classList.add('link'); lbl.dataset.u = e.u; }   // opened on pointer-up, below
+  gl.appendChild(lbl);
+  gLabels.appendChild(gl);
+
+  return {gm, gl, lbl, stem, dot, caps:[...gm.querySelectorAll('.cap')], tie:gm.querySelector('.tie'), half: e.s==='both' ? HALF(e.y) : 0, t1, t2, cy, pref:SIDE[i], up:SIDE[i],
+          bw:60, dx:0, dx0:0, dx1:0, anchorY:MID, a0:MID, a1:MID, fit:true, lean:0};
+});
+
+// One measuring pass on the real glyphs: character counts are wrong by up to a
+// third on names like “Riesenhuber & Poggio”, which is what let labels collide.
+(function measure(){
+  let top = Infinity, bot = -Infinity;
+  evNodes.forEach(n => {
+    const b1 = n.t1.getBBox(), b2 = n.t2.getBBox();
+    n.bw = Math.max(b1.width, b2.width);
+    top = Math.min(top, b1.y); bot = Math.max(bot, b2.y + b2.height);
+  });
+  DN_TOP = top; DN_BOT = bot;
+  const shift = -(DN_TOP + DN_BOT);           // mirror the block about the anchor
+  L1_UP = L1_DN + shift; L2_UP = L2_DN + shift;
+  UP_TOP = DN_TOP + shift; UP_BOT = DN_BOT + shift;
+})();
+
+// ---- label placement ----------------------------------------------------
+// Everything below is measured in screen pixels for a given viewBox, so a lane
+// is the same distance from a strand at every zoom and on every window size.
+const CLEAR = 13;      // strand edge → nearest text edge
+const PITCH = 42;      // lane to lane
+const LGAP  = 8;       // label to label, side by side
+const EDGE  = 8;       // frame margin
+const AXIS_PX = 36;    // reserved for the pinned year axis
+const LANES = 5;       // lanes hung off a strand, outward
+const INNER = 4;       // lanes hung off a strand's inner edge, into the gap: a
+                       // wide label over a sloping strand loses the first two
+                       // to the slope, and two labels can still need to pass
+const PINS  = 3;       // rows walked inward from the frame edge when none fit
+// Screen-pixel margins the map must stay out of. Non-zero when the caption card
+// takes a strip of its own (a top row) instead of floating over the braid.
+let PADL = 0, PADR = 0, PADT = 0;
+
+const cap = document.getElementById('cap');
+const hit = (a,b,p=0) => !(a.x+a.w+p<=b.x || b.x+b.w+p<=a.x || a.y+a.h+p<=b.y || b.y+b.h+p<=a.y);
+
+// The caption card as a screen-space obstacle, or null when it is hidden. The
+// first fitting pass of an era ignores it, to find out where the labels want to
+// be before the card is docked.
+let ignoreCard = false, CAPR = null, RECT = {w:VB_W, h:VB_H};
+function measureRects(){
+  const R = svg.getBoundingClientRect();
+  RECT = {w:R.width||VB_W, h:R.height||VB_H};
+  // The docked position comes from the style, not the rendered box: the card
+  // glides to a new spot, and the solver must see where it will end up.
+  const c = cap.getBoundingClientRect();
+  CAPR = {x:parseFloat(cap.style.left) || c.left-R.left, y:parseFloat(cap.style.top) || c.top-R.top, w:c.width, h:c.height};
+}
+const capBox = () => (ignoreCard || !cap.classList.contains('on')) ? null : CAPR;
+
+// Does a strand or a tie run through this box? Exact, unlike the envelope
+// bound: needed where a label is pinned to the frame rather than to a lane.
+let looseTies = false;   // last resort: another crossing's tie may pass behind a label
+// Both strands in screen pixels, every 4 px across the frame, for one camera:
+// the exact test runs for every candidate slot and must not recompute them.
+let strandPx = {key:'', n:null, a:null};
+function strandCols(vb, k){
+  const key = vb.x + ',' + vb.y + ',' + k;
+  if (strandPx.key === key) return strandPx;
+  const cols = Math.ceil(RECT.w/4) + 2, n = new Float32Array(cols), a = new Float32Array(cols);
+  for (let i=0; i<cols; i++){
+    const yr = yearAt(vb.x + i*4*k);
+    if (yr < Y0 || yr > Y1){ n[i] = a[i] = NaN; continue; }
+    n[i] = (strandY(yr,'neuro') - vb.y)/k; a[i] = (strandY(yr,'ai') - vb.y)/k;
+  }
+  return strandPx = {key, n, a};
+}
+// A strand label stays on its own side of the braid: outside its strand or in
+// the gap, never beyond the other strand. Exact, along the box's width.
+function ownSide(b, vb, k, e, pad=6){
+  if (e.s === 'both') return true;
+  const m = pad + STROKE/2/k, S = strandCols(vb, k);
+  const i0 = Math.max(0, Math.floor(b.x/4)), i1 = Math.min(S.n.length-1, Math.ceil((b.x+b.w+5)/4));
+  for (let i=i0; i<=i1; i++){
+    const yN = S.n[i], yA = S.a[i];
+    if (yN !== yN) continue;
+    if (e.s === 'neuro' ? yA < b.y + b.h + m : yN > b.y - m) return false;
+  }
+  return true;
+}
+function marksClear(b, vb, k, vis, self, pad=6){
+  const m = pad + STROKE/2/k, S = strandCols(vb, k);
+  const i0 = Math.max(0, Math.floor(b.x/4)), i1 = Math.min(S.n.length-1, Math.ceil((b.x+b.w+5)/4));
+  for (let i=i0; i<=i1; i++){
+    const yN = S.n[i], yA = S.a[i];
+    if (yN !== yN) continue;
+    if ((yN > b.y - m && yN < b.y + b.h + m) || (yA > b.y - m && yA < b.y + b.h + m)) return false;
+  }
+  if (looseTies) return true;
+  for (const e of vis){
+    if (e.s !== 'both' || e === self) continue;   // its own tie is its stem
+    const X = (x(e.y)-vb.x)/k, half = HALF(e.y)/k, Y = (MID-vb.y)/k;
+    if (hit({x:X-3, y:Y-half, w:6, h:2*half}, b, pad)) return false;
+  }
+  return true;
+}
+
+// A leader line must read as one clean stroke from dot to text. Beyond a slide
+// this steep it reads as a rule, not a pointer; the relaxed limit is only used
+// when nothing on the label's own side fits under the strict one, and the
+// last one only to keep a label on screen that would otherwise be dropped.
+const LEAN_MAX = 35, LEAN_RELAX = 45, LEAN_LAST = 60;   // degrees from vertical
+const lean = (x0,y0,x1,y1) => Math.atan2(Math.abs(x1-x0), Math.abs(y1-y0)) * 180/Math.PI;
+// Segment against a padded box (Liang–Barsky) and against another segment.
+function segRect(a, b, r, pad=0){
+  let t0=0, t1=1; const dx=b.x-a.x, dy=b.y-a.y;
+  const X0=r.x-pad, X1=r.x+r.w+pad, Y0=r.y-pad, Y1=r.y+r.h+pad;
+  for (const [p,q] of [[-dx, a.x-X0],[dx, X1-a.x],[-dy, a.y-Y0],[dy, Y1-a.y]]){
+    if (p===0){ if (q<0) return false; continue; }
+    const t=q/p;
+    if (p<0){ if (t>t1) return false; if (t>t0) t0=t; } else { if (t<t0) return false; if (t<t1) t1=t; }
+  }
+  return t0<=t1;
+}
+function segSeg(p,p2,q,q2){
+  const d = (a,b,c) => (b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+  const d1=d(q,q2,p), d2=d(q,q2,p2), d3=d(p,p2,q), d4=d(p,p2,q2);
+  return ((d1>0&&d2<0)||(d1<0&&d2>0)) && ((d3>0&&d4<0)||(d3<0&&d4>0));
+}
+// Is the stem from the marker (x0,y0) to the anchor (x1,y1) clear? It may not
+// run through a label already placed, cross another stem, the card or a
+// crossing's tie, and once it has left its own dot it may not touch
+// a strand.
+function stemClear(x0,y0,x1,y1, vb, k, vis, self, placed, stems, box){
+  const a = {x:x0,y:y0}, b = {x:x1,y:y1};
+  if (placed.some(p => segRect(a, b, p, 2))) return false;
+  if (stems.some(s => segSeg(a, b, s[0], s[1]))) return false;
+  if (box && segRect(a, b, box, 4)) return false;
+  // Past the marker itself: a same-year crossing's tie ends on this very dot.
+  const half = STROKE/2/k, zone = half + 7, L = Math.hypot(x1-x0, y1-y0), mid = (MID-vb.y)/k;
+  const a2 = L > zone ? {x:x0+(x1-x0)*zone/L, y:y0+(y1-y0)*zone/L} : b;
+  for (const e of vis){
+    if (e.s !== 'both' || e === self) continue;
+    const X = (x(e.y)-vb.x)/k, h = HALF(e.y)/k, Y = (MID-vb.y)/k;
+    if (segRect(a2, b, {x:X-3, y:Y-h, w:6, h:2*h}, 2)) return false;
+  }
+  for (let d=zone; d<=L; d+=5){
+    const t=d/L, X=x0+(x1-x0)*t, Y=y0+(y1-y0)*t;
+    const yr = yearAt(vb.x + X*k); if (yr<Y0 || yr>Y1) continue;
+    const h = HALF(yr)/k;
+    for (const [w,sy] of [['neuro', mid-h],['ai', mid+h]]){
+      if (Math.abs(sy - Y) < half + 1) return false;
+    }
+  }
+  return true;
+}
+
+// Greedy, left to right: each label takes the first free slot. A slot is free
+// when it clears the frame, the axis, the caption card and every label already
+// placed — on either side of the mid-line, not just its own.
+function layout(vis, vb, variant=0){
+  const W = RECT.w, H = RECT.h, k = vb.w / W;
+  const midPx = (MID - vb.y) / k;
+  const box = capBox();
+  const tags = tagBoxes(vb, W, H).filter(t => !t.off);
+  const placed = [], stems = [];        // boxes and leader lines already committed
+  const bh = up => up?UP_BOT-UP_TOP:DN_BOT-DN_TOP;
+  // On screen on all four sides, off the axis, off the card, off every label
+  // already placed and under no committed stem. A label that cannot satisfy
+  // this is dropped, not clipped.
+  const free = b => b.y >= PADT + EDGE && b.y + b.h <= H - AXIS_PX
+                 && b.x >= PADL + EDGE - 0.5 && b.x + b.w <= W - PADR - EDGE + 0.5
+                 && !(box && hit(b, box, 7)) && !tags.some(t => hit(b, t, 6)) && !placed.some(p => hit(b, p, LGAP))
+                 && !stems.some(st => segRect(st[0], st[1], b, 2));
+  // Where a stem leaves: the dot, or for a crossing the cap on the label's side.
+  const stemY = (n, up) => n.half ? midPx + (up?-1:1) * n.half/k : (n.cy - vb.y)/k;
+  // The slot for a box of half-width hw centred at c, on one side, in one row:
+  // a lane hung off the strand envelope under the box; then a lane hung off
+  // the label's own strand on its inner edge, into the gap between the
+  // strands, where the braid is open enough to hold it (the exact strand test
+  // is left to the caller); then a row pinned inside the frame edge for when
+  // that strand has left the frame.
+  // An inner or pinned row hangs its text toward the marker (sy): the anchor
+  // sits on the box edge facing the dot, so the stem meets the text, never
+  // runs through it — even when the strand has left the frame on the far side.
+  const slot = (c, hw, up, row, sy, self) => {
+    const inner = row >= LANES && row < LANES+INNER, pinned = row >= LANES+INNER;
+    const lane = pinned ? row-LANES-INNER : inner ? row-LANES : row;
+    if (inner){
+      const anchor = sy + (up?1:-1) * (STROKE/2/k + CLEAR + lane*PITCH);
+      return {b:{x:c-hw, w:2*hw, y:anchor + (up?DN_TOP:UP_TOP), h:bh(!up), inner:true}, anchor, pinned:true, inner, up:!up, side:up};
+    }
+    if (!pinned){
+      // Off the strand itself where the box clears it exactly: on a slope the
+      // envelope would hang the label off the strand's highest point under it,
+      // on a stem three times longer than it needs to be.
+      // Lane 0 decides for every lane of the label, so lanes never invert.
+      const base = sy + (up?-1:1) * (STROKE/2/k + CLEAR), tight = base + (up?-1:1) * lane*PITCH;
+      const tb0 = {x:c-hw, w:2*hw, y:base + (up?UP_TOP:DN_TOP), h:bh(up)};
+      const tb = {x:c-hw, w:2*hw, y:tight + (up?UP_TOP:DN_TOP), h:bh(up)};
+      if (self && Math.abs(base - midPx) > STROKE/2/k && marksClear(tb0, vb, k, vis, self) && (lane === 0 || marksClear(tb, vb, k, vis, self)))
+        return {b:tb, anchor:tight, pinned, up, side:up};
+      const envO = envHalf(yearAt(vb.x + (c-hw)*k), yearAt(vb.x + (c+hw)*k)) / k;
+      const anchor = midPx + (up?-1:1) * (envO + CLEAR + lane*PITCH);
+      return {b:{x:c-hw, w:2*hw, y:anchor + (up?UP_TOP:DN_TOP), h:bh(up)}, anchor, pinned, up, side:up};
+    }
+    const b = {x:c-hw, w:2*hw, h:bh(up), y: up ? PADT + EDGE + lane*PITCH : H - AXIS_PX - bh(up) - lane*PITCH};
+    const tUp = sy > b.y + b.h/2;
+    return {b, anchor: tUp ? b.y + b.h - UP_BOT : b.y - DN_TOP, pinned, up: tUp, side:up};
+  };
+  const commit = (n, got, cx) => {
+    n.fit = true; n.box = got.b; n.up = got.up; n.dx = got.b.x + got.b.w/2 - cx; n.anchorY = vb.y + got.anchor * k;
+    n.nostem = !!got.nostem; n.inner = !!got.b.inner;
+    n.t1.setAttribute('y', got.up ? L1_UP : L1_DN);
+    n.t2.setAttribute('y', got.up ? L2_UP : L2_DN);
+    n.lbl.classList.remove('nofit'); n.stem.classList.remove('nofit');
+    got.b.cx = cx; placed.push(got.b);
+    n.lean = got.nostem ? 0 : lean(cx, stemY(n, got.side), cx + n.dx, got.anchor);
+    if (!got.nostem) stems.push([{x:cx, y:stemY(n, got.side)}, {x:cx + n.dx, y:got.anchor}]);
+  };
+
+  // Everything one label needs to find itself a slot.
+  const solver = e => {
+    const n = evNodes[EVENTS.indexOf(e)];
+    const cx = (x(e.y) - vb.x) / k, hw = n.bw / 2;
+    // Slide the block back on screen if it hangs off an edge, but never so far
+    // that the stem leaves the text it points at.
+    let dx = 0, room = Math.max(0, hw - 12);
+    if (cx - hw < PADL + EDGE)          dx = Math.min(PADL + EDGE - (cx - hw), room);
+    else if (cx + hw > W - PADR - EDGE) dx = Math.max((W - PADR - EDGE) - (cx + hw), -room);
+    const xL = cx + dx - hw, xR = cx + dx + hw;
+    const env = envHalf(yearAt(vb.x + xL*k), yearAt(vb.x + xR*k)) / k;
+    const h1 = hw + 6, h2 = 2*hw + 10;
+    const nearLbl = q => Math.abs(q.cx - cx) < n.bw;
+    const roomAt = (b, sign) => {        // free px beside the straight slot at this height
+      const bc = b.x + b.w/2;
+      let r = sign > 0 ? (W - PADR - EDGE) - bc : bc - (PADL + EDGE);
+      placed.concat(box ? [box] : [], tags).forEach(q => {
+        if (q.y + q.h <= b.y - 3 || b.y + b.h + 3 <= q.y) return;
+        const qc = q.x + q.w/2;
+        if (sign > 0 && qc > bc) r = Math.min(r, q.x - bc);
+        if (sign < 0 && qc < bc) r = Math.min(r, bc - (q.x + q.w));
+      });
+      return r;
+    };
+    // One pass down a side. Straight first, always: offset 0 in lane 0, then
+    // lane 1, and so on. A sideways slide is allowed only when what blocks the
+    // straight slot is a near neighbour — a label whose dot sits within one
+    // label width, so the next lane would only stack the two over one x — or
+    // a fixed obstacle (frame, card, strand name). A label blocked by a farther
+    // label takes the next lane straight, so one slide never cascades down the
+    // row. Among the slides the smallest lean wins; a tie goes to the side
+    // with more room. A slot under the strict lean is taken at once; the first
+    // slot that only passes the relaxed lean is kept, and used if no lane
+    // fits strictly. Rows pinned to the frame edge come last, for when this
+    // side's strand has left the frame.
+    const side = (up, straightOnly=false, cap=LEAN_RELAX) => {
+      const sy = stemY(n, up);
+      let relaxed = null;
+      const test = (c, o) => {
+        if (!free(c.b) || !ownSide(c.b, vb, k, e)) return false;
+        const L = lean(cx, sy, cx+dx+o, c.anchor);
+        if (L > cap || (L > LEAN_MAX && relaxed)) return false;
+        if (c.pinned && !marksClear(c.b, vb, k, vis, e)) return false;
+        if (!stemClear(cx, sy, cx+dx+o, c.anchor, vb, k, vis, e, placed, stems, box)) return false;
+        if (L <= LEAN_MAX) return true;
+        relaxed = {up:c.up, side:up, anchor:c.anchor, b:c.b}; return false;
+      };
+      // Lanes outside the strand and lanes in the gap are one ladder, walked
+      // nearest the dot first: the shortest stem that clears wins, whichever
+      // side of the strand it is on.
+      // An inner lane belongs to the label's own strand. A crossing may take
+      // one too: its label then sits on its own tie, which runs behind the
+      // text — but never over the dot at the tie's centre.
+      const ladder = [];
+      for (let row=0; row<LANES+INNER; row++){
+        const c0 = slot(cx+dx, hw, up, row, sy, e);
+        if (c0.inner && n.half && c0.b.y < midPx + 10 && c0.b.y + c0.b.h > midPx - 10) continue;
+        ladder.push({row, c0, d:Math.abs(c0.anchor - sy)});
+      }
+      ladder.sort((p,q) => p.d - q.d);
+      for (let i=LANES+INNER; i<LANES+INNER+PINS; i++) ladder.push({row:i, c0:slot(cx+dx, hw, up, i, sy, e), pinned:true});
+      for (const {row, c0, pinned} of ladder){
+        if (pinned && (relaxed || straightOnly)) return relaxed;
+        if (test(c0, 0)) return {up:c0.up, side:up, anchor:c0.anchor, b:c0.b};
+        if (straightOnly) continue;
+        // What is in the way of the straight slot: labels over the box, or
+        // labels the straight stem would run through.
+        const p0 = {x:cx, y:sy}, p1 = {x:cx+dx, y:c0.anchor};
+        const blk = placed.filter(q => hit(c0.b, q, 3) || segRect(p0, p1, q, 2));
+        if (blk.some(q => !nearLbl(q))) continue;
+        const cands = [];
+        if (blk.length){                 // the smallest slides that clear the neighbours
+          cands.push(Math.max(...blk.map(q => q.x + q.w + 3 - c0.b.x)));
+          cands.push(Math.min(...blk.map(q => q.x - 3 - (c0.b.x + c0.b.w))));
+        }
+        cands.push(h1/2, -h1/2, h1, -h1, h2, -h2);
+        const roomy = roomAt(c0.b, 1) >= roomAt(c0.b, -1) ? 1 : -1;
+        const key = o => Math.abs(o) - (Math.sign(o) === roomy ? 10 : 0);
+        for (const o of [...new Set(cands)].filter(o => o).sort((p,q) => key(p) - key(q))){
+          const c = slot(cx+dx+o, hw, up, row, sy, e);
+          if (test(c, o)) return {up:c.up, side:up, anchor:c.anchor, b:c.b};
+        }
+      }
+      return relaxed;
+    };
+    // Still nothing: park it on its own side, closest in, and hide it.
+    const drop = () => {
+      n.fit = false; n.lean = 0;
+      const anchor = midPx + (n.pref?-1:1) * (env + CLEAR);
+      n.box = {x:xL, w:xR-xL, y:anchor + (n.pref?UP_TOP:DN_TOP), h:bh(n.pref)};
+      n.up = n.pref; n.dx = dx; n.anchorY = vb.y + anchor * k;
+      n.t1.setAttribute('y', n.pref ? L1_UP : L1_DN);
+      n.t2.setAttribute('y', n.pref ? L2_UP : L2_DN);
+      n.lbl.classList.add('nofit'); n.stem.classList.add('nofit');
+    };
+    return {e, n, cx, hw, dx, side, drop};
+  };
+
+  // Strand labels whose dots sit under each other's text can never all hang
+  // straight from the same strand: the second one's stem would run through
+  // the first. They are laid side by side as a group, centred so the outer
+  // stems lean equally, at the shallowest lane where every stem stays under
+  // the lean limit: the stems open into a V instead of one label being
+  // stacked over another or dropped.
+  // Twins on one dot are one block with one stem: the nearer label hangs
+  // straight from the dot and the other sits directly beyond it, in the next
+  // lane, with no stem of its own — two events of one year on one strand.
+  const stack = (m, up) => {
+    for (let row=0; row<LANES+INNER; row++){
+      const last = row + m.length - 1;
+      if (last >= LANES+INNER || (row < LANES && last >= LANES)) continue;   // never straddle outer and inner
+      const cs = m.map((q,i) => slot(q.cx + q.dx, q.hw, up, row+i, stemY(q.n, up), q.e));
+      const q0 = m[0], c0 = cs[0], sy = stemY(q0.n, up);
+      let ok = cs.every((c,i) => free(c.b) && ownSide(c.b, vb, k, m[i].e) && (!c.pinned || marksClear(c.b, vb, k, vis, m[i].e)));
+      ok = ok && lean(q0.cx, sy, q0.cx + q0.dx, c0.anchor) <= LEAN_MAX
+              && stemClear(q0.cx, sy, q0.cx + q0.dx, c0.anchor, vb, k, vis, q0.e, placed, stems, box);
+      if (ok) return m.map((q,i) => ({q, got:{up:cs[i].up, side:up, anchor:cs[i].anchor, b:cs[i].b, nostem:i>0}}));
+    }
+    return null;
+  };
+  const pair = (ms, sides) => {
+    if (ms.every(q => Math.abs(q.cx - ms[0].cx) < 1 && q.e.s === ms[0].e.s)){
+      for (const up of sides){ const res = stack(ms, up); if (res) return res; }
+    }
+    const m = ms.slice().sort((p,q) => p.cx - q.cx);
+    // A crossing still to be placed at this same year will want a straight
+    // stem through the middle of the V: leave it a corridor between the two.
+    const mid = m.reduce((s,q) => s + q.cx, 0)/m.length;
+    const xf = vis.filter(f => f.s === 'both' && !done.has(f)).map(f => (x(f.y)-vb.x)/k).find(X => Math.abs(X - mid) < 20);
+    const gap = xf === undefined || m.length > 2 ? 2*LGAP : 18;
+    const Wg = m.reduce((s,q) => s + 2*q.hw, 0) + gap*(m.length-1);
+    let run = 0; m.forEach(q => { q.pos = run + q.hw; run += 2*q.hw + gap; });   // centre_i = left + pos_i
+    const o = m.map(q => q.pos - q.cx);                                          // lean_i = left + o_i
+    let left = gap === 2*LGAP ? -(Math.max(...o) + Math.min(...o))/2              // equal and opposite leans
+                              : xf - (2*m[0].hw + gap/2);                          // corridor on the crossing
+    left = Math.max(PADL + EDGE, Math.min(W - PADR - EDGE - Wg, left));
+    m.forEach(q => { q.cv = left + q.pos; q.c = q.cv; });
+    for (const up of sides){
+      let relaxed = null;
+      const depth = (q, row) => Math.abs(slot(q.c, q.hw, up, row, stemY(q.n, up), q.e).anchor - stemY(q.n, up));
+      const lanes = [...Array(LANES+INNER).keys()], pins = [...Array(PINS).keys()].map(i => LANES+INNER+i);
+      // The two need not share a row: on a slope one hangs outside the strand
+      // and the other in the gap, each on the shortest stem that clears.
+      // Row pairs are walked by the deeper of the two stems, then evenness.
+      let combos;
+      if (m.length === 2){
+        combos = [];
+        lanes.forEach(r0 => lanes.forEach(r1 => { const d0 = depth(m[0], r0), d1 = depth(m[1], r1); combos.push({rows:[r0,r1], key:Math.max(d0,d1) + Math.abs(d0-d1)/4}); }));
+        combos.sort((p,q) => p.key - q.key);
+        combos = combos.map(o => o.rows).concat(pins.map(r => [r,r]));
+      } else {
+        combos = lanes.map(row => ({row, d:depth(m[0], row)})).sort((p,q) => p.d - q.d).map(o => m.map(() => o.row)).concat(pins.map(r => m.map(() => r)));
+      }
+      for (const rows of combos){
+        const row = rows[0];
+        if (row >= LANES+INNER && relaxed) return relaxed;
+        // One outside the strand and one in the gap hang in opposite
+        // directions, so neither stem meets the other's box: both go straight.
+        const apart = m.length === 2 && (rows[0] >= LANES && rows[0] < LANES+INNER) !== (rows[1] >= LANES && rows[1] < LANES+INNER);
+        m.forEach(q => { q.c = apart ? q.cx + q.dx : q.cv; });
+        const cs = m.map((q,i) => slot(q.c, q.hw, up, rows[i], stemY(q.n, up), q.e));
+        let worst = 0, ok = true;
+        for (let i=0; i<m.length && ok; i++){
+          const q = m[i], c = cs[i], others = cs.filter((_,j) => j!==i).map(o => o.b), sy = stemY(q.n, up);
+          ok = free(c.b) && ownSide(c.b, vb, k, q.e) && !others.some(o => hit(c.b, o, LGAP)) && (!c.pinned || marksClear(c.b, vb, k, vis, q.e));
+          if (!ok) break;
+          const L = lean(q.cx, sy, q.c, c.anchor); worst = Math.max(worst, L);
+          ok = L <= LEAN_RELAX && stemClear(q.cx, sy, q.c, c.anchor, vb, k, vis, q.e, placed.concat(others), stems, box);
+        }
+        if (!ok) continue;
+        const res = m.map((q,i) => ({q, got:{up:cs[i].up, side:up, anchor:cs[i].anchor, b:cs[i].b}}));
+        if (worst <= LEAN_MAX) return res;
+        if (!relaxed) relaxed = res;
+      }
+      if (relaxed) return relaxed;
+    }
+    return null;
+  };
+
+  // Crossings (both strands) claim their slots first: their tie fixes where
+  // they can hang. Everything else goes left to right, whether or not it is
+  // in the overview: giving a later landmark first pick was what left its
+  // neighbours with nowhere to go.
+  // The exception is a crossing with a strand label's dot under its text: its
+  // own label can hang from either strand, so it waits until the strand labels
+  // around it are settled, then takes whichever side lets it hang straight.
+  // A strand label never crosses to the far side of the other strand: its
+  // own side is part of what it means. With no room outside its strand or in
+  // the gap it takes a lane further out, and only as the very last resort is
+  // it hidden.
+  // The greedy order is the one thing that can be varied when a crowded
+  // decade defeats it: left to right, then landmarks first, then right to left;
+  // and, last, letting a crossing keep a straight stem over the strand label
+  // under it, which then finds a lane of its own.
+  const pri = e => (e.s==='both' ? 2 : 0) + (variant === 1 && e.key ? 1 : 0);
+  const dir = variant === 2 ? -1 : 1;
+  const order = vis.slice().sort((p,q) => (pri(q) - pri(p)) || dir*(p.y - q.y));
+  const done = new Set(), later = [], stuck = [];
+  const under = (S, f, sameSide) => f !== S.e && !done.has(f)
+        && (!sameSide || evNodes[EVENTS.indexOf(f)].pref === S.n.pref)
+        && Math.abs((x(f.y)-vb.x)/k - S.cx) < Math.max(S.hw, evNodes[EVENTS.indexOf(f)].bw/2) + 3;
+  const place = (S, sides) => { for (const [up, st, cap] of sides){ const got = S.side(up, st, cap); if (got){ commit(S.n, got, S.cx); return true; } } return false; };
+  // Before a label is dropped, a steep lean is the lesser evil; and before
+  // that, a neighbouring crossing's tie passing behind the text — its year
+  // is printed, so the reader is not misled.
+  const last = S => {
+    const sides = S.n.half ? [S.n.pref, !S.n.pref] : [S.n.pref];   // a crossing may hang from either strand
+    if (place(S, sides.map(up => [up, false, LEAN_LAST]))) return;
+    looseTies = true;
+    const ok = place(S, sides.map(up => [up, true]).concat(sides.map(up => [up, false, LEAN_LAST])));
+    looseTies = false;
+    if (!ok) S.drop();
+  };
+  // A marker that has left the frame (free zoom) takes its label with it: a
+  // label whose dot cannot be seen is a caption to nothing.
+  const onScreen = S => { const Y = (S.n.cy - vb.y)/k, h = S.n.half/k;
+    return S.cx > -8 && S.cx < W + 8 && Y + h > PADT - 8 && Y - h < H - AXIS_PX + 8; };
+  order.forEach(e => {
+    if (done.has(e)) return;
+    const S = solver(e);
+    if (!onScreen(S)){ done.add(e); S.drop(); return; }
+    if (e.s === 'both'){
+      if (variant === 3 && place(S, [[S.n.pref, true], [!S.n.pref, true]])){ done.add(e); return; }
+      if (order.some(f => f.s !== 'both' && under(S, f, false))) later.push(S);
+      // Straight on either strand before any slide: a crossing belongs to both.
+      else { done.add(e); if (!place(S, [[S.n.pref, true], [!S.n.pref, true], [S.n.pref], [!S.n.pref]])) last(S); }
+      return;
+    }
+    done.add(e);
+    // Twins: strand labels, still unplaced, wanting the same side, whose dots
+    // sit under this label (or this dot under theirs): lay them out together,
+    // at most three abreast.
+    let twins = order.filter(f => f.s !== 'both' && under(S, f, true));
+    // Twins on this very dot come first, as one block; a near neighbour with
+    // a dot of its own is a V-pair, and only when there is no block to make.
+    const same = twins.filter(f => f.y === e.y && f.s === e.s);
+    twins = (same.length ? same : twins).slice(0, 2);
+    if (twins.length){
+      const res = pair([S, ...twins.map(solver)], [S.n.pref]);
+      if (res){ res.forEach(r => commit(r.q.n, r.got, r.q.cx)); twins.forEach(f => done.add(f)); return; }
+    }
+    if (!place(S, [[S.n.pref]])) stuck.push(S);   // last resorts wait for the crossings
+  });
+  // The deferred crossings: straight on either strand before any slide.
+  later.forEach(S => { done.add(S.e); if (!place(S, [[S.n.pref, true], [!S.n.pref, true], [S.n.pref], [!S.n.pref]])) last(S); });
+  stuck.forEach(last);
+}
+
+// One layout, or up to three when the first leaves a label with no home:
+// the greedy solver is order-dependent, and a second order often finds room
+// the first could not. When every label has a home but one hangs on a stem
+// past the strict lean, the crossing-first order is tried instead. The best
+// of what was tried is what stays: fewest hidden, then fewest steep stems,
+// then least slid.
+function solve(vis, vb){
+  let best = null, last = -1;
+  const vs = [0];
+  for (let i=0; i<vs.length; i++){
+    const v = vs[i];
+    layout(vis, vb, v); last = v;
+    const nHid = vis.filter(e => !evNodes[EVENTS.indexOf(e)].fit).length;
+    const nLean = vis.filter(e => evNodes[EVENTS.indexOf(e)].lean > LEAN_MAX).length;
+    const slid = vis.reduce((s,e) => s + Math.abs(evNodes[EVENTS.indexOf(e)].dx), 0);
+    if (!best || nHid < best.nHid || (nHid === best.nHid && (nLean < best.nLean || (nLean === best.nLean && slid < best.slid)))) best = {v, nHid, nLean, slid};
+    if (nHid === 0 && nLean === 0) break;
+    if (v === 0) vs.push(...(nHid ? [1, 2] : [3]));
+  }
+  if (best.v !== last) layout(vis, vb, best.v);
+  return best.nHid;
+}
+
+// ---- camera -------------------------------------------------------------
+let cur = {x:0,y:0,w:VB_W,h:VB_H}, anim=null, flyP=1;
+function applyVB(){
+  svg.setAttribute('viewBox', `${cur.x} ${cur.y} ${cur.w} ${cur.h}`);
+  // Counter-scale every text group against the RENDERED width, so a 13px font
+  // in user units lands as 13 real pixels no matter how far we have zoomed.
+  const px = svg.getBoundingClientRect().width || VB_W;
+  const k = cur.w / px;
+  const s = `scale(${k.toFixed(4)})`;
+  drawAxis();
+  placeTags();
+  evNodes.forEach(n => {
+    const aY = n.a0 + (n.a1 - n.a0) * flyP;          // data-space y of the anchor
+    const dx = (n.dx0 + (n.dx1 - n.dx0) * flyP) * k; // edge nudge, data units
+    const local = aY - n.cy;
+    n.lbl.setAttribute('transform', `translate(${dx.toFixed(2)},${local.toFixed(2)}) ${s}`);
+    // A crossing's stem leaves from its cap on the strand nearest the label, so
+    // a label that slid sideways gets a short lean, not a diagonal across the braid.
+    const y1 = n.half ? (local > 0 ? n.half : -n.half) : 0;
+    n.stem.setAttribute('y1', y1);
+    // The anchor is the top of the em box, a few pixels above the tallest
+    // glyph; run the stem on to the ink so its tip disappears under the cream
+    // halo and reads as touching the text, not floating short of it.
+    n.stem.setAttribute('y2', (local + (n.up ? -STEM_IN_UP : STEM_IN_DN) * k).toFixed(2));
+    n.stem.setAttribute('x2', dx.toFixed(2));
+    if (n.nostem) n.stem.setAttribute('y1', n.stem.getAttribute('y2'));
+    // Screen-constant marker sizes: 4.5 px dot (6 px when its era is on), 2.5 px caps.
+    const on = n.gm.classList.contains('on');
+    n.dot.setAttribute('r', ((on ? 6 : 4.5) * k).toFixed(2));
+    n.caps.forEach(c => c.setAttribute('r', (2.5 * k).toFixed(2)));
+    n.stem.setAttribute('stroke-width', (1.2 * k).toFixed(2));
+    if (n.tie) n.tie.setAttribute('stroke-width', (2 * k).toFixed(2));
+  });
+}
+const tagN = document.getElementById('tagN'), tagA = document.getElementById('tagA');
+// Where the strand names sit for a given camera, in stage pixels. Shared by the
+// renderer and the label solver, which treats them as obstacles.
+function tagBoxes(vb, W, H){
+  const k = vb.w / W, py = v => (v - vb.y) / vb.h * H;
+  const inside = y => y >= PADT + 6 && y <= H - AXIS_PX - 22;   // a strand off-screen takes its name with it
+  const card = capBox();
+  // Where a name would sit under the card, it steps right to the card's edge
+  // and rides its strand there instead.
+  const at = (which, dy, w) => {
+    let X = 14;
+    for (let pass=0; pass<2; pass++){
+      const yr = Math.max(Y0, Math.min(Y1, yearAt(vb.x + X*k)));
+      const y = py(strandY(yr, which)) + dy, b = {x:X, y, w, h:20, off:!inside(y)};
+      if (!card || !hit(b, card, 6) || X > 14) return b;
+      X = card.x + card.w + 14;
+    }
+  };
+  return [at('neuro', -27, tagN.offsetWidth||120), at('ai', 13, tagA.offsetWidth||190)];
+}
+function placeTags(){
+  const r = svg.getBoundingClientRect(); if (!r.height) return;
+  const [bN, bA] = tagBoxes(cur, r.width, r.height);
+  tagN.style.top = bN.y + 'px'; tagN.style.left = bN.x + 'px'; tagN.classList.toggle('off', bN.off);
+  tagA.style.top = bA.y + 'px'; tagA.style.left = bA.x + 'px'; tagA.classList.toggle('off', bA.off);
+}
+const axis = document.getElementById('axis');
+function drawAxis(){
+  const span = (cur.w / (X1-X0)) * (Y1-Y0);          // years currently on screen
+  const step = span > 70 ? 10 : span > 34 ? 5 : span > 14 ? 2 : 1;
+  let html = '';
+  const from = Math.max(Y0, Math.ceil((Y0 + (cur.x-X0)/(X1-X0)*(Y1-Y0)) / step) * step);
+  for (let yr=from; yr<=Y1; yr+=step){
+    const pc = (x(yr) - cur.x) / cur.w * 100;
+    if (pc < 1 || pc > 99) continue;
+    html += `<i style="left:${pc}%"></i><span style="left:${pc}%">${yr}</span>`;
+  }
+  axis.innerHTML = html;
+}
+
+function fly(to, ms=700){
+  if (anim) cancelAnimationFrame(anim);
+  const from = {...cur}, t0 = performance.now();
+  const step = now => {
+    // The first frame's timestamp can predate t0 after a long synchronous
+    // layout, which would run the easing backwards through zero.
+    const p = Math.max(0, Math.min(1,(now-t0)/ms));
+    const e = p<.5 ? 4*p*p*p : 1-Math.pow(-2*p+2,3)/2;   // easeInOutCubic
+    flyP = e;
+    cur = {x:from.x+(to.x-from.x)*e, y:from.y+(to.y-from.y)*e,
+           w:from.w+(to.w-from.w)*e, h:from.h+(to.h-from.h)*e};
+    applyVB();
+    if (p<1) anim = requestAnimationFrame(step); else { flyP = 1; anim = null; }
+  };
+  anim = requestAnimationFrame(step);
+}
+
+// The true vertical extent of everything on screen for a given camera: the two
+// strands across the YEARS ACTUALLY VISIBLE (not just the era's, which stops
+// short of the frame), a focused dot's radius on top of them, every tie, and
+// every label the solver placed.
+function contentBand(vb, vis, W){
+  const k = vb.w / W;
+  const env = envHalf(yearAt(vb.x), yearAt(vb.x + vb.w)) + 8;
+  let top = MID - env, bot = MID + env;
+  vis.forEach(e => {
+    const n = evNodes[EVENTS.indexOf(e)];
+    if (e.s === 'both'){                       // tie ends, with their caps
+      top = Math.min(top, MID - HALF(e.y) - 4);
+      bot = Math.max(bot, MID + HALF(e.y) + 4);
+    }
+    if (!n.fit) return;
+    top = Math.min(top, n.anchorY + (n.up?UP_TOP:DN_TOP)*k);
+    bot = Math.max(bot, n.anchorY + (n.up?UP_BOT:DN_BOT)*k);
+  });
+  return {top, bot};
+}
+// Sit that band centred between the top margin and the year axis. When it is
+// taller than the frame the overflow is shared evenly, so a strand that runs
+// past the edge does so at both ends rather than all at the bottom.
+function recenter(vb, vis, W, H){
+  const k = vb.w / W, b = contentBand(vb, vis, W);
+  const slack = (H - AXIS_PX - EDGE - PADT) - (b.bot - b.top)/k;
+  return b.top - (PADT + EDGE + slack/2) * k;
+}
+
+// Frame an era, lay the labels out, then reframe on what the labels actually
+// occupy. Three things force a wider view: text deeper than the frame is tall,
+// text hanging off either end, and a label the solver could not place at all.
+function fitEra(era, vis, W, H, aspect){
+  let w = Math.max(460, x(era.b) - x(era.a) + 160);
+  // Nothing lies beyond the ends of the braid: a frame that would show empty
+  // years past either end slides back onto the data instead — and is judged
+  // there, since sliding a frame changes what its labels can do.
+  const x0 = x(Y0) - 30, x1 = x(Y1) + 30;
+  const onData = vb => { if (vb.w < x1 - x0){ if (vb.x + vb.w > x1) vb.x = x1 - vb.w; if (vb.x < x0) vb.x = x0; } return vb; };
+  let vb = onData({x:(x(era.a)+x(era.b))/2 - w/2, y:MID - w*aspect/2, w, h:w*aspect});
+  // Zooming out frees room for labels, but a label the solver cannot place
+  // for lack of a legal stem stays unplaced at any zoom: once a wider frame
+  // has stopped helping, keep the tightest frame that did best. A label on a
+  // stem past the strict lean is not settled either: a frame is only tight
+  // enough to keep when every stem is under it, and otherwise the best frame
+  // is the one with the fewest hidden, then the fewest steep.
+  // Each pass judges the frame the pass before it built, and what it keeps
+  // is that frame, as judged — not the recentred one it builds next, which
+  // no pass has laid out yet.
+  let best = null, stale = 0, good = null;
+  for (let pass=0; pass<12; pass++){
+    const judged = {...vb};
+    solve(vis, vb);
+    const k = w/W, h = w*aspect;
+    // the strands themselves, plus the radius of a focused dot sitting on one
+    let up = envHalf(era.a, era.b) + 8, dn = up;
+    let l = x(era.a), r = x(era.b), all = true;
+    vis.forEach(e => {
+      const n = evNodes[EVENTS.indexOf(e)];
+      // every marker of the era on screen, whatever its label did
+      up = Math.max(up, MID - n.cy + n.half + 10*k);
+      dn = Math.max(dn, n.cy + n.half - MID + 10*k);
+      up = Math.max(up, MID - (n.anchorY + (n.up?UP_TOP:DN_TOP)*k));
+      dn = Math.max(dn, (n.anchorY + (n.up?UP_BOT:DN_BOT)*k) - MID);
+      l = Math.min(l, x(e.y) + (n.dx - n.bw/2)*k);
+      r = Math.max(r, x(e.y) + (n.dx + n.bw/2)*k);
+      all = all && n.fit && n.lean <= LEAN_MAX;
+    });
+    const needH = up + dn + (PADT + EDGE + AXIS_PX)*k;
+    const band = w * (W - PADL - PADR) / W;          // data units the map may use
+    const needW = ((r-l) + 2*EDGE*k) * W / (W - PADL - PADR);
+    // Centre on the content: the axis eats the bottom, so the mid-line rides high.
+    vb = onData({x: l - (PADL + EDGE)*k - (band - (r-l) - 2*EDGE*k)/2,
+                 y: MID - up - (PADT + EDGE)*k - (h-needH)/2, w, h});
+    if (needH <= h && needW <= w){
+      if (all){
+        // Everything fits: the growth steps overshoot, so try a notch tighter,
+        // up to three times, and keep the tightest frame that still fits all.
+        if ((good && good.n >= 3) || w <= 460){ w = good ? good.w : w; if (good) vb = {...good.vb}; break; }
+        good = {w:judged.w, vb:judged, n:(good ? good.n : 0) + 1};
+        w = Math.max(460, w * 0.93); continue;
+      }
+      if (good){ w = good.w; vb = {...good.vb}; break; }
+      const nHid = vis.filter(e => !evNodes[EVENTS.indexOf(e)].fit).length;
+      const nLean = vis.filter(e => evNodes[EVENTS.indexOf(e)].lean > LEAN_MAX).length;
+      if (!best || nHid < best.nHid || (nHid === best.nHid && nLean < best.nLean)){ best = {nHid, nLean, vb:judged, w:judged.w}; stale = 0; }
+      else if (++stale >= 2){ w = best.w; vb = {...best.vb}; break; }
+    } else if (good){ w = good.w; vb = {...good.vb}; break; }
+    w = Math.min(3000, w * Math.min(1.6, Math.max(needH/h, needW/w, all?1:1.13) * 1.03));
+  }
+  if (good && (w !== good.w)){ w = good.w; vb = {...good.vb}; }
+  onData(vb);
+  solve(vis, vb);                        // converge against the final width
+  // One re-centring pass on what is really there, and one re-solve against it.
+  // Never more: the solver and the camera would chase each other. If the
+  // re-solve costs a label its home, or a stem its strict lean, the shift is
+  // given back.
+  const cost = () => vis.reduce((s,e) => { const n = evNodes[EVENTS.indexOf(e)]; return s + (n.fit ? 0 : 1000) + (n.lean > LEAN_MAX ? 1 : 0); }, 0);
+  const c0 = cost(), y0 = vb.y;
+  vb.y = recenter(vb, vis, W, H);
+  solve(vis, vb);
+  if (cost() > c0){ vb.y = y0; solve(vis, vb); }
+  return vb;
+}
+
+// Where the card can dock: the four corners and the two mid-height edges, where
+// it floats over the braid; then a top strip, where the map is inset below the
+// card so it covers nothing at all. A column docking is never offered: it
+// leaves half the frame to the card and packs the braid into the other half.
+// Order is the preference order.
+const cardSpots = (W,H,cw,ch) => {
+  const xs = [22, (W-cw)/2, W-22-cw], ys = [18, (H-AXIS_PX-ch)/2, H-AXIS_PX-10-ch];
+  const out = [];
+  ys.forEach(y => xs.forEach(x => out.push({x,y})));
+  out.push({x:22, y:18, padT:ch+18+10});
+  return out;
+};
+let dockSpot = null;
+function dockAt(s){
+  dockSpot = s;
+  cap.style.left = Math.round(Math.max(8, s.x)) + 'px';
+  cap.style.top  = Math.round(Math.max(8, s.y)) + 'px';
+  PADL = s.padL || 0; PADR = s.padR || 0; PADT = s.padT || 0;
+  measureRects();
+}
+// What the card buries where it sits: a dot or a tie, then a strand. An
+// in-era strand under the card costs more than a modest zoom out, so a top
+// strip or a corner over ghost strands is taken when one exists; a ghost
+// strand or a ghost dot stays cheap, or the card would flee into the gap
+// between the strands, over the lanes the labels need.
+function buryCost(vb, vis, W, r){
+  const k = vb.w/W;
+  let cost = 0;
+  EVENTS.forEach(e => {                      // a ghost of another era counts too, for less
+    const n = evNodes[EVENTS.indexOf(e)];
+    const X = (x(e.y)-vb.x)/k, half = e.s==='both' ? HALF(e.y)/k : 0;
+    if (hit({x:X-10, y:(n.cy-vb.y)/k-half-10, w:20, h:2*half+20}, r, 4)) cost += vis.includes(e) ? 600 : 40;
+  });
+  const era = ERAS[idx];
+  for (let X=Math.max(0,r.x); X<=r.x+r.w; X+=8){
+    const yr = yearAt(vb.x + X*k);
+    if (yr < Y0 || yr > Y1) continue;
+    const own = idx && yr >= era.a && yr <= era.b;   // the era's own strand, or a ghost
+    for (const wc of ['neuro','ai']){
+      const Y = (strandY(yr,wc)-vb.y)/k;
+      if (Y > r.y-3 && Y < r.y+r.h+3) cost += own ? 20 : 4;
+    }
+  }
+  return cost;
+}
+// What a docking costs, judged on the layout it actually produced: a label with
+// nowhere left to go is worst, then a buried dot, then a stem the card forced
+// past the strict lean, then a buried strand — and finally how far it forced
+// the zoom out.
+function cardCost(vb, vis, W, grow){
+  const r = capBox();
+  let cost = grow * 1200 + (r ? buryCost(vb, vis, W, r) : 0);
+  vis.forEach(e => {
+    const n = evNodes[EVENTS.indexOf(e)];
+    if (!n.fit) cost += 4000; else if (n.lean > LEAN_MAX) cost += 300;
+  });
+  return cost;
+}
+
+let idx = 0;
+function show(i){
+  idx = Math.max(0, Math.min(ERAS.length-1, i));
+  const era = ERAS[idx];
+  // The card is an obstacle, so its text and its size must be settled before a
+  // single label is placed.
+  cap.classList.toggle('on', !!era.title);
+  cap.querySelector('h2').textContent = era.title;
+  cap.querySelector('.l1').textContent = era.lines[0]||'';
+  cap.querySelector('.l2').textContent = era.lines[1]||'';
+
+  measureRects();
+  const W = RECT.w, H = RECT.h, aspect = H/W;
+  const vis = EVENTS.filter(e => idx===0 ? e.key : (e.y>=era.a && e.y<=era.b));
+  evNodes.forEach(n => { n.a0 = n.a1; n.dx0 = n.dx1; });   // fly from where they are
+
+  // Solve the era once with no card to get a baseline zoom, then solve it again
+  // for every docking spot and keep the cheapest. Judging the card on the
+  // finished layout is the only way to see what it really costs.
+  ignoreCard = true; PADL = PADR = PADT = 0;
+  let vb = fitEra(era, vis, W, H, aspect);
+  ignoreCard = false;
+  {
+    const w0 = vb.w, c = {width:CAPR.w, height:CAPR.h};
+    let best = null;
+    // The title of the all-years view stays at the top left, floating or as a strip.
+    let spots = cardSpots(W, H, c.width, c.height).map((s,i) => ({s, i})).filter(({s,i}) => idx !== 0 || i === 0 || s.padT);
+    // Refitting a crowded era for every docking is slow: there each float is
+    // first judged by one solve at the card-free camera with the card in the
+    // way, which already shows what it hides and what it bends, and only the
+    // four cheapest floats and the strip are refitted. A small era can afford
+    // every docking: the screen is only an estimate, and on a narrow window it
+    // can miss the one docking that places every label.
+    const screen = ({s}) => {
+      if (s.padT) return -1;
+      dockAt(s); solve(vis, vb);
+      return cardCost(vb, vis, W, 0);
+    };
+    spots = spots.map(o => ({...o, pre:screen(o)})).sort((p,q) => p.pre - q.pre).slice(0, vis.length > 8 ? 5 : 10);
+    spots.forEach(({s,i}) => {
+      dockAt(s);
+      const v = fitEra(era, vis, W, H, aspect);
+      const cost = cardCost(v, vis, W, v.w/w0 - 1) + i*3;
+      if (!best || cost < best.cost) best = {cost, s};
+    });
+    dockAt(best.s);
+  }
+  vb = fitEra(era, vis, W, H, aspect);
+  evNodes.forEach(n => { n.a1 = n.anchorY; n.dx1 = n.dx; });
+
+  fly(vb);
+  EVENTS.forEach((e,j) => {
+    const on = idx===0 ? !!e.key : (e.y>=era.a && e.y<=era.b);
+    evNodes[j].gm.classList.toggle('on', on);
+    evNodes[j].gl.classList.toggle('on', on);
+  });
+  [...document.querySelectorAll('.chip')].forEach((c,j)=>c.classList.toggle('on', j===idx));
+  document.getElementById('prev').disabled = idx===0;
+  document.getElementById('next').disabled = idx===ERAS.length-1;
+}
+
+// Re-solve at the current camera, without moving it: for free zoom, where the
+// lanes would otherwise keep the spacing they were given at era scale.
+function relayout(){
+  measureRects();
+  const era = ERAS[idx];
+  const vis = EVENTS.filter(e => idx===0 ? e.key : (e.y>=era.a && e.y<=era.b));
+  // A floating card whose spot the braid has drifted under steps to another
+  // floating spot — only when that clearly buries less, so it does not hop
+  // about while the map moves, and never onto a marker of the era: a card in
+  // the gap over a tie is worse than one over a strand. A top-strip docking
+  // stays where it is, but the strip itself is gone: the camera is the
+  // user's now, and a braid dragged under the card is no reason to hide
+  // the labels there.
+  PADT = 0;
+  if (idx !== 0 && dockSpot && !dockSpot.padT){
+    const W = RECT.w, H = RECT.h, c = {w:CAPR.w, h:CAPR.h}, k = cur.w/W;
+    const at = s => ({x:Math.max(8,s.x), y:Math.max(8,s.y), w:c.w, h:c.h});
+    const clear = r => !vis.some(e => { const n = evNodes[EVENTS.indexOf(e)], X = (x(e.y)-cur.x)/k, half = n.half/k;
+      return hit({x:X-10, y:(n.cy-cur.y)/k-half-10, w:20, h:2*half+20}, r, 4); });
+    const now = buryCost(cur, vis, W, at(dockSpot));
+    let best = null;
+    cardSpots(W, H, c.w, c.h).forEach((s,i) => {
+      if (s.padT || !clear(at(s))) return;
+      const cost = buryCost(cur, vis, W, at(s)) + i*3;
+      if (!best || cost < best.cost) best = {cost, s};
+    });
+    if (best && best.cost < now - 300) dockAt(best.s);
+  }
+  solve(vis, cur);
+  evNodes.forEach(n => { n.a0 = n.a1 = n.anchorY; n.dx0 = n.dx1 = n.dx; });
+  flyP = 1;
+}
+
+const chapters = document.getElementById('chapters');
+ERAS.forEach((e,i) => {
+  const b = document.createElement('button');
+  b.className='chip'; b.textContent=e.k; b.onclick=()=>show(i);
+  chapters.appendChild(b);
+});
+document.getElementById('prev').onclick = () => show(idx-1);
+document.getElementById('next').onclick = () => show(idx+1);
+addEventListener('keydown', ev => {
+  if (ev.key==='ArrowRight'||ev.key===' '){ show(idx+1); ev.preventDefault(); }
+  if (ev.key==='ArrowLeft'){ show(idx-1); ev.preventDefault(); }
+  if (ev.key==='0'||ev.key==='Home') show(0);
+});
+
+// Free pan and zoom, so the map can be taken anywhere mid-lecture.
+// The camera moves on every notch and every pointer move; the labels keep the
+// anchors they have and only counter-scale, then settle in one re-solve once
+// the wheel or the pointer has been still for a moment. Re-solving per notch
+// made the labels flicker between homes while zooming. A chapter flight in
+// progress owns the labels: a settle that lands during one is skipped.
+let drag=null, dragMoved=false, settleT=null;
+const settle = () => {
+  clearTimeout(settleT);
+  settleT = setTimeout(() => { settleT = null; if (!anim){ relayout(); applyVB(); } }, 120);
+};
+svg.addEventListener('pointerdown', e => {
+  dragMoved=false;
+  drag={px:e.clientX,py:e.clientY,vb:{...cur}};
+  svg.classList.add('dragging'); svg.setPointerCapture(e.pointerId);
+});
+svg.addEventListener('pointermove', e => {
+  if(!drag) return;
+  if (Math.hypot(e.clientX-drag.px, e.clientY-drag.py) > 4) dragMoved=true;
+  const r=svg.getBoundingClientRect(), k=cur.w/r.width;
+  cur={...drag.vb, x:drag.vb.x-(e.clientX-drag.px)*k, y:drag.vb.y-(e.clientY-drag.py)*k};
+  applyVB();
+  settle();
+});
+addEventListener('pointerup', ev => {
+  if (!drag) return;
+  drag=null; svg.classList.remove('dragging');
+  // The drag handler captures the pointer, so a click never reaches the label
+  // itself; resolve it here from whatever is under the pointer on release.
+  if (dragMoved) return;
+  const hit = document.elementFromPoint(ev.clientX, ev.clientY);
+  const lbl = hit && hit.closest && hit.closest('.lbl.link');
+  if (lbl && lbl.dataset.u) window.open(lbl.dataset.u, '_blank', 'noopener');
+});
+svg.addEventListener('wheel', e => {
+  e.preventDefault();
+  if (anim){ cancelAnimationFrame(anim); anim=null; flyP=1; }
+  const r=svg.getBoundingClientRect();
+  const mx=cur.x+(e.clientX-r.left)/r.width*cur.w, my=cur.y+(e.clientY-r.top)/r.height*cur.h;
+  const f = e.deltaY>0 ? 1.12 : 1/1.12;
+  const w = Math.min(2600, Math.max(420, cur.w*f)), h = w*(cur.h/cur.w);
+  cur = {x:mx-(mx-cur.x)*(w/cur.w), y:my-(my-cur.y)*(h/cur.h), w, h};
+  applyVB();
+  settle();
+}, {passive:false});
+
+const srcEl = document.getElementById('src');
+const toggleSrc = on => { srcEl.classList.toggle('on', on); document.getElementById('srcBtn').classList.toggle('on', on); };
+document.getElementById('srcBtn').onclick = () => toggleSrc(!srcEl.classList.contains('on'));
+document.getElementById('srcClose').onclick = () => toggleSrc(false);
+addEventListener('keydown', ev => { if (ev.key==='Escape') toggleSrc(false); });
+
+addEventListener('resize', () => show(idx));
+// Deep link: #era=3 opens on that chapter (0 = all years), so a lecture can embed
+// the braid already zoomed to its own decade.
+const hashEra = () => { const m = /era=(\d+)/.exec(location.hash); return m ? +m[1] : 0; };
+addEventListener('hashchange', () => show(hashEra()));
+show(hashEra());
+</script>
+</body>
+</html>

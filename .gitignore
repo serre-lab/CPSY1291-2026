@@ -1,0 +1,8 @@
+# Nothing here is private: this repo is the student-facing course website.
+# These patterns exist so an answer key can never be copied in by accident.
+*KEY*.ipynb
+*_KEY.*
+*solution*
+*SOLUTION*
+qa-reports/
+.DS_Store

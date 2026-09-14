@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A map of mental space — CPSY 1291</title>
+<style>
+  :root{ --sienna:#9C5A2E; --slate:#3E6D8E; --teal:#3F7A6B;
+         --cream:#FAF9F5; --ink:#1E293B; --muted:#5B6B7A; --rule:#E7E3DA; }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--cream);color:var(--ink);
+    font-family:"Helvetica Neue",Arial,system-ui,sans-serif;overflow:hidden}
+  #wrap{height:100%;display:flex;flex-direction:column}
+  #stage{position:relative;flex:1;overflow:hidden;cursor:grab}
+  #stage.drag{cursor:grabbing}
+  svg{position:absolute;inset:0;width:100%;height:100%}
+  .dot{transition:opacity .25s}
+  .thumb{transition:opacity .25s}
+  #tip{position:absolute;pointer-events:none;opacity:0;transition:opacity .12s;
+    background:var(--ink);color:var(--cream);font-size:13px;font-weight:600;
+    padding:5px 10px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-140%)}
+  #bar{display:flex;align-items:center;gap:14px;padding:9px 14px;border-top:1px solid var(--rule);
+    font-size:13px;color:var(--muted);flex-wrap:wrap}
+  .key{display:flex;align-items:center;gap:5px;font-weight:700;color:var(--ink);cursor:pointer;
+    opacity:.45;transition:opacity .15s}
+  .key.on{opacity:1}
+  .key i{width:12px;height:12px;border-radius:3px;display:inline-block}
+  button{font:inherit;font-weight:700;padding:4px 12px;border-radius:8px;border:2px solid var(--slate);
+    background:#fff;color:var(--slate);cursor:pointer}
+  .hint kbd{font-family:inherit;font-weight:700;background:#fff;border:1px solid var(--rule);
+    border-radius:5px;padding:1px 6px;color:var(--ink)}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <svg id="map" aria-label="A map of 120 animal photographs placed by multidimensional scaling of human similarity judgments. Zoom in to replace each point with its photograph."></svg>
+    <div id="tip"></div>
+  </div>
+  <div id="bar">
+    <button id="reset">Reset</button>
+    <div id="legend" style="display:flex;gap:12px;flex-wrap:wrap"></div>
+    <span class="hint" style="margin-left:auto"><kbd>scroll</kbd> zoom · <kbd>drag</kbd> pan · zoom in to see the photographs</span>
+  </div>
+</div>
+<script>
+const PTS = [{"x":-0.5951,"y":0.6081,"g":"Hoofed mammal","l":"hartebeest","i":0},{"x":-0.3114,"y":0.7603,"g":"Hoofed mammal","l":"hartebeest","i":1},{"x":0.3434,"y":-0.8855,"g":"Amphibian","l":"tree frog","i":2},{"x":-0.6456,"y":-0.3144,"g":"Primate","l":"chimpanzee","i":3},{"x":0.2199,"y":0.2549,"g":"Carnivore","l":"grey fox","i":4},{"x":0.6056,"y":-0.6311,"g":"Reptile","l":"Komodo dragon","i":5},{"x":0.043,"y":-0.3192,"g":"Rodent","l":"marmot","i":6},{"x":-0.7808,"y":0.2944,"g":"Hoofed mammal","l":"hippopotamus","i":7},{"x":-0.6123,"y":0.6243,"g":"Hoofed mammal","l":"zebra","i":8},{"x":0.2997,"y":-0.9162,"g":"Amphibian","l":"tree frog","i":9},{"x":0.9091,"y":-0.0105,"g":"Bird","l":"king penguin","i":10},{"x":-0.3284,"y":-0.6434,"g":"Primate","l":"indri","i":11},{"x":-0.5547,"y":-0.2783,"g":"Primate","l":"baboon","i":12},{"x":-0.7975,"y":0.3005,"g":"Hoofed mammal","l":"hippopotamus","i":13},{"x":0.2204,"y":0.7098,"g":"Carnivore","l":"red wolf","i":14},{"x":-0.6636,"y":-0.2996,"g":"Primate","l":"chimpanzee","i":15},{"x":0.5983,"y":-0.6964,"g":"Reptile","l":"whiptail","i":16},{"x":-0.3327,"y":-0.5842,"g":"Primate","l":"indri","i":17},{"x":0.3503,"y":0.4634,"g":"Carnivore","l":"jaguar","i":18},{"x":0.9393,"y":0.3132,"g":"Bird","l":"bald eagle","i":19},{"x":0.9497,"y":0.3322,"g":"Bird","l":"bald eagle","i":20},{"x":-0.4147,"y":0.6317,"g":"Hoofed mammal","l":"bighorn","i":21},{"x":-0.7602,"y":0.3739,"g":"Other mammal","l":"African elephant","i":22},{"x":-0.3397,"y":0.5725,"g":"Hoofed mammal","l":"llama","i":23},{"x":-0.6564,"y":-0.2435,"g":"Primate","l":"orangutan","i":24},{"x":-0.2289,"y":0.5167,"g":"Hoofed mammal","l":"llama","i":25},{"x":-0.6625,"y":-0.2906,"g":"Primate","l":"howler monkey","i":26},{"x":-0.6429,"y":-0.2611,"g":"Primate","l":"orangutan","i":27},{"x":0.2817,"y":0.4729,"g":"Carnivore","l":"tiger","i":28},{"x":0.0752,"y":-0.245,"g":"Rodent","l":"marmot","i":29},{"x":0.7231,"y":-0.5052,"g":"Reptile","l":"terrapin","i":30},{"x":-0.3207,"y":0.6814,"g":"Hoofed mammal","l":"impala","i":31},{"x":0.2605,"y":0.5594,"g":"Carnivore","l":"cheetah","i":32},{"x":-0.7457,"y":0.3806,"g":"Other mammal","l":"African elephant","i":33},{"x":-0.3113,"y":-0.4675,"g":"Primate","l":"titi","i":34},{"x":-0.6506,"y":-0.3129,"g":"Primate","l":"chimpanzee","i":35},{"x":0.254,"y":0.4704,"g":"Carnivore","l":"tiger","i":36},{"x":0.9329,"y":0.029,"g":"Bird","l":"king penguin","i":37},{"x":-0.5812,"y":-0.3946,"g":"Primate","l":"colobus","i":38},{"x":0.2483,"y":0.4417,"g":"Carnivore","l":"lynx","i":39},{"x":-0.6474,"y":-0.3242,"g":"Primate","l":"chimpanzee","i":40},{"x":0.2561,"y":0.4665,"g":"Carnivore","l":"tiger","i":41},{"x":0.5803,"y":-0.8147,"g":"Reptile","l":"horned viper","i":42},{"x":-0.5054,"y":-0.431,"g":"Primate","l":"guenon","i":43},{"x":0.3225,"y":0.5295,"g":"Carnivore","l":"cougar","i":44},{"x":0.3032,"y":0.4211,"g":"Carnivore","l":"lion","i":45},{"x":-0.4565,"y":-0.3986,"g":"Primate","l":"indri","i":46},{"x":-0.5535,"y":-0.3906,"g":"Primate","l":"colobus","i":47},{"x":-0.004,"y":0.0936,"g":"Carnivore","l":"giant panda","i":48},{"x":-0.744,"y":0.3609,"g":"Other mammal","l":"African elephant","i":49},{"x":-0.2121,"y":0.7087,"g":"Hoofed mammal","l":"bighorn","i":50},{"x":0.9768,"y":0.2079,"g":"Bird","l":"bulbul","i":51},{"x":0.9191,"y":-0.0192,"g":"Bird","l":"king penguin","i":52},{"x":-0.3346,"y":0.683,"g":"Hoofed mammal","l":"ram","i":53},{"x":0.6346,"y":-0.6594,"g":"Reptile","l":"banded gecko","i":54},{"x":0.0206,"y":-0.3914,"g":"Rodent","l":"fox squirrel","i":55},{"x":-0.5145,"y":0.4448,"g":"Hoofed mammal","l":"bison","i":56},{"x":0.0048,"y":-0.3484,"g":"Rodent","l":"marmot","i":57},{"x":-0.1041,"y":-0.6012,"g":"Rodent","l":"porcupine","i":58},{"x":0.9748,"y":0.1335,"g":"Bird","l":"albatross","i":59},{"x":-0.1132,"y":0.2161,"g":"Carnivore","l":"brown bear","i":60},{"x":-0.5725,"y":-0.2704,"g":"Primate","l":"baboon","i":61},{"x":0.5272,"y":-0.8356,"g":"Reptile","l":"green snake","i":62},{"x":0.5443,"y":-0.8195,"g":"Reptile","l":"diamondback","i":63},{"x":-0.5302,"y":-0.3107,"g":"Primate","l":"patas","i":64},{"x":0.3701,"y":-0.8944,"g":"Amphibian","l":"tree frog","i":65},{"x":-0.2775,"y":0.7402,"g":"Hoofed mammal","l":"impala","i":66},{"x":-0.5456,"y":-0.4142,"g":"Primate","l":"titi","i":67},{"x":-0.5292,"y":-0.3347,"g":"Primate","l":"patas","i":68},{"x":0.3555,"y":0.5386,"g":"Carnivore","l":"jaguar","i":69},{"x":-0.1734,"y":0.7351,"g":"Hoofed mammal","l":"gazelle","i":70},{"x":0.2787,"y":0.4988,"g":"Carnivore","l":"tiger","i":71},{"x":0.2831,"y":0.4939,"g":"Carnivore","l":"tiger","i":72},{"x":-0.1337,"y":0.187,"g":"Carnivore","l":"brown bear","i":73},{"x":0.1842,"y":0.7075,"g":"Carnivore","l":"coyote","i":74},{"x":-0.6096,"y":0.601,"g":"Hoofed mammal","l":"gazelle","i":75},{"x":0.9041,"y":0.0248,"g":"Bird","l":"king penguin","i":76},{"x":-0.6475,"y":-0.3112,"g":"Primate","l":"chimpanzee","i":77},{"x":0.5334,"y":-0.0801,"g":"Carnivore","l":"sea lion","i":78},{"x":-0.0166,"y":0.1693,"g":"Carnivore","l":"ice bear","i":79},{"x":-0.1566,"y":0.6752,"g":"Carnivore","l":"white wolf","i":80},{"x":-0.1803,"y":-0.601,"g":"Rodent","l":"porcupine","i":81},{"x":-0.5543,"y":-0.3447,"g":"Primate","l":"colobus","i":82},{"x":0.6288,"y":-0.5841,"g":"Reptile","l":"common iguana","i":83},{"x":0.3725,"y":-0.857,"g":"Amphibian","l":"tailed frog","i":84},{"x":-0.634,"y":-0.2405,"g":"Primate","l":"gorilla","i":85},{"x":0.7258,"y":-0.4965,"g":"Reptile","l":"box turtle","i":86},{"x":0.6191,"y":-0.6678,"g":"Reptile","l":"whiptail","i":87},{"x":-0.2814,"y":0.7211,"g":"Hoofed mammal","l":"impala","i":88},{"x":-0.6419,"y":-0.2408,"g":"Primate","l":"gorilla","i":89},{"x":-0.5178,"y":-0.2907,"g":"Primate","l":"patas","i":90},{"x":0.9991,"y":0.2041,"g":"Bird","l":"jacamar","i":91},{"x":0.2912,"y":0.4906,"g":"Carnivore","l":"tiger","i":92},{"x":0.1898,"y":0.7151,"g":"Carnivore","l":"coyote","i":93},{"x":0.3119,"y":0.5634,"g":"Carnivore","l":"lion","i":94},{"x":0.08,"y":-0.354,"g":"Rodent","l":"fox squirrel","i":95},{"x":-0.142,"y":0.1434,"g":"Carnivore","l":"American black bear","i":96},{"x":-0.6099,"y":-0.2422,"g":"Primate","l":"orangutan","i":97},{"x":0.1605,"y":0.4843,"g":"Carnivore","l":"lynx","i":98},{"x":0.9934,"y":0.1878,"g":"Bird","l":"house finch","i":99},{"x":0.5963,"y":-0.6729,"g":"Amphibian","l":"common newt","i":100},{"x":-0.1052,"y":-1.0,"g":"Other mammal","l":"killer whale","i":101},{"x":0.744,"y":-0.5113,"g":"Reptile","l":"terrapin","i":102},{"x":-0.6321,"y":-0.2885,"g":"Primate","l":"gorilla","i":103},{"x":-0.6275,"y":-0.3015,"g":"Primate","l":"chimpanzee","i":104},{"x":0.8186,"y":-0.444,"g":"Reptile","l":"African crocodile","i":105},{"x":0.5521,"y":-0.8021,"g":"Reptile","l":"night snake","i":106},{"x":-0.2276,"y":0.6663,"g":"Hoofed mammal","l":"ibex","i":107},{"x":-0.2904,"y":0.6529,"g":"Hoofed mammal","l":"ram","i":108},{"x":0.3459,"y":-0.8997,"g":"Amphibian","l":"tree frog","i":109},{"x":0.0372,"y":-0.2839,"g":"Rodent","l":"marmot","i":110},{"x":0.222,"y":0.7357,"g":"Carnivore","l":"coyote","i":111},{"x":-0.3241,"y":0.76,"g":"Hoofed mammal","l":"gazelle","i":112},{"x":0.3154,"y":0.5107,"g":"Carnivore","l":"tiger","i":113},{"x":-0.2171,"y":0.7562,"g":"Hoofed mammal","l":"bighorn","i":114},{"x":-0.4056,"y":0.4539,"g":"Hoofed mammal","l":"zebra","i":115},{"x":-0.6633,"y":-0.3125,"g":"Primate","l":"chimpanzee","i":116},{"x":-0.3628,"y":0.4606,"g":"Hoofed mammal","l":"zebra","i":117},{"x":0.9399,"y":0.2551,"g":"Bird","l":"cock","i":118},{"x":0.5647,"y":-0.8053,"g":"Reptile","l":"sidewinder","i":119}];
+const ATLAS='../images/2026-09-10/a1_mds_atlas.jpg', CELL=128, COLS=12;
+const COLOR={'Amphibian':'#3E6D8E','Bird':'#C2691C','Carnivore':'#3F7A6B','Hoofed mammal':'#B5396B',
+             'Other mammal':'#7A5AA8','Primate':'#8A5A3C','Reptile':'#D08AB0','Rodent':'#7B8794'};
+const svg=document.getElementById('map'), stage=document.getElementById('stage'), tip=document.getElementById('tip');
+const NS='http://www.w3.org/2000/svg';
+const mk=(n,a={})=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+
+// one <defs> pattern per image, cropped out of the sprite atlas
+const defs=mk('defs'); svg.appendChild(defs);
+const gThumb=mk('g'), gDot=mk('g'); svg.appendChild(gThumb); svg.appendChild(gDot);
+const off=new Set();  // taxa toggled off
+
+let W=0,H=0,scale=1,tx=0,ty=0,inited=false;
+function layout(){ const r=stage.getBoundingClientRect(); W=r.width; H=r.height;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  if(!inited){ tx=W/2; ty=H/2; inited=true; }
+  draw(); }
+const pad=()=>Math.min(W,H)*0.06;
+function toScreen(p){ const s=Math.min(W,H)/2-pad();
+  return [p.x*s*scale+tx, p.y*s*scale+ty]; }
+
+const nodes=PTS.map((p,k)=>{
+  const col=COLOR[p.g]||'#7B8794';
+  const pat=mk('pattern',{id:'im'+k,patternUnits:'objectBoundingBox',width:1,height:1});
+  const im=mk('image',{href:ATLAS,x:-(k%COLS)*CELL,y:-Math.floor(k/COLS)*CELL,
+    width:COLS*CELL,height:Math.ceil(PTS.length/COLS)*CELL,preserveAspectRatio:'none'});
+  pat.appendChild(im); defs.appendChild(pat);
+  const rect=mk('rect',{class:'thumb',fill:'url(#im'+k+')',rx:3,opacity:0});
+  const dot=mk('circle',{class:'dot',fill:col,r:7,stroke:'var(--cream)','stroke-width':1.5});
+  gThumb.appendChild(rect); gDot.appendChild(dot);
+  const show=e=>{ tip.textContent=p.l+' · '+p.g; const [x,y]=toScreen(p);
+    tip.style.left=x+'px'; tip.style.top=y+'px'; tip.style.opacity=1; };
+  [rect,dot].forEach(el=>{ el.addEventListener('pointerenter',show);
+    el.addEventListener('pointerleave',()=>tip.style.opacity=0); el.style.cursor='pointer'; });
+  return {p,rect,dot,col};
+});
+
+function draw(){
+  // photographs fade in as you zoom past 1.6x, which is the point of the widget
+  const t=Math.max(0,Math.min(1,(scale-1.5)/1.1));
+  const size=Math.max(26,Math.min(120,34*scale));
+  nodes.forEach(n=>{
+    const hidden=off.has(n.p.g);
+    const [x,y]=toScreen(n.p);
+    n.dot.setAttribute('cx',x); n.dot.setAttribute('cy',y);
+    n.dot.setAttribute('r', 7*Math.min(1.6,Math.max(.8,scale*.6)));
+    n.dot.setAttribute('opacity', hidden?0.05:(1-t));
+    n.rect.setAttribute('x',x-size/2); n.rect.setAttribute('y',y-size/2);
+    n.rect.setAttribute('width',size); n.rect.setAttribute('height',size);
+    n.rect.setAttribute('opacity', hidden?0:t);
+    n.rect.style.pointerEvents = t>0.5?'auto':'none';
+    n.dot.style.pointerEvents  = t>0.5?'none':'auto';
+  });
+}
+
+stage.addEventListener('wheel',e=>{ e.preventDefault();
+  const r=stage.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+  const f=e.deltaY>0?1/1.13:1.13, ns=Math.max(1,Math.min(9,scale*f));
+  tx=mx-(mx-tx)*(ns/scale); ty=my-(my-ty)*(ns/scale); scale=ns; draw();
+},{passive:false});
+let drag=null;
+stage.addEventListener('pointerdown',e=>{drag={x:e.clientX-tx,y:e.clientY-ty};stage.classList.add('drag');stage.setPointerCapture(e.pointerId);});
+stage.addEventListener('pointermove',e=>{ if(!drag)return; tx=e.clientX-drag.x; ty=e.clientY-drag.y; draw(); });
+addEventListener('pointerup',()=>{drag=null;stage.classList.remove('drag');});
+document.getElementById('reset').onclick=()=>{scale=1;tx=W/2;ty=H/2;draw();};
+
+const legend=document.getElementById('legend');
+Object.keys(COLOR).forEach(g=>{
+  const b=document.createElement('span'); b.className='key on';
+  b.innerHTML='<i style="background:'+COLOR[g]+'"></i>'+g;
+  b.onclick=()=>{ off.has(g)?off.delete(g):off.add(g); b.classList.toggle('on',!off.has(g)); draw(); };
+  legend.appendChild(b);
+});
+addEventListener('resize',layout); layout();
+</script>
+</body>
+</html>
