@@ -279,7 +279,7 @@
 </tbody>
 </table></div>
 <p>Each measurement: a <strong>numerical description</strong> of an object.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-marpit-scope-yjld2pjb="" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="26" data-marpit-pagination-total="66" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-marpit-scope-aehtxhea="" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="26" data-marpit-pagination-total="66" aria-labelledby="heading-26"><p class="page">Slide 26</p>
 <h2 id="heading-26">Notation</h2>
 
 <div class="table-scroll" tabindex="0" role="region" aria-label="Notation — table"><table><caption>Notation — table</caption>
@@ -332,7 +332,7 @@
 <figure><img src="../images/L01-concrete-2026-09/stimulus_028.png" alt="The tiger photograph used in the pixel explorer" aria-describedby="figure-27-1"><figcaption id="figure-27-1"><p>A photograph depicts a tiger. The animal is the referent; the photograph is one depiction; a pixel array is a numerical encoding of that photograph. This distinction does not imply that a neural response has the same meaning as either encoding.</p><a href="../images/L01-concrete-2026-09/stimulus_028.png">Open full-size figure</a></figcaption></figure>
 <p>One <strong>vector</strong>, two components:</p>
 <p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>=</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>≈</mo><mo stretchy="false">(</mo><mn>72.7</mn><mo separator="true">,</mo><mtext> </mtext><mn>40.6</mn><mo stretchy="false">)</mo><mspace width="1em"></mspace><mtext>for&nbsp;the&nbsp;tiger.</mtext></mrow><annotation encoding="application/x-tex">\mathbf{x}=(x_1,\,x_2)\approx(72.7,\,40.6)\quad\text{for the tiger.}
-</annotation></semantics></math></div></span></p><p>One image, one point.</p>
+</annotation></semantics></math></div></span></p><p>The two axes define a <strong>space</strong>; the tiger is one <strong>point</strong> in it.</p>
 </div>
 <div class="col fig">
 <figure><img src="../images/L01-feature-space-2026-09-13/feature_space_tiger.png" alt="Square plot of RMS contrast against mean intensity; the tiger's point at 72.7 and 40.6 is highlighted with its thumbnail beside it; five other images appear as grey dots" aria-describedby="figure-27-2"><figcaption id="figure-27-2"><p>Square plot of RMS contrast against mean intensity; the tiger's point at 72.7 and 40.6 is highlighted with its thumbnail beside it; five other images appear as grey dots</p><a href="../images/L01-feature-space-2026-09-13/feature_space_tiger.png">Open full-size figure</a></figcaption></figure>
@@ -359,7 +359,7 @@
 <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">x_1</annotation></semantics></math>: mean intensity · <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_2</annotation></semantics></math>: RMS contrast (standard deviation of the intensities)</p>
 <p>One <strong>vector</strong>, two components:</p>
 <p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>=</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathbf{x}=(x_1,\,x_2)
-</annotation></semantics></math></div></span></p><p>Every image: a point in the same space. <strong>Comparing images = comparing points.</strong></p>
+</annotation></semantics></math></div></span></p><p>Every image: a point in the same space. <strong>Comparing representations = comparing points.</strong></p>
 </div>
 <div class="col fig">
 <figure><img src="../images/L01-feature-space-2026-09-13/feature_space_all.png" alt="The same plot with all six images shown as thumbnails at their points: tiger, gorilla, eagle, frog, penguin and elephant" aria-describedby="figure-29-1"><figcaption id="figure-29-1"><p>The same plot with all six images shown as thumbnails at their points: tiger, gorilla, eagle, frog, penguin and elephant</p><a href="../images/L01-feature-space-2026-09-13/feature_space_all.png">Open full-size figure</a></figcaption></figure>
@@ -393,7 +393,7 @@
 <li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="double-struck">ℝ</mi><mi>D</mi></msup></mrow><annotation encoding="application/x-tex">\mathbb{R}^{D}</annotation></semantics></math>: all such lists</li>
 </ul>
 </li>
-<li>Same object, different measurement → different <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math>, different space</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> measurements define a <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math>-dimensional space; same object, different measurement → different space</li>
 </ul>
 </div>
 <div class="col">
@@ -594,7 +594,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 </ul>
 <figure><img src="../images/L01-similarity-2026-09/similarity_motivation.png" alt="Three bar patterns over twelve units: a pattern x; the same pattern with every unit doubled, which cosine similarity still scores 1; and the same pattern with a constant added to every unit, which correlation still scores 1" aria-describedby="figure-46-1"><figcaption id="figure-46-1"><p>Three bar patterns over twelve units: a pattern x; the same pattern with every unit doubled, which cosine similarity still scores 1; and the same pattern with a constant added to every unit, which correlation still scores 1</p><a href="../images/L01-similarity-2026-09/similarity_motivation.png">Open full-size figure</a></figcaption></figure>
 <div class="ref"><a href="https://docs.scipy.org/doc/scipy/reference/spatial.distance.html" rel="noopener">SciPy · spatial.distance</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-marpit-scope-m0n0dnpl="" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="47" data-marpit-pagination-total="66" aria-labelledby="heading-47"><p class="page">Slide 47</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-marpit-scope-moaehddh="" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="47" data-marpit-pagination-total="66" aria-labelledby="heading-47"><p class="page">Slide 47</p>
 <h2 id="heading-47">Which is closer to the tiger? It depends on the rule</h2>
 <div class="row">
 <div class="col">
@@ -705,7 +705,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <li>This image set: <strong>2.3 %</strong> of triples violate it in pixel space, <strong>0</strong> in the trained network's late layer</li>
 <li>Identity fails too: a brighter tiger is at cosine dissimilarity 0 from the original · <strong>A1 §1b–d</strong></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-54" data-marpit-scope-iobfaqsa="" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="54" data-marpit-pagination-total="66" aria-labelledby="heading-54"><p class="page">Slide 54</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-54" data-marpit-scope-dbb2ohy6="" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="54" data-marpit-pagination-total="66" aria-labelledby="heading-54"><p class="page">Slide 54</p>
 <h2 id="heading-54">Which rules are distances in the full sense?</h2>
 
 <p>Summary. Next lecture starts from an RDM and tries to <strong>recover the space behind it</strong>: points whose separations reproduce the entries. That works only if the entries behave like distances:</p>
