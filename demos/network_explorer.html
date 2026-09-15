@@ -439,8 +439,8 @@ body.embed .vector-card{margin:8px 0;padding:10px}body.embed #vectorPanel .vecto
       <section class="panel" aria-labelledby="inputTitle">
         <h2 class="panel-title" id="inputTitle">Model input crop</h2>
         <img id="inputImg" class="input-img" alt="Model input crop after preprocessing" width="180" height="180" />
-        <p class="preds-caption" id="predsCaption">Classifier output (top 3)</p>
-        <ul class="preds" id="preds" aria-label="Top classifier predictions"></ul>
+        <p class="preds-caption" id="predsCaption" hidden>Classifier output (top 3)</p>
+        <ul class="preds" id="preds" aria-label="Top classifier predictions" hidden></ul>
       </section>
 
       <section class="panel" id="channelPanel" aria-labelledby="galleryTitle">
@@ -907,7 +907,7 @@ body.embed .vector-card{margin:8px 0;padding:10px}body.embed #vectorPanel .vecto
     els.inputImg.alt = 'Preprocessed model input crop for ' + im.label;
 
     els.preds.innerHTML = '';
-    if (Array.isArray(im.predictions) && im.predictions.length) {
+    if (false && Array.isArray(im.predictions) && im.predictions.length) {  // predictions hidden: out-of-distribution inputs
       els.predsCaption.hidden = false;
       var top = im.predictions.slice(0, 3);
       top.forEach(function (p) {
