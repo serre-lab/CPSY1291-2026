@@ -283,7 +283,7 @@
 </tbody>
 </table></div>
 <p>Each measurement: a <strong>numerical description</strong> of an object.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-marpit-scope-ejkloedy="" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="26" data-marpit-pagination-total="65" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-marpit-scope-vmmgz81e="" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="26" data-marpit-pagination-total="65" aria-labelledby="heading-26"><p class="page">Slide 26</p>
 <h2 id="heading-26">Notation</h2>
 
 <p>Every measurement: a fixed-length list of numbers. One notation for pixels, voxels, neurons and network units.</p>
@@ -599,7 +599,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 </ul>
 <figure><img src="../images/L01-similarity-2026-09/similarity_motivation.png" alt="Three bar patterns over twelve units: a pattern x; the same pattern with every unit doubled, which cosine similarity still scores 1; and the same pattern with a constant added to every unit, which correlation still scores 1" aria-describedby="figure-46-1"><figcaption id="figure-46-1"><p>Three bar patterns over twelve units: a pattern x; the same pattern with every unit doubled, which cosine similarity still scores 1; and the same pattern with a constant added to every unit, which correlation still scores 1</p><a href="../images/L01-similarity-2026-09/similarity_motivation.png">Open full-size figure</a></figcaption></figure>
 <div class="ref"><a href="https://docs.scipy.org/doc/scipy/reference/spatial.distance.html" rel="noopener">SciPy · spatial.distance</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-marpit-scope-qewnd6an="" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="47" data-marpit-pagination-total="65" aria-labelledby="heading-47"><p class="page">Slide 47</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-marpit-scope-m0s6mshy="" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="47" data-marpit-pagination-total="65" aria-labelledby="heading-47"><p class="page">Slide 47</p>
 <h2 id="heading-47">Which is closer to the tiger? It depends on the rule</h2>
 <div class="row">
 <div class="col">
@@ -609,7 +609,8 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <tr>
 <th scope="col">Pair</th>
 <th scope="col">Euclidean</th>
-<th scope="col">Cosine diss.</th>
+<th scope="col">Cosine*</th>
+<th scope="col">Correlation*</th>
 </tr>
 </thead>
 <tbody>
@@ -617,11 +618,13 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <td>tiger–eagle</td>
 <td><strong>23.8</strong></td>
 <td>0.021</td>
+<td>0†</td>
 </tr>
 <tr>
 <td>tiger–penguin</td>
 <td>54.1</td>
 <td><strong>0.009</strong></td>
+<td>0†</td>
 </tr>
 </tbody>
 </table></div>
@@ -631,8 +634,8 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <tr>
 <th scope="col">Pair</th>
 <th scope="col">Euclidean</th>
-<th scope="col">Cosine</th>
-<th scope="col">Correlation</th>
+<th scope="col">Cosine*</th>
+<th scope="col">Correlation*</th>
 </tr>
 </thead>
 <tbody>
@@ -650,7 +653,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 </tr>
 </tbody>
 </table></div>
-<p>Euclidean keeps length; cosine and correlation keep direction only.</p>
+<p><span>* dissimilarities, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>cos</mi><mo>⁡</mo><mi>ϕ</mi></mrow><annotation encoding="application/x-tex">1-\cos\phi</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">1-r</annotation></semantics></math> · † with two components, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mo>±</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">r=\pm1</annotation></semantics></math> always: correlation needs more than two</span></p>
 </div>
 <div class="col fig">
 <figure><img src="../images/L01-feature-space-2026-09-13/geom_rule.png" alt="The two-feature plot with three arrows from the origin: the tiger x superscript 1, the eagle x superscript 2, and the penguin x superscript 3. The eagle's point is nearer the tiger's, but the penguin's arrow is more nearly parallel to the tiger's" aria-describedby="figure-47-1"><figcaption id="figure-47-1"><p>The two-feature plot with three arrows from the origin: the tiger x superscript 1, the eagle x superscript 2, and the penguin x superscript 3. The eagle's point is nearer the tiger's, but the penguin's arrow is more nearly parallel to the tiger's</p><a href="../images/L01-feature-space-2026-09-13/geom_rule.png">Open full-size figure</a></figcaption></figure>
@@ -686,7 +689,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <figure><img src="../images/L01-triangle-notation-2026-09-13/triangle_constraint.svg" alt="Image representations x with superscripts 1, 2 and 3 joined by two unit segments; bending gives endpoint distance 1.6, straightening gives the maximum 2, and a requested distance of 3 is unreachable" aria-describedby="figure-51-1"><figcaption id="figure-51-1"><p>An illustrative geometric constraint, not measured animal data. Three image representations use the established labels bold x with superscripts (1), (2), and (3). Left: two segments each of length one bend through coordinates (0,0), (0.8,0.6), and (1.6,0), giving endpoint distance 1.6. Right: straightening the two segments places the three endpoints at 0,1,2 along a line; their maximum separation is two. A dashed continuation to a guide at three marks the requested but unreachable separation. The guide is not a fourth representation or an observed point. Thus proposed RDM entries D12=1, D23=1, and D13=3 cannot all equal Euclidean distances in any dimension.</p><a href="../images/L01-triangle-notation-2026-09-13/triangle_constraint.svg">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-52" data-marpit-scope-djxifjmk="" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="52" data-marpit-pagination-total="65" aria-labelledby="heading-52"><p class="page">Slide 52</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-52" data-marpit-scope-iq5ssmic="" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="52" data-marpit-pagination-total="65" aria-labelledby="heading-52"><p class="page">Slide 52</p>
 <h2 id="heading-52">Which comparisons are metrics?</h2>
 
 <p>Why care: an RDM can be drawn as a <strong>map</strong> only if its rule behaves like distance on a map. Four requirements, checked for every triple of images:</p>
