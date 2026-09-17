@@ -26,7 +26,7 @@
 <p>33 minute papers. The four common questions:</p>
 <ul>
 <li><em>"Where did the 4,096 numbers go when a row became one square of the RDM?"</em> → one number per <strong>pair</strong>, computed from both rows: the first slides today</li>
-<li><em>"Is one channel one feature?"</em> → in the machine-learning sense, yes: each activation is one <strong>input dimension</strong>, one entry of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math>; a channel is a map of them. Whether it detects one nameable thing: a later lecture</li>
+<li><em>"Is one channel one feature?"</em> → in a <strong>convolutional network</strong>, yes: a channel is a whole sheet of units that share one set of weights, one feature detector applied at every position; the sheet shows <strong>where</strong> in the image that feature is present. Each unit is one entry of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math>. (A recording <em>channel</em> is one electrode, another word entirely)</li>
 <li><em>"Are the neural vectors per neuron, averaged over trials?"</em> → yes: one mean rate per neuron per image; Assignment 1 gives you those means</li>
 <li><em>"Why 0–1 rather than 0–255?"</em> → the same 256 levels divided by 255, nothing added or lost. Networks train and run in <strong>floating point</strong> (GPUs compute in floats; weights, activations and gradients are real numbers, far finer than 8-bit integers), so inputs are scaled to what the weights were trained on</li>
 </ul>
@@ -124,7 +124,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 </ul>
 <figure><img src="../images/L01-similarity-2026-09/similarity_motivation.png" alt="Three bar patterns over twelve units: a pattern x; the same pattern with every unit doubled, marked as unchanged for cosine and correlation but changed for Euclidean distance; and the same pattern with a constant added to every unit, marked as unchanged for correlation only" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>Three bar patterns over twelve units: a pattern x; the same pattern with every unit doubled, marked as unchanged for cosine and correlation but changed for Euclidean distance; and the same pattern with a constant added to every unit, marked as unchanged for correlation only</p><a href="../images/L01-similarity-2026-09/similarity_motivation.png">Open full-size figure</a></figcaption></figure>
 <div class="ref"><a href="https://docs.scipy.org/doc/scipy/reference/spatial.distance.html" rel="noopener">SciPy · spatial.distance</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-marpit-scope-nq4rtd4a="" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="72" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-marpit-scope-dciudsif="" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="72" aria-labelledby="heading-11"><p class="page">Slide 11</p>
 <h2 id="heading-11">Which is closer to the tiger? It depends on the measure</h2>
 <div class="row">
 <div class="col">
@@ -208,7 +208,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <li>A detour via the gorilla cannot beat the direct route from tiger to elephant: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>l</mi></mrow></msub><mo>≤</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>+</mo><msub><mi>d</mi><mrow><mi>k</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{il}\le d_{ik}+d_{kl}</annotation></semantics></math> (<strong>triangle inequality</strong>)</li>
 </ul>
 <p>Every measure in this lecture satisfies the first three. The fourth separates them.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-marpit-scope-wtdjqtdd="" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="72" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-marpit-scope-bdifuzxa="" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="72" aria-labelledby="heading-15"><p class="page">Slide 15</p>
 <h2 id="heading-15">Which measures are distances in the full sense?</h2>
 
 <p>The second half of today starts from an RDM and tries to <strong>recover the space behind it</strong>: points whose separations reproduce the entries. That needs entries that behave like distances:</p>
