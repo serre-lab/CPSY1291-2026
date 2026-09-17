@@ -166,7 +166,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <li><strong>Euclidean</strong> distance keeps gain and offset · <strong>cosine</strong> discards the gain · <strong>correlation</strong> discards both. Choose by what should not count</li>
 </ul>
 <div class="ref">Assignment 1 §1b: the three functions, then all three matrices</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-marpit-scope-lgldoyvk="" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="67" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-marpit-scope-lqh8zvxw="" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="67" aria-labelledby="heading-15"><p class="page">Slide 15</p>
 <h2 id="heading-15">Which is closer to the tiger? It depends on the measure</h2>
 <div class="row">
 <div class="col">
@@ -314,7 +314,7 @@ D     = squareform(d_vec)                <span class="hljs-comment"># (N, N): sy
 <li>Tiger to gorilla is never more than tiger to penguin plus penguin to gorilla: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>l</mi></mrow></msub><mo>≤</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>+</mo><msub><mi>d</mi><mrow><mi>k</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{il}\le d_{ik}+d_{kl}</annotation></semantics></math> (<strong>triangle inequality</strong>). Nothing stops a rater from breaking it</li>
 </ul>
 <p>The first three make <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi></mrow><annotation encoding="application/x-tex">\mathbf{D}</annotation></semantics></math> a dissimilarity matrix. The fourth is what points in a space obey: without it, no map reproduces the entries exactly. Which measures satisfy which, and whether people do: the assignment</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-marpit-scope-winecfxq="" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="67" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-marpit-scope-rphcjvz7="" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="67" aria-labelledby="heading-26"><p class="page">Slide 26</p>
 <h2 id="heading-26">Which measures are distances in the full sense?</h2>
 
 <p>The second half of today starts from an RDM and tries to <strong>recover the space behind it</strong>: points whose separations reproduce the entries. That needs entries that behave like distances:</p>
@@ -790,17 +790,14 @@ Y_nm = mds_nm.fit_transform(D)
 <div class="ref">All 120 Assignment 1 animals, human ratings (Peterson, Abbott &amp; Griffiths 2018)</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-58" data-paginate="true" data-marpit-pagination="58" data-marpit-pagination-total="67" aria-labelledby="heading-58"><p class="page">Slide 58</p>
 <h2 id="heading-58">Appendix · How many clusters? Cut the tree</h2>
-<div class="row">
-<div class="col fig">
+<div class="capfig">
 <figure><img src="../images/L02-clustering-2026-09-17/cluster_cut.svg" alt="Left: the average-linkage dendrogram of the 120 animals with three dashed cut heights labelled 2, 4 and 8 clusters. Right: the MDS map of the same animals coloured by the clusters each cut produces; the 8-cluster cut nearly matches the eight taxa" aria-describedby="figure-58-1"><figcaption id="figure-58-1"><p>Left: the average-linkage dendrogram of the 120 animals with three dashed cut heights labelled 2, 4 and 8 clusters. Right: the MDS map of the same animals coloured by the clusters each cut produces; the 8-cluster cut nearly matches the eight taxa</p><a href="../images/L02-clustering-2026-09-17/cluster_cut.svg">Open full-size figure</a></figcaption></figure>
 </div>
-<div class="col">
 <ul>
 <li>A dendrogram is <em>every</em> clustering at once; you get groups by <strong>cutting</strong> it at a height. Cut low, many small clusters; cut high, few large ones. <strong>The method does not choose for you</strong></li>
 <li>Cut at 8: nearly the eight taxa (adjusted Rand index <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.89</mn></mrow><annotation encoding="application/x-tex">0.89</annotation></semantics></math>). Cut at 2 or 4: not. <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math> is a choice you defend</li>
+<li>Choosing where to cut the tree is exactly parallel to choosing k dimensions in MDS: both methods hand you a free parameter, and both are routinely reported as if it had been discovered rather than chosen</li>
 </ul>
-</div>
-</div>
 <div class="ref">Same 120 animals and ratings · average linkage · map: metric MDS</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-59" data-paginate="true" data-marpit-pagination="59" data-marpit-pagination-total="67" aria-labelledby="heading-59"><p class="page">Slide 59</p>
 <h2 id="heading-59">Appendix · Clustering always returns a tree</h2>
