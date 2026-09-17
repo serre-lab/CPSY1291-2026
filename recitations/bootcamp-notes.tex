@@ -267,7 +267,7 @@ mask.sum()                  # how many -- True counts as 1
 np.unique(labels, return_counts=True)   # what values, how many of each
 np.argsort(v)[:5]           # indices of the five smallest values
 np.argsort(v)[::-1][:5]     # indices of the five largest
-np.triu_indices(n, k=1)     # the upper triangle: each pair exactly once
+np.triu_indices(N, k=1)     # the upper triangle: each pair exactly once
 \end{lstlisting}
 
 \texttt{argsort} is how you get ``the five most similar images'', and
@@ -278,19 +278,21 @@ without counting each pair twice.
 
 \subsection{A list of numbers is a point}
 
-The central move of this whole course: if you write down $p$ numbers about
-something --- the pixel values of an image, the firing rates of $p$ neurons, a
-person's rating on $p$ scales --- you can treat that list as a \emph{point} in a
-$p$-dimensional space. Two things are ``similar'' when their points are close.
+The central move of this whole course: if you write down $D$ numbers about
+something --- the pixel values of an image, the firing rates of $D$ neurons, a
+person's rating on $D$ scales --- you can treat that list as a \emph{point} in a
+$D$-dimensional space. The lectures write the vector for stimulus $i$ as
+$\bm{x}^{(i)}$ and its $j$-th entry as $x^{(i)}_j$; $N$ stimuli make an
+$N \times D$ matrix $\mathbf{X}$, one row per stimulus. Two things are ``similar'' when their points are close.
 Everything else is detail about what \emph{close} should mean.
 
 \subsection{Length, distance, and the dot product}
 
-For vectors $\bm{a}, \bm{b} \in \mathbb{R}^p$:
+For two stimuli $\bm{a} = \bm{x}^{(i)}$ and $\bm{b} = \bm{x}^{(k)}$ in $\mathbb{R}^D$ (the lectures keep the superscripts; here $\bm{a}, \bm{b}$ are shorter):
 \[
 \|\bm{a}\| = \sqrt{\textstyle\sum_j a_j^2}, \qquad
 d(\bm{a},\bm{b}) = \|\bm{a}-\bm{b}\|, \qquad
-\bm{a}\cdot\bm{b} = \textstyle\sum_j a_j b_j = \|\bm{a}\|\,\|\bm{b}\|\cos\theta .
+\bm{a}\cdot\bm{b} = \textstyle\sum_j a_j b_j = \|\bm{a}\|\,\|\bm{b}\|\cos\phi .
 \]
 The dot product is the workhorse. Read it as: \emph{how much of $\bm{a}$ points
 along $\bm{b}$}, scaled by both lengths. It is large when two vectors agree in
@@ -304,9 +306,9 @@ np.linalg.norm(a - b)    # distance
 
 \subsection{Cosine, and the identity you will use}
 
-Dividing out the lengths leaves only the angle:
+Dividing out the lengths leaves only the angle $\phi$ between the two vectors:
 \[
-\cos\theta = \frac{\bm{a}\cdot\bm{b}}{\|\bm{a}\|\,\|\bm{b}\|}.
+\cos\phi = \frac{\bm{a}\cdot\bm{b}}{\|\bm{a}\|\,\|\bm{b}\|}.
 \]
 This ignores magnitude, which is what you want when overall brightness or
 overall firing rate is not the thing you care about.
@@ -323,7 +325,7 @@ and it follows from expanding $\|\bm{a}-\bm{b}\|^2 = \bm{a}\cdot\bm{a} +
 \bm{b}\cdot\bm{b} - 2\,\bm{a}\cdot\bm{b}$:
 
 \begin{lstlisting}
-sq = (X**2).sum(axis=1)                       # (n,)
+sq = (X**2).sum(axis=1)                       # (N,)
 D2 = sq[:, None] + sq[None, :] - 2 * (X @ X.T)
 D  = np.sqrt(np.maximum(D2, 0))               # clip: tiny negatives are roundoff
 \end{lstlisting}
@@ -389,15 +391,17 @@ worth being precise about it, because three separate conventions collide here.
 
 \subsection{Square form and condensed form}
 
-A dissimilarity matrix over $n$ stimuli is $n \times n$, symmetric, with zeros
-on the diagonal. That is $n^2$ numbers to store $n(n-1)/2$ facts, so SciPy also
+A dissimilarity matrix over $N$ stimuli is $N \times N$, symmetric, with zeros
+on the diagonal; entry $d_{ik}$ is the dissimilarity of stimuli $i$ and $k$ (the
+lectures call it the RDM, representational dissimilarity matrix). That is $N^2$
+numbers to store $N(N-1)/2$ facts, so SciPy also
 has a \emph{condensed} form: a flat vector of just the upper triangle.
 \texttt{pdist} returns condensed; \texttt{squareform} converts between the two,
 in both directions.
 
 \begin{lstlisting}
-d = pdist(X, metric='euclidean')   # condensed: (n*(n-1)/2,)
-D = squareform(d)                  # square:    (n, n)
+d = pdist(X, metric='euclidean')   # condensed: (N*(N-1)/2,)
+D = squareform(d)                  # square:    (N, N)
 squareform(D, checks=False)        # back to condensed
 \end{lstlisting}
 
@@ -413,17 +417,17 @@ their dissimilarity matrices entry by entry. Take each one's upper triangle so
 that every pair is counted exactly once, and correlate the two lists:
 
 \begin{lstlisting}
-iu = np.triu_indices(n, k=1)       # k=1 excludes the diagonal
+iu = np.triu_indices(N, k=1)       # k=1 excludes the diagonal
 spearmanr(D1[iu], D2[iu])
 \end{lstlisting}
 
-Using the whole matrix instead would count every pair twice and add $n$
+Using the whole matrix instead would count every pair twice and add $N$
 meaningless zeros, which drags the correlation upward for no reason.
 
 \subsection{Checks worth running every time}
 
 \begin{lstlisting}
-D.shape                              # (n, n)?
+D.shape                              # (N, N)?
 np.abs(D - D.T).max()                # symmetric? (1e-16 is roundoff, not a bug)
 np.diag(D)                           # zeros on the diagonal?
 np.isnan(D).sum()                    # any missing?
@@ -603,9 +607,9 @@ X.min(), X.max(), np.ptp(X)   & range, and range as one number \\[3pt]
 \multicolumn{2}{@{}l}{\textit{\textnormal{reshaping and selecting}}}\\
 X[::24]                       & every 24th row \\
 X[mask]                       & the rows where a boolean is True \\
-X.reshape(n, -1)              & flatten all but the first axis \\
+X.reshape(N, -1)              & flatten all but the first axis \\
 np.argsort(v)                 & indices that would sort \texttt{v} \\
-np.triu\_indices(n, k=1)      & each pair once, no diagonal \\[3pt]
+np.triu\_indices(N, k=1)      & each pair once, no diagonal \\[3pt]
 \multicolumn{2}{@{}l}{\textit{\textnormal{the linear algebra}}}\\
 X @ X.T                       & every pairwise dot product at once \\
 X[:, None, :] - X[None, :, :] & every pairwise difference at once \\
