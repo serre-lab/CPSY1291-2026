@@ -26,7 +26,7 @@
 <p>33 minute papers. The four most common questions, and where today answers them:</p>
 <ul>
 <li><em>"Where did the 4,096 numbers go when a row of the response matrix became one square of the RDM?"</em> → the first slides today: one number per <strong>pair</strong>, computed from both rows</li>
-<li><em>"What is a channel, and is one channel one feature?"</em> → a channel is one spatial map of activations; what it responds to is not one nameable feature (a later lecture on convolutional networks)</li>
+<li><em>"What is a channel, and is one channel one feature?"</em> → in the machine-learning sense, yes: each activation is one <strong>input dimension</strong>, one entry of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math>; a channel is one spatial map of such activations. Whether it responds to one nameable thing is another question (a later lecture)</li>
 <li><em>"Are the neural vectors per neuron, averaged over trials?"</em> → yes: one mean rate per neuron per image; Assignment 1 gives you those means</li>
 <li><em>"Why real values 0–1 rather than 0–255?"</em> → the same numbers divided by 255; a convention, not a different measurement</li>
 </ul>
@@ -102,7 +102,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 </ul>
 <figure><img src="../images/L01-similarity-2026-09/similarity_motivation.png" alt="Three bar patterns over twelve units: a pattern x; the same pattern with every unit doubled, marked as unchanged for cosine and correlation but changed for Euclidean distance; and the same pattern with a constant added to every unit, marked as unchanged for correlation only" aria-describedby="figure-8-1"><figcaption id="figure-8-1"><p>Three bar patterns over twelve units: a pattern x; the same pattern with every unit doubled, marked as unchanged for cosine and correlation but changed for Euclidean distance; and the same pattern with a constant added to every unit, marked as unchanged for correlation only</p><a href="../images/L01-similarity-2026-09/similarity_motivation.png">Open full-size figure</a></figcaption></figure>
 <div class="ref"><a href="https://docs.scipy.org/doc/scipy/reference/spatial.distance.html" rel="noopener">SciPy · spatial.distance</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-marpit-scope-yvdsdgy6="" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="73" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-marpit-scope-kxojqpgn="" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="73" aria-labelledby="heading-9"><p class="page">Slide 9</p>
 <h2 id="heading-9">Which is closer to the tiger? It depends on the measure</h2>
 <div class="row">
 <div class="col">
@@ -186,7 +186,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <li>A detour via the gorilla cannot beat the direct route from tiger to elephant: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>l</mi></mrow></msub><mo>≤</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>+</mo><msub><mi>d</mi><mrow><mi>k</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{il}\le d_{ik}+d_{kl}</annotation></semantics></math> (<strong>triangle inequality</strong>)</li>
 </ul>
 <p>Every measure in this lecture satisfies the first three. The fourth is where they part.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-marpit-scope-1ds6wbjc="" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="73" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-marpit-scope-odhm0icy="" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="73" aria-labelledby="heading-13"><p class="page">Slide 13</p>
 <h2 id="heading-13">Which measures are distances in the full sense?</h2>
 
 <p>Summary. The second half of today starts from an RDM and tries to <strong>recover the space behind it</strong>: points whose separations reproduce the entries. That works only if the entries behave like distances:</p>
