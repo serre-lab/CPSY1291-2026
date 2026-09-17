@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MDS: recovering psychological spaces · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>MDS: recovering psychological spaces</h1><p>Reader-friendly version of the 74 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L02_mds-similarity.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">MDS: recovering psychological spaces</a></li><li><a href="#slide-2">Last time, and today</a></li><li><a href="#slide-3">Your questions from Tuesday</a></li><li><a href="#slide-4">An RDM compares every pair of images</a></li><li><a href="#slide-5">A difference defines a direction</a></li><li><a href="#slide-6">Euclidean distance</a></li><li><a href="#slide-7">The dot product measures alignment</a></li><li><a href="#slide-8">Two similarity measures: cosine and correlation</a></li><li><a href="#slide-9">Which is closer to the tiger? It depends on the measure</a></li><li><a href="#slide-10">Why network responses contain zeros</a></li><li><a href="#slide-11">Shared zeros can change correlation</a></li><li><a href="#slide-12">What should a dissimilarity satisfy?</a></li><li><a href="#slide-13">Two unit steps cannot span three units</a></li><li><a href="#slide-14">Cosine dissimilarity is not a metric: real images</a></li><li><a href="#slide-15">Which measures are distances in the full sense?</a></li><li><a href="#slide-16">Training changes the representation</a></li><li><a href="#slide-17">What training does to the RDM</a></li><li><a href="#slide-18">Similarity is the oldest measurement in the field</a></li><li><a href="#slide-19">Computing an RDM from a response matrix</a></li><li><a href="#slide-20">Human similarity judgments</a></li><li><a href="#slide-21">Which relationships are preserved?</a></li><li><a href="#slide-22">Why anyone cares: two species, one structure</a></li><li><a href="#slide-23">Multidimensional scaling: the problem</a></li><li><a href="#slide-24">Worked example — the color circle falls out</a></li><li><a href="#slide-25">Stress-based MDS — the optimization view</a></li><li><a href="#slide-26">Normalized MDS stress</a></li><li><a href="#slide-27">Watch it relax</a></li><li><a href="#slide-28">Running MDS in three lines</a></li><li><a href="#slide-29">Explore: dimensions, stress, and clusters</a></li><li><a href="#slide-30">Reading an MDS solution — three warnings</a></li><li><a href="#slide-31">Metric → non-metric: weaken the assumption</a></li><li><a href="#slide-32">Shepard's universal law of generalization</a></li><li><a href="#slide-33">Exponential and Gaussian decay</a></li><li><a href="#slide-34">Fitting curves and interpreting R²</a></li><li><a href="#slide-35">Rank order leaves the decay shape open</a></li><li><a href="#slide-36">An RDM is itself a vector</a></li><li><a href="#slide-37">Correlating two RDMs</a></li><li><a href="#slide-38">What that number does and does not say</a></li><li><a href="#slide-39">Human reliability sets the comparison scale</a></li><li><a href="#slide-40">Which system is most human-like? One wins</a></li><li><a href="#slide-41">The payoff: human similarity breaks all three rules</a></li><li><a href="#slide-42">MDS and clustering are different hypotheses</a></li><li><a href="#slide-43">Assignment 1: the analysis sequence</a></li><li><a href="#slide-44">Where this goes</a></li><li><a href="#slide-45">Recap</a></li><li><a href="#slide-46">Appendix · There is also a closed-form route</a></li><li><a href="#slide-47">Appendix · Comparing RDMs: what can go wrong</a></li><li><a href="#slide-48">Appendix · Which image is closer? The tigers</a></li><li><a href="#slide-49">Appendix · One object, three sources</a></li><li><a href="#slide-50">Appendix · Behaviour gives a dissimilarity matrix too</a></li><li><a href="#slide-51">Appendix · An RDM is a wall of numbers</a></li><li><a href="#slide-52">Appendix · Explore: the classic datasets</a></li><li><a href="#slide-53">Appendix · Emotion has a geometry too</a></li><li><a href="#slide-54">Appendix · Why exponential?</a></li><li><a href="#slide-55">Appendix · Violations of minimality and symmetry</a></li><li><a href="#slide-56">Appendix · Violations of the triangle inequality — and of hierarchy</a></li><li><a href="#slide-57">Appendix · Not every structure is a space</a></li><li><a href="#slide-58">Appendix · The pay-off: category structure, in two species</a></li><li><a href="#slide-59">Appendix · Which image is closer? The chimpanzees</a></li><li><a href="#slide-60">Appendix · Which image is closer? The orangutans</a></li><li><a href="#slide-61">Appendix · Training pulls categories together</a></li><li><a href="#slide-62">Appendix · Shepard's law meets deep networks</a></li><li><a href="#slide-63">Appendix · But: twelve datasets of simple stimuli</a></li><li><a href="#slide-64">Appendix · The answer: the law holds</a></li><li><a href="#slide-65">Appendix · Aside: language models recover the color wheel</a></li><li><a href="#slide-66">Appendix · Both score 70%. What did they learn?</a></li><li><a href="#slide-67">Appendix · Hierarchical clustering — the idea</a></li><li><a href="#slide-68">Appendix · The agglomerative algorithm, and the linkage choice</a></li><li><a href="#slide-69">Appendix · Linkage changes the answer</a></li><li><a href="#slide-70">Appendix · How many clusters? Cut the tree</a></li><li><a href="#slide-71">Appendix · The silhouette score measures separation</a></li><li><a href="#slide-72">Appendix · A tree becomes groups at a chosen cut</a></li><li><a href="#slide-73">Appendix · Clustering always returns a tree</a></li><li><a href="#slide-74">Recent papers · to be checked</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MDS: recovering psychological spaces · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>MDS: recovering psychological spaces</h1><p>Reader-friendly version of the 74 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L02_mds-similarity.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">MDS: recovering psychological spaces</a></li><li><a href="#slide-2">Last time, and today</a></li><li><a href="#slide-3">Your questions from Tuesday</a></li><li><a href="#slide-4">An RDM compares every pair of images</a></li><li><a href="#slide-5">A difference defines a direction</a></li><li><a href="#slide-6">Euclidean distance</a></li><li><a href="#slide-7">The dot product measures alignment</a></li><li><a href="#slide-8">Two similarity measures: cosine and correlation</a></li><li><a href="#slide-9">Which is closer to the tiger? It depends on the measure</a></li><li><a href="#slide-10">Why network responses contain zeros</a></li><li><a href="#slide-11">Shared zeros can change correlation</a></li><li><a href="#slide-12">What should a dissimilarity satisfy?</a></li><li><a href="#slide-13">Which measures are distances in the full sense?</a></li><li><a href="#slide-14">Training changes the representation</a></li><li><a href="#slide-15">What training does to the RDM</a></li><li><a href="#slide-16">Similarity is the oldest measurement in the field</a></li><li><a href="#slide-17">Computing an RDM from a response matrix</a></li><li><a href="#slide-18">Human similarity judgments</a></li><li><a href="#slide-19">Which relationships are preserved?</a></li><li><a href="#slide-20">Why anyone cares: two species, one structure</a></li><li><a href="#slide-21">Multidimensional scaling: the problem</a></li><li><a href="#slide-22">Worked example — the color circle falls out</a></li><li><a href="#slide-23">Stress-based MDS — the optimization view</a></li><li><a href="#slide-24">Normalized MDS stress</a></li><li><a href="#slide-25">Watch it relax</a></li><li><a href="#slide-26">Running MDS in three lines</a></li><li><a href="#slide-27">Explore: dimensions, stress, and clusters</a></li><li><a href="#slide-28">Reading an MDS solution — three warnings</a></li><li><a href="#slide-29">Metric → non-metric: weaken the assumption</a></li><li><a href="#slide-30">Shepard's universal law of generalization</a></li><li><a href="#slide-31">Exponential and Gaussian decay</a></li><li><a href="#slide-32">Fitting curves and interpreting R²</a></li><li><a href="#slide-33">Rank order leaves the decay shape open</a></li><li><a href="#slide-34">An RDM is itself a vector</a></li><li><a href="#slide-35">Correlating two RDMs</a></li><li><a href="#slide-36">What that number does and does not say</a></li><li><a href="#slide-37">Human reliability sets the comparison scale</a></li><li><a href="#slide-38">Which system is most human-like? One wins</a></li><li><a href="#slide-39">The payoff: human similarity breaks all three rules</a></li><li><a href="#slide-40">MDS and clustering are different hypotheses</a></li><li><a href="#slide-41">Assignment 1: the analysis sequence</a></li><li><a href="#slide-42">Where this goes</a></li><li><a href="#slide-43">Recap</a></li><li><a href="#slide-44">Appendix · There is also a closed-form route</a></li><li><a href="#slide-45">Appendix · Comparing RDMs: what can go wrong</a></li><li><a href="#slide-46">Appendix · Two unit steps cannot span three units</a></li><li><a href="#slide-47">Appendix · Cosine is not a metric: real images</a></li><li><a href="#slide-48">Appendix · Which image is closer? The tigers</a></li><li><a href="#slide-49">Appendix · One object, three sources</a></li><li><a href="#slide-50">Appendix · Behaviour gives a dissimilarity matrix too</a></li><li><a href="#slide-51">Appendix · An RDM is a wall of numbers</a></li><li><a href="#slide-52">Appendix · Explore: the classic datasets</a></li><li><a href="#slide-53">Appendix · Emotion has a geometry too</a></li><li><a href="#slide-54">Appendix · Why exponential?</a></li><li><a href="#slide-55">Appendix · Violations of minimality and symmetry</a></li><li><a href="#slide-56">Appendix · Violations of the triangle inequality — and of hierarchy</a></li><li><a href="#slide-57">Appendix · Not every structure is a space</a></li><li><a href="#slide-58">Appendix · The pay-off: category structure, in two species</a></li><li><a href="#slide-59">Appendix · Which image is closer? The chimpanzees</a></li><li><a href="#slide-60">Appendix · Which image is closer? The orangutans</a></li><li><a href="#slide-61">Appendix · Training pulls categories together</a></li><li><a href="#slide-62">Appendix · Shepard's law meets deep networks</a></li><li><a href="#slide-63">Appendix · But: twelve datasets of simple stimuli</a></li><li><a href="#slide-64">Appendix · The answer: the law holds</a></li><li><a href="#slide-65">Appendix · Aside: language models recover the color wheel</a></li><li><a href="#slide-66">Appendix · Both score 70%. What did they learn?</a></li><li><a href="#slide-67">Appendix · Hierarchical clustering — the idea</a></li><li><a href="#slide-68">Appendix · The agglomerative algorithm, and the linkage choice</a></li><li><a href="#slide-69">Appendix · Linkage changes the answer</a></li><li><a href="#slide-70">Appendix · How many clusters? Cut the tree</a></li><li><a href="#slide-71">Appendix · The silhouette score measures separation</a></li><li><a href="#slide-72">Appendix · A tree becomes groups at a chosen cut</a></li><li><a href="#slide-73">Appendix · Clustering always returns a tree</a></li><li><a href="#slide-74">Recent papers · to be checked</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
   <img src="../images/brown-crest-color.png" alt="Brown University crest">
   <div class="vrule"></div>
   <div>
@@ -102,7 +102,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 </ul>
 <figure><img src="../images/L01-similarity-2026-09/similarity_motivation.png" alt="Three bar patterns over twelve units: a pattern x; the same pattern with every unit doubled, marked as unchanged for cosine and correlation but changed for Euclidean distance; and the same pattern with a constant added to every unit, marked as unchanged for correlation only" aria-describedby="figure-8-1"><figcaption id="figure-8-1"><p>Three bar patterns over twelve units: a pattern x; the same pattern with every unit doubled, marked as unchanged for cosine and correlation but changed for Euclidean distance; and the same pattern with a constant added to every unit, marked as unchanged for correlation only</p><a href="../images/L01-similarity-2026-09/similarity_motivation.png">Open full-size figure</a></figcaption></figure>
 <div class="ref"><a href="https://docs.scipy.org/doc/scipy/reference/spatial.distance.html" rel="noopener">SciPy · spatial.distance</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-marpit-scope-scubxuga="" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="74" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-marpit-scope-hmls37sq="" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="74" aria-labelledby="heading-9"><p class="page">Slide 9</p>
 <h2 id="heading-9">Which is closer to the tiger? It depends on the measure</h2>
 <div class="row">
 <div class="col">
@@ -186,32 +186,8 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <li>A detour via the gorilla cannot beat the direct route from tiger to elephant: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>l</mi></mrow></msub><mo>≤</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>+</mo><msub><mi>d</mi><mrow><mi>k</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{il}\le d_{ik}+d_{kl}</annotation></semantics></math> (<strong>triangle inequality</strong>)</li>
 </ul>
 <p>Every measure in this lecture satisfies the first three. The fourth is where they part.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="74" aria-labelledby="heading-13"><p class="page">Slide 13</p>
-<h2 id="heading-13">Two unit steps cannot span three units</h2>
-<div class="row">
-<div class="col">
-<p>The fourth property, tested on a three-image RDM:</p>
-<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mstyle mathcolor="#B23A2E"><mn>3</mn></mstyle></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mstyle mathcolor="#B23A2E"><mn>3</mn></mstyle></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{D}=\begin{pmatrix}0&amp;1&amp;\color{#B23A2E}{3}\\1&amp;0&amp;1\\\color{#B23A2E}{3}&amp;1&amp;0\end{pmatrix}
-</annotation></semantics></math></div></span></p></div>
-<div class="col">
-<ul>
-<li>Zero diagonal, symmetric, nonnegative: the first three hold</li>
-<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mn>13</mn></msub><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">d_{13}=3</annotation></semantics></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mn>12</mn></msub><mo>=</mo><msub><mi>d</mi><mn>23</mn></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">d_{12}=d_{23}=1</annotation></semantics></math>: impossible for a distance. Two unit steps reach at most 2</li>
-<li>Euclidean requires <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mn>13</mn></msub><mo>≤</mo><msub><mi>d</mi><mn>12</mn></msub><mo>+</mo><msub><mi>d</mi><mn>23</mn></msub><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">d_{13}\leq d_{12}+d_{23}=2</annotation></semantics></math></li>
-</ul>
-</div>
-</div>
-<figure><img src="../images/L01-triangle-notation-2026-09-13/triangle_constraint.svg" alt="Image representations x with superscripts 1, 2 and 3 joined by two unit segments; bending gives endpoint distance 1.6, straightening gives the maximum, 2" aria-describedby="figure-13-1"><figcaption id="figure-13-1"><p>Image representations x with superscripts 1, 2 and 3 joined by two unit segments; bending gives endpoint distance 1.6, straightening gives the maximum, 2</p><a href="../images/L01-triangle-notation-2026-09-13/triangle_constraint.svg">Open full-size figure</a></figcaption></figure>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="74" aria-labelledby="heading-14"><p class="page">Slide 14</p>
-<h2 id="heading-14">Cosine dissimilarity is not a metric: real images</h2>
-<p>Pixel vectors. The route from tiger A to the bison <strong>through tiger C is shorter than the direct route</strong>. No arrangement of points can reproduce that.</p>
-<figure><img src="../images/L01-triangle-notation-2026-09-13/cosine_violation_real.svg" alt="Three photographs, tiger A, tiger C and a bison, with cosine dissimilarities between pixel vectors: A to C 0.113, C to bison 0.174, sum 0.287, but A to bison directly 0.348, a triangle-inequality violation" aria-describedby="figure-14-1"><figcaption id="figure-14-1"><p>Three photographs, tiger A, tiger C and a bison, with cosine dissimilarities between pixel vectors: A to C 0.113, C to bison 0.174, sum 0.287, but A to bison directly 0.348, a triangle-inequality violation</p><a href="../images/L01-triangle-notation-2026-09-13/cosine_violation_real.svg">Open full-size figure</a></figcaption></figure>
-<ul>
-<li>This image set: <strong>2.3 %</strong> of triples violate it in pixel space, <strong>0</strong> in the trained network's late layer</li>
-<li>Identity fails too: a brighter tiger is at cosine dissimilarity 0 from the original · <strong>A1 §1b–d</strong></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-marpit-scope-ub0l2p3l="" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="74" aria-labelledby="heading-15"><p class="page">Slide 15</p>
-<h2 id="heading-15">Which measures are distances in the full sense?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-marpit-scope-arwxmf4p="" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="74" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<h2 id="heading-13">Which measures are distances in the full sense?</h2>
 
 <p>Summary. The second half of today starts from an RDM and tries to <strong>recover the space behind it</strong>: points whose separations reproduce the entries. That works only if the entries behave like distances:</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Which measures are distances in the full sense? — table"><table><caption>Which measures are distances in the full sense? — table</caption>
@@ -262,19 +238,19 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 </tr>
 </tbody>
 </table></div>
-<p class="metric-domain">✓ holds throughout the domain; ✗ can fail, even when the measure is defined (cosine needs nonzero vectors, correlation nonconstant ones).<br>In practice the failures are rare (2.3 % of pixel triples, none in the trained network) and are the price of a useful invariance: cosine factors out gain, correlation gain and baseline.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="74" aria-labelledby="heading-16"><p class="page">Slide 16</p>
-<h2 id="heading-16">Training changes the representation</h2>
+<p class="metric-domain">✓ holds throughout the domain; ✗ can fail even when the measure is defined. On our images: 2.3 % of pixel triples break the triangle inequality under cosine, none in the trained late layer, and a brighter copy of an image sits at cosine distance 0 from it. <b>You test this yourself: Assignment 1 bonus B1</b> · worked examples in the appendix.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="74" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<h2 id="heading-14">Training changes the representation</h2>
 <ul>
 <li>The RDMs above came from a <strong>trained</strong> network. Where did that structure come from?</li>
 <li><strong>Weights</strong>: the adjustable numbers inside the network. Training: find weights that reduce the classification loss on labeled images</li>
 </ul>
-<figure><img src="../images/L01-training-2026-09-13/training_loop.svg" alt="Supervised training: four labelled training photographs (frog, eagle, elephant, penguin) pass one at a time through a network to produce class predictions; comparing the prediction with the true label gives a loss, which guides weight updates and changes internal representations" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>Supervised training: four labelled training photographs (frog, eagle, elephant, penguin) pass one at a time through a network to produce class predictions; comparing the prediction with the true label gives a loss, which guides weight updates and changes internal representations</p><a href="../images/L01-training-2026-09-13/training_loop.svg">Open full-size figure</a></figcaption></figure>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="74" aria-labelledby="heading-17"><p class="page">Slide 17</p>
-<h2 id="heading-17">What training does to the RDM</h2>
+<figure><img src="../images/L01-training-2026-09-13/training_loop.svg" alt="Supervised training: four labelled training photographs (frog, eagle, elephant, penguin) pass one at a time through a network to produce class predictions; comparing the prediction with the true label gives a loss, which guides weight updates and changes internal representations" aria-describedby="figure-14-1"><figcaption id="figure-14-1"><p>Supervised training: four labelled training photographs (frog, eagle, elephant, penguin) pass one at a time through a network to produce class predictions; comparing the prediction with the true label gives a loss, which guides weight updates and changes internal representations</p><a href="../images/L01-training-2026-09-13/training_loop.svg">Open full-size figure</a></figcaption></figure>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="74" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<h2 id="heading-15">What training does to the RDM</h2>
 <div class="row">
 <div class="col">
-<figure><img src="../images/L01-concrete-2026-09/rdm_trained_untrained.png" alt="Two six-by-six correlation-distance RDMs for the frog, eagle, elephant, tiger, penguin and gorilla images from late ResNet-18 activations: with random weights every off-diagonal entry is small, about 0.11 to 0.19; with ImageNet-trained weights every off-diagonal entry is large, about 0.87 to 1.04" aria-describedby="figure-17-1"><figcaption id="figure-17-1"><p>Two six-by-six correlation-distance RDMs for the frog, eagle, elephant, tiger, penguin and gorilla images from late ResNet-18 activations: with random weights every off-diagonal entry is small, about 0.11 to 0.19; with ImageNet-trained weights every off-diagonal entry is large, about 0.87 to 1.04</p><a href="../images/L01-concrete-2026-09/rdm_trained_untrained.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L01-concrete-2026-09/rdm_trained_untrained.png" alt="Two six-by-six correlation-distance RDMs for the frog, eagle, elephant, tiger, penguin and gorilla images from late ResNet-18 activations: with random weights every off-diagonal entry is small, about 0.11 to 0.19; with ImageNet-trained weights every off-diagonal entry is large, about 0.87 to 1.04" aria-describedby="figure-15-1"><figcaption id="figure-15-1"><p>Two six-by-six correlation-distance RDMs for the frog, eagle, elephant, tiger, penguin and gorilla images from late ResNet-18 activations: with random weights every off-diagonal entry is small, about 0.11 to 0.19; with ImageNet-trained weights every off-diagonal entry is large, about 0.87 to 1.04</p><a href="../images/L01-concrete-2026-09/rdm_trained_untrained.png">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -286,8 +262,8 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 </div>
 </div>
 <div class="ref">Correlation distance on the 4,096 stored late-layer activations · random weights, seed 1291</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="74" aria-labelledby="heading-18"><p class="page">Slide 18</p>
-<h2 id="heading-18">Similarity is the oldest measurement in the field</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="74" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<h2 id="heading-16">Similarity is the oldest measurement in the field</h2>
 <ul>
 <li>Ask a person which two of three colors go together; ask which two Morse-code beeps get confused; ask a pigeon to peck for one hue and see how much it generalizes to a neighboring one.</li>
 <li>All of these return the same kind of number: <strong>how close are stimulus <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math> and stimulus <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi></mrow><annotation encoding="application/x-tex">j</annotation></semantics></math>?</strong></li>
@@ -295,8 +271,8 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <li>The bet of this lecture: if you collect <em>all</em> the pairwise answers, the <strong>structure</strong> of the set falls out.</li>
 </ul>
 <div class="ref">Ekman <b>1954</b> (color similarity) · Rothkopf <b>1957</b> (Morse-code confusions) · Shepard <b>1962</b>, Kruskal <b>1964</b> (MDS)</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-class="codeslide" data-marpit-pagination="19" data-marpit-pagination-total="74" aria-labelledby="heading-19"><p class="page">Slide 19</p>
-<h2 id="heading-19">Computing an RDM from a response matrix</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-class="codeslide" data-marpit-pagination="17" data-marpit-pagination-total="74" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<h2 id="heading-17">Computing an RDM from a response matrix</h2>
 <marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
 <span class="hljs-keyword">from</span> scipy.spatial.distance <span class="hljs-keyword">import</span> pdist, squareform
 
@@ -313,28 +289,28 @@ D     = squareform(d_vec)                <span class="hljs-comment"># (N, N): sy
 <li><code>pdist</code> never forms the <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>×</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">N\times N</annotation></semantics></math> matrix — it computes exactly the upper triangle. <code>squareform</code> converts either way.</li>
 <li>Swap <code>metric="euclidean"</code> (or <code>"cosine"</code>) to change the geometry; nothing downstream changes.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="74" aria-labelledby="heading-20"><p class="page">Slide 20</p>
-<h2 id="heading-20">Human similarity judgments</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="74" aria-labelledby="heading-18"><p class="page">Slide 18</p>
+<h2 id="heading-18">Human similarity judgments</h2>
 <p>Peterson and colleagues asked people: <strong>how similar are these two images, from 0 to 10?</strong> Ten raters for every pair of 120 animal photographs.</p>
-<figure><img src="../images/L01-opening-2026-09/tigers_monkey.svg" alt="The two tiger photographs A and B from the opening slide of the first lecture, and a monkey photograph, C" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>The two tiger photographs A and B from the opening slide of the first lecture, and a monkey photograph, C</p><a href="../images/L01-opening-2026-09/tigers_monkey.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L01-opening-2026-09/tigers_monkey.svg" alt="The two tiger photographs A and B from the opening slide of the first lecture, and a monkey photograph, C" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>The two tiger photographs A and B from the opening slide of the first lecture, and a monkey photograph, C</p><a href="../images/L01-opening-2026-09/tigers_monkey.svg">Open full-size figure</a></figcaption></figure>
 <p>Mean rating &nbsp; A–B: <b>10.0</b> &nbsp;·&nbsp; A–C: <b>2.9</b> &nbsp;·&nbsp; B–C: <b>2.2</b></p>
 <div class="ref">Ratings: <a href="https://doi.org/10.1111/cogs.12670" rel="noopener">Peterson, Abbott &amp; Griffiths <i>Cognitive Science</i> 2018</a>, the data used in Assignment 1</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="74" aria-labelledby="heading-21"><p class="page">Slide 21</p>
-<h2 id="heading-21">Which relationships are preserved?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="74" aria-labelledby="heading-19"><p class="page">Slide 19</p>
+<h2 id="heading-19">Which relationships are preserved?</h2>
 <p>The same three photographs, four kinds of measurement: <strong>pixels</strong>, <strong>IT neurons</strong>, <strong>network activations</strong>, <strong>human ratings</strong>.</p>
-<figure><img src="../images/L01-opening-2026-09/tigers_monkey.svg" alt="The same two tiger photographs and monkey photograph, labeled A, B and C" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>The same two tiger photographs and monkey photograph, labeled A, B and C</p><a href="../images/L01-opening-2026-09/tigers_monkey.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L01-opening-2026-09/tigers_monkey.svg" alt="The same two tiger photographs and monkey photograph, labeled A, B and C" aria-describedby="figure-19-1"><figcaption id="figure-19-1"><p>The same two tiger photographs and monkey photograph, labeled A, B and C</p><a href="../images/L01-opening-2026-09/tigers_monkey.svg">Open full-size figure</a></figcaption></figure>
 <p>Do they all agree that A and B are closer than A and C? <b>That is what Assignment 1 measures.</b></p>
 <div class="ref"><a href="https://doi.org/10.1016/j.tics.2013.06.007" rel="noopener">Kriegeskorte &amp; Kievit <i>Trends in Cognitive Sciences</i> 2013</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-marpit-pagination="22" data-marpit-pagination-total="74" aria-labelledby="heading-22"><p class="page">Slide 22</p>
-<h2 id="heading-22">Why anyone cares: two species, one structure</h2>
-<figure><img src="../images/2026-09-17/s04_composite.svg" alt="center Two 92-by-92 dissimilarity matrices, monkey IT and human IT, both showing the same blue animate block and warm inanimate block with face and body sub-blocks" aria-describedby="figure-22-1"><figcaption id="figure-22-1"><p>center Two 92-by-92 dissimilarity matrices, monkey IT and human IT, both showing the same blue animate block and warm inanimate block with face and body sub-blocks</p><a href="../images/2026-09-17/s04_composite.svg">Open full-size figure</a></figcaption></figure>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="74" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<h2 id="heading-20">Why anyone cares: two species, one structure</h2>
+<figure><img src="../images/2026-09-17/s04_composite.svg" alt="center Two 92-by-92 dissimilarity matrices, monkey IT and human IT, both showing the same blue animate block and warm inanimate block with face and body sub-blocks" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>center Two 92-by-92 dissimilarity matrices, monkey IT and human IT, both showing the same blue animate block and warm inanimate block with face and body sub-blocks</p><a href="../images/2026-09-17/s04_composite.svg">Open full-size figure</a></figcaption></figure>
 <ul>
 <li>The same 92 object images, shown to a <strong>monkey</strong> (single-unit IT recordings) and to a <strong>human</strong> (fMRI IT voxels). Two utterly different measurement systems, two <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>92</mn><mo>×</mo><mn>92</mn></mrow><annotation encoding="application/x-tex">92\times92</annotation></semantics></math> matrices.</li>
 <li>They look <mark>strikingly alike</mark> — an animate/inanimate block structure with face and body sub-blocks in both.</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1016/j.neuron.2008.10.043" rel="noopener">Kriegeskorte et al. <b>Neuron 2008</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-marpit-pagination="23" data-marpit-pagination-total="74" aria-labelledby="heading-23"><p class="page">Slide 23</p>
-<h2 id="heading-23">Multidimensional scaling: the problem</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="74" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<h2 id="heading-21">Multidimensional scaling: the problem</h2>
 <div class="row">
 <div class="col">
 <p><strong>Given</strong> a dissimilarity matrix <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{\mathbf{D}}</annotation></semantics></math> over <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> stimuli, with entries <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{d_{ij}}</annotation></semantics></math>.</p>
@@ -351,16 +327,16 @@ D     = squareform(d_vec)                <span class="hljs-comment"># (N, N): sy
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="74" aria-labelledby="heading-24"><p class="page">Slide 24</p>
-<h2 id="heading-24">Worked example — the color circle falls out</h2>
-<figure><img src="../images/2026-09-17/s03_img00.png" alt="center MDS of judged similarities among 14 monochromatic lights: the points fall on a circle ordered by wavelength, with violet closing the loop next to red" aria-describedby="figure-24-1"><figcaption id="figure-24-1"><p>center MDS of judged similarities among 14 monochromatic lights: the points fall on a circle ordered by wavelength, with violet closing the loop next to red</p><a href="../images/2026-09-17/s03_img00.png">Open full-size figure</a></figcaption></figure>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-marpit-pagination="22" data-marpit-pagination-total="74" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<h2 id="heading-22">Worked example — the color circle falls out</h2>
+<figure><img src="../images/2026-09-17/s03_img00.png" alt="center MDS of judged similarities among 14 monochromatic lights: the points fall on a circle ordered by wavelength, with violet closing the loop next to red" aria-describedby="figure-22-1"><figcaption id="figure-22-1"><p>center MDS of judged similarities among 14 monochromatic lights: the points fall on a circle ordered by wavelength, with violet closing the loop next to red</p><a href="../images/2026-09-17/s03_img00.png">Open full-size figure</a></figcaption></figure>
 <ul>
 <li>Input: humans judging the similarity of <strong>14 monochromatic lights</strong>, 434–674 nm — a triangle of numbers, no spatial information whatsoever.</li>
 <li>Output: a <strong>circle</strong>, ordered by wavelength, closing the gap between violet and red. Nobody told the algorithm that hue is circular.</li>
 </ul>
 <div class="ref">Data: Ekman <b>1954</b> · analysis after Shepard <b>1962</b></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="74" aria-labelledby="heading-25"><p class="page">Slide 25</p>
-<h2 id="heading-25">Stress-based MDS — the optimization view</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-marpit-pagination="23" data-marpit-pagination-total="74" aria-labelledby="heading-23"><p class="page">Slide 23</p>
+<h2 id="heading-23">Stress-based MDS — the optimization view</h2>
 <div class="row">
 <div class="col">
 <p>Real dissimilarities are noisy, and often no exact Euclidean configuration exists. So stop demanding one and <strong>minimize the mismatch</strong> instead:</p>
@@ -372,13 +348,13 @@ D     = squareform(d_vec)                <span class="hljs-comment"># (N, N): sy
 </ul>
 </div>
 <div class="col fig">
-<figure><img src="../images/2026-09-17/s08_img00.png" alt="A curve f of x with tangent slopes marked at three points and the downhill update rule x-new equals x minus eta times the slope" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>A curve f of x with tangent slopes marked at three points and the downhill update rule x-new equals x minus eta times the slope</p><a href="../images/2026-09-17/s08_img00.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/2026-09-17/s08_img00.png" alt="A curve f of x with tangent slopes marked at three points and the downhill update rule x-new equals x minus eta times the slope" aria-describedby="figure-23-1"><figcaption id="figure-23-1"><p>A curve f of x with tangent slopes marked at three points and the downhill update rule x-new equals x minus eta times the slope</p><a href="../images/2026-09-17/s08_img00.png">Open full-size figure</a></figcaption></figure>
 <p>SMACOF — iterative majorization, step downhill each round</p>
 </div>
 </div>
 <div class="ref">Kruskal <b>1964</b> · usually reported in normalized form, as <i>Kruskal stress-1</i></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="74" aria-labelledby="heading-26"><p class="page">Slide 26</p>
-<h2 id="heading-26">Normalized MDS stress</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="74" aria-labelledby="heading-24"><p class="page">Slide 24</p>
+<h2 id="heading-24">Normalized MDS stress</h2>
 <p>Let <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ij}</annotation></semantics></math> be a distance in the map and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover accent="true"><mi>d</mi><mo>^</mo></mover><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\hat d_{ij}</annotation></semantics></math> its fitted target.</p>
 <p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">s</mi><mi mathvariant="normal">s</mi><mtext> ⁣</mtext><mtext> ⁣</mtext><mo>−</mo><mtext> ⁣</mtext><mtext> ⁣</mtext><mn>1</mn></mrow><mo>=</mo><msqrt><mfrac><mrow><munder><mo>∑</mo><mrow><mi>i</mi><mo>&lt;</mo><mi>j</mi></mrow></munder><mo stretchy="false">(</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>−</mo><msub><mover accent="true"><mi>d</mi><mo>^</mo></mover><mrow><mi>i</mi><mi>j</mi></mrow></msub><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><mrow><munder><mo>∑</mo><mrow><mi>i</mi><mo>&lt;</mo><mi>j</mi></mrow></munder><msubsup><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow><mrow><mtext> </mtext><mn>2</mn></mrow></msubsup></mrow></mfrac></msqrt><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\mathrm{Stress\!\! -\!\!1}=\sqrt{\frac{\sum_{i&lt;j}(d_{ij}-\hat d_{ij})^2}{\sum_{i&lt;j}d_{ij}^{\,2}}}.
 </annotation></semantics></math></div></span></p><ul>
@@ -387,22 +363,22 @@ D     = squareform(d_vec)                <span class="hljs-comment"># (N, N): sy
 <li>This 0–1 number is what <code>sklearn</code> prints for a nonmetric fit. <mark>Kruskal's 1964 rule of thumb reads it: 0.05 excellent · 0.10 fair · 0.20 poor.</mark> Better than any threshold: refit on shuffled dissimilarities at the same item count and dimension.</li>
 </ul>
 <div class="ref"><a href="https://scikit-learn.org/1.8/modules/generated/sklearn.manifold.MDS.html" rel="noopener">Kruskal 1964 · scikit-learn MDS</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-marpit-pagination="27" data-marpit-pagination-total="74" aria-labelledby="heading-27"><p class="page">Slide 27</p>
-<h2 id="heading-27">Watch it relax</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="74" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<h2 id="heading-25">Watch it relax</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/2026-09-17/s10_img00.png" alt="Three snapshots of 1-D MDS: points A, B, C start bunched on a line at iteration 0 and spread to their final spacing by iteration 250" aria-describedby="figure-27-1"><figcaption id="figure-27-1"><p>Three snapshots of 1-D MDS: points A, B, C start bunched on a line at iteration 0 and spread to their final spacing by iteration 250</p><a href="../images/2026-09-17/s10_img00.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/2026-09-17/s10_img00.png" alt="Three snapshots of 1-D MDS: points A, B, C start bunched on a line at iteration 0 and spread to their final spacing by iteration 250" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>Three snapshots of 1-D MDS: points A, B, C start bunched on a line at iteration 0 and spread to their final spacing by iteration 250</p><a href="../images/2026-09-17/s10_img00.png">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col fig">
-<figure><img src="../images/2026-09-17/s11_img00.png" alt="Three snapshots of 2-D MDS on four US cities: random starting positions settle into the familiar map arrangement by iteration 400" aria-describedby="figure-27-2"><figcaption id="figure-27-2"><p>Three snapshots of 2-D MDS on four US cities: random starting positions settle into the familiar map arrangement by iteration 400</p><a href="../images/2026-09-17/s11_img00.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/2026-09-17/s11_img00.png" alt="Three snapshots of 2-D MDS on four US cities: random starting positions settle into the familiar map arrangement by iteration 400" aria-describedby="figure-25-2"><figcaption id="figure-25-2"><p>Three snapshots of 2-D MDS on four US cities: random starting positions settle into the familiar map arrangement by iteration 400</p><a href="../images/2026-09-17/s11_img00.png">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <ul>
 <li><strong>Left, 1-D:</strong> three points slide along a line until the three pairwise gaps are as close to right as they can be.</li>
 <li><strong>Right, 2-D:</strong> four US cities, initialized at random, settle into the map you would draw from an atlas — from driving distances alone.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-class="codeslide" data-marpit-pagination="28" data-marpit-pagination-total="74" aria-labelledby="heading-28"><p class="page">Slide 28</p>
-<h2 id="heading-28">Running MDS in three lines</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-class="codeslide" data-marpit-pagination="26" data-marpit-pagination-total="74" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<h2 id="heading-26">Running MDS in three lines</h2>
 <marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">from</span> sklearn.manifold <span class="hljs-keyword">import</span> MDS
 
 mds = MDS(n_components=<span class="hljs-number">2</span>,             <span class="hljs-comment"># k = 2, because we want to look at it</span>
@@ -420,25 +396,25 @@ Y_nm = mds_nm.fit_transform(D)
 <li><code>metric="precomputed"</code> is the flag that matters (called <code>dissimilarity=</code> before scikit-learn 1.8) — otherwise sklearn computes Euclidean distances from <code>D</code> as if it were raw data.</li>
 <li><code>n_init=8</code>: stress-based MDS has <strong>local minima</strong>, so restart and keep the best.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="74" aria-labelledby="heading-29"><p class="page">Slide 29</p>
-<h2 id="heading-29">Explore: dimensions, stress, and clusters</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-marpit-pagination="27" data-marpit-pagination-total="74" aria-labelledby="heading-27"><p class="page">Slide 27</p>
+<h2 id="heading-27">Explore: dimensions, stress, and clusters</h2>
 <div class="interactive-figure interactive-wide">
 
 <div class="print-figure">
-<figure><img src="../images/L02-mds-explorer-2026-09-13/mds_explorer_k2_c4.png" alt="Left: nonmetric MDS map of 120 animal images from human similarity ratings, points coloured by cluster. Right: the dendrogram of the same dissimilarities with a dashed cut line at four clusters" aria-describedby="figure-29-1"><figcaption id="figure-29-1"><p>Left: nonmetric MDS map of 120 animal images from human similarity ratings, points coloured by cluster. Right: the dendrogram of the same dissimilarities with a dashed cut line at four clusters</p><a href="../images/L02-mds-explorer-2026-09-13/mds_explorer_k2_c4.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L02-mds-explorer-2026-09-13/mds_explorer_k2_c4.png" alt="Left: nonmetric MDS map of 120 animal images from human similarity ratings, points coloured by cluster. Right: the dendrogram of the same dissimilarities with a dashed cut line at four clusters" aria-describedby="figure-27-1"><figcaption id="figure-27-1"><p>Left: nonmetric MDS map of 120 animal images from human similarity ratings, points coloured by cluster. Right: the dendrogram of the same dissimilarities with a dashed cut line at four clusters</p><a href="../images/L02-mds-explorer-2026-09-13/mds_explorer_k2_c4.png">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1111/cogs.12670" rel="noopener">Peterson, Abbott &amp; Griffiths <i>Cognitive Science</i> 2018</a> · <a href="../demos/mds_explorer.html" rel="noopener">open full screen</a></div>
-<p class="explorer-links"><a href="../demos/mds_explorer.html">Nonmetric MDS of the 120 animal images in one, two or three dimensions beside a dendrogram of the same dissimilarities; choose the source, the linkage rule and where to cut the tree — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="74" aria-labelledby="heading-30"><p class="page">Slide 30</p>
-<h2 id="heading-30">Reading an MDS solution — three warnings</h2>
+<p class="explorer-links"><a href="../demos/mds_explorer.html">Nonmetric MDS of the 120 animal images in one, two or three dimensions beside a dendrogram of the same dissimilarities; choose the source, the linkage rule and where to cut the tree — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="74" aria-labelledby="heading-28"><p class="page">Slide 28</p>
+<h2 id="heading-28">Reading an MDS solution — three warnings</h2>
 <ul>
 <li><strong>The solution is not unique.</strong> Shift, rotate or reflect the whole configuration and the pairwise distances are unchanged, so stress is unchanged. <mark>The axes mean nothing.</mark> Only relative positions do.</li>
 <li><strong>The dimension <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math> is your choice.</strong> Plot stress against <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math>: it always falls, so look for the elbow. Two dimensions is a display convenience, not a discovery.</li>
 <li><strong>Low stress ≠ true.</strong> Enough dimensions will fit anything, including noise. Report normalized stress (Stress-1), and say how many dimensions you used.</li>
 </ul>
 <p>A useful habit: if a story about your map depends on which way is "up", the story is about the plot, not the data.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="74" aria-labelledby="heading-31"><p class="page">Slide 31</p>
-<h2 id="heading-31">Metric → non-metric: weaken the assumption</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="74" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<h2 id="heading-29">Metric → non-metric: weaken the assumption</h2>
 <div class="row">
 <div class="col">
 <ul>
@@ -456,11 +432,11 @@ Y_nm = mds_nm.fit_transform(D)
 </div>
 </div>
 <div class="ref">Shepard <b>1962</b> · Kruskal <b>1964</b></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="74" aria-labelledby="heading-32"><p class="page">Slide 32</p>
-<h2 id="heading-32">Shepard's universal law of generalization</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="74" aria-labelledby="heading-30"><p class="page">Slide 30</p>
+<h2 id="heading-30">Shepard's universal law of generalization</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/2026-09-17/s17_img00.png" alt="Twelve small panels of generalization plotted against distance in psychological space — sizes, hues, phonemes, Morse code, human and pigeon data — each tracing the same exponential decay" aria-describedby="figure-32-1"><figcaption id="figure-32-1"><p>Twelve small panels of generalization plotted against distance in psychological space — sizes, hues, phonemes, Morse code, human and pigeon data — each tracing the same exponential decay</p><a href="../images/2026-09-17/s17_img00.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/2026-09-17/s17_img00.png" alt="Twelve small panels of generalization plotted against distance in psychological space — sizes, hues, phonemes, Morse code, human and pigeon data — each tracing the same exponential decay" aria-describedby="figure-30-1"><figcaption id="figure-30-1"><p>Twelve small panels of generalization plotted against distance in psychological space — sizes, hues, phonemes, Morse code, human and pigeon data — each tracing the same exponential decay</p><a href="../images/2026-09-17/s17_img00.png">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -474,8 +450,8 @@ Y_nm = mds_nm.fit_transform(D)
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1126/science.3629243" rel="noopener">Shepard <b>Science 1987</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="74" aria-labelledby="heading-33"><p class="page">Slide 33</p>
-<h2 id="heading-33">Exponential and Gaussian decay</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="74" aria-labelledby="heading-31"><p class="page">Slide 31</p>
+<h2 id="heading-31">Exponential and Gaussian decay</h2>
 <div class="row">
 <div class="col">
 <p>Two curves, each with two fitted parameters:</p>
@@ -488,12 +464,12 @@ Y_nm = mds_nm.fit_transform(D)
 </ul>
 </div>
 <div class="col fig">
-<figure><img src="../images/A1-coverage-2026-09/decay_families.svg" alt="Exponential and Gaussian similarity curves with the same value at zero but different initial slopes" aria-describedby="figure-33-1"><figcaption id="figure-33-1"><p>Exponential and Gaussian similarity curves with the same value at zero but different initial slopes</p><a href="../images/A1-coverage-2026-09/decay_families.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/A1-coverage-2026-09/decay_families.svg" alt="Exponential and Gaussian similarity curves with the same value at zero but different initial slopes" aria-describedby="figure-31-1"><figcaption id="figure-31-1"><p>Exponential and Gaussian similarity curves with the same value at zero but different initial slopes</p><a href="../images/A1-coverage-2026-09/decay_families.svg">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1126/science.3629243" rel="noopener">Shepard 1987</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="74" aria-labelledby="heading-34"><p class="page">Slide 34</p>
-<h2 id="heading-34">Fitting curves and interpreting R²</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="74" aria-labelledby="heading-32"><p class="page">Slide 32</p>
+<h2 id="heading-32">Fitting curves and interpreting R²</h2>
 <div class="row">
 <div class="col">
 <p><strong>Fitting</strong> chooses parameters that minimize squared residuals.</p>
@@ -505,12 +481,12 @@ Y_nm = mds_nm.fit_transform(D)
 </ul>
 </div>
 <div class="col fig">
-<figure><img src="../images/A1-coverage-2026-09/raw_and_binned.svg" alt="Illustrative noisy pair observations with their bin means and an exponential curve" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Illustrative noisy pair observations with their bin means and an exponential curve</p><a href="../images/A1-coverage-2026-09/raw_and_binned.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/A1-coverage-2026-09/raw_and_binned.svg" alt="Illustrative noisy pair observations with their bin means and an exponential curve" aria-describedby="figure-32-1"><figcaption id="figure-32-1"><p>Illustrative noisy pair observations with their bin means and an exponential curve</p><a href="../images/A1-coverage-2026-09/raw_and_binned.svg">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <div class="ref"><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html" rel="noopener">SciPy · curve_fit</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="74" aria-labelledby="heading-35"><p class="page">Slide 35</p>
-<h2 id="heading-35">Rank order leaves the decay shape open</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="74" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<h2 id="heading-33">Rank order leaves the decay shape open</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Rank order leaves the decay shape open — table"><table><caption>Rank order leaves the decay shape open — table</caption>
 <thead>
 <tr>
@@ -535,8 +511,8 @@ Y_nm = mds_nm.fit_transform(D)
 <li>The map and the curve still use the <strong>same ratings</strong>. Independent ratings provide a stronger test.</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1126/science.3629243" rel="noopener">Shepard 1987</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="74" aria-labelledby="heading-36"><p class="page">Slide 36</p>
-<h2 id="heading-36">An RDM is itself a vector</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="74" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<h2 id="heading-34">An RDM is itself a vector</h2>
 <p>Two systems, the same <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> images, two RDMs. Take each <strong>upper triangle</strong> and lay it out as a list: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>N</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">N(N-1)/2</annotation></semantics></math> numbers, one per pair. For <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><mn>120</mn></mrow><annotation encoding="application/x-tex">N = 120</annotation></semantics></math>, that is <strong>7,140</strong> numbers per system.</p>
 <ul>
 <li>Two lists of the same length: <mark>every measure from the first half of the lecture applies to them</mark>, one level up</li>
@@ -545,8 +521,8 @@ Y_nm = mds_nm.fit_transform(D)
 <li>The two systems share no scale (ratings on 0–10; correlation distances on 0–2), so the honest comparison is on <strong>ranks</strong>: which pairs each system calls close</li>
 </ul>
 <div class="ref">Numbers: Assignment 1 data · ResNet-18 late layer, correlation-distance RDM · human RDM D = 10 − S</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="74" aria-labelledby="heading-37"><p class="page">Slide 37</p>
-<h2 id="heading-37">Correlating two RDMs</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="74" aria-labelledby="heading-35"><p class="page">Slide 35</p>
+<h2 id="heading-35">Correlating two RDMs</h2>
 <div class="row">
 <div class="col">
 <p>Two systems, the <strong>same <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> stimuli</strong>, two matrices: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi><mtext>human</mtext></msup></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{\mathbf{D}^{\text{human}}}</annotation></semantics></math> from the judgments, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi><mtext>model</mtext></msup></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{\mathbf{D}^{\text{model}}}</annotation></semantics></math> from a layer. Flatten each <strong>upper triangle</strong> into a list of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>N</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">N(N-1)/2</annotation></semantics></math> numbers and correlate the two lists:</p>
@@ -562,8 +538,8 @@ Y_nm = mds_nm.fit_transform(D)
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.3389/neuro.06.004.2008" rel="noopener">Kriegeskorte, Mur &amp; Bandettini <b>2008</b></a> · <a href="https://doi.org/10.1016/j.tics.2013.06.007" rel="noopener">Kriegeskorte &amp; Kievit <b>2013</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="74" aria-labelledby="heading-38"><p class="page">Slide 38</p>
-<h2 id="heading-38">What that number does and does not say</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="74" aria-labelledby="heading-36"><p class="page">Slide 36</p>
+<h2 id="heading-36">What that number does and does not say</h2>
 <ul>
 <li>It says the two systems <strong>order the pairs alike</strong>: what one treats as close, the other tends to treat as close. That is a claim about <strong>geometry</strong>, and it is the only claim it is.</li>
 <li>It does <strong>not</strong> say they get there the same way. Two systems can agree on every pair while measuring completely different things about the images.</li>
@@ -572,8 +548,8 @@ Y_nm = mds_nm.fit_transform(D)
 <li><mark>Matching geometry is evidence about a representation, not a demonstration of shared mechanism.</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1016/j.tics.2013.06.007" rel="noopener">Kriegeskorte &amp; Kievit <b>TICS 2013</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="74" aria-labelledby="heading-39"><p class="page">Slide 39</p>
-<h2 id="heading-39">Human reliability sets the comparison scale</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="74" aria-labelledby="heading-37"><p class="page">Slide 37</p>
+<h2 id="heading-37">Human reliability sets the comparison scale</h2>
 <p><strong>Split-half reliability:</strong> correlate two independent sets of ratings for the same pairs. That agreement is the <mark>noise ceiling</mark> — how well the measurement predicts itself, and the bar no model should beat.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Human reliability sets the comparison scale — table"><table><caption>Human reliability sets the comparison scale — table</caption>
 <thead>
@@ -599,10 +575,10 @@ Y_nm = mds_nm.fit_transform(D)
 <li>The averaged ratings are more reliable than either half, so that fraction is an <strong>upper bound</strong> on what the model has reached.</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1111/cogs.12670" rel="noopener">Peterson et al. 2018</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="74" aria-labelledby="heading-40"><p class="page">Slide 40</p>
-<h2 id="heading-40">Which system is most human-like? One wins</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="74" aria-labelledby="heading-38"><p class="page">Slide 38</p>
+<h2 id="heading-38">Which system is most human-like? One wins</h2>
 <div class="capfig">
-<figure><img src="../images/L02-rdm-alignment-2026-09-17/rdm_alignment.svg" alt="Bar chart of Spearman correlation between the human RDM and five candidate RDMs on the 120 animal images: pixels 0.01, early layer 0.10, middle layer 0.17, late layer 0.42, late layer with random weights 0.03; a dashed line at 0.82 marks the agreement between two independent groups of raters" aria-describedby="figure-40-1"><figcaption id="figure-40-1"><p>Bar chart of Spearman correlation between the human RDM and five candidate RDMs on the 120 animal images: pixels 0.01, early layer 0.10, middle layer 0.17, late layer 0.42, late layer with random weights 0.03; a dashed line at 0.82 marks the agreement between two independent groups of raters</p><a href="../images/L02-rdm-alignment-2026-09-17/rdm_alignment.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L02-rdm-alignment-2026-09-17/rdm_alignment.svg" alt="Bar chart of Spearman correlation between the human RDM and five candidate RDMs on the 120 animal images: pixels 0.01, early layer 0.10, middle layer 0.17, late layer 0.42, late layer with random weights 0.03; a dashed line at 0.82 marks the agreement between two independent groups of raters" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>Bar chart of Spearman correlation between the human RDM and five candidate RDMs on the 120 animal images: pixels 0.01, early layer 0.10, middle layer 0.17, late layer 0.42, late layer with random weights 0.03; a dashed line at 0.82 marks the agreement between two independent groups of raters</p><a href="../images/L02-rdm-alignment-2026-09-17/rdm_alignment.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li>Pixels: <strong>0.01</strong>. Nothing in the raw image orders the pairs the way people do</li>
@@ -611,11 +587,11 @@ Y_nm = mds_nm.fit_transform(D)
 <li>Two rater groups agree at <strong>0.82</strong>: the late layer reaches about <strong>half</strong> of that</li>
 </ul>
 <div class="ref">Assignment 1 data · Peterson, Abbott &amp; Griffiths 2018 ratings · ResNet-18, correlation-distance RDMs · Spearman on upper triangles</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="74" aria-labelledby="heading-41"><p class="page">Slide 41</p>
-<h2 id="heading-41">The payoff: human similarity breaks all three rules</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="74" aria-labelledby="heading-39"><p class="page">Slide 39</p>
+<h2 id="heading-39">The payoff: human similarity breaks all three rules</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/2026-09-17/s18_img00.png" alt="The three metric axioms written out: minimality, symmetry, and the triangle inequality" aria-describedby="figure-41-1"><figcaption id="figure-41-1"><p>The three metric axioms written out: minimality, symmetry, and the triangle inequality</p><a href="../images/2026-09-17/s18_img00.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/2026-09-17/s18_img00.png" alt="The three metric axioms written out: minimality, symmetry, and the triangle inequality" aria-describedby="figure-39-1"><figcaption id="figure-39-1"><p>The three metric axioms written out: minimality, symmetry, and the triangle inequality</p><a href="../images/2026-09-17/s18_img00.png">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <p>Every method so far assumes dissimilarity is a <strong>distance</strong>: the three axioms on the left. Tversky, with data: <mark>human judgments violate all three.</mark></p>
@@ -628,8 +604,8 @@ Y_nm = mds_nm.fit_transform(D)
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1037/0033-295X.84.4.327" rel="noopener">Tversky <b>Psych. Review 1977</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="74" aria-labelledby="heading-42"><p class="page">Slide 42</p>
-<h2 id="heading-42">MDS and clustering are different hypotheses</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="74" aria-labelledby="heading-40"><p class="page">Slide 40</p>
+<h2 id="heading-40">MDS and clustering are different hypotheses</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="MDS and clustering are different hypotheses — table"><table><caption>MDS and clustering are different hypotheses — table</caption>
 <thead>
 <tr>
@@ -668,8 +644,8 @@ Y_nm = mds_nm.fit_transform(D)
 </table></div>
 <p>Run both. Where they disagree is usually where the interesting question is.</p>
 <div class="ref">Shepard, <i>Multidimensional scaling, tree-fitting, and clustering</i>, <b>Science 1980</b></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-marpit-pagination="43" data-marpit-pagination-total="74" aria-labelledby="heading-43"><p class="page">Slide 43</p>
-<h2 id="heading-43">Assignment 1: the analysis sequence</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="74" aria-labelledby="heading-41"><p class="page">Slide 41</p>
+<h2 id="heading-41">Assignment 1: the analysis sequence</h2>
 <p><strong>Part 2</strong> is this lecture, step by step. Parts 1, 3, 4: distances and RDMs · PCA and monkey IT · t-SNE sweeps. Bonus: metric tests, <strong>hierarchical clustering</strong>, robustness.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Assignment 1: the analysis sequence — table"><table><caption>Assignment 1: the analysis sequence — table</caption>
 <thead>
@@ -706,8 +682,8 @@ Y_nm = mds_nm.fit_transform(D)
 </tbody>
 </table></div>
 <p><strong>Due Tuesday, September 29.</strong> Research-trail entry 1: Friday, September 18.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="74" aria-labelledby="heading-44"><p class="page">Slide 44</p>
-<h2 id="heading-44">Where this goes</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="74" aria-labelledby="heading-42"><p class="page">Slide 42</p>
+<h2 id="heading-42">Where this goes</h2>
 <ul>
 <li><strong>Tuesday</strong> — <strong>PCA</strong>: the same kind of description, but with <em>ordered, meaningful axes</em>, obtained directly from the data rather than by iterating.</li>
 <li><strong>And the idea you used today comes back</strong>: minimize a mismatch by stepping downhill is how every network later in the course is trained.</li>
@@ -716,8 +692,8 @@ Y_nm = mds_nm.fit_transform(D)
 <li><strong>Later in the course</strong> — <strong>RSA</strong> at full scale: how large a correlation has to be before it counts, and how monkey IT, human IT and a CNN layer end up ranked on the same axis.</li>
 <li><strong>Assignment 1</strong> (due Tuesday 9/29) — build RDMs, run MDS and PCA, sweep t-SNE — and cluster, in the bonus — on real neural and behavioral data.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-class="lead" data-marpit-pagination="45" data-marpit-pagination-total="74" aria-labelledby="heading-45"><p class="page">Slide 45</p>
-<h2 id="heading-45">Recap</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-class="lead" data-marpit-pagination="43" data-marpit-pagination-total="74" aria-labelledby="heading-43"><p class="page">Slide 43</p>
+<h2 id="heading-43">Recap</h2>
 <ul>
 <li>A <strong>dissimilarity matrix</strong> turns any set of responses — neurons, voxels, model units, judgments — into one <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>×</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">N\times N</annotation></semantics></math> object whose size does not depend on the measurement system.</li>
 <li><strong>MDS</strong> turns that matrix into a map, exactly (classical, eigendecomposition) or approximately (stress, SMACOF). The axes mean nothing; the relative positions mean everything.</li>
@@ -726,8 +702,8 @@ Y_nm = mds_nm.fit_transform(D)
 <li><strong>Hierarchical clustering</strong> reads the same matrix as nested categories instead of a flat space (the algorithm is in the appendix).</li>
 <li><strong>Representational similarity analysis</strong>: correlate the <strong>upper triangles</strong> of two such matrices and you get one number — how far two systems agree about what resembles what.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-marpit-pagination="46" data-marpit-pagination-total="74" aria-labelledby="heading-46"><p class="page">Slide 46</p>
-<h2 id="heading-46">Appendix · There is also a closed-form route</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="74" aria-labelledby="heading-44"><p class="page">Slide 44</p>
+<h2 id="heading-44">Appendix · There is also a closed-form route</h2>
 <p><strong>Classical MDS</strong> (Torgerson 1952) turns the distance table into inner products and reads coordinates off directly — no iteration at all.</p>
 <ul>
 <li>It is exact, and it is what <code>sklearn</code>'s classical solver does under the hood</li>
@@ -736,8 +712,8 @@ Y_nm = mds_nm.fit_transform(D)
 </ul>
 <p><strong>We will use the optimisation route instead</strong> — not because it is easier, but because the <em>method</em> is the one that matters for the rest of this course.</p>
 <div class="ref">Torgerson <b>1952</b> · also called <i>principal coordinates analysis</i></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-paginate="true" data-marpit-pagination="47" data-marpit-pagination-total="74" aria-labelledby="heading-47"><p class="page">Slide 47</p>
-<h2 id="heading-47">Appendix · Comparing RDMs: what can go wrong</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-marpit-pagination="45" data-marpit-pagination-total="74" aria-labelledby="heading-45"><p class="page">Slide 45</p>
+<h2 id="heading-45">Appendix · Comparing RDMs: what can go wrong</h2>
 <p>One correlation is a point estimate. Papers add three things; each has a catch.</p>
 <ul>
 <li><strong>Uncertainty.</strong> Bootstrap over <em>stimuli</em> (and over <em>subjects</em> when people made the RDM) for an interval on <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math>. One model beats another only if their intervals separate under the same resampling</li>
@@ -746,6 +722,30 @@ Y_nm = mds_nm.fit_transform(D)
 <li><strong>What it does not show.</strong> Matching RDMs means the two systems order the pairs alike, not that they compute alike</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1371/journal.pcbi.1003553" rel="noopener">Nili et al. <b>PLOS Comput Biol 2014</b></a> · <a href="https://doi.org/10.1016/j.neuroimage.2015.12.012" rel="noopener">Walther et al. <b>NeuroImage 2016</b></a> · <a href="https://doi.org/10.1371/journal.pcbi.1008846" rel="noopener">Schütt et al. <b>PLOS Comput Biol 2023</b></a> · <a href="https://doi.org/10.1101/2024.08.07.607035" rel="noopener">Soni et al. <b>2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-marpit-pagination="46" data-marpit-pagination-total="74" aria-labelledby="heading-46"><p class="page">Slide 46</p>
+<h2 id="heading-46">Appendix · Two unit steps cannot span three units</h2>
+<div class="row">
+<div class="col">
+<p>The fourth property, tested on a three-image RDM:</p>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mstyle mathcolor="#B23A2E"><mn>3</mn></mstyle></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mstyle mathcolor="#B23A2E"><mn>3</mn></mstyle></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{D}=\begin{pmatrix}0&amp;1&amp;\color{#B23A2E}{3}\\1&amp;0&amp;1\\\color{#B23A2E}{3}&amp;1&amp;0\end{pmatrix}
+</annotation></semantics></math></div></span></p></div>
+<div class="col">
+<ul>
+<li>Zero diagonal, symmetric, nonnegative: the first three hold</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mn>13</mn></msub><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">d_{13}=3</annotation></semantics></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mn>12</mn></msub><mo>=</mo><msub><mi>d</mi><mn>23</mn></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">d_{12}=d_{23}=1</annotation></semantics></math>: impossible for a distance. Two unit steps reach at most 2</li>
+<li>Euclidean requires <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mn>13</mn></msub><mo>≤</mo><msub><mi>d</mi><mn>12</mn></msub><mo>+</mo><msub><mi>d</mi><mn>23</mn></msub><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">d_{13}\leq d_{12}+d_{23}=2</annotation></semantics></math></li>
+</ul>
+</div>
+</div>
+<figure><img src="../images/L01-triangle-notation-2026-09-13/triangle_constraint.svg" alt="Image representations x with superscripts 1, 2 and 3 joined by two unit segments; bending gives endpoint distance 1.6, straightening gives the maximum, 2" aria-describedby="figure-46-1"><figcaption id="figure-46-1"><p>Image representations x with superscripts 1, 2 and 3 joined by two unit segments; bending gives endpoint distance 1.6, straightening gives the maximum, 2</p><a href="../images/L01-triangle-notation-2026-09-13/triangle_constraint.svg">Open full-size figure</a></figcaption></figure>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-paginate="true" data-marpit-pagination="47" data-marpit-pagination-total="74" aria-labelledby="heading-47"><p class="page">Slide 47</p>
+<h2 id="heading-47">Appendix · Cosine is not a metric: real images</h2>
+<p>Pixel vectors. The route from tiger A to the bison <strong>through tiger C is shorter than the direct route</strong>. No arrangement of points can reproduce that.</p>
+<figure><img src="../images/L01-triangle-notation-2026-09-13/cosine_violation_real.svg" alt="Three photographs, tiger A, tiger C and a bison, with cosine dissimilarities between pixel vectors: A to C 0.113, C to bison 0.174, sum 0.287, but A to bison directly 0.348, a triangle-inequality violation" aria-describedby="figure-47-1"><figcaption id="figure-47-1"><p>Three photographs, tiger A, tiger C and a bison, with cosine dissimilarities between pixel vectors: A to C 0.113, C to bison 0.174, sum 0.287, but A to bison directly 0.348, a triangle-inequality violation</p><a href="../images/L01-triangle-notation-2026-09-13/cosine_violation_real.svg">Open full-size figure</a></figcaption></figure>
+<ul>
+<li>This image set: <strong>2.3 %</strong> of triples violate it in pixel space, <strong>0</strong> in the trained network's late layer</li>
+<li>Identity fails too: a brighter tiger is at cosine dissimilarity 0 from the original · <strong>A1 §1b–d</strong></li>
+</ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-48" data-paginate="true" data-marpit-pagination="48" data-marpit-pagination-total="74" aria-labelledby="heading-48"><p class="page">Slide 48</p>
 <h2 id="heading-48">Appendix · Which image is closer? The tigers</h2>
 <figure><img src="../images/L01-distances-2026-09-13/animal_distances.png" alt="The three tiger photographs A, B, C and two exact three-point maps: in pixel space B and C, the same pose on grass, are the closest pair; in network responses A and B, the mirror pair, are closest" aria-describedby="figure-48-1"><figcaption id="figure-48-1"><p>The three tiger photographs A, B, C and two exact three-point maps: in pixel space B and C, the same pose on grass, are the closest pair; in network responses A and B, the mirror pair, are closest</p><a href="../images/L01-distances-2026-09-13/animal_distances.png">Open full-size figure</a></figcaption></figure>
