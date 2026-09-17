@@ -1,60 +1,19 @@
+\DocumentMetadata{lang=en-US, pdfversion=2.0, pdfstandard=ua-2, testphase={phase-III,math,title,table,firstaid}}
 % CPSY 1291 -- Programming notes for Assignment 1
-% A handout to help: the Python, NumPy, SciPy and scikit-learn you need to read and write
-% the Assignment 1 notebooks. Compile:  latexmk -lualatex a1-programming-notes.tex
-%
-% ---------------------------------------------------------------------------------------
-% ANSWER-LEAK AUDIT (2026-09-17). Checked against A1_part1..4.ipynb and the *_KEY.ipynb.
-%
-% What the assignment asks the student to write, and what this handout does about it:
-%   1b  euclidean(X), cosine_dist(X), correlation_dist(X): N x N pairwise-distance matrices
-%       from a data matrix, no scipy.
-%         LEFT OUT: any function body computing pairwise distances over a matrix; the
-%         squared-norm expansion sq[:,None] + sq[None,:] - 2 X@X.T; the broadcast idiom
-%         X[:,None,:] - X[None,:,:]; row-normalising then X@X.T; row-centring then cosine.
-%         SHOWN: np.dot / np.linalg.norm on ONE pair of toy vectors; column- and
-%         row-centring as a generic broadcasting example on a 3 x 2 toy array.
-%   1c  compare with pdist/squareform, print max |ours - scipy|.
-%         SHOWN: the pdist/squareform signatures (the notebook imports them for the
-%         student). LEFT OUT: the comparison loop.
-%   1d  build, check and plot 12 RDMs (4 reps x 3 measures), reorder with np.ix_, colour
-%       limits at the 2nd/98th percentile of the upper triangle.
-%         SHOWN: np.ix_, np.triu_indices, np.percentile, plt.subplots/imshow, each on toy
-%         data. LEFT OUT: the assembled loop and the checks-per-panel print.
-%   2c  count units constant across the 120 images.   LEFT OUT entirely (no std==0 idiom).
-%   2d  D_human from S_human, zero diagonal.           LEFT OUT (no "max minus S" line);
-%         np.fill_diagonal is shown generically on a toy matrix.
-%   2g/2h  polyfit line + curve_fit exponential and Gaussian, R^2, running mean, plot.
-%         SHOWN: curve_fit(f, x, y, p0=, maxfev=) and np.polyfit/polyval on a 5-point toy
-%         straight line with a toy model function. LEFT OUT: any fit of f_exp/f_gauss to
-%         distance-similarity pairs, the R^2 code (the notebook provides r2()), the plot.
-%   2i  Spearman between human and each layer's upper triangle; divide by the ceiling.
-%         SHOWN: spearmanr(a, b).statistic on toy vectors. LEFT OUT: the layer loop, the
-%         ceiling and any division by it.
-%   3b/3c  PCA, cumulative variance, components to reach 85%, four image subsets, variance
-%       partition.   SHOWN: the PCA(...).fit_transform pattern, explained_variance_ratio_,
-%         np.cumsum, and np.argmax on a toy boolean. LEFT OUT: the ">= 0.85" line, the
-%         subsets, the within/between partition.
-%   3e/3f/3g/3h  animacy vector, spikiness (perimeter^2/area), pointbiserialr, silhouette,
-%       IT NaN handling.   SHOWN: pointbiserialr and silhouette_samples signatures;
-%         np.isnan / np.nanmean / np.where on a toy 3 x 3. LEFT OUT: the perimeter code,
-%         the DROP/IMPUTE lines on it_raw, any per-category loop.
-%   4b/4c/4d  t-SNE sweep, islands via single linkage, seed stability, purity_per_point.
-%         SHOWN: TSNE and linkage/fcluster signatures. LEFT OUT: the sweep, the island
-%         labelling, purity_per_point.
-%   Per-group means (3c "51 object means"): shown as a ONE-group toy (X[labels == 'a']
-%         .mean(axis=0)); the stack-over-51-objects comprehension is left out.
-% No numeric result from any KEY appears in this handout.
-% ---------------------------------------------------------------------------------------
+% The Python, NumPy, SciPy and scikit-learn calls the Assignment 1 notebooks use.
+% Compile:  latexmk -lualatex a1-programming-notes.tex
 \documentclass[11pt]{article}
 \usepackage{cpsy1291-handout}
+\newtcolorbox{codebox}{colback=codebg, colframe=codebg, boxrule=0pt, arc=0pt, left=4pt, right=4pt, top=0pt, bottom=0pt, before skip=8pt, after skip=8pt, fontupper=\small}
+\hypersetup{pdftitle={CPSY 1291: Programming notes for Assignment 1}, pdfauthor={CPSY 1291, Brown University}}
 
 \begin{document}
 
 \begin{center}
-{\sffamily\small\color{accent}\MakeUppercase{CPSY 1291 \ $\cdot$\ A handout to help}}\\[5pt]
+{\sffamily\small\color{accent}\MakeUppercase{CPSY 1291 \ $\cdot$\ Programming reference}}\\[5pt]
 {\sffamily\LARGE\bfseries\color{brown} Programming notes for Assignment 1}\\[3pt]
 {\sffamily\large\color{ink} The Python, NumPy, SciPy and scikit-learn the notebooks use}\\[6pt]
-{\color{lightgray}\small Fall 2026 \quad$\cdot$\quad keep it next to the notebook; nothing here answers a graded question}
+{\color{lightgray}\small Fall 2026}
 \end{center}
 \vspace{4pt}\hrule\vspace{10pt}
 
@@ -62,82 +21,142 @@
 \addcontentsline{toc}{section}{What this is}
 
 Assignment 1 hands you four notebooks. Each has \emph{provided} cells, which you run as
-they are, and \emph{TODO} cells, which you complete. Every TODO cell lists the functions
-it expects you to use. This handout is the reference for those functions: what each one
-takes, what it returns, and what its error messages mean. The mathematics behind them is
-in the companion handout, \emph{Linear algebra for this course}.
+they are, and \emph{TODO} cells, which you complete. Most TODO cells suggest useful
+functions; this reference explains those calls: what each one takes, what it returns, and
+what its error messages mean. The companion handout, \emph{Vectors, distances, and
+dissimilarity matrices}, covers the mathematics of vectors, dot products, and
+dissimilarities.
 
-It is not a solution set. Every example below runs on a toy array you can type in and
-check by eye; none of it is the assignment's data or the assignment's computation. If a
-line here looks like it could be pasted into a TODO cell as the answer, it is not, and
-the reason is usually that the assignment asks for the same idea applied to a whole
-matrix at once.
+These notes explain the notation and library calls used in Assignment 1. Follow each
+notebook's instructions about which calculations you must implement yourself. Use the
+small examples to understand each operation before applying it in your notebook.
+
+Every example below assumes these two imports, which the notebooks' setup cells run for you:
+\begin{codebox}
+\begin{verbatim}
+import numpy as np
+import matplotlib.pyplot as plt
+\end{verbatim}
+\end{codebox}
+
+Examples marked \emph{usage pattern} show a call's arguments and result without a runnable
+input; the others run as printed.
 
 \begin{keybox}
-\ask{The one habit.} Print the shape of everything. Nearly every bug in numerical code is
-a shape bug, and shape bugs announce themselves the moment you look.
+\ask{Check shapes first.} Start by comparing the actual shape of a result with the shape
+you expected. Matching shapes are necessary but not sufficient: the values and the order
+of the items also need checking.
 \end{keybox}
 
-\section{Python in one page}
+\section{Python essentials}\label{sec:python}
 
 \subsection{Containers}
 
-\begin{lstlisting}
+\begin{codebox}
+\begin{verbatim}
 xs = [3, 1, 4]              # list: grows, holds anything
-xs.append(1)
+xs.append(1)                # xs is now [3, 1, 4, 1]
 d = {'cat': 0, 'dog': 1}    # dict: look things up by name
 d['cat']                    # -> 0
 shape = (120, 4096)         # tuple: fixed; shapes are tuples
 shape[0]                    # -> 120
-\end{lstlisting}
+\end{verbatim}
+\end{codebox}
 
 A NumPy \texttt{array} is the fourth container and the one that matters: a block of
 numbers of one type with a shape. Lists are for bookkeeping; arrays are for arithmetic.
 
-\subsection{Functions return, they do not print}
+\needspace{8\baselineskip}
+\subsection{Return a result so later code can use it}
 
-\begin{lstlisting}
+\begin{codebox}
+\begin{verbatim}
 def halfway(a, b):
     """The point midway between a and b."""
     return (a + b) / 2
 
 m = halfway(np.array([0., 2.]), np.array([4., 4.]))   # array([2., 3.])
-\end{lstlisting}
+\end{verbatim}
+\end{codebox}
 
-A function that \texttt{print}s its answer cannot be reused; one that \texttt{return}s it
-can. The TODO cells that ask for a function will call it later in the notebook, so it
-must return.
+Printing displays a value; returning passes it to the caller. A function with no
+\texttt{return} statement returns \texttt{None}. The TODO cells that ask for a function
+will call it later in the notebook, so it must return its result.
 
-\subsection{Loops, comprehensions, and pairs}
+\subsection{Loops and comprehensions}
 
-\begin{lstlisting}
-squares = [v ** 2 for v in xs]           # a loop that builds a list
-for i, v in enumerate(xs): ...           # index and value together
-for name, value in zip(names, values): ...   # two sequences in step
-for layer in ('early', 'middle', 'late'): ...   # loop over strings
-\end{lstlisting}
+\begin{codebox}
+\begin{verbatim}
+squares = [v ** 2 for v in xs]     # a loop that builds a list: [9, 1, 16, 1]
+for i, value in enumerate(xs):     # enumerate: index and value together
+    print(i, value)                # prints 0 3, then 1 1, then 2 4, then 3 1
+\end{verbatim}
+\end{codebox}
 
-Loops over \emph{layers} or \emph{models} are fine and expected. Loops over the
-\emph{entries of an array} are usually a sign that NumPy could do it in one line; \S2
-shows how.
+Loops over layers, models, or seeds are the normal way to organise an analysis. NumPy
+applies arithmetic to whole arrays at once (\S\ref{sec:numpy}), so a loop over the entries of an
+array is rarely needed.
 
 \subsection{Reading an error message}
 
 Read the \emph{last} line first: it names the error. Then read upward to find the line
-of \emph{your} code (not the library's) that caused it. \S6 lists the ones you will meet.
+of \emph{your} code (not the library's) that caused it. \S\ref{sec:errors} lists the ones you will meet.
 
-\section{NumPy: arrays, shapes, and the axis argument}
+\section{Reading printed shapes}\label{sec:shapes}
 
-\subsection{Shape, dtype, and one row per stimulus}
+\begin{center}
+\small
+\begin{tabular}{@{}>{\ttfamily}l p{10.6cm}@{}}
+\toprule
+\textnormal{\textbf{Printed}} & \textbf{Read it as} \\
+\midrule
+(120, 4096)   & a matrix: 120 stimuli, each a vector of 4,096 features \\
+(4096,)       & a one-dimensional array of 4,096 numbers (the shape is a one-element tuple) \\
+(120, 1)      & a column: 120 rows of one number each; broadcasts against \texttt{(120, 4096)} \\
+(120,)        & 120 numbers; does \emph{not} broadcast against \texttt{(120, 4096)} \\
+(120, 120)    & a square matrix over 120 stimuli: a similarity or dissimilarity matrix \\
+(7140,)       & the upper triangle of a $120 \times 120$ matrix: $120 \cdot 119 / 2$ pairs \\
+(120, 2)      & 120 points in the plane: an MDS, PCA or t-SNE embedding \\
+(120, 224, 224, 3) & 120 colour photographs, $224 \times 224$ pixels, 3 channels (Parts 1--2) \\
+(120, 150528) & the same photographs, each flattened to one vector ($224 \cdot 224 \cdot 3$) \\
+(1224, 200, 200) & 1,224 greyscale images of $200 \times 200$ pixels (Part 3) \\
+(1224, 40000) & the same images, each flattened to one vector ($200 \cdot 200$) \\
+()            & a single number wrapped in an array; \texttt{x.item()} extracts it \\
+\bottomrule
+\end{tabular}
+\end{center}
 
-\begin{lstlisting}
+Write the shape you \emph{expect} in a comment before you run the line, then compare. The
+notebooks' setup cells print shapes at every load for exactly this reason.
+
+\section{A debugging recipe}\label{sec:debug}
+
+\begin{enumerate}
+\item \textbf{Shape.} Print it. Is it what you expected, and the right way round?
+\item \textbf{Type and range.} \texttt{X.dtype}, \texttt{X.min()}, \texttt{X.max()}.
+      Unsigned-integer arithmetic (\texttt{uint8}) wraps around; lower-precision
+      floating point (\texttt{float32}) accumulates roundoff.
+\item \textbf{Missing values.} \texttt{np.isnan(X).sum()}.
+\item \textbf{A case you can check by hand.} Run your code on a small array such as
+      \texttt{A} in \S\ref{sec:shape} and compare with a calculator.
+\item \textbf{Say what the line computes}, in one sentence, before fixing it. If you
+      cannot, work through a smaller example, reread the companion handout, or ask.
+\end{enumerate}
+
+\section{NumPy: arrays, shapes, and the axis argument}\label{sec:numpy}
+
+\subsection{Shape, dtype, and one row per stimulus}\label{sec:shape}
+
+\begin{codebox}
+\begin{verbatim}
 A = np.array([[1., 2.],
-              [3., 4.],
-              [5., 6.]])
+              [3., 6.],
+              [5., 4.]])
 A.shape      # (3, 2): 3 rows, 2 columns
 A.ndim       # 2
 A.dtype      # float64
-\end{lstlisting}
+\end{verbatim}
+\end{codebox}
 
 \begin{keybox}
 \ask{The convention.} A data matrix is \textbf{stimuli by features}: one \emph{row} per
@@ -146,81 +165,121 @@ stimulus $i$ and \texttt{X.shape[0]} is how many stimuli there are. The assignme
 matrices are, for example, \texttt{(120, 4096)}: 120 images, 4{,}096 units.
 \end{keybox}
 
+\subsection{Arithmetic on arrays: \texttt{*} is not \texttt{@}}
+
+\begin{codebox}
+\begin{verbatim}
+A * A        # ELEMENTWISE product, same shape as A: [[1, 4], [9, 36], [25, 16]]
+A ** 2       # elementwise square, the same numbers; ** is the power operator
+A @ A.T      # MATRIX product: (3, 2) @ (2, 3) -> (3, 3), row dotted with row
+3 ^ 2        # 1, not 9: ^ is bitwise XOR in Python, never exponentiation
+v = np.array([1., 2., 3.])
+v.T.shape    # (3,): transposing a 1-D array does nothing
+v[:, None].shape                 # (3, 1): this is how you make a column
+[1, 2] + [3, 4], [1, 2] * 2      # on LISTS: [1, 2, 3, 4] and [1, 2, 1, 2]
+\end{verbatim}
+\end{codebox}
+
+\texttt{+}, \texttt{-}, \texttt{*}, \texttt{/} and \texttt{**} act entry by entry on
+arrays; \texttt{@} (or \texttt{np.dot}) is the matrix product of the companion handout.
+On lists, \texttt{+} concatenates and \texttt{*} repeats. Convert with \texttt{np.array}.
+
 \subsection{Indexing and slicing}
 
-\begin{lstlisting}
+\begin{codebox}
+\begin{verbatim}
 A[0]         # array([1., 2.])    row 0
-A[:, 1]      # array([2., 4., 6.])  column 1
+A[:, 1]      # array([2., 6., 4.])  column 1
 A[:2]        # rows 0 and 1
-A[-1]        # array([5., 6.])    last row
+A[-1]        # array([5., 4.])    last row
 A[1, 0]      # 3.0                 row 1, column 0
-\end{lstlisting}
+\end{verbatim}
+\end{codebox}
 
-Indices start at 0, so the last valid row of a 120-row matrix is 119. A slice is a
-\emph{view} of the same memory: changing \texttt{A[0]} changes \texttt{A}.
+Indices start at 0, so the last valid row of a 120-row matrix is 119. Basic slices such as
+\texttt{A[:2]} share memory with \texttt{A}: changing one changes the other. Use
+\texttt{.copy()} for an independent array. Boolean and integer-array indexing (\S\ref{sec:broadcast}, \S\ref{sec:ix}) return copies.
+
+\subsection{Reshaping}
+
+\begin{codebox}
+\begin{verbatim}
+np.arange(6)                 # array([0, 1, 2, 3, 4, 5])
+np.arange(6).reshape(2, 3)   # [[0, 1, 2], [3, 4, 5]]: same numbers, read row by row
+np.arange(6).reshape(2, -1)  # -1 means "whatever fits": also (2, 3)
+imgs.reshape(len(imgs), -1)  # usage pattern: (n, 200, 200) -> (n, 40000)
+np.stack([A[0], A[1]])       # two vectors -> one (2, 2) matrix, one per row
+\end{verbatim}
+\end{codebox}
 
 \subsection{The axis argument}
 
 \begin{keybox}
-\ask{The axis you name is the axis that disappears.} \texttt{A.mean(axis=0)} averages
-\emph{down} the rows and leaves one number per column. \texttt{A.mean(axis=1)} averages
-\emph{across} the columns and leaves one number per row.
+\ask{Reductions and \texttt{axis}.} For a reduction such as \texttt{mean}, \texttt{sum} or
+\texttt{std}, \texttt{axis} names the dimension being combined. By default that dimension
+disappears from the result; \texttt{keepdims=True} keeps it with length 1.
+\texttt{A.mean(axis=0)} combines the rows and leaves one number per column;
+\texttt{A.mean(axis=1)} combines the columns and leaves one number per row.
 \end{keybox}
 
-\begin{lstlisting}
-A.mean(axis=0)                  # array([3., 4.])       shape (2,)
-A.mean(axis=1)                  # array([1.5, 3.5, 5.5])  shape (3,)
-A.mean(axis=1, keepdims=True)   # array([[1.5], [3.5], [5.5]])  shape (3, 1)
+\begin{codebox}
+\begin{verbatim}
+A.mean(axis=0)                  # array([3., 4.])         shape (2,)
+A.mean(axis=1)                  # array([1.5, 4.5, 4.5])  shape (3,)
+A.mean(axis=1, keepdims=True)   # array([[1.5], [4.5], [4.5]])  shape (3, 1)
 A.sum(), A.max(axis=0), A.std(axis=1)   # same rule for every reduction
-\end{lstlisting}
+np.cumsum([2, 3, 1])            # running total: array([2, 5, 6])
+\end{verbatim}
+\end{codebox}
 
-\texttt{keepdims=True} keeps the reduced axis as size 1, which is what lets the result
-be subtracted back from \texttt{A} (next section).
-
-\subsection{Broadcasting}
+\subsection{Broadcasting}\label{sec:broadcast}
 
 When two arrays have different shapes, NumPy stretches any size-1 dimension to match.
 Compare shapes \emph{from the right}: each pair must be equal, or one of them must be 1.
+A missing leading dimension counts as 1.
 
-\begin{lstlisting}
-A - A.mean(axis=0)     # (3,2) - (2,)   -> each column minus its own mean
-# array([[-2., -2.],
-#        [ 0.,  0.],
-#        [ 2.,  2.]])
-A - A.mean(axis=1, keepdims=True)   # (3,2) - (3,1) -> each row minus its own mean
-# array([[-0.5,  0.5],
-#        [-0.5,  0.5],
-#        [-0.5,  0.5]])
-A - A.mean(axis=1)     # (3,2) - (3,)  -> ValueError: operands could not be
-                       #    broadcast together with shapes (3,2) (3,)
-\end{lstlisting}
+\begin{codebox}
+\begin{verbatim}
+A + np.array([10., 20.])              # (3,2) + (2,)  -> one offset per column
+# array([[11., 22.],
+#        [13., 26.],
+#        [15., 24.]])
+A + np.array([[10.], [20.], [30.]])   # (3,2) + (3,1) -> one offset per row
+# array([[11., 12.],
+#        [23., 26.],
+#        [35., 34.]])
+A + np.array([10., 20., 30.])         # (3,2) + (3,)  -> expected error:
+# ValueError: operands could not be broadcast together with shapes (3,2) (3,)
+\end{verbatim}
+\end{codebox}
 
-The first two do genuinely different things, and \texttt{keepdims} is what selects
-between them. The third fails because \texttt{(3,)} lines up against the \emph{columns}
-(2), not the rows. \texttt{v[:, None]} turns a \texttt{(3,)} vector into \texttt{(3, 1)}
-by hand, the same effect as \texttt{keepdims}.
+\texttt{axis} selects which entries a reduction combines; \texttt{keepdims} (or
+\texttt{v[:, None]}) controls the result's shape so that it broadcasts back against the
+matrix the way you intend. The third line fails because \texttt{(3,)} lines up against
+the \emph{columns} (2), not the rows. A wrong broadcast can also run without any error
+when the sizes happen to match, so check the result's shape and a value or two.
 
 \subsection{Boolean masks}
 
-\begin{lstlisting}
+\begin{codebox}
+\begin{verbatim}
 labels = np.array(['a', 'b', 'a'])
 mask = (labels == 'a')       # array([ True, False,  True])
-A[mask]                      # rows 0 and 2
+A[mask]                      # rows 0 and 2, as a new (2, 2) array
 mask.sum()                   # 2  (True counts as 1)
 mask.mean()                  # 0.667: the FRACTION that is True
-A[mask].mean(axis=0)         # array([3., 4.]): the mean row of group 'a'
 np.isin(labels, ['a', 'c'])  # membership test, one boolean per entry
-\end{lstlisting}
+\end{verbatim}
+\end{codebox}
 
 Combine masks with \texttt{\&}, \texttt{|}, \texttt{\textasciitilde}, always with
 parentheses: \texttt{(labels == 'a') | (labels == 'b')}. Writing \texttt{and} or
 \texttt{or} between arrays raises ``truth value of an array is ambiguous''.
-``For each group, the mean row'' is the last idiom applied once per group, with
-\texttt{np.stack} to put the results back into one matrix.
 
-\subsection{Sorting, unique values, and the upper triangle}
+\subsection{Sorting, unique values, and the upper triangle}\label{sec:triu}
 
-\begin{lstlisting}
+\begin{codebox}
+\begin{verbatim}
 v = np.array([0.3, 0.1, 0.7, 0.2])
 np.argsort(v)            # array([1, 3, 0, 2]): INDICES, smallest first
 np.argsort(v)[::-1]      # largest first
@@ -230,138 +289,193 @@ iu = np.triu_indices(4, k=1)   # upper triangle of a 4 x 4, no diagonal
 iu                       # (array([0,0,0,1,1,2]), array([1,2,3,2,3,3]))
 M = np.arange(16).reshape(4, 4)
 M[iu]                    # array([1, 2, 3, 6, 7, 11]): 6 = 4*3/2 entries
-\end{lstlisting}
+\end{verbatim}
+\end{codebox}
 
 \texttt{argsort} returns positions, not values. \texttt{triu\_indices(N, k=1)} is a
 \emph{pair} of index arrays that walk the entries above the diagonal in a fixed order;
-\texttt{D[iu]} pulls those $N(N-1)/2$ entries out as a flat vector, and two matrices
-indexed with the same \texttt{iu} line up pair for pair.
+\texttt{D[iu]} pulls those $N(N-1)/2$ entries out as a flat vector. If two matrices list
+the same stimuli in the same order, the same \texttt{iu} extracts corresponding pairs.
 
-\subsection{Reordering rows and columns together}
+\subsection{Reordering rows and columns together}\label{sec:ix}
 
-\begin{lstlisting}
-order = np.array([2, 0, 1])
-M[np.ix_(order, order)]   # rows AND columns in that order: a 3 x 3 block
-M[order, order]           # NOT that: picks M[2,2], M[0,0], M[1,1] -> 3 diagonal entries
-\end{lstlisting}
+\begin{codebox}
+\begin{verbatim}
+order = np.array([2, 0, 3, 1])   # a permutation of all four indices
+M[np.ix_(order, order)]   # rows AND columns in that order: the 4 x 4, rearranged
+M[order, order]           # NOT that: M[2,2], M[0,0], M[3,3], M[1,1] -> 4 entries
+\end{verbatim}
+\end{codebox}
 
 Two index arrays side by side are read as \emph{pairs} of coordinates. \texttt{np.ix\_}
-builds the open grid instead, which is what ``sort the matrix by category'' means.
+selects every combination of the specified rows and columns, which is what ``sort the
+matrix by category'' means. An \texttt{order} shorter than the matrix selects a
+sub-matrix.
 
-\subsection{Diagonals, percentiles, and missing values}
+\subsection{Diagonals, percentiles, tolerances, and missing values}
 
-\begin{lstlisting}
+\begin{codebox}
+\begin{verbatim}
 np.fill_diagonal(M, 0)          # in place; returns None
 np.diag(M)                      # the diagonal as a vector
 np.percentile(v, [2, 98])       # two numbers: 2nd and 98th percentile of v
-np.allclose(a, b)               # equal up to floating-point roundoff?
+np.allclose(a, b)               # usage pattern: equal within rtol=1e-5, atol=1e-8?
+w = np.array([-1., 2., -3.])
+np.where(w < 0, 0., w)          # array([0., 2., 0.]): a NEW array, entry by entry
 
 B = np.array([[1., np.nan], [3., 4.], [5., 6.]])
 np.isnan(B).sum()               # 1: how many NaNs
 np.isnan(B).any(axis=0)         # array([False,  True]): which COLUMNS have any
 np.nanmean(B, axis=0)           # array([3., 5.]): mean ignoring NaNs
-np.where(np.isnan(B), 0., B)    # replace NaNs by 0 (or by anything else)
-\end{lstlisting}
+\end{verbatim}
+\end{codebox}
 
-A single \texttt{nan} spreads through everything it touches: a mean, a correlation, a
-distance. Count them before trusting any number downstream.
+\texttt{np.allclose} answers ``equal within the chosen absolute and relative tolerances'';
+its defaults accept differences much larger than floating-point roundoff, so pass
+\texttt{atol=} when the scale matters, and check shapes separately (arrays of different
+shapes may broadcast and still compare). Ordinary means, correlations and distances
+propagate NaNs; the \texttt{nan}-aware functions skip them, but an all-NaN column still
+has no mean. Replacing missing observations changes the analysis: use the preprocessing
+rule the notebook specifies.
 
 \subsection{Loading the data: \texttt{.npz} files}
 
-\begin{lstlisting}
-arc = np.load('file.npz', allow_pickle=True)   # an archive, like a read-only dict
-arc.files                    # the keys, e.g. ['early', 'middle', 'late', 'image_names']
+\begin{codebox}
+\begin{verbatim}
+arc = np.load('activations.npz', allow_pickle=True)   # usage pattern: dict-like
+arc.files                    # the keys, e.g. ['early', 'middle', 'late']
 X = arc['late']              # one array out
 X.shape, X.dtype             # e.g. (120, 4096) float32
 X = X.astype(np.float64)     # float32 -> float64 before computing distances
-\end{lstlisting}
+\end{verbatim}
+\end{codebox}
 
-The notebooks load everything for you and print a variable list at the bottom of the
-setup cell. Read that list; it tells you every name, shape and dtype you will use. The
-\texttt{float64} cast matters: with \texttt{float32} arithmetic the diagonal of a distance
-matrix comes out visibly above zero.
+The notebooks load everything for you. Read the ``Variables you will use'' comments at
+the bottom of each setup cell; they list every name, shape and dtype. Cast to
+\texttt{float64} before distance calculations to reduce roundoff; some formulas can still
+leave residuals of order $10^{-8}$ where an exact zero is expected.
 
-\section{SciPy and scikit-learn: the calls the notebooks use}
+\section{SciPy and scikit-learn: the calls the notebooks use}\label{sec:calls}
 
 \subsection{Distances: \texttt{pdist} and \texttt{squareform}}
 
-\begin{lstlisting}
+\begin{codebox}
+\begin{verbatim}
 from scipy.spatial.distance import pdist, squareform
-d = pdist(A, metric='euclidean')   # CONDENSED: shape (n*(n-1)/2,), one value per pair
-D = squareform(d)                  # SQUARE: shape (n, n), symmetric, zero diagonal
-d = squareform(D, checks=False)    # and back; checks=False tolerates roundoff asymmetry
-\end{lstlisting}
+d = pdist(A, metric='euclidean')   # CONDENSED: shape (n*(n-1)/2,), one per pair
+d                                  # array([4.472, 4.472, 2.828])
+D = squareform(d)                  # SQUARE: shape (3, 3), symmetric, zero diagonal
+squareform(D)                      # and back to the condensed form
+\end{verbatim}
+\end{codebox}
 
 \texttt{metric} is any of \texttt{'euclidean'}, \texttt{'cosine'},
-\texttt{'correlation'}, and others. Functions disagree about which form they want:
-\texttt{imshow} and \texttt{MDS} need the square; \texttt{linkage} needs the condensed
-form. \hl{When a call complains about your distance matrix, this is almost always why.}
+\texttt{'correlation'}, and others. When you supply precomputed dissimilarities, MDS
+expects the square form and \texttt{linkage} expects the condensed form. \texttt{squareform}
+checks that a square input is symmetric with a zero diagonal and raises if not; that is a
+useful check, not an obstacle, so find the cause before reaching for
+\texttt{checks=False}, which skips the check without repairing anything.
 
-\subsection{The scikit-learn pattern}
+\subsection{The scikit-learn pattern for embeddings}
 
-Every scikit-learn tool works the same way: put the settings in the constructor, hand the
-data to \texttt{fit\_transform}, and read anything it learned from an attribute with a
-\emph{trailing underscore}.
+The embedding methods used here (PCA, MDS, t-SNE) follow one pattern: put the settings in
+the constructor, hand the data to \texttt{fit\_transform}, and read anything it learned
+from an attribute with a \emph{trailing underscore}.
 
-\begin{lstlisting}
+\begin{codebox}
+\begin{verbatim}
 from sklearn.decomposition import PCA
 pca = PCA(n_components=2)
 Y = pca.fit_transform(A)            # A is (3, 2) in  ->  Y is (3, 2) out
-pca.explained_variance_ratio_       # (2,): fraction of variance per component
-np.cumsum(pca.explained_variance_ratio_)   # running total, ends at 1.0 here
-\end{lstlisting}
+pca.explained_variance_ratio_       # array([0.75, 0.25]): variance per component
+\end{verbatim}
+\end{codebox}
 
-\texttt{np.argmax} on a boolean array returns the position of the first \texttt{True}
-(positions start at 0): \texttt{np.argmax(np.array([False, False, True, True]))} is 2.
+\texttt{Y} holds one row of component scores per row of \texttt{A}. PCA centres each
+feature (column) across the rows; it does not centre each row across its features, and it
+does not rescale the features. The ratios are sorted, largest first, and sum to 1 when
+\texttt{n\_components} equals the number of features.
 
 \subsection{MDS with a precomputed dissimilarity matrix}
 
-\begin{lstlisting}
+Multidimensional scaling takes a dissimilarity matrix and looks for points in the plane
+whose pairwise distances match it as well as possible. It starts from a random layout and
+moves the points to reduce the mismatch, so different starts can give different maps. The
+notebook provides the MDS call in Part 2; this is what its arguments mean.
+
+\begin{codebox}
+\begin{verbatim}
 from sklearn.manifold import MDS
 mds = MDS(n_components=2, metric='precomputed', metric_mds=False,
-          init='random', n_init=4, max_iter=400, random_state=0,
-          normalized_stress='auto')
+          n_init=4, max_iter=400, random_state=0)    # usage pattern
 Y = mds.fit_transform(D)     # D square (n, n) in  ->  Y (n, 2) out
-mds.stress_                  # how badly the 2-D map distorts D; lower is better
-\end{lstlisting}
+mds.stress_                  # mismatch between map distances and disparities
+\end{verbatim}
+\end{codebox}
 
 \begin{itemize}
 \item \texttt{metric='precomputed'}: \texttt{D} already holds dissimilarities; do not
       recompute them from \texttt{D} as if it were data.
 \item \texttt{metric\_mds=False}: nonmetric MDS, which fits only the \emph{rank order} of
       the dissimilarities. \texttt{True} fits their values.
-\item \texttt{random\_state}: MDS starts from a random layout, so two runs differ unless
-      you fix the seed. \texttt{n\_init} runs several starts and keeps the best.
-\item These spellings need scikit-learn $\geq 1.8$; the Part 2 setup cell upgrades Colab
-      for you. Older versions spell it \texttt{dissimilarity='precomputed'}.
+\item \texttt{random\_state} fixes the random start so two runs agree; \texttt{n\_init}
+      runs several starts and keeps the best.
+\item \texttt{stress\_} is comparable only between runs on the same input with the same
+      stress definition. These argument names need scikit-learn $\geq 1.8$; the Part 2
+      setup cell installs it. If the error in \S\ref{sec:errors} appears anyway, restart the kernel and
+      rerun the setup cell.
 \end{itemize}
 
-\subsection{Other embeddings, same pattern}
+\subsection{t-SNE}
 
-\begin{lstlisting}
-from sklearn.manifold import TSNE
-Y = TSNE(n_components=2, perplexity=30, init='pca', random_state=0,
-         max_iter=1000).fit_transform(X)       # X (n, d) in  ->  (n, 2) out
-\end{lstlisting}
+\texttt{sklearn.manifold.TSNE} follows the same constructor-then-\texttt{fit\_transform}
+pattern and takes coordinates, shape \texttt{(n, d)}, not a distance matrix. The Part 4
+notebook states the settings it wants; the arguments mean:
+
+\begin{center}
+\small
+\begin{tabular}{@{}>{\ttfamily}l p{9.6cm}@{}}
+\toprule
+\textnormal{\textbf{Argument}} & \textbf{Meaning} \\
+\midrule
+n\_components & dimension of the output; \texttt{2} gives an \texttt{(n, 2)} map \\
+perplexity    & roughly, how many neighbours each point tries to keep close; must be smaller than \texttt{n} \\
+init          & starting layout: \texttt{'pca'} (deterministic) or \texttt{'random'} \\
+random\_state & seed for the random parts; fix it to make a run repeatable \\
+max\_iter     & how many optimisation steps to run \\
+\bottomrule
+\end{tabular}
+\end{center}
 
 \subsection{Correlations}
 
-\begin{lstlisting}
+\begin{codebox}
+\begin{verbatim}
 from scipy.stats import spearmanr, pointbiserialr
 res = spearmanr([1, 2, 3, 4], [1, 3, 2, 4])
 res.statistic     # 0.8: the rank correlation rho
-res.pvalue        # exists; but if the entries are pairs of images they are not
-                  # independent, so do not lean on it
-pointbiserialr([0, 0, 1, 1], [1.0, 2.0, 5.0, 6.0]).statistic   # binary vs continuous
-np.corrcoef(a, b)[0, 1]                                        # Pearson r, one pair
-\end{lstlisting}
+res.pvalue        # exists, but see below
+pointbiserialr([0, 0, 1, 1], [1., 2., 5., 6.]).statistic   # 0.970
+np.corrcoef([1, 2, 3], [1, 2, 4])[0, 1]     # 0.982: Pearson r of the two inputs
+\end{verbatim}
+\end{codebox}
 
-Both inputs must be flat vectors of the same length. To correlate two matrices, index
-both with the same \texttt{np.triu\_indices} pair first (\S2.6).
+Both inputs must be flat vectors of the same length. \texttt{np.corrcoef} returns the
+$2 \times 2$ matrix of correlations among its inputs (ones on the diagonal), so
+\texttt{[0, 1]} picks the entry for input 0 against input 1. To compare two symmetric
+RDMs over the same ordered stimuli, correlate their corresponding upper-triangle entries
+(\S\ref{sec:triu}). RDM entries share stimuli, so the usual p-value does not establish significance
+for an RDM correlation.
 
 \subsection{Fitting a curve: \texttt{curve\_fit}, \texttt{polyfit}, \texttt{polyval}}
 
-\begin{lstlisting}
+Fitting and drawing are two separate steps. Fitting finds the parameter values that make a
+model function match the observed $(x, y)$ pairs as closely as possible. Drawing evaluates
+the fitted function on a fresh, evenly spaced grid of $x$ values (\texttt{np.linspace}) so
+the curve looks smooth; the grid is not the data.
+
+\begin{codebox}
+\begin{verbatim}
 from scipy.optimize import curve_fit
 
 def line(t, m, c):          # first argument is the data; the rest are parameters
@@ -369,166 +483,151 @@ def line(t, m, c):          # first argument is the data; the rest are parameter
 
 t = np.array([0., 1., 2., 3., 4.])
 y = np.array([1., 3., 5., 7., 9.])
-popt, pcov = curve_fit(line, t, y, p0=[1, 0], maxfev=10000)
-popt                        # array([2., 1.]): the fitted m and c
+popt, pcov = curve_fit(line, t, y, p0=[1, 0])
+popt                        # array([2., 1.]): fitted m, c in the function's order
 line(t, *popt)              # the fitted values; * unpacks popt into m, c
-
-coef = np.polyfit(t, y, 1)  # straight line, degree 1: array([2., 1.]) slope, intercept
-np.polyval(coef, t)         # the line evaluated at t
 np.linspace(0, 4, 50)       # 50 evenly spaced points, for drawing a smooth curve
-\end{lstlisting}
+\end{verbatim}
+\end{codebox}
 
 \begin{itemize}
-\item \texttt{p0} is the starting guess. Start near the right scale: if $y$ runs 0--10, a
-      parameter that multiplies the whole curve should start near 10, not 1.
-\item \texttt{maxfev} is the iteration budget. If the fit fails with ``Optimal parameters
-      not found'', raise it; if it still fails, say so in your answer. A fit that will not
-      converge is a finding, not a bug.
-\item \texttt{popt} comes back in the order of the function's parameters after the first
-      argument. Feed it back with \texttt{*popt}.
+\item \texttt{p0} is the starting guess. Choose values whose predicted curve has a
+      plausible scale over the observed inputs; a poor start can send the fit to a wrong
+      solution or no solution.
+\item \texttt{maxfev} limits the number of function evaluations for the default solver.
+      If fitting fails, read the whole message and inspect the inputs, the model function
+      and the starting values before raising it. Report a failure you cannot resolve; by
+      itself it does not show that the model is wrong.
+\item \texttt{np.polyfit(x, y, deg)} fits a polynomial of degree \texttt{deg} and returns
+      its coefficients, highest power first; \texttt{np.polyval(coef, x)} evaluates a
+      polynomial with those coefficients at \texttt{x}.
 \end{itemize}
 
-$R^2$, when a notebook asks for it, is provided as a function in that notebook. Its
-definition is $1 - \sum_i (y_i - \hat{y}_i)^2 / \sum_i (y_i - \bar{y})^2$: 1 is a perfect
-fit, 0 is no better than predicting the mean, negative is worse than that. It is a ratio,
-so two $R^2$ values compare only when computed against the same target.
+$R^2$, when a notebook asks for it, is provided as a function in that notebook. With
+$\hat{y}_i$ the model's prediction for observation $i$, it is
+$1 - \sum_i (y_i - \hat{y}_i)^2 / \sum_i (y_i - \bar{y})^2$: 1 is a perfect fit, 0 is no
+better than predicting the mean, negative is worse than that, and a constant target makes
+the denominator zero. To compare models directly, compute $R^2$ on the same observed
+response values; averaging or binning the data changes the target and its variance.
 
 \subsection{Hierarchical clustering}
 
-\begin{lstlisting}
+\begin{codebox}
+\begin{verbatim}
 from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
-Z = linkage(pdist(A), method='average')       # takes the CONDENSED form
-Z = linkage(squareform(D, checks=False), method='single')   # from a square matrix
-groups = fcluster(Z, t=2, criterion='maxclust')   # cut into 2 groups: one label per row
-groups = fcluster(Z, t=0.5, criterion='distance') # or cut at a height
-dendrogram(Z, no_labels=True)                     # draw the tree
-\end{lstlisting}
+Z = linkage(pdist(A), method='average')   # takes the CONDENSED form; Z is (n-1, 4)
+\end{verbatim}
+\end{codebox}
+
+Each row of \texttt{Z} records one merge: the two clusters joined, the height (distance)
+at which they joined, and the size of the result. \texttt{method} chooses how the distance
+between clusters is defined (\texttt{'single'}: closest pair; \texttt{'average'}: mean
+over pairs). \texttt{fcluster(Z, t, criterion)} cuts the tree and returns one integer
+label per row: with \texttt{criterion='maxclust'} it forms \emph{at most} \texttt{t}
+clusters (tied merge heights can produce fewer), with \texttt{criterion='distance'} it
+cuts at height \texttt{t}. \texttt{dendrogram(Z)} draws the tree. If you try both
+linkage methods, give the results different names rather than overwriting \texttt{Z}.
 
 \subsection{Silhouette scores}
 
-\begin{lstlisting}
+\begin{codebox}
+\begin{verbatim}
 from sklearn.metrics import silhouette_samples
-sil = silhouette_samples(Y, labels)   # Y: (n, 2) COORDINATES, not a distance matrix
-                                      # labels: one group code per row; returns (n,)
-\end{lstlisting}
+sil = silhouette_samples(Y, labels)   # usage pattern: Y (n, d), one label per row
+                                      # returns (n,): one score per point
+\end{verbatim}
+\end{codebox}
 
-Near 1: the point sits well inside its own group. Near 0: on a boundary. Negative: closer
-to another group than to its own. \texttt{sil[labels == g].mean()} is group $g$'s score.
+For each point, the score compares its mean distance to its own group with its mean
+distance to the nearest other group. Near 1: much closer to its own group. Near 0: the
+two average distances are similar. Negative: closer to another group than to its own.
+It needs at least two groups and fewer groups than points. The function returns one score
+per image; the notebook says how to summarise those scores.
 
-\section{Sanity checks on a distance matrix}
+\section{Sanity checks on a distance matrix}\label{sec:checks}
 
-Run these every time you have made one, before anything downstream reads it:
+Run these every time you have made one, before anything downstream reads it. In a
+notebook, only the last bare expression in a cell is displayed, so \texttt{print} each
+check:
 
-\begin{lstlisting}
-D.shape                          # (n, n)?
-np.allclose(D, D.T)              # symmetric?  (1e-16 off is roundoff, not a bug)
-np.allclose(np.diag(D), 0)       # zeros on the diagonal?
-(D >= 0).all()                   # nonnegative?
-np.isnan(D).sum()                # 0?
+\begin{codebox}
+\begin{verbatim}
+print('shape', D.shape)                              # (n, n)?
+print('symmetric', np.allclose(D, D.T, atol=1e-8))   # 1e-16 off is roundoff
+print('zero diagonal', np.allclose(np.diag(D), 0, atol=1e-8))
+print('nonnegative', (D >= 0).all())
+print('all finite', np.isfinite(D).all())            # catches nan AND inf
 off = D[np.triu_indices(len(D), k=1)]   # the off-diagonal entries, each pair once
-off.min(), off.max()             # their range
-\end{lstlisting}
+print('range', off.min(), off.max())
+\end{verbatim}
+\end{codebox}
 
-If the diagonal is $10^{-6}$ rather than $0$, you computed in \texttt{float32}, or your
-formula reaches zero only up to roundoff; \texttt{np.fill\_diagonal(D, 0)} is the fix.
-If \texttt{np.abs(D - D.T).max()} is $10^{-17}$, nothing is wrong. Cosine and correlation
-distances must lie in $[0, 2]$; if you see values outside that range, a normalisation is
-missing or a vector had zero length.
+If the diagonal is $10^{-8}$ rather than $0$, inspect the values before changing them:
+a formula that reaches zero only up to roundoff is fine to clean with
+\texttt{np.fill\_diagonal(D, 0)}, but decide that after establishing the discrepancy is
+numerical, not before. If \texttt{np.abs(D - D.T).max()} is $10^{-17}$, nothing is wrong.
+Cosine and correlation distances lie in $[0, 2]$: excursions of order $10^{-15}$ are
+roundoff; larger ones mean the formula or its inputs need checking; a zero-length or
+constant row needs the explicit policy the notebook states.
 
-\section{Plots as instruments}
+\needspace{12\baselineskip}
+\section{Plotting matrices and embeddings}
 
-\begin{lstlisting}
+\begin{codebox}
+\begin{verbatim}
 fig, ax = plt.subplots(2, 3, figsize=(12, 7))   # a 2 x 3 grid; ax is a (2, 3) array
-ax[0, 1].imshow(D, vmin=lo, vmax=hi)            # a matrix as an image
+lo, hi = np.percentile(D, [2, 98])
+im = ax[0, 1].imshow(D, vmin=lo, vmax=hi)       # a matrix as an image
+fig.colorbar(im, ax=ax[0, 1])                   # its colour scale
 ax[1, 0].scatter(Y[:, 0], Y[:, 1], s=8)          # a 2-D embedding
 ax[0, 0].set_title('...'); ax[0, 0].set_xticks([]); ax[0, 0].set_yticks([])
 plt.tight_layout(); plt.show()
-\end{lstlisting}
+\end{verbatim}
+\end{codebox}
 
-When a matrix plot looks washed out, a few extreme values are eating the colour scale:
-set \texttt{vmin} and \texttt{vmax} from percentiles (\S2.8) instead of letting matplotlib
-choose. To colour a scatter by category, loop over the categories and call
-\texttt{ax.scatter} once per group with a \texttt{label=}, then \texttt{ax.legend()}.
+\texttt{vmin} and \texttt{vmax} set which values map to the two ends of the colour scale;
+values outside share the end colours but are not removed from the data. Use the limits the
+notebook specifies, label every panel, and show a colour bar, since panels with different
+limits cannot be compared by colour alone. To colour a scatter by category, loop over the
+categories and call \texttt{ax.scatter} once per group with a \texttt{label=}, then
+\texttt{ax.legend()}.
 
-\section{Common errors and what they mean}
+\section{Common errors and what they mean}\label{sec:errors}
 
 \newcommand{\err}[1]{{\small\ttfamily #1}\\}
 \begin{itemize}
 \item \err{ValueError: operands could not be broadcast together with shapes (120,4096) (120,)}
-      A reduction lost an axis. Add \texttt{keepdims=True} or \texttt{[:, None]} (\S2.4).
+      A reduction dropped an axis. Decide which axis you meant and what shape the result
+      should have; \texttt{keepdims=True} or \texttt{[:, None]} restores it (\S\ref{sec:broadcast}).
 \item \err{ValueError: shapes (120,4096) and (120,4096) not aligned}
-      Matrix product with inner dimensions that do not match. One side needs a \texttt{.T}.
+      Matrix product with inner dimensions that do not match. Work out the intended
+      operation and its output shape before transposing anything: a \texttt{.T} on the
+      wrong operand gives a valid but wrong matrix.
 \item \err{IndexError: index 120 is out of bounds for axis 0 with size 120}
       Indices start at 0; the last row is 119.
 \item \err{ValueError: The truth value of an array with more than one element is ambiguous}
-      \texttt{and}/\texttt{or} between arrays. Use \texttt{\&}/\texttt{|} with parentheses.
-\item \err{ValueError: Distance matrix 'X' must be symmetric}\
-      \err{ValueError: The condensed distance matrix must contain only finite values}
-      \texttt{linkage} was handed a square matrix, or \texttt{squareform} one with
-      roundoff asymmetry. Pass \texttt{squareform(D, checks=False)}.
+      \texttt{and}/\texttt{or} between arrays, or \texttt{if array:}. Use \texttt{\&}/\texttt{|}
+      with parentheses for masks; use \texttt{.any()} or \texttt{.all()} for a single yes/no.
+\item \err{ValueError: Distance matrix 'X' must be symmetric}
+      \texttt{squareform} received a square matrix that is not symmetric. Find the
+      asymmetry (\texttt{np.abs(D - D.T).max()}) and its cause before continuing.
+\item \err{ValueError: The condensed distance matrix must contain only finite values}
+      There is a \texttt{nan} or \texttt{inf} in the distances. Locate it
+      (\texttt{np.argwhere(\textasciitilde np.isfinite(D))}) and trace it to its input.
 \item \err{TypeError: MDS.\_\_init\_\_() got an unexpected keyword argument 'metric\_mds'}
-      scikit-learn older than 1.8. Re-run the setup cell.
+      scikit-learn older than 1.8. Restart the kernel and re-run the setup cell.
 \item \err{RuntimeError: Optimal parameters not found}
-      \texttt{curve\_fit} ran out of iterations. Raise \texttt{maxfev}, improve \texttt{p0}.
-\item \err{NameError: name 'D\_human' is not defined}
-      A cell that defines it has not been run in this session, or was run before you
-      fixed it. Run cells top to bottom.
-\item \err{KeyError: 'late'}
-      Wrong key on an \texttt{npz} archive; print \texttt{arc.files}.
+      \texttt{curve\_fit} did not converge. Check the model, the inputs and \texttt{p0};
+      then raise \texttt{maxfev}.
 \item \err{TypeError: 'numpy.float64' object is not callable}
       A name that used to be a function is now a number, usually \texttt{r2 = r2(...)}
       or a variable named \texttt{sum}. Rename and re-run the definition.
 \item \err{NotImplementedError: 1b: write your code here, then delete this line.}
       The guard line at the bottom of a TODO cell. Delete it once your code is in.
-\item \err{nan}, with no error at all.
-      A zero-variance unit was divided by its standard deviation, or a \texttt{nan} in
-      the input propagated. Count NaNs and zero-variance columns before the computation,
-      not after.
+\item \textbf{Unexpected \texttt{nan} results}, with no error at all.
+      A \texttt{nan} in the input propagated, or a division by zero occurred. Check which
+      axis the computation runs along: a row-wise correlation needs variation within each
+      row; standardising units across images needs variation within each column.
 \end{itemize}
-
-\section{Reading printed shapes}
-
-\begin{center}
-\small
-\begin{tabular}{@{}>{\ttfamily}l l@{}}
-\toprule
-\textnormal{\textbf{Printed}} & \textbf{Read it as} \\
-\midrule
-(120, 4096)   & a matrix: 120 stimuli, each a vector of 4,096 features \\
-(4096,)       & one vector of 4,096 numbers; the trailing comma makes it a 1-tuple \\
-(120, 1)      & a column: 120 rows of one number each; broadcasts against \texttt{(120, 4096)} \\
-(120,)        & 120 numbers; does \emph{not} broadcast against \texttt{(120, 4096)} \\
-(120, 120)    & a square matrix over 120 stimuli: a similarity or dissimilarity matrix \\
-(7140,)       & the upper triangle of a $120 \times 120$ matrix: $120 \cdot 119 / 2$ pairs \\
-(120, 2)      & 120 points in the plane: an MDS, PCA or t-SNE embedding \\
-(1224, 200, 200, 3) & 1,224 images of 200 by 200 pixels with 3 colour channels \\
-(1224, 120000) & the same images, each flattened to one vector ($200 \cdot 200 \cdot 3$) \\
-()            & a single number wrapped in an array; \texttt{float(x)} unwraps it \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-Write the shape you \emph{expect} in a comment before you run the line, then compare. The
-notebooks' provided cells print shapes at every load for exactly this reason.
-
-\section{A debugging recipe}
-
-\begin{enumerate}
-\item \textbf{Shape.} Print it. Is it what you expected, and the right way round?
-\item \textbf{Type and range.} \texttt{X.dtype}, \texttt{X.min()}, \texttt{X.max()}.
-      \texttt{uint8} and \texttt{float32} both cause quiet, plausible-looking wrongness.
-\item \textbf{Missing values.} \texttt{np.isnan(X).sum()}.
-\item \textbf{A case you can check by hand.} Run your code on a $3 \times 2$ array like
-      \texttt{A} above and compare with a calculator.
-\item \textbf{Plot it.} A wrong matrix usually looks wrong.
-\item \textbf{Say what the line computes}, in one sentence, before fixing it. If you
-      cannot, the problem is the idea, not the syntax, and the linear-algebra handout is
-      the place to go.
-\end{enumerate}
-
-\vspace{4pt}\hrule\vspace{4pt}
-{\color{lightgray}\footnotesize Nothing on these pages answers a graded question. The
-notebooks' TODO cells name the functions they need; this handout says what those
-functions do.}
 
 \end{document}

@@ -1,17 +1,23 @@
-% cpsy1291-handout.sty -- shared preamble for the CPSY 1291 recitation handouts.
-% Extracted from bootcamp-notes.tex so that every weekly handout looks the same.
-% Compile handouts with:  latexmk -lualatex handout-NN-slug.tex
-\ProvidesPackage{cpsy1291-handout}[2026/08/19 CPSY 1291 recitation handout style]
+% cpsy1291-handout.sty -- shared preamble for the CPSY 1291 handouts.
+% Compile handouts with:  latexmk -lualatex <file>.tex
+\ProvidesPackage{cpsy1291-handout}[2026/09/17 CPSY 1291 handout style]
 
 \RequirePackage{fontspec}
-\setmainfont{Lora}[
-  Path = /Users/tserre/Library/Fonts/ , Extension = .ttf ,
-  UprightFont = Lora-Regular , BoldFont = Lora-SemiBold ,
-  ItalicFont = Lora-Italic , BoldItalicFont = Lora-Italic ]
-\setsansfont{Poppins}[
-  Path = /Users/tserre/Library/Fonts/ , Extension = .ttf ,
-  UprightFont = Poppins-Regular , BoldFont = Poppins-SemiBold ]
-\setmonofont{Menlo}[Scale=0.86]
+% Fonts: the author's copies of Lora and Poppins when present, otherwise the
+% same families if the system provides them, otherwise TeX Gyre (ships with TeX Live).
+\IfFileExists{/Users/tserre/Library/Fonts/Lora-Regular.ttf}{%
+  \setmainfont{Lora}[
+    Path = /Users/tserre/Library/Fonts/ , Extension = .ttf ,
+    UprightFont = Lora-Regular , BoldFont = Lora-SemiBold ,
+    ItalicFont = Lora-Italic , BoldItalicFont = Lora-Italic ]
+  \setsansfont{Poppins}[
+    Path = /Users/tserre/Library/Fonts/ , Extension = .ttf ,
+    UprightFont = Poppins-Regular , BoldFont = Poppins-SemiBold ]
+}{%
+  \IfFontExistsTF{Lora}{\setmainfont{Lora}}{\setmainfont{TeX Gyre Pagella}}
+  \IfFontExistsTF{Poppins}{\setsansfont{Poppins}}{\setsansfont{TeX Gyre Heros}}
+}
+\IfFontExistsTF{Menlo}{\setmonofont{Menlo}[Scale=0.86]}{\setmonofont{TeX Gyre Cursor}[Scale=0.92]}
 
 \RequirePackage[margin=1.1in]{geometry}
 \RequirePackage{enumitem}
@@ -24,13 +30,15 @@
 \RequirePackage{array}
 \RequirePackage{amsmath,amssymb,bm}
 \RequirePackage{listings}
-\RequirePackage{mdframed}
+\RequirePackage{tcolorbox}
 \RequirePackage{soul}
+\RequirePackage{needspace}
 
 \definecolor{accent}{HTML}{9C5A2E}
 \definecolor{brown}{HTML}{6B4F3A}
 \definecolor{ink}{HTML}{1E293B}
-\definecolor{lightgray}{HTML}{8A7E70}
+% Secondary text: 7.7:1 on white, 6.9:1 on the code background (WCAG AA needs 4.5:1).
+\definecolor{lightgray}{HTML}{5C5147}
 \definecolor{codebg}{HTML}{F5F1EA}
 \definecolor{gold}{HTML}{F2C14E}
 
@@ -47,14 +55,12 @@
   basicstyle=\ttfamily\small, backgroundcolor=\color{codebg},
   frame=single, rulecolor=\color{codebg!60!lightgray}, framesep=5pt,
   breaklines=true, showstringspaces=false, columns=fullflexible,
-  keywordstyle=\color{accent}, commentstyle=\color{lightgray}\itshape,
+  keywordstyle=\color{accent}, commentstyle=\color{ink},
   language=Python, aboveskip=8pt, belowskip=8pt, xleftmargin=2pt,
 }
 
-\newmdenv[backgroundcolor=codebg, linecolor=accent, linewidth=1.6pt,
-          topline=false, bottomline=false, rightline=false,
-          innerleftmargin=9pt, innertopmargin=6pt, innerbottommargin=6pt,
-          skipabove=9pt, skipbelow=9pt]{keybox}
+\newtcolorbox{keybox}{colback=codebg, colframe=accent, boxrule=0pt, leftrule=1.6pt, arc=0pt,
+  left=9pt, right=6pt, top=6pt, bottom=6pt, before skip=9pt, after skip=9pt}
 
 \newcommand{\ask}[1]{\textcolor{accent}{\textbf{#1}}}
 

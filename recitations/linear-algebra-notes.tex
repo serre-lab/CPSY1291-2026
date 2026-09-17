@@ -1,10 +1,10 @@
-% CPSY 1291 -- Linear algebra for this course
-% A handout to help. Written for a student who found the linear algebra in the first
-% lectures fast. It defines every symbol the lectures and Assignment 1 use, with a small
-% numerical example per concept. There is no code here beyond a one-line NumPy aside.
+\DocumentMetadata{lang=en-US, pdfversion=2.0, pdfstandard=ua-2, testphase={phase-III,math,title,table,firstaid}}
+% CPSY 1291 -- Vectors, distances, and dissimilarity matrices
+% Worked examples of vectors, dot products, distances, and RDMs.
 % Compile:  latexmk -lualatex linear-algebra-notes.tex
 \documentclass[11pt]{article}
 \usepackage{cpsy1291-handout}
+\hypersetup{pdftitle={CPSY 1291: Vectors, distances, and dissimilarity matrices}, pdfauthor={CPSY 1291, Brown University}}
 
 \newcommand{\vx}{\bm{x}}
 \newcommand{\vy}{\bm{y}}
@@ -15,15 +15,15 @@
 \newcommand{\deuc}{d_{\mathrm{euc}}}
 \newcommand{\dcos}{d_{\cos}}
 \newcommand{\dcorr}{d_{\mathrm{corr}}}
-\newcommand{\np}[1]{{\small\color{lightgray}\textit{In NumPy:} \texttt{#1}}\par}
+\newcommand{\np}[1]{{\small\color{lightgray}In NumPy: \texttt{#1}}\par}
 
 \begin{document}
 
 \begin{center}
-{\sffamily\small\color{accent}\MakeUppercase{CPSY 1291 \ $\cdot$\ A handout to help}}\\[5pt]
-{\sffamily\LARGE\bfseries\color{brown} Linear algebra for this course}\\[3pt]
-{\sffamily\large\color{ink} Vectors, distances, and dissimilarity matrices, with the numbers written out}\\[6pt]
-{\color{lightgray}\small Fall 2026 \quad$\cdot$\quad read at your own pace; every symbol here is the one the lectures use}
+{\sffamily\small\color{accent}\MakeUppercase{CPSY 1291 \ $\cdot$\ Worked examples}}\\[5pt]
+{\sffamily\LARGE\bfseries\color{brown} Vectors, distances, and dissimilarity matrices}\\[3pt]
+{\sffamily\large\color{ink} The linear algebra behind the first lectures and Assignment 1, with the numbers written out}\\[6pt]
+{\color{lightgray}\small Fall 2026}
 \end{center}
 \vspace{4pt}\hrule\vspace{10pt}
 
@@ -31,18 +31,25 @@
 \addcontentsline{toc}{section}{Who this is for}
 
 Several of you said that the linear algebra in the first lectures went by quickly.
-This handout slows it down. It contains nothing that is not already in the lectures;
-it just takes each object one at a time, defines it, and works a small numerical example
-by hand so that you can see what the symbols are doing. Vectors here have two or three
-entries so the arithmetic fits on a line. The vectors in the course have thousands of
-entries, and nothing changes except the length of the sums.
+This handout takes each object one at a time, defines it, and works a small numerical
+example by hand. Start with the worked examples; after each one, cover the calculation and
+try it yourself. Vectors here have two or three entries so the arithmetic fits on a line.
+The same formulas apply when the vectors have thousands of entries.
 
 \begin{keybox}
-\ask{The one idea.} A list of $D$ numbers is a point in a $D$-dimensional space. Once
-two things are points, ``how similar are they'' becomes ``how far apart are they'', and
-there is more than one reasonable answer to that. Everything below is about making that
-sentence precise.
+\ask{Similarity as distance.} A list of $D$ numbers is a point in a $D$-dimensional space.
+We can model the similarity of two things by choosing a representation, so that each thing
+is a point, and a rule for measuring dissimilarity between points. There is more than one
+reasonable rule; this handout works through three.
 \end{keybox}
+
+\textbf{How to read the symbols.} $\sum_{j=1}^{D}$ means ``repeat the expression that follows
+for $j = 1, 2, \dots, D$, then add the results''. $x \in [0, 2]$ means $x$ lies between $0$
+and $2$, endpoints included; $[0, \infty)$ means $x \geq 0$. $|c|$ is the absolute value
+of $c$. $\arccos$ undoes the cosine: $\arccos(0.96)$ is the angle whose cosine is $0.96$.
+Vector entries are written horizontally to save space; in a matrix--vector product
+(\S\ref{sec:matrices}) the input vector is a column, and in a data matrix each response
+vector occupies one row.
 
 \section{Vectors, and the names the course uses}
 
@@ -67,13 +74,15 @@ in exactly this sense.
 \subsection{Stimuli are indexed with a superscript in parentheses}
 
 The course looks at many stimuli at once, so it needs two indices: \emph{which stimulus}
-and \emph{which entry}. The convention, used in every lecture and assignment:
+and \emph{which entry}. The convention in the lectures:
 \begin{itemize}
 \item $\vx^{(i)}$ is the response vector to stimulus $i$, for $i = 1, \dots, N$;
 \item $x^{(i)}_j$ is its $j$-th entry, for $j = 1, \dots, D$.
 \end{itemize}
-So $N$ counts stimuli (images, trials, conditions) and $D$ counts entries (pixels, units,
-neurons, rating scales). Read $x^{(7)}_{3}$ as ``the response of neuron 3 to image 7''.
+Here $N$ is the number of represented items (images, conditions) and $D$ is the number of
+features (pixels, units, neurons, rating scales). The Assignment 1 notebooks call these
+dimensions \texttt{n} and \texttt{p}. The parentheses in $\vx^{(i)}$ identify an item; they
+do not indicate a power. Read $x^{(7)}_{3}$ as ``the response of neuron 3 to image 7''.
 
 \subsection{Stacking the vectors: the response matrix}
 
@@ -97,10 +106,15 @@ $\vx^{(1)} = (3, 4)$, $\vx^{(2)} = (4, 3)$, $\vx^{(3)} = (0, 1)$:
 \mX = \begin{pmatrix} 3 & 4 \\ 4 & 3 \\ 0 & 1 \end{pmatrix}, \qquad
 \text{row 2 is } \vx^{(2)},\quad \text{column 2 is neuron 2's response to every image.}
 \]
-``$N \times D$'' always means rows first, then columns. \hl{Rows are stimuli; columns are
-features.} Every data matrix in this course is laid out this way.
+``$N \times D$'' always means rows first, then columns. For the response matrices in this
+course, \emph{rows are stimuli and columns are features}.
 
-\np{X.shape is (N, D); X[i] is row i; X[:, j] is column j.}
+Mathematics counts from 1 and Python counts from 0: the mathematical $\vx^{(1)}$ is
+\texttt{X[0]}, and $x^{(i)}_j$ is \texttt{X[i-1, j-1]}.
+
+\np{X.shape is (N, D); X[0] is the first row; X[:, 0] is the first column.}
+
+\textit{Try it.} Which entry of $\mX$ above is neuron 2's response to image 3? (Answers at the end.)
 
 \section{Adding, subtracting, and scaling vectors}
 
@@ -116,15 +130,17 @@ c\,\vx = (c x_1, \dots, c x_D).
 \vx + \vy = (7, 7), \qquad \vx - \vy = (-1, 1), \qquad 2\vx = (6, 8), \qquad
 \tfrac{1}{2}\vx = (1.5, 2).
 \]
-Geometrically, $\vx + \vy$ is the arrow you get by placing $\vy$'s tail at $\vx$'s head;
-$c\vx$ points the same way as $\vx$ (the opposite way if $c < 0$) and is $|c|$ times as
-long.
+Geometrically, $\vx + \vy$ is the arrow you get by placing $\vy$'s tail at $\vx$'s head.
+For $c > 0$, $c\vx$ points the same way as $\vx$ and is $c$ times as long; for $c < 0$ it
+points the opposite way and is $|c|$ times as long; for $c = 0$ it is the zero vector
+$\bm{0} = (0, \dots, 0)$, which has no direction.
 
 \begin{keybox}
 \ask{The difference vector.} $\vx - \vy$ is the arrow \emph{from} the point $\vy$ \emph{to}
-the point $\vx$. Its length is the distance between them. That one sentence is the whole
-of \S4, so it is worth a second read: subtracting two response vectors gives the
-displacement between two stimuli in neuron space.
+the point $\vx$, and its length is the distance between them. For example,
+$(3, 4) - (4, 3) = (-1, 1)$: from $(4, 3)$, move one unit left and one unit up to reach
+$(3, 4)$. Subtracting two response vectors gives the displacement between two stimuli in
+neuron space; \S\ref{sec:euc} measures its length.
 \end{keybox}
 
 \np{x + y, x - y, 2 * x, all entry by entry.}
@@ -156,7 +172,8 @@ $\norm{(4, 3)} = 5$.\quad $\norm{(0, 1)} = 1$.\quad $\norm{(1, 1, 1)} = \sqrt{3}
 Scaling a vector scales its length: $\norm{c\vx} = |c|\,\norm{\vx}$, so
 $\norm{2\,(3, 4)} = \norm{(6, 8)} = 10$. Dividing a vector by its own norm gives a
 \emph{unit vector}, length exactly 1, pointing the same way: $(3, 4)/5 = (0.6, 0.8)$,
-and indeed $0.36 + 0.64 = 1$.
+and indeed $0.36 + 0.64 = 1$. This requires $\vx \neq \bm{0}$: the zero vector has length
+zero and no direction, so it cannot be normalised.
 
 \np{np.linalg.norm(x); np.dot(x, y) or x @ y for the dot product.}
 
@@ -169,21 +186,22 @@ arrows:
 \qquad\text{equivalently}\qquad
 \cos\phi = \frac{\vx \cdot \vy}{\norm{\vx}\,\norm{\vy}} .
 \]
-This is the fact that makes the dot product useful. Read it as: \emph{how much of $\vx$
-points along $\vy$}, scaled by both lengths. It is large and positive when the two arrows
-point the same way ($\phi$ near $0$, $\cos\phi$ near $1$), zero when they are
-perpendicular ($\phi = 90^\circ$, $\cos\phi = 0$), and negative when they point in
-opposite directions ($\phi$ near $180^\circ$, $\cos\phi$ near $-1$).
+This is the fact that makes the dot product useful. For fixed vector lengths, the dot
+product is largest when the arrows point in the same direction ($\phi = 0$,
+$\cos\phi = 1$), zero when they are perpendicular ($\phi = 90^\circ$, $\cos\phi = 0$), and
+negative when the angle exceeds $90^\circ$. Its magnitude also depends on both lengths.
+The second formula needs both lengths to be nonzero.
 
 \textbf{Example.} For $\vx = (3, 4)$ and $\vy = (4, 3)$,
 \[
 \cos\phi = \frac{24}{5 \cdot 5} = 0.96, \qquad \phi = \arccos(0.96) \approx 16.3^\circ .
 \]
 For $\vx = (3, 4)$ and $\vy = (4, -3)$ the dot product was $0$, so $\cos\phi = 0$ and the
-arrows are perpendicular; a sketch confirms it. For $\vx = (3, 4)$ and $2\vx = (6, 8)$,
-$\cos\phi = 50 / (5 \cdot 10) = 1$: same direction, angle zero.
+arrows are perpendicular; draw both on graph paper to confirm it. For $\vx = (3, 4)$ and
+$2\vx = (6, 8)$, $\cos\phi = 50 / (5 \cdot 10) = 1$: same direction, angle zero.
 
 \section{Euclidean distance}
+\label{sec:euc}
 
 The \emph{Euclidean distance} between two points is the length of the difference vector,
 the straight-line distance between them:
@@ -201,37 +219,41 @@ So images 1 and 2 are close, and image 3 is far from both. This is the distance 
 measure with a ruler on a drawing of the three points.
 
 Three properties, all visible in the example: the distance from a point to itself is
-$0$; $\deuc(\vx, \vy) = \deuc(\vy, \vx)$; and a distance is never negative. They matter
-in \S7.
+$0$; $\deuc(\vx, \vy) = \deuc(\vy, \vx)$; and a distance is never negative. They return
+in \S\ref{sec:rdm}.
 
-Euclidean distance is sensitive to overall magnitude. A neuron population that fires twice
-as hard to every image moves every point twice as far from the origin and doubles every
-distance, even though the \emph{pattern} across neurons is unchanged. The next two
+Euclidean distance is sensitive to overall magnitude. If a neuron population fires twice
+as hard to every image, every point moves twice as far from the origin and every distance
+doubles, even though the \emph{pattern} across neurons is unchanged. The next two
 measures are designed to ignore that.
 
 \np{np.linalg.norm(x - y).}
 
+\textit{Try it.} What happens to $\deuc(\vx, \vy)$ if both $\vx$ and $\vy$ are multiplied by $2$?
+
 \section{Cosine similarity and cosine dissimilarity}
 
-\emph{Cosine similarity} is just $\cos\phi$ from \S3.3: the dot product with both lengths
-divided out. It compares directions and ignores lengths entirely. The course turns it
+\emph{Cosine similarity} is $\cos\phi$ from \S3.3: the dot product with both lengths
+divided out. It compares directions and ignores lengths. The course turns it
 into a dissimilarity (small means similar) by subtracting from one:
 \[
 \dcos(\vx^{(i)}, \vx^{(k)}) = 1 - \cos\phi
 = 1 - \frac{\vx^{(i)} \cdot \vx^{(k)}}{\norm{\vx^{(i)}}\,\norm{\vx^{(k)}}} .
 \]
 It is $0$ when the two vectors point the same way, $1$ when they are perpendicular, and
-$2$ when they point in opposite directions; so it lives in $[0, 2]$.
+$2$ when they point in opposite directions; so it lies in $[0, 2]$. Both vectors must have
+nonzero length, or the fraction is undefined.
 
 \textbf{Example.} $\vx^{(1)} = (3, 4)$ and $\vx^{(2)} = (4, 3)$: $\cos\phi = 0.96$, so
 $\dcos = 0.04$. Nearly the same direction; nearly zero dissimilarity.
 
 \textbf{Example, where the two measures disagree.} Take $\vx = (1, 0)$ and $\vy = (3, 0)$.
 Euclidean distance: $\norm{(-2, 0)} = 2$. Cosine: $\cos\phi = 3 / (1 \cdot 3) = 1$, so
-$\dcos = 0$. Euclidean says ``two units apart''; cosine says ``identical''. Neither is
-wrong: one asks \emph{how far apart are the points}, the other \emph{do the arrows point
-the same way}. If $\vy$ is the same neurons firing three times as hard, cosine is the
-measure that says so.
+$\dcos = 0$. Euclidean says ``two units apart''; cosine dissimilarity is zero because the
+directions match, although the vectors differ in length. Neither is wrong: one asks
+\emph{how far apart are the points}, the other \emph{do the arrows point the same way}.
+If $\vy$ is the same neurons firing three times as hard, cosine ignores that gain and
+Euclidean distance reports it.
 
 \np{1 - np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y)), for one pair of vectors.}
 
@@ -240,13 +262,21 @@ measure that says so.
 \subsection{Centring a vector by its own mean}
 
 The \emph{mean} of a vector is the average of its entries, $\bar{x} = \frac{1}{D}\sum_j x_j$.
-\emph{Centring} subtracts it from every entry, so the centred vector
-$\tilde{\vx} = \vx - \bar{x}$ has mean zero. This is a per-vector operation: each stimulus
-is centred by its \emph{own} mean, across its $D$ entries.
+\emph{Centring} subtracts it from every entry:
+\[
+\tilde{x}_j = x_j - \bar{x}, \qquad
+\tilde{\vx} = (x_1 - \bar{x},\ \dots,\ x_D - \bar{x}) ,
+\]
+so the centred vector $\tilde{\vx}$ has mean zero. This is a per-vector operation: each
+stimulus is centred by its \emph{own} mean, across its $D$ entries.
 
 \textbf{Example.} $\vx = (1, 2, 3)$ has mean $2$, so $\tilde{\vx} = (-1, 0, 1)$.
 $\vy = (2, 4, 6)$ has mean $4$, so $\tilde{\vy} = (-2, 0, 2)$.
 $\bm{z} = (3, 2, 1)$ has mean $2$, so $\tilde{\bm{z}} = (1, 0, -1)$.
+
+\textbf{Example, a uniform offset disappears.} $(1, 2, 4)$ has mean $7/3$ and
+$(6, 7, 9)$ has mean $22/3$; both centre to $(-\tfrac43, -\tfrac13, \tfrac53)$. Adding
+$5$ to every entry changed the point but not the centred vector.
 
 \subsection{Pearson correlation is cosine similarity after centring}
 
@@ -257,9 +287,12 @@ r(\vx, \vy) = \frac{\tilde{\vx} \cdot \tilde{\vy}}{\norm{\tilde{\vx}}\,\norm{\ti
 = \frac{\sum_j (x_j - \bar{x})(y_j - \bar{y})}
        {\sqrt{\sum_j (x_j - \bar{x})^2}\,\sqrt{\sum_j (y_j - \bar{y})^2}} .
 \]
-The second form is the textbook definition; the first says what it is: cosine on centred
-vectors. $r$ lies in $[-1, 1]$. It is $1$ when one vector is a positive-slope straight-line
-function of the other, $-1$ for a negative slope, and $0$ when there is no linear relation.
+The two formulas are equivalent: expand the centred vectors in the first to obtain the
+second. Both vectors must vary across their entries; a constant vector becomes $\bm{0}$
+after centring and the fraction is undefined. $r$ lies in $[-1, 1]$. It is $1$ when
+$y_j = a x_j + b$ for every entry with $a > 0$, $-1$ when the same holds with $a < 0$, and
+$0$ when there is no linear relation across these entries (a nonlinear relation may still
+exist).
 
 \textbf{Example.} $\tilde{\vx} = (-1, 0, 1)$ and $\tilde{\vy} = (-2, 0, 2)$:
 $r = (2 + 0 + 2) / (\sqrt{2}\cdot\sqrt{8}) = 4 / 4 = 1$. Indeed $\vy = 2\vx$.
@@ -275,10 +308,11 @@ again in $[0, 2]$: $0$ for a perfectly matching pattern, $1$ for no linear relat
 for a perfectly reversed one.
 
 \begin{keybox}
-\ask{Why centre?} Cosine ignores how \emph{strongly} a population fires overall.
-Correlation also ignores its \emph{baseline}: adding the same constant to every neuron's
-rate leaves $r$ unchanged, because centring removes it. Correlation therefore compares
-only the \emph{pattern} of ups and downs across neurons.
+\ask{Why centre?} Multiplying either response vector by a positive constant leaves cosine
+similarity unchanged. Correlation is also unchanged when the same constant is added to
+every entry of either vector (a uniform offset within that vector, as in the example
+above). Correlation therefore compares only the \emph{pattern} of ups and downs across
+neurons.
 \end{keybox}
 
 \textbf{Example, where cosine and correlation disagree.} Take $\vx = (5, 5, 6)$ and
@@ -295,9 +329,9 @@ r = \frac{-1/3}{6/9} = -0.5, \qquad \dcorr = 1.5 .
 \]
 Cosine calls them nearly identical because both are dominated by a large shared baseline
 (every neuron firing at about 5). Correlation strips the baseline and sees what is left:
-$\vx$ peaks on neuron 3, $\vy$ peaks on neuron 1, opposite patterns. When the vectors are
-ReLU activations, which are non-negative and often share a large common offset, this
-difference between the two measures is not a technicality.
+the centred patterns are negatively correlated, because their largest entries occur at
+different neurons. This illustrates why positive response vectors, such as ReLU
+activations, can have high cosine similarity but much lower correlation.
 
 \np{np.corrcoef(x, y)[0, 1] gives r for one pair of vectors.}
 
@@ -311,82 +345,23 @@ For two response vectors $\vx^{(i)}$ and $\vx^{(k)}$:
 \]
 \begin{center}
 \small
-\begin{tabular}{@{}lllll@{}}
+\begin{tabular}{@{}lp{3.6cm}lp{2.8cm}l@{}}
 \toprule
-measure & ignores & range & $0$ means & example, $(3,4)$ vs.\ $(4,3)$ \\
+measure & unchanged by & range & $0$ means & $(3,4)$ vs.\ $(4,3)$ \\
 \midrule
-$\deuc$ & nothing & $[0, \infty)$ & same point & $\sqrt{2} \approx 1.414$ \\
-$\dcos$ & overall magnitude & $[0, 2]$ & same direction & $0.04$ \\
-$\dcorr$ & magnitude and baseline & $[0, 2]$ & same pattern & $2$ \\
+$\deuc$ & nothing, in general & $[0, \infty)$ & same point & $\sqrt{2} \approx 1.414$ \\
+$\dcos$ & positive rescaling of either vector & $[0, 2]$ & same direction & $0.04$ \\
+$\dcorr$ & positive rescaling plus a uniform offset & $[0, 2]$ & $y_j = a x_j + b$, $a > 0$ & $2$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 The last cell is worth checking by hand: $(3, 4)$ centres to $(-0.5, 0.5)$ and $(4, 3)$ to
-$(0.5, -0.5)$, exactly opposite, so $r = -1$ and $\dcorr = 2$. With only two entries a
-pattern can only go up or down, so $D = 2$ correlations are always $\pm 1$; with
-$D = 4096$ the measure is far more graded.
-
-\section{Matrices}
-
-\subsection{What a matrix is, and two ways to read one}
-
-A matrix is a rectangular grid of numbers with $m$ rows and $n$ columns, ``$m \times n$''.
-Its entry in row $i$, column $j$ is written with two subscripts, row first: $(\bm{A})_{ij}$
-or $a_{ij}$. Two readings recur in this course.
-\textbf{As data:} $\mX$ from \S1.3, one row per stimulus, one column per feature.
-\textbf{As a map:} a matrix $\bm{W}$ turns a vector into a new vector, $\vw \mapsto
-\bm{W}\vw$, which is what a layer of a neural network does.
-
-\subsection{The matrix--vector product is a stack of dot products}
-
-If $\bm{A}$ is $m \times n$ and $\vw$ has $n$ entries, the product $\bm{A}\vw$ is a vector
-with $m$ entries, and \hl{its $i$-th entry is the dot product of row $i$ of $\bm{A}$ with
-$\vw$}:
-\[
-(\bm{A}\vw)_i = \sum_{j=1}^{n} a_{ij}\,w_j = \bm{a}_i \cdot \vw ,
-\quad\text{where } \bm{a}_i \text{ is row } i .
-\]
-\textbf{Example.} With the $3 \times 2$ response matrix from \S1.3 and $\vw = (1, -1)$:
-\[
-\mX\vw = \begin{pmatrix} 3 & 4 \\ 4 & 3 \\ 0 & 1 \end{pmatrix}
-\begin{pmatrix} 1 \\ -1 \end{pmatrix}
-= \begin{pmatrix} 3 - 4 \\ 4 - 3 \\ 0 - 1 \end{pmatrix}
-= \begin{pmatrix} -1 \\ 1 \\ -1 \end{pmatrix} .
-\]
-Read it as ``project every stimulus onto the direction $\vw$'': one number per image.
-The inner dimensions must agree: a $3 \times 2$ matrix takes a vector with $2$ entries and
-returns one with $3$. A matrix times a matrix works the same way, one column at a time:
-$(m \times k)\,(k \times n) \to (m \times n)$.
-
-\np{A @ w; the shapes must read (m, n) @ (n,) -> (m,).}
-
-\subsection{The transpose}
-
-The \emph{transpose} $\bm{A}^{\top}$ swaps rows and columns: $(\bm{A}^{\top})_{ij} = a_{ji}$,
-and an $m \times n$ matrix becomes $n \times m$.
-\[
-\mX = \begin{pmatrix} 3 & 4 \\ 4 & 3 \\ 0 & 1 \end{pmatrix}
-\quad\Longrightarrow\quad
-\mX^{\top} = \begin{pmatrix} 3 & 4 & 0 \\ 4 & 3 & 1 \end{pmatrix} .
-\]
-Transposing a data matrix turns ``one row per stimulus'' into ``one column per stimulus''.
-One product is worth knowing by name:
-$\mX\mX^{\top}$ is $N \times N$ and its entry $(i, k)$ is the dot product of row $i$ with
-row $k$, that is, $\vx^{(i)} \cdot \vx^{(k)}$, every pairwise dot product at once.
-\[
-\mX\mX^{\top} =
-\begin{pmatrix} 3 & 4 \\ 4 & 3 \\ 0 & 1 \end{pmatrix}
-\begin{pmatrix} 3 & 4 & 0 \\ 4 & 3 & 1 \end{pmatrix}
-=
-\begin{pmatrix} 25 & 24 & 4 \\ 24 & 25 & 3 \\ 4 & 3 & 1 \end{pmatrix} .
-\]
-The diagonal holds the squared norms ($25, 25, 1$, matching \S3.2) and the off-diagonal
-entries are the dot products computed in \S3.1. A matrix that equals its own transpose,
-as this one does, is called \emph{symmetric}.
-
-\np{X.T; X @ X.T.}
+$(0.5, -0.5)$, exactly opposite, so $r = -1$ and $\dcorr = 2$. For two nonconstant vectors
+with two entries, correlation can only be $+1$ or $-1$; with three or more entries,
+intermediate values are possible.
 
 \section{The dissimilarity matrix}
+\label{sec:rdm}
 
 \subsection{Definition}
 
@@ -400,7 +375,7 @@ Entry $d_{ik}$ answers one question: \emph{how dissimilar are stimuli $i$ and $k
 this measure, in this representation?} Row $i$ of $\mD$ is stimulus $i$'s dissimilarity to
 everything.
 
-\textbf{Example.} Euclidean, on the three images of \S4:
+\textbf{Example.} Euclidean, on the three images of \S\ref{sec:euc}:
 \[
 \mD =
 \begin{pmatrix}
@@ -416,35 +391,39 @@ everything.
 \end{pmatrix} .
 \]
 
-\subsection{Three properties every dissimilarity matrix has}
+\subsection{Three checks for the RDMs used here}
 
-They follow from the three properties of a distance noted in \S4, and they are the first
-thing to check when you have computed one:
+They follow from the three properties of a distance noted in \S\ref{sec:euc}, and they are
+the first thing to check when you have computed one:
 \begin{itemize}
 \item \textbf{Zero diagonal:} $d_{ii} = 0$. A stimulus is not dissimilar to itself.
-\item \textbf{Symmetric:} $d_{ik} = d_{ki}$, so $\mD = \mD^{\top}$. The dissimilarity of
-      $i$ to $k$ is the dissimilarity of $k$ to $i$.
+\item \textbf{Symmetric:} $d_{ik} = d_{ki}$, so $\mD = \mD^{\top}$ (the transpose,
+      \S\ref{sec:matrices}: the matrix with rows and columns swapped).
 \item \textbf{Non-negative:} $d_{ik} \geq 0$.
 \end{itemize}
-The same three hold for $\dcos$ and $\dcorr$; only the range of the off-diagonal entries
-changes.
+The same three hold for $\dcos$ and $\dcorr$, provided the measure is defined for every
+row: a zero-length row has no cosine dissimilarity and a constant row has no correlation.
+The Assignment 1 notebook guards the denominator with a tiny constant so the code does not
+divide by zero; that is a computational convention, not a definition of correlation for a
+constant vector, and the checks above assume it was not needed.
 
 \subsection{Counting the pairs}
 
-Because of the zero diagonal and the symmetry, an $N \times N$ dissimilarity matrix holds
-only $N(N-1)/2$ distinct numbers, the entries above the diagonal (the \emph{upper triangle}).
-For $N = 3$ that is $3$ numbers; for $N = 120$ it is $7{,}140$. When you compare two
-dissimilarity matrices, those are the numbers you want: using all $N^2$ entries counts
-every pair twice and adds $N$ zeros from the diagonal.
+Because of the zero diagonal and the symmetry, an $N \times N$ dissimilarity matrix
+describes $N(N-1)/2$ unordered stimulus pairs, represented by the entries strictly above
+the diagonal (the \emph{upper triangle}). For $N = 3$ that is $3$ pairs; for $N = 120$ it
+is $7{,}140$. When you compare two dissimilarity matrices, those are the entries you want:
+using all $N^2$ entries counts every pair twice and adds $N$ zeros from the diagonal.
 
 \np{np.allclose(D, D.T); np.allclose(np.diag(D), 0); (D >= 0).all().}
 
-\section{Ranks and Spearman correlation}
+\needspace{5\baselineskip}\section{Ranks and Spearman correlation}
+\label{sec:spearman}
 
 Sometimes only the \emph{ordering} of a set of numbers is trustworthy, not their exact
-values. Rating scales are like this: a ``7'' is above a ``6'' but not necessarily one
-unit above. The \emph{rank} of an entry is its position when the entries are sorted from
-smallest to largest.
+values. Rating scales are like this: the numerical difference between ratings 6 and 7 need
+not represent the same psychological difference as that between 2 and 3. The \emph{rank}
+of an entry is its position when the entries are sorted from smallest to largest.
 
 \textbf{Example.} $\vx = (10, 20, 25)$ has ranks $(1, 2, 3)$; $\vy = (1, 5, 4)$ has ranks
 $(1, 3, 2)$. Ties get the average of the positions they occupy: $(4, 4, 9)$ has ranks
@@ -452,21 +431,86 @@ $(1.5, 1.5, 3)$.
 
 The \emph{Spearman correlation} $\rho$ is the Pearson correlation of the two rank vectors.
 It measures whether two variables increase together, without assuming the relation is a
-straight line. With no ties there is a shortcut:
-\[
-\rho = 1 - \frac{6\sum_j \delta_j^2}{n(n^2 - 1)}, \qquad
-\delta_j = \text{rank}(x_j) - \text{rank}(y_j) .
-\]
-\textbf{Example.} Ranks $(1, 2, 3)$ and $(1, 3, 2)$ give $\bm{\delta} = (0, -1, 1)$,
-$\sum \delta_j^2 = 2$, and $\rho = 1 - 6 \cdot 2 / (3 \cdot 8) = 0.5$. Computing Pearson
-$r$ directly on the two rank vectors gives the same $0.5$: centre both to
-$(-1, 0, 1)$ and $(-1, 1, 0)$, then $r = (1 + 0 + 0)/(\sqrt{2}\cdot\sqrt{2}) = 0.5$.
+straight line.
+
+\textbf{Example.} Ranks $(1, 2, 3)$ and $(1, 3, 2)$ centre to $(-1, 0, 1)$ and
+$(-1, 1, 0)$, so $\rho = (1 + 0 + 0)/(\sqrt{2}\cdot\sqrt{2}) = 0.5$.
 
 Two dissimilarity matrices are compared by taking the $N(N-1)/2$ upper-triangle entries of
 each, in the same pair order, and computing $\rho$ between the two lists: a high $\rho$
 says the pairs one representation calls far apart, the other does too, whatever the units.
+Both matrices must refer to the same stimuli in the same row and column order; matching
+shapes alone does not establish this.
 
 \np{scipy.stats.spearmanr(a, b).statistic.}
+
+\needspace{6\baselineskip}\section{Optional: matrix products and the Gram matrix}
+\label{sec:matrices}
+
+\subsection{What a matrix is, and two ways to read one}
+
+A matrix is a rectangular grid of numbers with $m$ rows and $n$ columns, ``$m \times n$''.
+Its entry in row $i$, column $j$ is written with two subscripts, row first: $(\bm{A})_{ij}$
+or $a_{ij}$. Two readings recur in this course.
+\textbf{As data:} $\mX$ from \S1.3, one row per stimulus, one column per feature.
+\textbf{As a map:} a matrix $\bm{W}$ transforms an input vector, $\vx \mapsto \bm{W}\vx$.
+This is the linear operation inside many neural-network layers (a layer usually adds a bias
+and applies a nonlinearity as well).
+
+\subsection{The matrix--vector product is a stack of dot products}
+
+If $\bm{A}$ is $m \times n$ and $\vw$ has $n$ entries, the product $\bm{A}\vw$ is a vector
+with $m$ entries, and \emph{its $i$-th entry is the dot product of row $i$ of $\bm{A}$ with
+$\vw$}:
+\[
+(\bm{A}\vw)_i = \sum_{j=1}^{n} a_{ij}\,w_j = \bm{a}_i \cdot \vw ,
+\quad\text{where } \bm{a}_i \text{ is row } i .
+\]
+\textbf{Example.} With the $3 \times 2$ response matrix from \S1.3 and $\vw = (1, -1)$,
+written as a column:
+\[
+\mX\vw = \begin{pmatrix} 3 & 4 \\ 4 & 3 \\ 0 & 1 \end{pmatrix}
+\begin{pmatrix} 1 \\ -1 \end{pmatrix}
+= \begin{pmatrix} 3 - 4 \\ 4 - 3 \\ 0 - 1 \end{pmatrix}
+= \begin{pmatrix} -1 \\ 1 \\ -1 \end{pmatrix} .
+\]
+Read it as ``for each image, subtract neuron 2's response from neuron 1's response'': one
+number per image. The inner dimensions must agree: a $3 \times 2$ matrix takes a vector
+with $2$ entries and returns one with $3$. A matrix times a matrix works the same way, one
+column at a time: $(m \times k)\,(k \times n) \to (m \times n)$.
+
+\np{A @ w; the shapes must read (m, n) @ (n,) -> (m,).}
+
+\subsection{The transpose, and every dot product at once}
+
+The \emph{transpose} $\bm{A}^{\top}$ swaps rows and columns: $(\bm{A}^{\top})_{ij} = a_{ji}$,
+and an $m \times n$ matrix becomes $n \times m$.
+\[
+\mX = \begin{pmatrix} 3 & 4 \\ 4 & 3 \\ 0 & 1 \end{pmatrix}
+\quad\Longrightarrow\quad
+\mX^{\top} = \begin{pmatrix} 3 & 4 & 0 \\ 4 & 3 & 1 \end{pmatrix} .
+\]
+Transposing a data matrix turns ``one row per stimulus'' into ``one column per stimulus''.
+One product is worth knowing by name: $\mX\mX^{\top}$ (the \emph{Gram matrix}) is
+$N \times N$ and its entry $(i, k)$ is the dot product of row $i$ with row $k$, that is,
+$\vx^{(i)} \cdot \vx^{(k)}$, every pairwise dot product at once.
+\[
+\mX\mX^{\top} =
+\begin{pmatrix} 3 & 4 \\ 4 & 3 \\ 0 & 1 \end{pmatrix}
+\begin{pmatrix} 3 & 4 & 0 \\ 4 & 3 & 1 \end{pmatrix}
+=
+\begin{pmatrix} 25 & 24 & 4 \\ 24 & 25 & 3 \\ 4 & 3 & 1 \end{pmatrix} .
+\]
+The diagonal holds the squared norms ($25, 25, 1$, matching \S3.2) and the off-diagonal
+entries are the dot products computed in \S3.1. A matrix that equals its own transpose,
+as this one does, is called \emph{symmetric}.
+
+\np{X.T; X @ X.T.}
+
+\subsection*{Answers to ``Try it''}
+\S1.3: row 3, column 2, which is $x^{(3)}_2 = 1$.\quad
+\S\ref{sec:euc}: it doubles, because $\norm{2\vx - 2\vy} = 2\norm{\vx - \vy}$;
+$\dcos$ and $\dcorr$ are unchanged.
 
 \subsection*{Symbols used in this handout}
 \begin{center}
