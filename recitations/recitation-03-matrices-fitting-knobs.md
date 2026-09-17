@@ -59,7 +59,7 @@ what to do about a method that has a **knob**.
 Part 4 of the assignment.
 
 If the room is thin on R02 attendance, do NOT back up — point at
-bootcamp-notes.pdf and recitation-02, and keep going. Backing up costs the
+linear-algebra-notes.pdf / a1-programming-notes.pdf and recitation-02, and keep going. Backing up costs the
 whole session.
 -->
 

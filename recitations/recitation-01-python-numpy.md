@@ -23,7 +23,7 @@ math: katex
   Assignment 2 and its own recitation. Concepts (Shepard, psychological space)
   are carried by L1/L2, not here (Recitation 2 keeps only pointers).
 
-  MATERIAL: the companion notes (bootcamp-notes.pdf) cover the same ground in
+  MATERIAL: the companion notes (linear-algebra-notes.pdf / a1-programming-notes.pdf) cover the same ground in
   prose. Tell students at the start that they do not need to take notes.
 
   NOTATION (recorded decision, 2026-09-01): the recitation decks follow the
@@ -635,6 +635,6 @@ the table out; every row carries a real section label they can go find.
 The concepts — psychological space, Shepard's law, why any of this is science —
 are what L1/L2 carry this week — Recitation 2 keeps them to pointers; the notebooks
 also start with glossary cells for the vocabulary. Point them at
-bootcamp-notes.pdf for the prose version, and take questions with whatever time
+linear-algebra-notes.pdf / a1-programming-notes.pdf for the prose version, and take questions with whatever time
 is left.
 -->

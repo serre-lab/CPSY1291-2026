@@ -721,7 +721,7 @@ straight into the buffer slide — do not let this one absorb its minutes.
 
 - Anything from today you want run again, slower — say so now
 - Or open your own part 2 and get unstuck **while the room is full of help**
-- Not covered today ≠ not on A1: `bootcamp-notes.pdf` and office hours carry the rest
+- Not covered today ≠ not on A1: `linear-algebra-notes.pdf / a1-programming-notes.pdf` and office hours carry the rest
 
 <!--
 3 min. A deliberate buffer, budgeted on purpose — do not fill it with new
@@ -731,5 +731,5 @@ failure from the call-sheet slide actually happen, then fix it.
 
 Close with logistics: A1 is due Monday 9/29; restart-and-run-all before
 submitting re-runs the t-SNE sweep, so budget for it. Office hours and
-bootcamp-notes.pdf for everything else.
+linear-algebra-notes.pdf / a1-programming-notes.pdf for everything else.
 -->

@@ -14,8 +14,8 @@ constraints, and what is deliberately excluded.
 
 | # | Week | Serves | Handout | Deck |
 |---|---|---|---|---|
-| 1 | 1 | A1 | `bootcamp-notes` | `recitation-01-python-numpy` |
-| 2 | 2 | A1 | `bootcamp-notes` | `recitation-02-vectors-to-pca` |
+| 1 | 1 | A1 | `a1-programming-notes` | `recitation-01-python-numpy` |
+| 2 | 2 | A1 | `linear-algebra-notes` | `recitation-02-vectors-to-pca` |
 | 3 | 3 | A1 | `handout-03-matrices-fitting-knobs` | `recitation-03-matrices-fitting-knobs` |
 | 4 | 4 | A2 | `handout-04-gradients-chain-rule` | `recitation-04-gradients-chain-rule` |
 | 5 | 5 | A2 | `handout-05-pytorch-training-loop` | `recitation-05-pytorch-training-loop` |
@@ -29,8 +29,11 @@ constraints, and what is deliberately excluded.
 | 13 | 13 | project | `handout-13-project-clinic-i` | `recitation-13-project-clinic-i` |
 | 14 | 14 | project | `handout-14-project-clinic-ii` | `recitation-14-project-clinic-ii` |
 
-Weeks 1 and 2 share one handout: `bootcamp-notes.pdf` covers both sessions, and
-predates the per-week convention.
+Weeks 1 and 2 are served by two standalone handouts rather than per-week ones:
+`linear-algebra-notes.pdf` (vectors, distances, dissimilarity matrices, with worked
+numbers) and `a1-programming-notes.pdf` (the Python/NumPy/SciPy/scikit-learn calls the
+Assignment 1 notebooks use). Both are written as help for a student who found the
+linear algebra fast, not as a record of what a session covered.
 
 **Two sessions have hard dates.** R07 must be held before the midterm (Thu 10/22),
 and R12 must be held before Thanksgiving recess, since the final exam is Tue 12/1

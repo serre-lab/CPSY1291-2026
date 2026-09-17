@@ -5,7 +5,7 @@ Maintainers: Thomas Serre (@tserre), Peisen Zhou (@PPPayson).
 
 - `recitations/recitation-NN-*.md` — one Marp deck per weekly 80-minute recitation.
 - `recitations/handout-NN-*.tex/.pdf` — printed handout paired with a week, where one exists.
-- `recitations/bootcamp-notes.tex/.pdf` — standalone Python/numpy notes for the early weeks.
+- `recitations/linear-algebra-notes.tex/.pdf` and `recitations/a1-programming-notes.tex/.pdf` — two standalone handouts to help with Assignment 1: the linear algebra, and the Python/NumPy/SciPy calls.
 - Every push to `main` rebuilds the decks and publishes to GitHub Pages automatically,
   and students may follow the published links at any time — finish an edit before pushing.
 
