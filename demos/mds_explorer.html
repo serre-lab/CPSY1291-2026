@@ -208,7 +208,7 @@ function update(){
   document.getElementById('axes-ctl').hidden=state.k!==3;
   const st=S.mds;
   document.getElementById('stress-line').innerHTML=
-    ['1','2','3'].map(k=>{const s=`k = ${k}: ${st[k].stress.toFixed(3)}`;return +k===state.k?`<b>${s}</b>`:s;}).join(' · ')+' (stress)';
+    ['1','2','3'].map(k=>{const s=`m = ${k}: ${st[k].stress.toFixed(3)}`;return +k===state.k?`<b>${s}</b>`:s;}).join(' · ')+' (stress)';
   document.getElementById('cut-line-text').textContent=
     `${state.linkage} linkage · cut at height ${clus.cutHeight.toFixed(2)} → ${state.clusters} cluster${state.clusters>1?'s':''}`+
     (clus.tied?' (tied merge heights: cut by merge order)':'');
@@ -224,7 +224,7 @@ function writeStatus(){
   let hov='';
   if(state.hover>=0){const it=DATA.items[state.hover];hov=` · <b>${it.label}</b> (${it.taxon}, cluster ${clus.label[state.hover]+1})`;}
   document.getElementById('status').innerHTML=
-    `${S.label} · ${S.dissimilarity} · MDS k = ${state.k}, stress ${S.mds[String(state.k)].stress.toFixed(3)} · `+
+    `${S.label} · ${S.dissimilarity} · MDS m = ${state.k}, stress ${S.mds[String(state.k)].stress.toFixed(3)} · `+
     `<span class="muted">cluster sizes</span> ${sizes}${hov}`;
   document.getElementById('live').textContent=
     `${S.label}, ${state.k} dimensions, stress ${S.mds[String(state.k)].stress.toFixed(3)}, ${state.linkage} linkage, `+

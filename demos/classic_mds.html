@@ -196,7 +196,7 @@ function update(){
   clus=cutTree(C.linkage,C.leaves,state.clusters);
   document.getElementById('axes-ctl').hidden=state.k!==3;
   document.getElementById('stress-line').innerHTML=
-    Object.keys(DS.mds).map(k=>{const s=`k = ${k}: ${DS.mds[k].stress.toFixed(3)}`;return +k===state.k?`<b>${s}</b>`:s;}).join(' · ');
+    Object.keys(DS.mds).map(k=>{const s=`m = ${k}: ${DS.mds[k].stress.toFixed(3)}`;return +k===state.k?`<b>${s}</b>`:s;}).join(' · ');
   document.getElementById('cut-line-text').textContent=
     `${state.linkage} · cut at ${clus.cutHeight.toFixed(2)} → ${state.clusters} cluster${state.clusters>1?'s':''}`+(clus.tied?' (tied heights)':'');
   drawMap(); drawScree(); drawTree(); paintHover(); writeStatus();
@@ -291,7 +291,7 @@ function drawScree(){
     const t=mk('text',{x:left-8,y:y+4,'font-size':13,fill:'#5B6B7A','text-anchor':'end'}); t.textContent=v.toFixed(2); svg.appendChild(t);
   }
   ks.forEach(k=>{const t=mk('text',{x:xOf(k),y:h-bottom+20,'font-size':14,fill:'#5B6B7A','text-anchor':'middle'});t.textContent=k;svg.appendChild(t);});
-  const xl=mk('text',{x:(left+w-right)/2,y:h-8,'font-size':14,fill:'#5B6B7A','font-style':'italic','text-anchor':'middle'}); xl.textContent='dimensions k'; svg.appendChild(xl);
+  const xl=mk('text',{x:(left+w-right)/2,y:h-8,'font-size':14,fill:'#5B6B7A','font-style':'italic','text-anchor':'middle'}); xl.textContent='dimensions m'; svg.appendChild(xl);
   const yl=mk('text',{x:14,y:(top+h-bottom)/2,'font-size':14,fill:'#5B6B7A','font-style':'italic','text-anchor':'middle',transform:`rotate(-90 14 ${(top+h-bottom)/2})`}); yl.textContent='stress'; svg.appendChild(yl);
   // reference lines: Kruskal's rules of thumb
   [[0.2,'poor'],[0.1,'fair'],[0.05,'good']].forEach(([v,lab])=>{ if(v>ymax)return; const y=yOf(v);
@@ -301,7 +301,7 @@ function drawScree(){
   ks.forEach((k,j)=>{
     const sel=k===state.k, has=!!DS.mds[String(k)];
     const c=mk('circle',{cx:xOf(k),cy:yOf(st[j]),r:sel?8:5,fill:sel?'#C94A3A':'#3E6D8E',class:has?'scree-hit':''});
-    c.appendChild(mk('title')).textContent=`k = ${k}: stress ${st[j].toFixed(3)}`+(has?'':' (no map for k > 3)');
+    c.appendChild(mk('title')).textContent=`m = ${k}: stress ${st[j].toFixed(3)}`+(has?'':' (no map for k > 3)');
     if(has) c.addEventListener('click',()=>{state.k=k;document.querySelectorAll('#dims button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.k===k?'true':'false'));update();});
     svg.appendChild(c);
     if(sel){const t=mk('text',{x:xOf(k)+10,y:yOf(st[j])-10,'font-size':14,fill:'#C94A3A'});t.textContent=st[j].toFixed(3);svg.appendChild(t);}
