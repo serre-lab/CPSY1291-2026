@@ -206,7 +206,7 @@ function writeStatus(){
   let hov='';
   if(state.hover>=0) hov=` · <b>${DS.labels[state.hover]}</b> (cluster ${clus.label[state.hover]+1})`;
   document.getElementById('status').innerHTML=
-    `<b>${DS.label}</b>: ${DS.n} ${DS.items} (${DS.cite}) · dissimilarity = ${DS.rule} · `+
+    `<b>${DS.label}</b>: ${DS.n} ${DS.items} · <span class="muted">source</span> ${DS.cite} <a href="https://scholar.google.com/scholar?q=${encodeURIComponent(DS.cite)}" target="_blank" rel="noopener">find the paper</a> · dissimilarity = ${DS.rule} · `+
     `k = ${state.k}, stress ${DS.mds[String(state.k)].stress.toFixed(3)} · <span class="muted">cluster sizes</span> ${sizes}${hov}`;
   document.getElementById('live').textContent=
     `${DS.label}, ${state.k} dimensions, stress ${DS.mds[String(state.k)].stress.toFixed(3)}, ${state.linkage} linkage, `+
