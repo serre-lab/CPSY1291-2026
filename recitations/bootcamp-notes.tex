@@ -283,7 +283,7 @@ something --- the pixel values of an image, the firing rates of $D$ neurons, a
 person's rating on $D$ scales --- you can treat that list as a \emph{point} in a
 $D$-dimensional space. The lectures write the vector for stimulus $i$ as
 $\bm{x}^{(i)}$ and its $j$-th entry as $x^{(i)}_j$; $N$ stimuli make an
-$N \times D$ matrix $\mathbf{X}$, one row per stimulus. Two things are ``similar'' when their points are close.
+$N \times D$ matrix $\bm{X}$, one row per stimulus. Two things are ``similar'' when their points are close.
 Everything else is detail about what \emph{close} should mean.
 
 \subsection{Length, distance, and the dot product}
@@ -320,6 +320,18 @@ after subtracting each vector's own mean.} So ``correlation distance'' is
 you the other for free.
 \end{keybox}
 
+The lectures name the three dissimilarities this way, and Assignment~1 \S1b
+asks you to write all three as \texttt{euclidean(X)}, \texttt{cosine\_dist(X)}
+and \texttt{correlation\_dist(X)}, each returning the $N \times N$ matrix over
+the rows of \texttt{X}:
+\[
+d_{\mathrm{euc}} = \|\bm{a}-\bm{b}\|, \qquad
+d_{\cos} = 1 - \cos\phi, \qquad
+d_{\mathrm{corr}} = 1 - r,
+\]
+where $r$ is the Pearson correlation of $\bm{a}$ and $\bm{b}$: the cosine after
+each vector's own mean is subtracted. The last two lie in $[0, 2]$.
+
 Two ways to get all pairwise distances. The second is the one to use at scale,
 and it follows from expanding $\|\bm{a}-\bm{b}\|^2 = \bm{a}\cdot\bm{a} +
 \bm{b}\cdot\bm{b} - 2\,\bm{a}\cdot\bm{b}$:
@@ -354,7 +366,7 @@ dimensions agree.
 Subtracting the mean of each feature puts the cloud of points at the origin
 without changing its shape. After centering, the covariance matrix
 \[
-\bm{C} = \tfrac{1}{n-1}\,\tilde{\bm{X}}^{\!\top}\tilde{\bm{X}}
+\bm{C} = \tfrac{1}{N-1}\,\tilde{\bm{X}}^{\!\top}\tilde{\bm{X}}
 \]
 holds the variance of each feature on its diagonal and, off the diagonal, how
 each pair of features vary together.
@@ -428,8 +440,9 @@ meaningless zeros, which drags the correlation upward for no reason.
 
 \begin{lstlisting}
 D.shape                              # (N, N)?
-np.abs(D - D.T).max()                # symmetric? (1e-16 is roundoff, not a bug)
-np.diag(D)                           # zeros on the diagonal?
+np.allclose(D, D.T)                  # symmetric? (1e-16 off is roundoff, not a bug)
+np.allclose(np.diag(D), 0)           # zeros on the diagonal?
+(D >= 0).all()                       # nonnegative?
 np.isnan(D).sum()                    # any missing?
 np.fill_diagonal(D, 0)               # force the diagonal if it drifted
 \end{lstlisting}
@@ -457,7 +470,18 @@ The same shape of call gives you \texttt{MDS(...)} and \texttt{TSNE(...)}. Two
 things to watch. Some of these take \emph{a dissimilarity matrix} rather than
 feature vectors, which you signal with \texttt{metric='precomputed'}. And some
 are stochastic, so they take a \texttt{random\_state} --- meaning two runs give
-two answers unless you fix it.
+two answers unless you fix it. The call the lectures use:
+
+\begin{lstlisting}
+mds = MDS(n_components=2, metric='precomputed', n_init=8,
+          normalized_stress='auto', random_state=0)
+Y = mds.fit_transform(D)            # (N, 2); mds.stress_ afterwards
+\end{lstlisting}
+
+Add \texttt{metric\_mds=False} for non-metric MDS, which fits only the rank
+order of the dissimilarities. \texttt{metric='precomputed'} is the scikit-learn
+$\geq 1.8$ spelling (\texttt{dissimilarity='precomputed'} before); the
+Assignment~1 setup cell installs 1.8 for you.
 
 \subsection{Hierarchical clustering}
 
@@ -493,15 +517,18 @@ computed against the same target.}
 \begin{itemize}
 \item \textbf{Mean, variance, standard deviation.} The center, the spread, and
       the spread in the original units. A feature with \emph{zero} variance is
-      a special hazard: correlation divides by the standard deviation, so a
-      unit that never responds will produce a division by zero or a silent
-      \texttt{nan} in everything downstream.
+      a special hazard: correlation divides by a standard deviation, so if you
+      $z$-score each \emph{unit} across stimuli (Assignment~1 \S3h) a unit that
+      never responds divides by zero and puts a silent \texttt{nan} into
+      everything downstream. Correlation \emph{between two images} across their
+      units (\S1b) does not fail on a dead unit, but it is biased by it: see
+      exercise~10.
 \item \textbf{The $z$-score} $(x - \mu)/\sigma$ puts different measurements on a
       common scale. Note that $z$-scoring each vector and then taking dot
       products \emph{is} computing correlations.
-\item \textbf{Pearson vs.\ Spearman correlation.} Pearson measures how well a
-      \emph{straight line} fits; Spearman does the same after replacing values
-      by their ranks, so it measures whether two things increase together
+\item \textbf{Pearson vs.\ Spearman correlation.} Pearson ($r$) measures how
+      well a \emph{straight line} fits; Spearman ($\rho$) does the same after
+      replacing values by their ranks, so it measures whether two things increase together
       without assuming the relation is linear. Use Spearman when only the
       ordering is meaningful.
 \item \textbf{What a $p$-value assumes.} A $p$-value asks how surprising your
@@ -548,8 +575,9 @@ before you have to think hard.
       quiet, plausible-looking wrongness.
 \item \textbf{Missing values.} \texttt{np.isnan(X).sum()}. One \texttt{nan}
       spreads through everything it touches.
-\item \textbf{Degenerate rows or columns.} Anything with zero variance will
-      break a correlation, because you divide by its standard deviation.
+\item \textbf{Degenerate rows or columns.} Anything with zero variance breaks
+      a correlation taken along that axis, because you divide by its standard
+      deviation.
 \item \textbf{A case you can check by hand.} Compute one value with a
       calculator, or on a $2\times2$ example, and compare.
 \item \textbf{Plot it.} A picture of a wrong matrix usually looks obviously
@@ -666,8 +694,12 @@ OffsetImage / AnnotationBbox  & draw images at their coordinates \\
 \item No. That is floating-point roundoff, around $10^{-17}$. Symmetrize with
       \texttt{(D + D.T) / 2} and move on.
 \item \texttt{(X == 0).mean()}. Network activations are full of exact zeros
-      because of the \texttt{ReLU} nonlinearity, and a unit that is \emph{always}
-      zero has no variance --- which breaks any correlation computed with it.
+      because of the \texttt{ReLU} nonlinearity. A unit that is \emph{always}
+      zero has no variance, so $z$-scoring it across stimuli divides by zero;
+      and zeros that two images \emph{share} pull both means down after
+      centering and then count as agreement, which inflates their correlation
+      (Assignment~1 \S2c). Decide the unit set once, for every image, and say
+      what you did.
 \end{enumerate}
 
 \end{document}

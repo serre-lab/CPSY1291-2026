@@ -37,12 +37,12 @@ X - X.mean(axis=1)         # ValueError: (120,4096) (120,)
 
 \block{Boolean masks}
 \begin{lstlisting}
-mask = (taxon == 2)     # one boolean per stimulus
+mask = (taxon == 'Primate')   # one boolean per stimulus
 X[mask]                 # just those rows
 mask.sum(); mask.mean() # how many; what FRACTION (a rate)
-np.isin(cat, [0, 2])    # membership in a set of labels
+np.isin(cat, [0, 2])    # Part 3 codes: 0 Animal, 2 Face
 \end{lstlisting}
-\ret{Element-wise logic on arrays: \texttt{\&} and \ $\cdot$\ \texttt{|} or \ $\cdot$\ \texttt{\textasciitilde} not --- \emph{always with parentheses}: \texttt{(taxon == 2) | (taxon == 5)}. Writing \texttt{and}/\texttt{or} between arrays raises ``truth value \dots\ is ambiguous''.}
+\ret{Element-wise logic on arrays: \texttt{\&} and \ $\cdot$\ \texttt{|} or \ $\cdot$\ \texttt{\textasciitilde} not --- \emph{always with parentheses}: \texttt{(taxon == 'Primate') | (taxon == 'Rodent')}. Writing \texttt{and}/\texttt{or} between arrays raises ``truth value \dots\ is ambiguous''.}
 
 \block{The upper triangle, and reordering a matrix}
 \begin{lstlisting}
@@ -66,7 +66,7 @@ np.argsort(v)[::-1][:5]  # indices of the 5 LARGEST
 \begin{lstlisting}
 rho = spearmanr(D1[iu], D2[iu]).statistic
 \end{lstlisting}
-\ret{\texttt{.statistic} is where the number lives (\texttt{.pvalue} exists, but the pairs are not independent --- do not lean on it). Spearman = Pearson on \emph{ranks}: only the ordering of dissimilarities is meaningful. Never feed the whole matrix: that counts every pair twice and adds $n$ zeros.}
+\ret{\texttt{.statistic} is where the number lives (\texttt{.pvalue} exists, but the pairs are not independent --- do not lean on it). Spearman = Pearson on \emph{ranks}: only the ordering of dissimilarities is meaningful. Never feed the whole matrix: that counts every pair twice and adds $N$ zeros.}
 
 \block{Condensed vs square}
 \begin{lstlisting}
@@ -84,7 +84,7 @@ y_hat   = f_exp(x, *popt)  # * unpacks the parameters back in
 coef  = np.polyfit(x, y, 1)  # slope and intercept
 y_hat = np.polyval(coef, x)  # the line at every x
 \end{lstlisting}
-\ret{\texttt{p0}: start near the right scale --- similarities run 0--10, so $a \approx 10$. \texttt{maxfev}: raise it, or hard fits die with ``Optimal parameters not found''. Wrap in \texttt{try/except RuntimeError} where a fit is \emph{allowed} to fail (2h says so --- that failure is a finding, not a bug).}
+\ret{\texttt{p0}: start near the right scale --- similarities run 0--10, so $a \approx 10$. \texttt{maxfev}: raise it, or hard fits die with ``Optimal parameters not found''. If a fit still fails, report which model and layer: a finding, not a bug.}
 
 \block{Goodness of fit}
 \[
@@ -98,9 +98,9 @@ est = PCA(n_components=50)
 Y   = est.fit_transform(X)     # items x features in
 est.explained_variance_ratio_  # exists only after .fit
 cum = np.cumsum(est.explained_variance_ratio_)
-np.argmax(cum >= 0.85)  # first True: components to 85%
+np.argmax(cum >= 0.85) + 1   # first True index; +1 = count
 \end{lstlisting}
-\ret{Settings go in the constructor, data goes to \texttt{.fit}, learned results grow a \emph{trailing underscore} (not a typo). \texttt{MDS} takes a dissimilarity matrix: \texttt{metric='precomputed'}. Random methods differ between runs unless you set \texttt{random\_state} --- reproducible is not the same as meaningful.}
+\ret{Settings go in the constructor, data goes to \texttt{.fit}, learned results grow a \emph{trailing underscore} (not a typo). \texttt{MDS} takes a dissimilarity matrix: \texttt{metric='precomputed'} (was \texttt{dissimilarity=} before 1.8). Random methods differ between runs unless you set \texttt{random\_state} --- reproducible is not the same as meaningful.}
 
 \block{Per-group anything (groupby without groupby)}
 \begin{lstlisting}
@@ -118,11 +118,11 @@ IT = np.where(np.isnan(it_raw),                   # IMPUTE
 \end{lstlisting}
 \ret{Both are defensible; the notebook only demands you \emph{say which}. Ordering rule: check for zero-variance units \emph{before} z-scoring --- dividing by a std of 0 makes NaNs, and one NaN poisons everything downstream. Related clip: \texttt{np.sqrt(np.maximum(D2, 0))} --- floating point leaves tiny negatives where the true value is 0.}
 
-\block{\texttt{silhouette\_score} --- what goes in}
+\block{\texttt{silhouette\_samples} --- what goes in}
 \begin{lstlisting}
-silhouette_score(proj_fc6[:, :2], (cat == c).astype(int))
+sil = silhouette_samples(proj_fc6[:, :2], cat)  # 3g
 \end{lstlisting}
-\ret{First argument: the 2-D \emph{coordinates} in the PC1--PC2 plane, \emph{not} the RDM --- it computes its own distances. Second: a binary labeling, this category against everything else. Near 1 = sits apart \ $\cdot$\ near 0 = on a boundary \ $\cdot$\ negative = closer to another group than its own. No relation to 3f's silhouette \emph{masks} --- the name is a coincidence.}
+\ret{First argument: the 2-D \emph{coordinates} in the PC1--PC2 plane, \emph{not} the RDM --- it computes its own distances. Second: the six category codes; \texttt{sil[cat == c].mean()} is that category's score (3g). Near 1 = sits apart \ $\cdot$\ near 0 = on a boundary \ $\cdot$\ negative = closer to another group than its own. No relation to 3f's silhouette \emph{masks}; the name is a coincidence.}
 
 \end{multicols}
 
