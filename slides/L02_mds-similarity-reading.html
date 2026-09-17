@@ -63,7 +63,7 @@
 </annotation></semantics></math></div></span></p><ul>
 <li>Rows and columns: images, here ordered by category. Each entry: one comparison</li>
 <li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math>: the <strong>dissimilarity measure</strong>. It decides which differences count</li>
-<li>Constraints: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">d_{ii}=0</annotation></semantics></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>=</mo><msub><mi>d</mi><mrow><mi>k</mi><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ik}=d_{ki}</annotation></semantics></math>, and for a distance, no shortcut beats the direct route</li>
+<li>What makes it a dissimilarity matrix: <strong>zero diagonal</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">d_{ii}=0</annotation></semantics></math>), <strong>symmetric</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>=</mo><msub><mi>d</mi><mrow><mi>k</mi><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ik}=d_{ki}</annotation></semantics></math>), <strong>nonnegative</strong>. MDS refuses a non-symmetric matrix; a nonzero diagonal distorts the map. The triangle inequality is a further property, of <em>distances</em>; without it MDS still runs, and the mismatch shows up as stress</li>
 </ul>
 </div>
 <div class="col fig">
@@ -125,7 +125,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 </ul>
 <figure><img src="../images/L01-similarity-2026-09/similarity_motivation.png" alt="Three bar patterns over twelve units: a pattern x; the same pattern with every unit doubled, marked as unchanged for cosine and correlation but changed for Euclidean distance; and the same pattern with a constant added to every unit, marked as unchanged for correlation only" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>Three bar patterns over twelve units: a pattern x; the same pattern with every unit doubled, marked as unchanged for cosine and correlation but changed for Euclidean distance; and the same pattern with a constant added to every unit, marked as unchanged for correlation only</p><a href="../images/L01-similarity-2026-09/similarity_motivation.png">Open full-size figure</a></figcaption></figure>
 <div class="ref"><a href="https://docs.scipy.org/doc/scipy/reference/spatial.distance.html" rel="noopener">SciPy · spatial.distance</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-marpit-scope-cmaubpau="" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="72" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-marpit-scope-wjtt9epp="" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="72" aria-labelledby="heading-11"><p class="page">Slide 11</p>
 <h2 id="heading-11">Which is closer to the tiger? It depends on the measure</h2>
 <div class="row">
 <div class="col">
@@ -209,7 +209,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <li>A detour via the gorilla cannot beat the direct route from tiger to elephant: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>l</mi></mrow></msub><mo>≤</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>+</mo><msub><mi>d</mi><mrow><mi>k</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{il}\le d_{ik}+d_{kl}</annotation></semantics></math> (<strong>triangle inequality</strong>)</li>
 </ul>
 <p>Every measure in this lecture satisfies the first three. The fourth separates them.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-marpit-scope-qfyb9naq="" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="72" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-marpit-scope-heks4id9="" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="72" aria-labelledby="heading-15"><p class="page">Slide 15</p>
 <h2 id="heading-15">Which measures are distances in the full sense?</h2>
 
 <p>The second half of today starts from an RDM and tries to <strong>recover the space behind it</strong>: points whose separations reproduce the entries. That needs entries that behave like distances:</p>
