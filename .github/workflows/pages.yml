@@ -29,6 +29,7 @@ jobs:
             npx --yes @marp-team/marp-cli@latest "$f" -o "_site/recitations/$b.html" --html --theme-set recitations/theme/cpsy1291-recitation.css
           done
           cp -f recitations/handout-*.pdf recitations/linear-algebra-notes.pdf recitations/a1-programming-notes.pdf _site/recitations/ 2>/dev/null || true
+          cp -f recitations/follow-along-*.ipynb recitations/python-warmup.ipynb _site/recitations/ 2>/dev/null || true
           cp -f colab-setup.html _site/ 2>/dev/null || true
           cp -f syllabus.pdf notation-reference.pdf _site/ 2>/dev/null || true
           for d in slides images demos figures; do
@@ -41,6 +42,7 @@ jobs:
             echo '</ul><h2>Recitations</h2><ul>'
             for f in _site/recitations/recitation-*.html; do b=$(basename "$f"); echo "<li><a href=\"recitations/$b\">${b%.html}</a></li>"; done
             for f in _site/recitations/*.pdf; do [ -f "$f" ] || continue; b=$(basename "$f"); echo "<li><a href=\"recitations/$b\">$b</a></li>"; done
+            for f in _site/recitations/*.ipynb; do [ -f "$f" ] || continue; b=$(basename "$f"); echo "<li><a href=\"recitations/$b\">$b</a> (notebook: download, then File → Upload in Colab)</li>"; done
             echo '</ul><h2>Course</h2><ul>'
             [ -f _site/syllabus.pdf ] && echo '<li><a href="syllabus.pdf">Syllabus (PDF)</a></li>'
             [ -f _site/notation-reference.pdf ] && echo '<li><a href="notation-reference.pdf">Notation reference (PDF)</a></li>'
