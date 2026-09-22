@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCA &amp; eigendecomposition · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>PCA &amp; eigendecomposition</h1><p>Reader-friendly version of the 68 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L03_pca-eigendecomposition.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">PCA &amp; eigendecomposition</a></li><li><a href="#slide-2">Last time: comparing representational spaces</a></li><li><a href="#slide-3">How many dimensions describe the variation?</a></li><li><a href="#slide-4">Can fewer coordinates capture the variation?</a></li><li><a href="#slide-5">Why look for a direction at all?</a></li><li><a href="#slide-6">Why look for a direction at all?</a></li><li><a href="#slide-7">From the same cloud to one distribution</a></li><li><a href="#slide-8">From observed values to a Gaussian model</a></li><li><a href="#slide-9">The Gaussian model in two dimensions</a></li><li><a href="#slide-10">Where is the cloud, and how does it spread?</a></li><li><a href="#slide-11">Where is the cloud, and how does it spread?</a></li><li><a href="#slide-12">Centering, in code</a></li><li><a href="#slide-13">Covariance: do the deviations go together?</a></li><li><a href="#slide-14">The covariance matrix</a></li><li><a href="#slide-15">Projection onto a unit direction</a></li><li><a href="#slide-16">Projection onto a unit direction</a></li><li><a href="#slide-17">Projection onto a unit direction</a></li><li><a href="#slide-18">A direction keeps part of the spread</a></li><li><a href="#slide-19">Turn it until the leftovers are smallest</a></li><li><a href="#slide-20">Spin the axis yourself</a></li><li><a href="#slide-21">From turning the line to a calculation</a></li><li><a href="#slide-22">The covariance matrix changes a direction</a></li><li><a href="#slide-23">Most directions turn</a></li><li><a href="#slide-24">Eigenvectors are directions that do not turn</a></li><li><a href="#slide-25">An eigenvalue gives variance along its eigenvector</a></li><li><a href="#slide-26">PCA = eigendecomposition of 𝐂\mathbf{C}</a></li><li><a href="#slide-27">From a line to a plane</a></li><li><a href="#slide-28">The new coordinates are the PC scores</a></li><li><a href="#slide-29">Reconstruction: the way back</a></li><li><a href="#slide-30">What do we lose when we keep fewer components?</a></li><li><a href="#slide-31">How many components? The scree plot</a></li><li><a href="#slide-32">Most variance need not mean most useful</a></li><li><a href="#slide-33">Which direction would you keep?</a></li><li><a href="#slide-34">Low variance can still separate the groups</a></li><li><a href="#slide-35">PCA in scikit-learn</a></li><li><a href="#slide-36">Can these directions help explain a neuron?</a></li><li><a href="#slide-37">Build an object space from network responses</a></li><li><a href="#slide-38">Test whether a direction predicts a response</a></li><li><a href="#slide-39">Neural preferences occupy different regions</a></li><li><a href="#slide-40">Use the space to make a new prediction</a></li><li><a href="#slide-41">What did PCA buy us?</a></li><li><a href="#slide-42">What if the variation follows a curve?</a></li><li><a href="#slide-43">Further reading for the research trail</a></li><li><a href="#slide-44">Minute paper</a></li><li><a href="#slide-45">Appendix: examples and implementation details</a></li><li><a href="#slide-46">The measurement scale changes PCA</a></li><li><a href="#slide-47">One direction was not enough</a></li><li><a href="#slide-48">How far does the dependence reach?</a></li><li><a href="#slide-49">One object, many images</a></li><li><a href="#slide-50">The same picture, drawn by hand</a></li><li><a href="#slide-51">Two sheets, tangled</a></li><li><a href="#slide-52">Why more dimensions make learning harder</a></li><li><a href="#slide-53">Same images, different coordinates</a></li><li><a href="#slide-54">PCA in code: two routes to the same answer</a></li><li><a href="#slide-55">Eigenfaces</a></li><li><a href="#slide-56">PCA as compression — eigenfaces</a></li><li><a href="#slide-57">Face space: the plane, with real faces on it</a></li><li><a href="#slide-58">A face = mean + a few eigenfaces</a></li><li><a href="#slide-59">Mix your own face</a></li><li><a href="#slide-60">Two views, one answer</a></li><li><a href="#slide-61">PCA as decorrelation &amp; whitening</a></li><li><a href="#slide-62">What do the components look like?</a></li><li><a href="#slide-63">Dimension counts depend on sampling</a></li><li><a href="#slide-64">Identity and viewpoint contribute variance</a></li><li><a href="#slide-65">Testing an interpretation of a PC</a></li><li><a href="#slide-66">Preprocessing neural responses</a></li><li><a href="#slide-67">The rainbow cortex is three numbers per voxel</a></li><li><a href="#slide-68">PCA only ever finds a flat subspace</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCA &amp; eigendecomposition · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>PCA &amp; eigendecomposition</h1><p>Reader-friendly version of the 59 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L03_pca-eigendecomposition.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">PCA &amp; eigendecomposition</a></li><li><a href="#slide-2">Last time: comparing representational spaces</a></li><li><a href="#slide-3">How many dimensions describe the variation?</a></li><li><a href="#slide-4">Can fewer coordinates capture the variation?</a></li><li><a href="#slide-5">Why look for a direction at all?</a></li><li><a href="#slide-6">Why look for a direction at all?</a></li><li><a href="#slide-7">From the same cloud to one distribution</a></li><li><a href="#slide-8">From observed values to a Gaussian model</a></li><li><a href="#slide-9">The Gaussian model in two dimensions</a></li><li><a href="#slide-10">Where is the cloud, and how does it spread?</a></li><li><a href="#slide-11">Where is the cloud, and how does it spread?</a></li><li><a href="#slide-12">Centering, in code</a></li><li><a href="#slide-13">Covariance: do the deviations go together?</a></li><li><a href="#slide-14">The covariance matrix</a></li><li><a href="#slide-15">Projection onto a unit direction</a></li><li><a href="#slide-16">Projection onto a unit direction</a></li><li><a href="#slide-17">Projection onto a unit direction</a></li><li><a href="#slide-18">A direction keeps part of the spread</a></li><li><a href="#slide-19">Turn it until the leftovers are smallest</a></li><li><a href="#slide-20">Spin the axis yourself</a></li><li><a href="#slide-21">From turning the line to a calculation</a></li><li><a href="#slide-22">The covariance matrix changes a direction</a></li><li><a href="#slide-23">Most directions turn</a></li><li><a href="#slide-24">Eigenvectors are directions that do not turn</a></li><li><a href="#slide-25">An eigenvalue gives variance along its eigenvector</a></li><li><a href="#slide-26">PCA = eigendecomposition of 𝐂\mathbf{C}</a></li><li><a href="#slide-27">From a line to a plane</a></li><li><a href="#slide-28">The new coordinates are the PC scores</a></li><li><a href="#slide-29">Reconstruction: the way back</a></li><li><a href="#slide-30">What do we lose when we keep fewer components?</a></li><li><a href="#slide-31">How many components? The scree plot</a></li><li><a href="#slide-32">Most variance need not mean most useful</a></li><li><a href="#slide-33">Which direction would you keep?</a></li><li><a href="#slide-34">Low variance can still separate the groups</a></li><li><a href="#slide-35">PCA in scikit-learn</a></li><li><a href="#slide-36">Can these directions help explain a neuron?</a></li><li><a href="#slide-37">Build an object space from network responses</a></li><li><a href="#slide-38">Test whether a direction predicts a response</a></li><li><a href="#slide-39">Neural preferences occupy different regions</a></li><li><a href="#slide-40">Use the space to make a new prediction</a></li><li><a href="#slide-41">What did PCA buy us?</a></li><li><a href="#slide-42">What if the variation follows a curve?</a></li><li><a href="#slide-43">Further reading for the research trail</a></li><li><a href="#slide-44">Minute paper</a></li><li><a href="#slide-45">Appendix: examples and implementation details</a></li><li><a href="#slide-46">The measurement scale changes PCA</a></li><li><a href="#slide-47">One direction was not enough</a></li><li><a href="#slide-48">How far does the dependence reach?</a></li><li><a href="#slide-49">PCA in code: two routes to the same answer</a></li><li><a href="#slide-50">Eigenfaces</a></li><li><a href="#slide-51">PCA as compression — eigenfaces</a></li><li><a href="#slide-52">Face space: the plane, with real faces on it</a></li><li><a href="#slide-53">A face = mean + a few eigenfaces</a></li><li><a href="#slide-54">Mix your own face</a></li><li><a href="#slide-55">Two views, one answer</a></li><li><a href="#slide-56">PCA as decorrelation &amp; whitening</a></li><li><a href="#slide-57">What do the components look like?</a></li><li><a href="#slide-58">The rainbow cortex is three numbers per voxel</a></li><li><a href="#slide-59">PCA only ever finds a flat subspace</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
   <img src="../images/brown-crest-color.png" alt="Brown University crest">
   <div class="vrule"></div>
   <div>
@@ -10,7 +10,7 @@
 <h2 id="heading-1">PCA &amp; eigendecomposition</h2>
 <p class="meta">Tuesday, September 22 · Fall 2026</p>
 
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="68" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="59" aria-labelledby="heading-2"><p class="page">Slide 2</p>
 <h2 id="heading-2">Last time: comparing representational spaces</h2>
 <div class="capfig">
 <figure><img src="../images/L03/02_human_rdm_to_map.svg" alt="Left: the 120 animal photographs as a dissimilarity matrix built from people's ratings, blocked by animal category. Right: the two-dimensional map non-metric MDS recovers from that matrix, each point one photograph, coloured by category, with primates, birds and reptiles falling in separate regions" aria-describedby="figure-2-1"><figcaption id="figure-2-1"><p>Left: the 120 animal photographs as a dissimilarity matrix built from people's ratings, blocked by animal category. Right: the two-dimensional map non-metric MDS recovers from that matrix, each point one photograph, coloured by category, with primates, birds and reptiles falling in separate regions</p><a href="../images/L03/02_human_rdm_to_map.svg">Open full-size figure</a></figcaption></figure>
@@ -21,7 +21,7 @@
 <li><strong>MDS</strong> recovers a psychological space whose distances approximate the judged dissimilarities.</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1111/cogs.12670" rel="noopener">Peterson, Abbott &amp; Griffiths <i>Cognitive Science</i> 2018</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="68" aria-labelledby="heading-3"><p class="page">Slide 3</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="59" aria-labelledby="heading-3"><p class="page">Slide 3</p>
 <h2 id="heading-3">How many dimensions describe the variation?</h2>
 <div class="capfig">
 <figure><img src="../images/L03/arc_two_inputs.svg" alt="A response matrix connects to the familiar RDM and MDS map above. Below are the new questions: what varies together, and how many effective dimensions describe the variation?" aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>A response matrix connects to the familiar RDM and MDS map above. Below are the new questions: what varies together, and how many effective dimensions describe the variation?</p><a href="../images/L03/arc_two_inputs.svg">Open full-size figure</a></figcaption></figure>
@@ -30,7 +30,7 @@
 <li><strong>MDS</strong> summarized dissimilarities as coordinates in a psychological space. Now return to the <strong>response matrix</strong>: hundreds of measured dimensions—pixels, features or neurons—for each stimulus.</li>
 <li>If many responses vary together, their variation may occupy fewer <strong>effective dimensions</strong>. How many are needed, and what is lost when we retain only some of them?</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="68" aria-labelledby="heading-4"><p class="page">Slide 4</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="59" aria-labelledby="heading-4"><p class="page">Slide 4</p>
 <h2 id="heading-4">Can fewer coordinates capture the variation?</h2>
 <p>Which directions capture most of the variation, and what do we lose when we retain only a lower-dimensional description?</p>
 <ul>
@@ -38,7 +38,7 @@
 <li>Find a direction, project onto it, and reconstruct.</li>
 <li>Use the same operations to study images and neural responses.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-marpit-pagination="5" data-marpit-pagination-total="68" aria-labelledby="heading-5"><p class="page">Slide 5</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-marpit-pagination="5" data-marpit-pagination-total="59" aria-labelledby="heading-5"><p class="page">Slide 5</p>
 <h2 id="heading-5">Why look for a direction at all?</h2>
 <div class="row">
 <div class="col fig">
@@ -54,7 +54,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="68" aria-labelledby="heading-6"><p class="page">Slide 6</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="59" aria-labelledby="heading-6"><p class="page">Slide 6</p>
 <h2 id="heading-6">Why look for a direction at all?</h2>
 <div class="row">
 <div class="col fig">
@@ -70,7 +70,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-marpit-pagination="7" data-marpit-pagination-total="68" aria-labelledby="heading-7"><p class="page">Slide 7</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-marpit-pagination="7" data-marpit-pagination-total="59" aria-labelledby="heading-7"><p class="page">Slide 7</p>
 <h2 id="heading-7">From the same cloud to one distribution</h2>
 <div class="capfig">
 <figure><img src="../images/L03/arc_spread.svg" alt="The same two-pixel cloud from the previous slide appears on the left, with a vertical line at the mean x1 value of 101.6; an arrow labeled read only x1 leads to a histogram of those same 120 x1 coordinates with the identical mean marked" aria-describedby="figure-7-1"><figcaption id="figure-7-1"><p>The same two-pixel cloud from the previous slide appears on the left, with a vertical line at the mean x1 value of 101.6; an arrow labeled read only x1 leads to a histogram of those same 120 x1 coordinates with the identical mean marked</p><a href="../images/L03/arc_spread.svg">Open full-size figure</a></figcaption></figure>
@@ -79,7 +79,7 @@
 <li>These are the <strong>same 120 dots</strong>. For the moment, read each dot's horizontal <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">x_1</annotation></semantics></math> coordinate and set <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_2</annotation></semantics></math> aside.</li>
 <li>The histogram is the <strong>distribution</strong> of those 120 values. Their mean is <strong>101.6</strong>; their spread tells us how much this measurement varies across photographs.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="68" aria-labelledby="heading-8"><p class="page">Slide 8</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="59" aria-labelledby="heading-8"><p class="page">Slide 8</p>
 <h2 id="heading-8">From observed values to a Gaussian model</h2>
 <div class="capfig">
 <figure><img src="../images/L03/12_normal_distribution_1.svg" alt="A complete symmetric Gaussian bell curve from three standard deviations below its mean to three above, with the mean marked, the interval of one standard deviation shaded, and approximately 68 percent written inside it" aria-describedby="figure-8-1"><figcaption id="figure-8-1"><p>A complete symmetric Gaussian bell curve from three standard deviations below its mean to three above, with the mean marked, the interval of one standard deviation shaded, and approximately 68 percent written inside it</p><a href="../images/L03/12_normal_distribution_1.svg">Open full-size figure</a></figcaption></figure>
@@ -88,7 +88,7 @@
 <li>The previous histogram showed <strong>observed pixel values</strong>. This is an <strong>idealized reference model</strong>, not an assumption today's method requires.</li>
 <li>A <strong>Gaussian</strong> is smooth and bell-shaped. Its <strong>mean</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi></mrow><annotation encoding="application/x-tex">\mu</annotation></semantics></math> gives the center and its <strong>standard deviation</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi></mrow><annotation encoding="application/x-tex">\sigma</annotation></semantics></math> gives the spread; about <strong>68%</strong> lies between <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi><mo>−</mo><mi>σ</mi></mrow><annotation encoding="application/x-tex">\mu-\sigma</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi><mo>+</mo><mi>σ</mi></mrow><annotation encoding="application/x-tex">\mu+\sigma</annotation></semantics></math>.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="68" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="59" aria-labelledby="heading-9"><p class="page">Slide 9</p>
 <h2 id="heading-9">The Gaussian model in two dimensions</h2>
 <div class="capfig">
 <figure><img src="../images/L03/12_normal_distribution_2.svg" alt="Five hundred points sampled from a two-dimensional Gaussian, forming a tilted elliptical cloud centered at the mean, with one- and two-standard-deviation elliptical contours" aria-describedby="figure-9-1"><figcaption id="figure-9-1"><p>Five hundred points sampled from a two-dimensional Gaussian, forming a tilted elliptical cloud centered at the mean, with one- and two-standard-deviation elliptical contours</p><a href="../images/L03/12_normal_distribution_2.svg">Open full-size figure</a></figcaption></figure>
@@ -98,7 +98,7 @@
 <li>The mean becomes a <strong>mean vector</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold-italic">μ</mi></mrow><annotation encoding="application/x-tex">\boldsymbol{\mu}</annotation></semantics></math>, the center of the cloud; the <strong>covariance matrix</strong> describes its width, elongation and tilt.</li>
 <li><mark>PCA will find the ellipse's principal axes.</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="68" aria-labelledby="heading-10"><p class="page">Slide 10</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="59" aria-labelledby="heading-10"><p class="page">Slide 10</p>
 <h2 id="heading-10">Where is the cloud, and how does it spread?</h2>
 <div class="row">
 <div class="col fig">
@@ -113,7 +113,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="68" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="59" aria-labelledby="heading-11"><p class="page">Slide 11</p>
 <h2 id="heading-11">Where is the cloud, and how does it spread?</h2>
 <div class="row">
 <div class="col fig">
@@ -127,7 +127,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="68" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="59" aria-labelledby="heading-12"><p class="page">Slide 12</p>
 <h2 id="heading-12">Centering, in code</h2>
 <marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">mean = features.mean(axis=<span class="hljs-number">0</span>)     <span class="hljs-comment"># (D,) mean response across stimuli, for each coordinate</span>
 centred = features - mean        <span class="hljs-comment"># (N, D) each stimulus response minus the mean response</span>
@@ -138,7 +138,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <li>The mean is a vector with one entry per coordinate. Subtracting it from every row leaves each column summing to zero.</li>
 <li>Keep the mean. <mark>Everything computed from here on is a difference from it</mark>, so we will want it back at the end.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="68" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="59" aria-labelledby="heading-13"><p class="page">Slide 13</p>
 <h2 id="heading-13">Covariance: do the deviations go together?</h2>
 <div class="row">
 <div class="col fig">
@@ -152,7 +152,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="68" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="59" aria-labelledby="heading-14"><p class="page">Slide 14</p>
 <h2 id="heading-14">The covariance matrix</h2>
 <div class="capfig">
 <figure><img src="../images/L03/15_covariance_matrix.svg" alt="Three two-dimensional clouds side by side, each with its two-by-two covariance matrix printed underneath: a round cloud with equal spread in both directions, an ellipse stretched along the horizontal axis, and a tilted ellipse whose long axis runs diagonally" aria-describedby="figure-14-1"><figcaption id="figure-14-1"><p>Three two-dimensional clouds side by side, each with its two-by-two covariance matrix printed underneath: a round cloud with equal spread in both directions, an ellipse stretched along the horizontal axis, and a tilted ellipse whose long axis runs diagonally</p><a href="../images/L03/15_covariance_matrix.svg">Open full-size figure</a></figcaption></figure>
@@ -162,7 +162,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <li>Geometrically <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐂</mi></mrow><annotation encoding="application/x-tex">\mathbf{C}</annotation></semantics></math> summarizes the cloud’s <strong>spread and orientation</strong>: round, an ellipse, or an ellipse tilted because the two vary together.</li>
 <li>The ellipse's <strong>long axis</strong> — its <mark>direction of greatest variance</mark> — is the direction we have been looking for.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="68" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="59" aria-labelledby="heading-15"><p class="page">Slide 15</p>
 <h2 id="heading-15">Projection onto a unit direction</h2>
 <div class="row">
 <div class="col fig">
@@ -176,7 +176,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="68" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="59" aria-labelledby="heading-16"><p class="page">Slide 16</p>
 <h2 id="heading-16">Projection onto a unit direction</h2>
 <div class="row">
 <div class="col fig">
@@ -189,7 +189,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="68" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="59" aria-labelledby="heading-17"><p class="page">Slide 17</p>
 <h2 id="heading-17">Projection onto a unit direction</h2>
 <div class="row">
 <div class="col fig">
@@ -203,7 +203,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="68" aria-labelledby="heading-18"><p class="page">Slide 18</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="59" aria-labelledby="heading-18"><p class="page">Slide 18</p>
 <h2 id="heading-18">A direction keeps part of the spread</h2>
 <div class="row">
 <div class="col fig">
@@ -216,7 +216,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="68" aria-labelledby="heading-19"><p class="page">Slide 19</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="59" aria-labelledby="heading-19"><p class="page">Slide 19</p>
 <h2 id="heading-19">Turn it until the leftovers are smallest</h2>
 <div class="row">
 <div class="col fig">
@@ -229,7 +229,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="68" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="59" aria-labelledby="heading-20"><p class="page">Slide 20</p>
 <h2 id="heading-20">Spin the axis yourself</h2>
 <div class="demo">Live demo</div>
 <div class="interactive-figure narrow">
@@ -242,7 +242,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <li>Before turning the axis, predict which direction leaves the smallest error.</li>
 <li>Projected variance and squared reconstruction error add to a fixed total. <mark>Maximizing one minimizes the other.</mark></li>
 </ul>
-<p class="explorer-links"><a href="../demos/axis_spinner.html">Drag a unit direction through a centred cloud of the 120 animal photographs and watch the projected variance and the reconstruction error trade off; their sum is fixed — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="68" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<p class="explorer-links"><a href="../demos/axis_spinner.html">Drag a unit direction through a centred cloud of the 120 animal photographs and watch the projected variance and the reconstruction error trade off; their sum is fixed — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="59" aria-labelledby="heading-21"><p class="page">Slide 21</p>
 <h2 id="heading-21">From turning the line to a calculation</h2>
 <div class="row">
 <div class="col fig">
@@ -259,7 +259,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-marpit-pagination="22" data-marpit-pagination-total="68" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-marpit-pagination="22" data-marpit-pagination-total="59" aria-labelledby="heading-22"><p class="page">Slide 22</p>
 <h2 id="heading-22">The covariance matrix changes a direction</h2>
 <div class="row">
 <div class="col fig">
@@ -273,7 +273,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-marpit-pagination="23" data-marpit-pagination-total="68" aria-labelledby="heading-23"><p class="page">Slide 23</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-marpit-pagination="23" data-marpit-pagination-total="59" aria-labelledby="heading-23"><p class="page">Slide 23</p>
 <h2 id="heading-23">Most directions turn</h2>
 <div class="row">
 <div class="col fig">
@@ -286,7 +286,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="68" aria-labelledby="heading-24"><p class="page">Slide 24</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="59" aria-labelledby="heading-24"><p class="page">Slide 24</p>
 <h2 id="heading-24">Eigenvectors are directions that do not turn</h2>
 <div class="row">
 <div class="col fig">
@@ -301,7 +301,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐂</mi><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mi>k</mi></msub><mo>=</mo><msub><mi>λ</mi><mi>k</mi></msub><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mi>k</mi></msub><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\mathbf{C}\mathbf{v}_k=\lambda_k\mathbf{v}_k.
 </annotation></semantics></math></div></span></p></div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="68" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="59" aria-labelledby="heading-25"><p class="page">Slide 25</p>
 <h2 id="heading-25">An eigenvalue gives variance along its eigenvector</h2>
 <div class="row">
 <div class="col fig">
@@ -321,7 +321,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="68" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="59" aria-labelledby="heading-26"><p class="page">Slide 26</p>
 <h2 id="heading-26">PCA = eigendecomposition of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐂</mi></mrow><annotation encoding="application/x-tex">\mathbf{C}</annotation></semantics></math></h2>
 <p>Covariance (centered, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> samples): <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>  </mtext><mi mathvariant="normal" data-original-mathvariant="bold">𝐂</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mn>1</mn><mi>N</mi></mfrac></mstyle><msub><mo>∑</mo><mi>i</mi></msub><msup><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>~</mo></mover><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup><msup><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>~</mo></mover><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></mrow></msup></mrow><annotation encoding="application/x-tex">\;\mathbf{C} = \dfrac{1}{N}\sum_{i} \tilde{\mathbf{x}}^{(i)}\tilde{\mathbf{x}}^{(i)\top}</annotation></semantics></math> &nbsp; <span class="small">(code divides by <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">N-1</annotation></semantics></math>; same eigenvectors)</span></p>
 <p>Eigendecomposition (orthonormal <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐕</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{V}}</annotation></semantics></math>):</p>
@@ -331,7 +331,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <li><span><b>Variance</b></span> along <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mi>k</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{v}_k}</annotation></semantics></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><msub><mi>λ</mi><mi>k</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{\lambda_k}</annotation></semantics></math>.</li>
 <li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>PC1</mtext><mo>=</mo><mstyle mathcolor="#B5396B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mn>1</mn></msub></mstyle></mrow><annotation encoding="application/x-tex">\text{PC1} = \textcolor{#B5396B}{\mathbf{v}_1}</annotation></semantics></math>, the <span>eigenvector</span> with the largest <span>eigenvalue</span>.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-marpit-pagination="27" data-marpit-pagination-total="68" aria-labelledby="heading-27"><p class="page">Slide 27</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-marpit-pagination="27" data-marpit-pagination-total="59" aria-labelledby="heading-27"><p class="page">Slide 27</p>
 <h2 id="heading-27">From a line to a plane</h2>
 <div class="row">
 <div class="col fig">
@@ -348,7 +348,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="68" aria-labelledby="heading-28"><p class="page">Slide 28</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="59" aria-labelledby="heading-28"><p class="page">Slide 28</p>
 <h2 id="heading-28">The new coordinates are the PC scores</h2>
 <div class="row">
 <div class="col fig">
@@ -366,7 +366,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="68" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="59" aria-labelledby="heading-29"><p class="page">Slide 29</p>
 <h2 id="heading-29">Reconstruction: the way back</h2>
 <div class="row">
 <div class="col fig">
@@ -385,7 +385,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="68" aria-labelledby="heading-30"><p class="page">Slide 30</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="59" aria-labelledby="heading-30"><p class="page">Slide 30</p>
 <h2 id="heading-30">What do we lose when we keep fewer components?</h2>
 <div class="capfig">
 <figure><img src="../images/L03/43_reconstruction_residual.svg" alt="Top: one face reconstructed with K equal to 1, 5, 20, 50, 150 and 400 components, from a blurry near-average to the exact original. Bottom: the residual fraction for this face at each K as dots, compared with the eigenvalue tail computed from the whole dataset" aria-describedby="figure-30-1"><figcaption id="figure-30-1"><p>Top: one face reconstructed with K equal to 1, 5, 20, 50, 150 and 400 components, from a blurry near-average to the exact original. Bottom: the residual fraction for this face at each K as dots, compared with the eigenvalue tail computed from the whole dataset</p><a href="../images/L03/43_reconstruction_residual.svg">Open full-size figure</a></figcaption></figure>
@@ -396,7 +396,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <li><strong>Dots:</strong> this face. <strong>Curve:</strong> the discarded variance across all 400 faces, which need not equal one face's error.</li>
 </ul>
 <div class="ref"><a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_olivetti_faces.html" rel="noopener">Olivetti faces · AT&amp;T Laboratories Cambridge</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="68" aria-labelledby="heading-31"><p class="page">Slide 31</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="59" aria-labelledby="heading-31"><p class="page">Slide 31</p>
 <h2 id="heading-31">How many components? The scree plot</h2>
 <figure><img src="../images/L03/45_olivetti_scree.svg" alt="center Scree plot and cumulative variance for the same 400 Olivetti faces used on the preceding slide" aria-describedby="figure-31-1"><figcaption id="figure-31-1"><p>center Scree plot and cumulative variance for the same 400 Olivetti faces used on the preceding slide</p><a href="../images/L03/45_olivetti_scree.svg">Open full-size figure</a></figcaption></figure>
 <ul>
@@ -405,7 +405,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <li>A variance threshold sets a reconstruction budget. It does not establish performance on a task.</li>
 </ul>
 <div class="ref"><a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_olivetti_faces.html" rel="noopener">Olivetti faces · AT&amp;T Laboratories Cambridge</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="68" aria-labelledby="heading-32"><p class="page">Slide 32</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="59" aria-labelledby="heading-32"><p class="page">Slide 32</p>
 <h2 id="heading-32">Most variance need not mean most useful</h2>
 <div class="capfig">
 <figure><img src="../images/L03/38_variance_is_not_usefulness.svg" alt="Left: the 120 photographs laid out along the leading direction of their pixel coordinates, running from dark pictures to bright ones with animals of different categories interspersed. Right: position along that direction plotted against the mean pixel value of each photograph, an almost perfect straight line, r equals 0.99" aria-describedby="figure-32-1"><figcaption id="figure-32-1"><p>Left: the 120 photographs laid out along the leading direction of their pixel coordinates, running from dark pictures to bright ones with animals of different categories interspersed. Right: position along that direction plotted against the mean pixel value of each photograph, an almost perfect straight line, r equals 0.99</p><a href="../images/L03/38_variance_is_not_usefulness.svg">Open full-size figure</a></figcaption></figure>
@@ -415,7 +415,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <li>Would this direction help distinguish the animals? This plot alone cannot answer.</li>
 <li><mark>PCA ranks directions by variance; the task determines what is useful.</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="68" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="59" aria-labelledby="heading-33"><p class="page">Slide 33</p>
 <h2 id="heading-33">Which direction would you keep?</h2>
 <div class="capfig">
 <figure><img src="../images/L03/arc_task_1.svg" alt="Toy classes with a high-variance horizontal direction and low-variance vertical separation; projection panels ask for a prediction" aria-describedby="figure-33-1"><figcaption id="figure-33-1"><p>Toy classes with a high-variance horizontal direction and low-variance vertical separation; projection panels ask for a prediction</p><a href="../images/L03/arc_task_1.svg">Open full-size figure</a></figcaption></figure>
@@ -425,7 +425,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <li>Which direction would best reconstruct the points?</li>
 <li>Which direction would best distinguish the groups?</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="68" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="59" aria-labelledby="heading-34"><p class="page">Slide 34</p>
 <h2 id="heading-34">Low variance can still separate the groups</h2>
 <div class="capfig">
 <figure><img src="../images/L03/arc_task_2.svg" alt="Toy classes with a high-variance horizontal direction and low-variance vertical separation; PC1 scores overlap while PC2 scores separate the classes" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Toy classes with a high-variance horizontal direction and low-variance vertical separation; PC1 scores overlap while PC2 scores separate the classes</p><a href="../images/L03/arc_task_2.svg">Open full-size figure</a></figcaption></figure>
@@ -435,7 +435,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <li><strong>PC2 retains 2.2%</strong>, yet a threshold at zero separates the groups.</li>
 <li><mark>Variance measures spread. Task relevance depends on what we want to distinguish.</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="68" aria-labelledby="heading-35"><p class="page">Slide 35</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="59" aria-labelledby="heading-35"><p class="page">Slide 35</p>
 <h2 id="heading-35">PCA in scikit-learn</h2>
 <marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">from</span> sklearn.decomposition <span class="hljs-keyword">import</span> PCA
 
@@ -450,7 +450,7 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li><strong>SVD</strong> computes the PCA directions and variances from the centered data without explicitly forming its covariance matrix.</li>
 </ul>
 <div class="ref"><a href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html" rel="noopener">scikit-learn · PCA</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="68" aria-labelledby="heading-36"><p class="page">Slide 36</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="59" aria-labelledby="heading-36"><p class="page">Slide 36</p>
 <h2 id="heading-36">Can these directions help explain a neuron?</h2>
 <div class="capfig">
 <figure><img src="../images/L03/bao2020_fig3b_row.png" alt="Three example IT cells from Bao and colleagues, each shown as a 24-view by 51-object response matrix with four views of the cell's preferred object picked out and shown underneath: an aeroplane, a swan and a basket" aria-describedby="figure-36-1"><figcaption id="figure-36-1"><p>Three example IT cells from Bao and colleagues, each shown as a 24-view by 51-object response matrix with four views of the cell's preferred object picked out and shown underneath: an aeroplane, a swan and a basket</p><a href="../images/L03/bao2020_fig3b_row.png">Open full-size figure</a></figcaption></figure>
@@ -461,7 +461,7 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li>Can a space derived from a network's responses help organize these preferences?</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. <i>Nature</i> 2020 · Fig. 3b</a>, three of the example cells</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="68" aria-labelledby="heading-37"><p class="page">Slide 37</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="59" aria-labelledby="heading-37"><p class="page">Slide 37</p>
 <h2 id="heading-37">Build an object space from network responses</h2>
 <div class="row">
 <div class="col fig">
@@ -479,7 +479,7 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. Nature 2020</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="68" aria-labelledby="heading-38"><p class="page">Slide 38</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="59" aria-labelledby="heading-38"><p class="page">Slide 38</p>
 <h2 id="heading-38">Test whether a direction predicts a response</h2>
 <div class="capfig">
 <figure><img src="../images/L03/arc_readout_schematic.svg" alt="Schematic simulated example: projecting points in model space onto a direction gives a scalar related to a simulated neural response" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>Schematic simulated example: projecting points in model space onto a direction gives a scalar related to a simulated neural response</p><a href="../images/L03/arc_readout_schematic.svg">Open full-size figure</a></figcaption></figure>
@@ -489,7 +489,7 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li>Choose a direction using training images, then ask whether each image's <strong>projection</strong> predicts the cell's response on held-out images.</li>
 <li>The preferred direction can combine several PCs; it need not coincide with PC1 or PC2.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="68" aria-labelledby="heading-39"><p class="page">Slide 39</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="59" aria-labelledby="heading-39"><p class="page">Slide 39</p>
 <h2 id="heading-39">Neural preferences occupy different regions</h2>
 <div class="row">
 <div class="col fig">
@@ -504,7 +504,7 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao, She, McGill &amp; Tsao <i>Nature</i> 2020</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="68" aria-labelledby="heading-40"><p class="page">Slide 40</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="59" aria-labelledby="heading-40"><p class="page">Slide 40</p>
 <h2 id="heading-40">Use the space to make a new prediction</h2>
 <div class="capfig">
 <figure><img src="../images/L03/bao2020_cortical_prediction.png" alt="Published coronal fMRI maps from two monkeys, showing the four networks at posterior, middle and anterior IT; magenta marks the predicted stubby-object network" aria-describedby="figure-40-1"><figcaption id="figure-40-1"><p>Published coronal fMRI maps from two monkeys, showing the four networks at posterior, middle and anterior IT; magenta marks the predicted stubby-object network</p><a href="../images/L03/bao2020_cortical_prediction.png">Open full-size figure</a></figcaption></figure>
@@ -515,7 +515,7 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li><mark>A description of a representation can guide a new experiment.</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. Nature 2020 · Fig. 4c</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="68" aria-labelledby="heading-41"><p class="page">Slide 41</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="59" aria-labelledby="heading-41"><p class="page">Slide 41</p>
 <h2 id="heading-41">What did PCA buy us?</h2>
 <div class="row">
 <div class="col fig">
@@ -531,7 +531,7 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="68" aria-labelledby="heading-42"><p class="page">Slide 42</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="59" aria-labelledby="heading-42"><p class="page">Slide 42</p>
 <h2 id="heading-42">What if the variation follows a curve?</h2>
 <div class="capfig">
 <figure><img src="../images/L03/09_rotation_curve.svg" alt="Rotated, shifted and resized versions of an image projected into two PCA directions; rotation traces a closed curve" aria-describedby="figure-42-1"><figcaption id="figure-42-1"><p>Rotated, shifted and resized versions of an image projected into two PCA directions; rotation traces a closed curve</p><a href="../images/L03/09_rotation_curve.svg">Open full-size figure</a></figcaption></figure>
@@ -542,7 +542,7 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li>PCA approximates data with a <strong>flat subspace</strong>.</li>
 <li>Next: nonlinear maps, and how to check what their geometry preserves.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-marpit-pagination="43" data-marpit-pagination-total="68" aria-labelledby="heading-43"><p class="page">Slide 43</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-marpit-pagination="43" data-marpit-pagination-total="59" aria-labelledby="heading-43"><p class="page">Slide 43</p>
 <h2 id="heading-43">Further reading for the research trail</h2>
 <p class="meta"><b>Handout:</b> <a href="https://serre-lab.github.io/CPSY1291-2026/recitations/pca-statistics-notes.pdf" rel="noopener">Statistics and the mathematics of PCA</a> — variance, covariance, eigenvectors, projection and reconstruction, worked by hand in this lecture’s notation.</p>
 <ul>
@@ -553,7 +553,7 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li><strong>Stringer et al. (2019):</strong> a structured, high-dimensional neural spectrum. <a href="https://doi.org/10.1038/s41586-019-1346-5">Nature</a></li>
 </ul>
 <p>Trail entry: pick <strong>any paper cited in a lecture so far</strong>, read it, and post <strong>four to six sentences</strong> on Ed under <strong>Research trail</strong> — what it did, and what surprised you or what question it left you with. <strong>Reply once</strong> to a classmate. Next deadline <strong>Fri 9/25</strong>, best three of four entries count.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="68" aria-labelledby="heading-44"><p class="page">Slide 44</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="59" aria-labelledby="heading-44"><p class="page">Slide 44</p>
 <h2 id="heading-44">Minute paper</h2>
 <p>Submit on <strong>Canvas → Minute papers → Minute Paper 4</strong>.</p>
 <p>Write three brief points in your own words:</p>
@@ -563,11 +563,11 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li>Another idea you found interesting, and why it matters for brains, behavior or AI</li>
 </ol>
 <p>Credit for a thoughtful attempt, not for being correct.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-marpit-pagination="45" data-marpit-pagination-total="68" aria-labelledby="heading-45"><p class="page">Slide 45</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-marpit-pagination="45" data-marpit-pagination-total="59" aria-labelledby="heading-45"><p class="page">Slide 45</p>
 <h2 id="heading-45">Appendix: examples and implementation details</h2>
 <p>Additional examples, the PCA/SVD implementation, and assignment reference material.</p>
 <p>Use these explanations as needed while working through the notebooks. The live lecture develops the main geometric argument.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-marpit-pagination="46" data-marpit-pagination-total="68" aria-labelledby="heading-46"><p class="page">Slide 46</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-marpit-pagination="46" data-marpit-pagination-total="59" aria-labelledby="heading-46"><p class="page">Slide 46</p>
 <h2 id="heading-46">The measurement scale changes PCA</h2>
 <div class="row">
 <div class="col fig">
@@ -581,7 +581,7 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-paginate="true" data-marpit-pagination="47" data-marpit-pagination-total="68" aria-labelledby="heading-47"><p class="page">Slide 47</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-paginate="true" data-marpit-pagination="47" data-marpit-pagination-total="59" aria-labelledby="heading-47"><p class="page">Slide 47</p>
 <h2 id="heading-47">One direction was not enough</h2>
 <div class="capfig">
 <figure><img src="../images/L03/03_how_many_directions.svg" alt="Left: the same 120 photographs placed on a single direction, coloured by animal category, with the categories piled on top of one another. Right: the distortion of the ratings plotted against the number of directions kept, falling steeply from one to two and then flattening out" aria-describedby="figure-47-1"><figcaption id="figure-47-1"><p>Left: the same 120 photographs placed on a single direction, coloured by animal category, with the categories piled on top of one another. Right: the distortion of the ratings plotted against the number of directions kept, falling steeply from one to two and then flattening out</p><a href="../images/L03/03_how_many_directions.svg">Open full-size figure</a></figcaption></figure>
@@ -590,7 +590,7 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li>Fit the same ratings on <strong>one</strong> direction and the categories pile up: the distances in the fit no longer match the judged dissimilarities.</li>
 <li>A <strong>second</strong> direction removes most of that distortion. A third and a fourth remove very little. <mark>Two directions greatly improve the fit, but some distortion remains.</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-48" data-paginate="true" data-marpit-pagination="48" data-marpit-pagination-total="68" aria-labelledby="heading-48"><p class="page">Slide 48</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-48" data-paginate="true" data-marpit-pagination="48" data-marpit-pagination-total="59" aria-labelledby="heading-48"><p class="page">Slide 48</p>
 <h2 id="heading-48">How far does the dependence reach?</h2>
 <div class="capfig">
 <figure><img src="../images/L03/07_dependence_reach.svg" alt="Three panels. Left: a pixel plotted against its immediate neighbour across the 120 photographs, the points hugging the diagonal at r equals 0.81. Middle: the same pixel against the one twenty places away, a formless cloud at r equals 0.08. Right: the correlation plotted against separation, falling steeply over the first few pixels and flattening near zero" aria-describedby="figure-48-1"><figcaption id="figure-48-1"><p>Three panels. Left: a pixel plotted against its immediate neighbour across the 120 photographs, the points hugging the diagonal at r equals 0.81. Middle: the same pixel against the one twenty places away, a formless cloud at r equals 0.08. Right: the correlation plotted against separation, falling steeply over the first few pixels and flattening near zero</p><a href="../images/L03/07_dependence_reach.svg">Open full-size figure</a></figcaption></figure>
@@ -600,55 +600,8 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li>Next door, the two pixel values strongly covary. Twenty pixels away it tells you almost nothing.</li>
 <li><mark>Neighbouring measurements are strongly dependent, and the dependence is local.</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-49" data-paginate="true" data-marpit-pagination="49" data-marpit-pagination-total="68" aria-labelledby="heading-49"><p class="page">Slide 49</p>
-<h2 id="heading-49">One object, many images</h2>
-<div class="capfig">
-<figure><img src="../images/L03/08_viewpoint_manifold.svg" alt="Left: the 24 viewpoints of one object plotted in two directions of its own responses, filling a single compact patch, with four of the views shown. Right: three objects, each of whose 24 viewpoints occupies a separate patch of the same plane" aria-describedby="figure-49-1"><figcaption id="figure-49-1"><p>Left: the 24 viewpoints of one object plotted in two directions of its own responses, filling a single compact patch, with four of the views shown. Right: three objects, each of whose 24 viewpoints occupies a separate patch of the same plane</p><a href="../images/L03/08_viewpoint_manifold.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li>Photograph one object from 24 viewpoints: 24 very different images, and in the network's response space they fill one small <strong>patch</strong>.</li>
-<li>For these three objects, the views occupy different regions. Viewpoint varies <strong>within</strong> each object; identity differs <strong>between</strong> objects.</li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-50" data-paginate="true" data-class="l03-paper-panel" data-marpit-pagination="50" data-marpit-pagination-total="68" aria-labelledby="heading-50"><p class="page">Slide 50</p>
-<h2 id="heading-50">The same picture, drawn by hand</h2>
-<div class="capfig">
-<figure><img src="../images/L03/dicarlo2007_a.png" alt="One person's face images trace a curved sheet, a manifold, inside image space, with three example heads at different poses sitting on it" aria-describedby="figure-50-1"><figcaption id="figure-50-1"><p>One person's face images trace a curved sheet, a manifold, inside image space, with three example heads at different poses sitting on it</p><a href="../images/L03/dicarlo2007_a.png">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li>As DiCarlo and Cox drew it: every image of one person forms a <strong>curved sheet</strong>, and the sheet has far fewer dimensions than the space holding it.</li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <i>Trends Cogn. Sci.</i> 2007</a> · Fig. 1a</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-51" data-paginate="true" data-class="l03-paper-panel" data-marpit-pagination="51" data-marpit-pagination-total="68" aria-labelledby="heading-51"><p class="page">Slide 51</p>
-<h2 id="heading-51">Two sheets, tangled</h2>
-<div class="capfig">
-<figure><img src="../images/L03/dicarlo2007_d.png" alt="In actual pixel space the sheets of two different people are interleaved, and no flat plane separates them" aria-describedby="figure-51-1"><figcaption id="figure-51-1"><p>In actual pixel space the sheets of two different people are interleaved, and no flat plane separates them</p><a href="../images/L03/dicarlo2007_d.png">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li>In <strong>pixel</strong> coordinates the sheets of two people are interleaved, which is why no simple rule separates them there.</li>
-<li>Perception can be read as <strong>untangling</strong>: finding coordinates in which the sheets pull apart. <mark>PCA finds linear directions. Nonlinear maps can reveal other relationships, but do not guarantee recognition.</mark></li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <i>Trends Cogn. Sci.</i> 2007</a> · Fig. 1d</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-52" data-paginate="true" data-marpit-pagination="52" data-marpit-pagination-total="68" aria-labelledby="heading-52"><p class="page">Slide 52</p>
-<h2 id="heading-52">Why more dimensions make learning harder</h2>
-<div class="capfig">
-<figure><img src="../images/L03/01_curse_fixed_budget.svg" alt="Thirty examples cover a line densely, leave gaps in a square and leave a cube mostly empty" aria-describedby="figure-52-1"><figcaption id="figure-52-1"><p>Thirty examples cover a line densely, leave gaps in a square and leave a cube mostly empty</p><a href="../images/L03/01_curse_fixed_budget.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li>Covering a space at a fixed resolution costs <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>k</mi><mi>D</mi></msup></mrow><annotation encoding="application/x-tex">k^{D}</annotation></semantics></math> examples, ten values per axis giving 100 in two dimensions, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>16</mn></msup></mrow><annotation encoding="application/x-tex">10^{16}</annotation></semantics></math> for a <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4</mn><mo>×</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">4\times4</annotation></semantics></math> image and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>4096</mn></msup></mrow><annotation encoding="application/x-tex">10^{4096}</annotation></semantics></math> for a <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>64</mn><mo>×</mo><mn>64</mn></mrow><annotation encoding="application/x-tex">64\times64</annotation></semantics></math> one.</li>
-<li>Raise the resolution and the number of coordinates explodes; the number of images we can collect does not.</li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-53" data-paginate="true" data-marpit-pagination="53" data-marpit-pagination-total="68" aria-labelledby="heading-53"><p class="page">Slide 53</p>
-<h2 id="heading-53">Same images, different coordinates</h2>
-<div class="capfig">
-<figure><img src="../images/L03/11_alignment_pixels_vs_network.svg" alt="Two scatter plots. Left, in pixel coordinates, the distance between two photographs plotted against how dissimilar people judged them: a formless cloud with a flat median line and a rank correlation of 0.01. Right, in the late layer of a trained network, the same plot rises clearly, rank correlation 0.42" aria-describedby="figure-53-1"><figcaption id="figure-53-1"><p>Two scatter plots. Left, in pixel coordinates, the distance between two photographs plotted against how dissimilar people judged them: a formless cloud with a flat median line and a rank correlation of 0.01. Right, in the late layer of a trained network, the same plot rises clearly, rank correlation 0.42</p><a href="../images/L03/11_alignment_pixels_vs_network.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li>Every pair: how far apart the two images are, against how dissimilar people judged them.</li>
-<li>In <strong>pixel</strong> coordinates there is almost no monotonic association, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>s</mi></msub><mo>=</mo><mn>0.01</mn></mrow><annotation encoding="application/x-tex">r_s = 0.01</annotation></semantics></math>. In a trained network's late layer, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>s</mi></msub><mo>=</mo><mn>0.42</mn></mrow><annotation encoding="application/x-tex">r_s = 0.42</annotation></semantics></math>.</li>
-<li>Same images, same measure. <mark>What changed is the coordinates.</mark></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-54" data-paginate="true" data-class="codeslide" data-marpit-pagination="54" data-marpit-pagination-total="68" aria-labelledby="heading-54"><p class="page">Slide 54</p>
-<h2 id="heading-54">PCA in code: two routes to the same answer</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-49" data-paginate="true" data-class="codeslide" data-marpit-pagination="49" data-marpit-pagination-total="59" aria-labelledby="heading-49"><p class="page">Slide 49</p>
+<h2 id="heading-49">PCA in code: two routes to the same answer</h2>
 <marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">centred = features - features.mean(axis=<span class="hljs-number">0</span>)
 
 <span class="hljs-comment"># Route 1: eigendecomposition of sample covariance</span>
@@ -666,19 +619,19 @@ Z = centred @ V2[:, :K]                   <span class="hljs-comment"># (N, K) sc
 <li>Use <code>eigh</code>, not <code>eig</code>: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐂</mi></mrow><annotation encoding="application/x-tex">\mathbf{C}</annotation></semantics></math> is <strong>symmetric</strong>, so the eigenvalues are real and <code>eigh</code> is faster and stabler. It returns them <strong>ascending</strong>, so the reversal is not optional.</li>
 <li><strong>Prefer route 2.</strong> Forming <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐂</mi></mrow><annotation encoding="application/x-tex">\mathbf{C}</annotation></semantics></math> costs <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>×</mo><mi>D</mi></mrow><annotation encoding="application/x-tex">D\times D</annotation></semantics></math> memory; for a <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>256</mn><mo>×</mo><mn>256</mn></mrow><annotation encoding="application/x-tex">256\times256</annotation></semantics></math> color image <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>≈</mo><mn>196,608</mn></mrow><annotation encoding="application/x-tex">D\approx196{,}608</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐂</mi></mrow><annotation encoding="application/x-tex">\mathbf{C}</annotation></semantics></math> would be ~309 GB in float64. SVD never builds it. Sign is arbitrary: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{v}_k</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">-\mathbf{v}_k</annotation></semantics></math> are both valid; Assignment 2's helper fixes it so the largest entry is positive.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-55" data-paginate="true" data-class="lead" data-marpit-pagination="55" data-marpit-pagination-total="68" aria-labelledby="heading-55"><p class="page">Slide 55</p>
-<h2 id="heading-55">Eigenfaces</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-50" data-paginate="true" data-class="lead" data-marpit-pagination="50" data-marpit-pagination-total="59" aria-labelledby="heading-50"><p class="page">Slide 50</p>
+<h2 id="heading-50">Eigenfaces</h2>
 <p>PCA on 400 faces, and a classic approach to face recognition.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-56" data-paginate="true" data-marpit-pagination="56" data-marpit-pagination-total="68" aria-labelledby="heading-56"><p class="page">Slide 56</p>
-<h2 id="heading-56">PCA as compression — eigenfaces</h2>
-<figure><img src="../images/2026-10-06/eigenfaces.svg" alt="center Grid of the mean face and leading eigenfaces, with opposing signs shown in red and blue" aria-describedby="figure-56-1"><figcaption id="figure-56-1"><p>center Grid of the mean face and leading eigenfaces, with opposing signs shown in red and blue</p><a href="../images/2026-10-06/eigenfaces.svg">Open full-size figure</a></figcaption></figure>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-51" data-paginate="true" data-marpit-pagination="51" data-marpit-pagination-total="59" aria-labelledby="heading-51"><p class="page">Slide 51</p>
+<h2 id="heading-51">PCA as compression — eigenfaces</h2>
+<figure><img src="../images/2026-10-06/eigenfaces.svg" alt="center Grid of the mean face and leading eigenfaces, with opposing signs shown in red and blue" aria-describedby="figure-51-1"><figcaption id="figure-51-1"><p>center Grid of the mean face and leading eigenfaces, with opposing signs shown in red and blue</p><a href="../images/2026-10-06/eigenfaces.svg">Open full-size figure</a></figcaption></figure>
 <p>Stack face images as vectors and run <strong>PCA</strong> → the leading eigenvectors are <strong>eigenfaces</strong>: ghostly, face-like basis images. PCA discovers a <em>useful representation</em>, not just a single direction.</p>
 <div class="ref"><a href="https://doi.org/10.1162/jocn.1991.3.1.71" rel="noopener">Turk &amp; Pentland <i>J. Cogn. Neurosci.</i> 1991</a> · precursor: <a href="https://doi.org/10.1364/JOSAA.4.000519" rel="noopener">Sirovich &amp; Kirby <i>J. Opt. Soc. Am. A</i> 1987</a> · Olivetti faces (AT&amp;T Laboratories Cambridge)</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-57" data-paginate="true" data-marpit-pagination="57" data-marpit-pagination-total="68" aria-labelledby="heading-57"><p class="page">Slide 57</p>
-<h2 id="heading-57">Face space: the plane, with real faces on it</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-52" data-paginate="true" data-marpit-pagination="52" data-marpit-pagination-total="59" aria-labelledby="heading-52"><p class="page">Slide 52</p>
+<h2 id="heading-52">Face space: the plane, with real faces on it</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L03/22_face_space.svg" alt="Twelve face photographs placed on a plane at their coordinates along the first two eigenfaces, z1 on the horizontal axis and z2 on the vertical" aria-describedby="figure-57-1"><figcaption id="figure-57-1"><p>Twelve face photographs placed on a plane at their coordinates along the first two eigenfaces, z1 on the horizontal axis and z2 on the vertical</p><a href="../images/L03/22_face_space.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/22_face_space.svg" alt="Twelve face photographs placed on a plane at their coordinates along the first two eigenfaces, z1 on the horizontal axis and z2 on the vertical" aria-describedby="figure-52-1"><figcaption id="figure-52-1"><p>Twelve face photographs placed on a plane at their coordinates along the first two eigenfaces, z1 on the horizontal axis and z2 on the vertical</p><a href="../images/L03/22_face_space.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -688,29 +641,29 @@ Z = centred @ V2[:, :K]                   <span class="hljs-comment"># (N, K) sc
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-58" data-paginate="true" data-marpit-pagination="58" data-marpit-pagination-total="68" aria-labelledby="heading-58"><p class="page">Slide 58</p>
-<h2 id="heading-58">A face = mean + a few eigenfaces</h2>
-<figure><img src="../images/2026-10-06/eigenface_reconstruction.svg" alt="center A face reconstructed using 1, 5, 25, 100 and 400 components, beside the original image" aria-describedby="figure-58-1"><figcaption id="figure-58-1"><p>center A face reconstructed using 1, 5, 25, 100 and 400 components, beside the original image</p><a href="../images/2026-10-06/eigenface_reconstruction.svg">Open full-size figure</a></figcaption></figure>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-53" data-paginate="true" data-marpit-pagination="53" data-marpit-pagination-total="59" aria-labelledby="heading-53"><p class="page">Slide 53</p>
+<h2 id="heading-53">A face = mean + a few eigenfaces</h2>
+<figure><img src="../images/2026-10-06/eigenface_reconstruction.svg" alt="center A face reconstructed using 1, 5, 25, 100 and 400 components, beside the original image" aria-describedby="figure-53-1"><figcaption id="figure-53-1"><p>center A face reconstructed using 1, 5, 25, 100 and 400 components, beside the original image</p><a href="../images/2026-10-06/eigenface_reconstruction.svg">Open full-size figure</a></figcaption></figure>
 <ul>
 <li>These faces can be approximated by the <strong>mean face</strong> plus a weighted sum of <strong>eigenfaces</strong>. More components add finer detail.</li>
 <li>The coefficients can also be used for <strong>recognition</strong>. Whether they preserve identity needs a recognition test.</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1162/jocn.1991.3.1.71" rel="noopener">Turk &amp; Pentland <i>J. Cogn. Neurosci.</i> 1991</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-59" data-paginate="true" data-marpit-pagination="59" data-marpit-pagination-total="68" aria-labelledby="heading-59"><p class="page">Slide 59</p>
-<h2 id="heading-59">Mix your own face</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-54" data-paginate="true" data-marpit-pagination="54" data-marpit-pagination-total="59" aria-labelledby="heading-54"><p class="page">Slide 54</p>
+<h2 id="heading-54">Mix your own face</h2>
 <div class="demo">Live demo</div>
 <div class="interactive-figure narrow">
 
 <div class="print-figure">
-<figure><img src="../images/L03/demo_eigenface_mixer.png" alt="The eigenface mixer's K tab: one Olivetti face beside its reconstruction from the first 20 components, with the residual fraction and the eigenvalue tail printed" aria-describedby="figure-59-1"><figcaption id="figure-59-1"><p>The eigenface mixer's K tab: one Olivetti face beside its reconstruction from the first 20 components, with the residual fraction and the eigenvalue tail printed</p><a href="../images/L03/demo_eigenface_mixer.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/demo_eigenface_mixer.png" alt="The eigenface mixer's K tab: one Olivetti face beside its reconstruction from the first 20 components, with the residual fraction and the eigenvalue tail printed" aria-describedby="figure-54-1"><figcaption id="figure-54-1"><p>The eigenface mixer's K tab: one Olivetti face beside its reconstruction from the first 20 components, with the residual fraction and the eigenvalue tail printed</p><a href="../images/L03/demo_eigenface_mixer.png">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <ul>
 <li>Each slider sets one coefficient in <strong>mean + weighted eigenfaces</strong>.</li>
 <li>Set a coefficient to zero to remove that direction’s contribution.</li>
 </ul>
-<p class="explorer-links"><a href="../demos/eigenface_mixer.html">Eigenface mixer: sliders on the first eight eigenface coefficients rebuild a face from the mean; a second tab reconstructs a stored face with a growing number of components; a third lets you click anywhere on the PC1–PC2 plane to see the face there — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-60" data-paginate="true" data-marpit-pagination="60" data-marpit-pagination-total="68" aria-labelledby="heading-60"><p class="page">Slide 60</p>
-<h2 id="heading-60">Two views, one answer</h2>
+<p class="explorer-links"><a href="../demos/eigenface_mixer.html">Eigenface mixer: sliders on the first eight eigenface coefficients rebuild a face from the mean; a second tab reconstructs a stored face with a growing number of components; a third lets you click anywhere on the PC1–PC2 plane to see the face there — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-55" data-paginate="true" data-marpit-pagination="55" data-marpit-pagination-total="59" aria-labelledby="heading-55"><p class="page">Slide 55</p>
+<h2 id="heading-55">Two views, one answer</h2>
 <ul>
 <li><strong>Maximize</strong> the variance of the projections: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mrow><mo stretchy="false">∥</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mo stretchy="false">∥</mo><mo>=</mo><mn>1</mn></mrow></munder><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐂</mi><mtext> </mtext><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle\max_{\lVert\mathbf{v}\rVert=1}\mathbf{v}^\top\mathbf{C}\,\mathbf{v}</annotation></semantics></math></li>
 <li><strong>Minimize</strong> the squared reconstruction error: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><munder><mrow><mi>min</mi><mo>⁡</mo></mrow><mrow><mo stretchy="false">∥</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mo stretchy="false">∥</mo><mo>=</mo><mn>1</mn></mrow></munder><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mi>N</mi></mfrac></mstyle><munder><mo>∑</mo><mi>i</mi></munder><mo stretchy="false">∥</mo><msup><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>~</mo></mover><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup><mo>−</mo><mo stretchy="false">(</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mi mathvariant="normal">⊤</mi></msup><msup><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>~</mo></mover><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup><mo stretchy="false">)</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><msup><mo stretchy="false">∥</mo><mn>2</mn></msup></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle\min_{\lVert\mathbf{v}\rVert=1}\tfrac{1}{N}\sum_i\lVert\tilde{\mathbf{x}}^{(i)} - (\mathbf{v}^\top\tilde{\mathbf{x}}^{(i)})\mathbf{v}\rVert^2</annotation></semantics></math></li>
@@ -718,8 +671,8 @@ Z = centred @ V2[:, :K]                   <span class="hljs-comment"># (N, K) sc
 <li>For <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi></mrow><annotation encoding="application/x-tex">K</annotation></semantics></math> retained PCs, the average squared fitting-data reconstruction error is <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mrow><mi>k</mi><mo>&gt;</mo><mi>K</mi></mrow></msub><msub><mi>λ</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">\sum_{k&gt;K}\lambda_k</annotation></semantics></math> (using covariance divided by <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math>).</li>
 <li><strong>Connection to MDS:</strong> classical MDS on a Euclidean dissimilarity matrix returns the PCA coordinates up to an orthogonal transformation of the centered data. MDS was doing an eigendecomposition all along — it just never told you which axis was which.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-61" data-paginate="true" data-marpit-pagination="61" data-marpit-pagination-total="68" aria-labelledby="heading-61"><p class="page">Slide 61</p>
-<h2 id="heading-61">PCA as decorrelation &amp; whitening</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-56" data-paginate="true" data-marpit-pagination="56" data-marpit-pagination-total="59" aria-labelledby="heading-56"><p class="page">Slide 56</p>
+<h2 id="heading-56">PCA as decorrelation &amp; whitening</h2>
 <ul>
 <li>Project onto the eigenbasis and the new coordinates are <strong>uncorrelated</strong> — the covariance becomes <strong>diagonal</strong>. For positive eigenvalues, rescale each retained axis by <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><msqrt><msub><mi>λ</mi><mi>i</mi></msub></msqrt></mrow><annotation encoding="application/x-tex">1/\sqrt{\lambda_i}</annotation></semantics></math> and you get <strong>whitening</strong>: zero correlation, unit variance.</li>
 </ul>
@@ -733,111 +686,20 @@ Z = centred @ V2[:, :K]                   <span class="hljs-comment"># (N, K) sc
 </ul>
 </li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-62" data-paginate="true" data-marpit-pagination="62" data-marpit-pagination-total="68" aria-labelledby="heading-62"><p class="page">Slide 62</p>
-<h2 id="heading-62">What do the components look like?</h2>
-<figure><img src="../images/2026-09-24/pca_eigenpatterns.png" alt="center Principal components of synthetic image patterns, shown as red and blue signed weights: structured patterns dominate early components and noise appears in later ones" aria-describedby="figure-62-1"><figcaption id="figure-62-1"><p>center Principal components of synthetic image patterns, shown as red and blue signed weights: structured patterns dominate early components and noise appears in later ones</p><a href="../images/2026-09-24/pca_eigenpatterns.png">Open full-size figure</a></figcaption></figure>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-57" data-paginate="true" data-marpit-pagination="57" data-marpit-pagination-total="59" aria-labelledby="heading-57"><p class="page">Slide 57</p>
+<h2 id="heading-57">What do the components look like?</h2>
+<figure><img src="../images/2026-09-24/pca_eigenpatterns.png" alt="center Principal components of synthetic image patterns, shown as red and blue signed weights: structured patterns dominate early components and noise appears in later ones" aria-describedby="figure-57-1"><figcaption id="figure-57-1"><p>center Principal components of synthetic image patterns, shown as red and blue signed weights: structured patterns dominate early components and noise appears in later ones</p><a href="../images/2026-09-24/pca_eigenpatterns.png">Open full-size figure</a></figcaption></figure>
 <ul>
 <li>Each eigenvector is a <strong>vector in the original space</strong> — so each PC <em>un-rolls back into a picture</em>. Here the inputs are synthetic patterns: early components recover structured variation; later ones contain little variance.</li>
 <li>PCA is more than compression: we can inspect the <strong>weights on the original variables</strong>, then test what they capture.</li>
 </ul>
 <div class="ref">Generated after <a href="https://probml.github.io/pml-book/book1.html" rel="noopener">Murphy <i>Probabilistic Machine Learning</i> 2022</a> ch. 20 (MIT License)</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-63" data-paginate="true" data-marpit-pagination="63" data-marpit-pagination-total="68" aria-labelledby="heading-63"><p class="page">Slide 63</p>
-<h2 id="heading-63">Dimension counts depend on sampling</h2>
-<p>For <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> centered observations with <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> features:</p>
-<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">rank</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi><mi>c</mi></msub><mo stretchy="false">)</mo><mo>≤</mo><mi>min</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>N</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mi>D</mi><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\operatorname{rank}(\mathbf{X}_{c})\leq\min(N-1,D).
-</annotation></semantics></math></div></span></p><div class="table-scroll" tabindex="0" role="region" aria-label="Dimension counts depend on sampling — table"><table><caption>Dimension counts depend on sampling — table</caption>
-<thead>
-<tr>
-<th scope="col">Input to PCA</th>
-<th scope="col">Rows</th>
-<th scope="col">What changes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>All objects and views</td>
-<td>1,224</td>
-<td>Identity and viewpoint both vary</td>
-</tr>
-<tr>
-<td>Mean over views for each object</td>
-<td>51</td>
-<td>Viewpoint variation is averaged</td>
-</tr>
-<tr>
-<td>One view per object</td>
-<td>51</td>
-<td>Same row count, viewpoint retained</td>
-</tr>
-<tr>
-<td>Random image subset</td>
-<td>51</td>
-<td>Row-count control</td>
-</tr>
-</tbody>
-</table></div>
-<p>With 51 rows, at most <strong>50</strong> components can have nonzero variance.</p>
-<div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. <i>Nature</i> 2020</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-64" data-paginate="true" data-marpit-pagination="64" data-marpit-pagination-total="68" aria-labelledby="heading-64"><p class="page">Slide 64</p>
-<h2 id="heading-64">Identity and viewpoint contribute variance</h2>
-<div class="row">
-<div class="col">
-<p>For equal numbers of views per object:</p>
-<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>V</mi><mrow><mi mathvariant="normal">t</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">l</mi></mrow></msub><mo>=</mo><msub><mi>V</mi><mrow><mi mathvariant="normal">w</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">h</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">n</mi></mrow></msub><mo>+</mo><msub><mi>V</mi><mrow><mi mathvariant="normal">b</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">w</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">n</mi></mrow></msub><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">V_{\mathrm{total}}=V_{\mathrm{within}}+V_{\mathrm{between}}.
-</annotation></semantics></math></div></span></p><ul>
-<li><strong>Within:</strong> average variation around each object's mean.</li>
-<li>Between: variation of object means around the overall mean.</li>
-<li>Example: total <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5</mn><mo>=</mo><mn>1</mn><mo>+</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">5=1+4</annotation></semantics></math>. Within <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>20</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">20\%</annotation></semantics></math>; between <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>80</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">80\%</annotation></semantics></math>.</li>
-</ul>
-</div>
-<div class="col fig">
-<figure><img src="../images/A1-coverage-2026-09/within_between.svg" alt="Two objects with feature values zero and two versus four and six, object means one and five, and overall mean three" aria-describedby="figure-64-1"><figcaption id="figure-64-1"><p>Two objects with feature values zero and two versus four and six, object means one and five, and overall mean three</p><a href="../images/A1-coverage-2026-09/within_between.svg">Open full-size figure</a></figcaption></figure>
-</div>
-</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-65" data-paginate="true" data-marpit-pagination="65" data-marpit-pagination-total="68" aria-labelledby="heading-65"><p class="page">Slide 65</p>
-<h2 id="heading-65">Testing an interpretation of a PC</h2>
-<div class="table-scroll" tabindex="0" role="region" aria-label="Testing an interpretation of a PC — table"><table><caption>Testing an interpretation of a PC — table</caption>
-<thead>
-<tr>
-<th scope="col">Hypothesis</th>
-<th scope="col">Measurement</th>
-<th scope="col">Test against PC scores</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Animacy</td>
-<td>Binary label, 0 or 1</td>
-<td>Point-biserial correlation</td>
-</tr>
-<tr>
-<td>Spikiness</td>
-<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><msup><mi>P</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><mi>A</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\log(P^2/A)</annotation></semantics></math> from the object outline</td>
-<td>Spearman rank correlation</td>
-</tr>
-</tbody>
-</table></div>
-<ul>
-<li><strong>Point-biserial correlation</strong> is Pearson correlation with one binary variable.</li>
-<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math>: outline perimeter. <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math>: silhouette area. Scaling a shape by 2 multiplies <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>P</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">P^2</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math> by 4, leaving their ratio unchanged.</li>
-<li>Test both PCs and both properties. A correlation supports an association, not a unique semantic interpretation.</li>
-</ul>
-<div class="ref"><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.pointbiserialr.html" rel="noopener">SciPy · pointbiserialr</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-66" data-paginate="true" data-marpit-pagination="66" data-marpit-pagination-total="68" aria-labelledby="heading-66"><p class="page">Slide 66</p>
-<h2 id="heading-66">Preprocessing neural responses</h2>
-<ul>
-<li><strong>Missing responses:</strong> drop units with too many missing values, then replace remaining missing values by that unit's observed mean; or drop every incomplete unit.</li>
-<li>Centering: subtract each unit's mean across images.</li>
-<li>Standardizing: also divide each unit by its standard deviation. A unit with standard deviation zero needs separate handling.</li>
-<li>Raw-response PCA gives high-variance units more influence. Z-scored PCA puts units on comparable scales.</li>
-</ul>
-<p>Example: standard deviations <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn></mrow><annotation encoding="application/x-tex">2</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>20</mn></mrow><annotation encoding="application/x-tex">20</annotation></semantics></math> imply variances <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4</mn></mrow><annotation encoding="application/x-tex">4</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>400</mn></mrow><annotation encoding="application/x-tex">400</annotation></semantics></math>. After z-scoring, both variances are <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math>.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-67" data-paginate="true" data-marpit-pagination="67" data-marpit-pagination-total="68" aria-labelledby="heading-67"><p class="page">Slide 67</p>
-<h2 id="heading-67">The rainbow cortex is three numbers per voxel</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-58" data-paginate="true" data-marpit-pagination="58" data-marpit-pagination-total="59" aria-labelledby="heading-58"><p class="page">Slide 58</p>
+<h2 id="heading-58">The rainbow cortex is three numbers per voxel</h2>
 <div class="row">
 <div class="col fig">
 <div class="capfig">
-<figure><img src="../images/L03/huth2016_semantic_map_complete.png" alt="Complete published panels showing projections of word-related features above cortical surfaces, where every voxel is colored by its first three PCA coordinates — red for PC1, green for PC2, blue for PC3 — producing a smooth rainbow map across cortex" aria-describedby="figure-67-1"><figcaption id="figure-67-1"><p>Complete published panels showing projections of word-related features above cortical surfaces, where every voxel is colored by its first three PCA coordinates — red for PC1, green for PC2, blue for PC3 — producing a smooth rainbow map across cortex</p><a href="../images/L03/huth2016_semantic_map_complete.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/huth2016_semantic_map_complete.png" alt="Complete published panels showing projections of word-related features above cortical surfaces, where every voxel is colored by its first three PCA coordinates — red for PC1, green for PC2, blue for PC3 — producing a smooth rainbow map across cortex" aria-describedby="figure-58-1"><figcaption id="figure-58-1"><p>Complete published panels showing projections of word-related features above cortical surfaces, where every voxel is colored by its first three PCA coordinates — red for PC1, green for PC2, blue for PC3 — producing a smooth rainbow map across cortex</p><a href="../images/L03/huth2016_semantic_map_complete.png">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <div class="col">
@@ -848,11 +710,11 @@ Z = centred @ V2[:, :K]                   <span class="hljs-comment"># (N, K) sc
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/nature17637" rel="noopener">Huth, de Heer, Griffiths, Theunissen &amp; Gallant <i>Nature</i> 2016</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-68" data-paginate="true" data-marpit-pagination="68" data-marpit-pagination-total="68" aria-labelledby="heading-68"><p class="page">Slide 68</p>
-<h2 id="heading-68">PCA only ever finds a flat subspace</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-59" data-paginate="true" data-marpit-pagination="59" data-marpit-pagination-total="59" aria-labelledby="heading-59"><p class="page">Slide 59</p>
+<h2 id="heading-59">PCA only ever finds a flat subspace</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L03/46_pca_is_linear.svg" alt="Top: two interleaved spiral arms, one blue and one green, with the PC1 line drawn through them. Bottom: the histogram of the coordinates along PC1, where the two arms overlap almost completely" aria-describedby="figure-68-1"><figcaption id="figure-68-1"><p>Top: two interleaved spiral arms, one blue and one green, with the PC1 line drawn through them. Bottom: the histogram of the coordinates along PC1, where the two arms overlap almost completely</p><a href="../images/L03/46_pca_is_linear.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/46_pca_is_linear.svg" alt="Top: two interleaved spiral arms, one blue and one green, with the PC1 line drawn through them. Bottom: the histogram of the coordinates along PC1, where the two arms overlap almost completely" aria-describedby="figure-59-1"><figcaption id="figure-59-1"><p>Top: two interleaved spiral arms, one blue and one green, with the PC1 line drawn through them. Bottom: the histogram of the coordinates along PC1, where the two arms overlap almost completely</p><a href="../images/L03/46_pca_is_linear.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>

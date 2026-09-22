@@ -6,7 +6,7 @@
     <span class="name">Computational Methods for Mind, Brain &amp; Behavior</span>
   </div>
 </div>
-<div class="eyebrow">Lecture 2 · Theme 1 — Representational spaces</div>
+<div class="eyebrow">Lecture 2 · Theme 1: Representational spaces</div>
 <h2 id="heading-1">MDS: recovering psychological spaces</h2>
 <p class="meta">Thursday, September 17 · Fall 2026</p>
 
@@ -23,10 +23,10 @@
 </div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="67" aria-labelledby="heading-3"><p class="page">Slide 3</p>
 <h2 id="heading-3">Your questions from Tuesday</h2>
-<p>33 minute papers. The four common questions:</p>
+<p>Four questions came up often enough to answer here:</p>
 <ul>
 <li><em>"Where did the 4,096 numbers go when a row became one square of the RDM?"</em>: one number per <strong>pair</strong>, computed from both rows: the first slides today</li>
-<li><em>"Is one channel one feature?"</em>: in a <strong>convolutional network</strong>, yes: a channel is a whole sheet of units that share one set of weights, one feature detector applied at every position; the sheet shows <strong>where</strong> in the image that feature is present. Each unit is one entry of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math>. A recording <em>channel</em> is one electrode, another word</li>
+<li><em>"How different channels can provide different features"</em>: in a <strong>convolutional network</strong>, yes: a channel is a whole sheet of units that share one set of weights, one feature detector applied at every position; the sheet shows <strong>where</strong> in the image that feature is present. Each unit is one entry of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math>. A recording <em>channel</em> is one electrode, another word</li>
 <li><em>"Are the neural vectors per neuron, averaged over trials?"</em>: yes: one mean rate per neuron per image; Assignment 1 gives you those means</li>
 <li><em>"Why 0–1 rather than 0–255?"</em>: the same 256 levels divided by 255, nothing added or lost. Networks train and run in <strong>floating point</strong>: weights, activations and gradients are real numbers, far finer than 8-bit integers, so inputs are scaled to what the weights were trained on</li>
 </ul>
@@ -154,7 +154,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <li><strong>Euclidean</strong> distance keeps gain and offset · <strong>cosine</strong> discards the gain · <strong>correlation</strong> discards both. Choose by what should not count</li>
 </ul>
 <div class="ref">Assignment 1 §1b: the three functions, then all three matrices</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-marpit-scope-gbofxzxd="" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="67" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-marpit-scope-2dxdnw6r="" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="67" aria-labelledby="heading-14"><p class="page">Slide 14</p>
 <h2 id="heading-14">Which is closer to the tiger? It depends on the measure</h2>
 <div class="row">
 <div class="col">
@@ -258,7 +258,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <figure><img src="../images/L01-opening-2026-09/tigers_monkey.svg" alt="Two tiger photographs A and B and a monkey photograph C, from the Assignment 1 image set" aria-describedby="figure-19-1"><figcaption id="figure-19-1"><p>Two tiger photographs A and B and a monkey photograph C, from the Assignment 1 image set</p><a href="../images/L01-opening-2026-09/tigers_monkey.svg">Open full-size figure</a></figcaption></figure>
 <p>Mean rating &nbsp; A–B: <b>10.0</b> &nbsp;·&nbsp; A–C: <b>2.9</b> &nbsp;·&nbsp; B–C: <b>2.2</b> &nbsp;·&nbsp; one number per pair: a dissimilarity matrix, from which the space is to be recovered</p>
 <div class="ref">Ratings: <a href="https://doi.org/10.1111/cogs.12670" rel="noopener">Peterson, Abbott &amp; Griffiths <i>Cognitive Science</i> 2018</a>, the data used in Assignment 1</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-marpit-scope-ee5ir3uj="" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="67" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-marpit-scope-wxgg9qcz="" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="67" aria-labelledby="heading-20"><p class="page">Slide 20</p>
 <h2 id="heading-20">Which measures are distances in the full sense?</h2>
 
 <p><strong>Will it work?</strong> Yes, if the matrix is, or is well approximated by, a table of <strong>distances between points</strong> in that space. What a table of distances must satisfy, and which of our measures satisfy it:</p>
@@ -804,7 +804,7 @@ Y_nm = mds_nm.fit_transform(D)
 <div class="row">
 <div class="col">
 <ol>
-<li>Compute all pairwise distances — the matrix <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi></mrow><annotation encoding="application/x-tex">\mathbf{D}</annotation></semantics></math>.</li>
+<li>Compute all pairwise distances: the matrix <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi></mrow><annotation encoding="application/x-tex">\mathbf{D}</annotation></semantics></math>.</li>
 <li><strong>Merge</strong> the two closest clusters.</li>
 <li><strong>Update</strong> the distances from the new cluster to all others, using a <strong>linkage rule</strong>.</li>
 <li>Repeat until one cluster remains.</li>
@@ -814,10 +814,10 @@ Y_nm = mds_nm.fit_transform(D)
 <div class="col">
 <p>Step 3 is the whole design decision:</p>
 <ul>
-<li><strong>Single</strong> — distance to the <em>closest</em> member. Chains.</li>
-<li><strong>Complete</strong> — distance to the <em>farthest</em> member. Compact, equal-size clusters.</li>
-<li><strong>Average</strong> — mean over all cross-pairs. The usual compromise.</li>
-<li><strong>Ward</strong> — merge the pair that increases within-cluster variance least. Needs coordinates, not just <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi></mrow><annotation encoding="application/x-tex">\mathbf{D}</annotation></semantics></math>.</li>
+<li><strong>Single</strong>, distance to the <em>closest</em> member. Chains.</li>
+<li><strong>Complete</strong>, distance to the <em>farthest</em> member. Compact, equal-size clusters.</li>
+<li><strong>Average</strong>, mean over all cross-pairs. The usual compromise.</li>
+<li><strong>Ward</strong>, merge the pair that increases within-cluster variance least. Needs coordinates, not just <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi></mrow><annotation encoding="application/x-tex">\mathbf{D}</annotation></semantics></math>.</li>
 </ul>
 </div>
 </div>
@@ -826,7 +826,7 @@ Y_nm = mds_nm.fit_transform(D)
 <figure><img src="../images/L02-clustering-2026-09-17/cluster_linkage.svg" alt="Three dendrograms of the same 120 animals from the human dissimilarity matrix, single, complete and average linkage, each leaf marked with its taxon colour: single linkage grows one long chain, complete linkage makes compact groups, average linkage sits between" aria-describedby="figure-59-1"><figcaption id="figure-59-1"><p>Three dendrograms of the same 120 animals from the human dissimilarity matrix, single, complete and average linkage, each leaf marked with its taxon colour: single linkage grows one long chain, complete linkage makes compact groups, average linkage sits between</p><a href="../images/L02-clustering-2026-09-17/cluster_linkage.svg">Open full-size figure</a></figcaption></figure>
 <ul>
 <li><strong>Same 120 animals, same human ratings</strong>, three linkage rules: three different trees. The colours under the leaves are the eight taxa</li>
-<li>Single linkage <strong>chains</strong>: one long thin cluster forms by hopping neighbor to neighbor. Complete linkage forces <strong>compact</strong> groups, which can split a genuinely elongated one.</li>
+<li>Single linkage <strong>chains</strong>: one long thin cluster forms by hopping neighbor to neighbor. Complete linkage forces <strong>compact</strong> groups, which can split a elongated one.</li>
 </ul>
 <div class="ref">All 120 Assignment 1 animals, human ratings · <a href="https://doi.org/10.1111/cogs.12670" rel="noopener">Peterson, Abbott &amp; Griffiths <i>Cognitive Science</i> 2018</a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-60" data-paginate="true" data-marpit-pagination="60" data-marpit-pagination-total="67" aria-labelledby="heading-60"><p class="page">Slide 60</p>
@@ -849,9 +849,9 @@ Y_nm = mds_nm.fit_transform(D)
 </div>
 <div class="col">
 <ul>
-<li>Over a thousand patients with depression, clustered on <strong>resting-state fMRI connectivity</strong>, cut into four <strong>"biotypes"</strong> — each one claimed to predict who responds to which treatment.</li>
+<li>Over a thousand patients with depression, clustered on <strong>resting-state fMRI connectivity</strong>, cut into four <strong>"biotypes"</strong>, each one claimed to predict who responds to which treatment.</li>
 <li>Same algorithm as the last three slides. The arithmetic is not in question.</li>
-<li><mark>The biotypes did not replicate.</mark> Reanalysis found no evidence of genuine cluster structure in the data — and a tree comes back from <em>any</em> matrix, including one with no groups in it.</li>
+<li><mark>The biotypes did not replicate.</mark> Reanalysis found no evidence of genuine cluster structure in the data, and a tree comes back from <em>any</em> matrix, including one with no groups in it.</li>
 <li>Whether the branches name something real is a <strong>separate claim</strong>, needing separate evidence.</li>
 </ul>
 </div>
@@ -911,14 +911,14 @@ Y_nm = mds_nm.fit_transform(D)
 <h2 id="heading-64">Appendix · Violations of minimality and symmetry</h2>
 <div class="row">
 <div class="col">
-<p><strong>Minimality</strong> — <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>≥</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">d_{ik} \ge d_{ii} = 0</annotation></semantics></math></p>
+<p><strong>Minimality</strong>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>≥</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">d_{ik} \ge d_{ii} = 0</annotation></semantics></math></p>
 <ul>
 <li>Rothkopf's Morse-code study: participants judged some <em>different</em> pairs "same" more reliably than they judged an identical pair "same".</li>
-<li>Self-similarity is <strong>not constant</strong> across items — familiar signals are recognized as themselves more reliably than unfamiliar ones.</li>
+<li>Self-similarity is <strong>not constant</strong> across items, familiar signals are recognized as themselves more reliably than unfamiliar ones.</li>
 </ul>
 </div>
 <div class="col">
-<p><strong>Symmetry</strong> — <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>=</mo><msub><mi>d</mi><mrow><mi>k</mi><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ik} = d_{ki}</annotation></semantics></math></p>
+<p><strong>Symmetry</strong>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>=</mo><msub><mi>d</mi><mrow><mi>k</mi><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ik} = d_{ki}</annotation></semantics></math></p>
 <ul>
 <li><em>A camel is more similar to a horse than a horse is to a camel.</em></li>
 <li><em>An ellipse is more similar to a circle than a circle is to an ellipse.</em></li>
@@ -937,7 +937,7 @@ Y_nm = mds_nm.fit_transform(D)
 <div class="col">
 <ul>
 <li><strong>Triangle inequality:</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>+</mo><msub><mi>d</mi><mrow><mi>k</mi><mi>l</mi></mrow></msub><mo>≥</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ik} + d_{kl} \ge d_{il}</annotation></semantics></math>. Two items can each be similar to a third <em>on different features</em>, and not at all similar to each other.</li>
-<li><strong>Nearest-neighbor restriction:</strong> in an <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math>-dimensional Euclidean space, a point can be the nearest neighbor of only a bounded number of others. Conceptual hierarchies break that bound — <em>fruit</em> is the nearest neighbor of many fruits at once, but an MDS map can only put it near two or three.</li>
+<li><strong>Nearest-neighbor restriction:</strong> in an <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math>-dimensional Euclidean space, a point can be the nearest neighbor of only a bounded number of others. Conceptual hierarchies break that bound, <em>fruit</em> is the nearest neighbor of many fruits at once, but an MDS map can only put it near two or three.</li>
 </ul>
 </div>
 </div>
@@ -961,7 +961,7 @@ Y_nm = mds_nm.fit_transform(D)
 </div>
 <div class="col">
 <ul>
-<li><strong>2,185 short videos</strong> rated by hundreds of viewers for what they felt. No stimulus dimensions, no recordings — <strong>judgments are the only input</strong>.</li>
+<li><strong>2,185 short videos</strong> rated by hundreds of viewers for what they felt. No stimulus dimensions, no recordings, <strong>judgments are the only input</strong>.</li>
 <li>The structure that comes back needs <strong>27 categories</strong>, not the textbook two, and they are joined by <mark>smooth gradients rather than gaps</mark>: anxiety shades into fear, fear into horror.</li>
 </ul>
 <p>The 2-D layout here uses a nonlinear cousin of MDS, taught in a later lecture.</p>
