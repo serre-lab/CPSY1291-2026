@@ -475,10 +475,6 @@ function drawSweep(){
   ctx.setLineDash([3,3]); ctx.strokeStyle=COL.gold; ctx.lineWidth=2;
   ctx.beginPath(); ctx.moveTo(bx, pad.t); ctx.lineTo(bx, pad.t+ih); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle=COL.ink; ctx.font='600 12px Poppins,system-ui,sans-serif';
-  ctx.textAlign = bx > pad.l+iw*0.62 ? 'right' : 'left';
-  ctx.fillText('smallest error: '+Math.round(best)+'\u00b0',
-               bx + (ctx.textAlign==='right' ? -10 : 10), pad.t+ih*0.52);
   ctx.font='12px Poppins,system-ui,sans-serif';
 
   // curves

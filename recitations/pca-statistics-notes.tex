@@ -59,7 +59,7 @@ across, the convention used throughout the course.
 
 \subsection{Mean and deviations}
 
-The \emph{mean} of $n$ numbers is their sum divided by $n$. The first feature (the first
+The \emph{mean} of $N$ numbers is their sum divided by $N$. The first feature (the first
 column of $\mX$) has values $5, 1, 4, 2$:
 \[
 \bar{x}_1 = \tfrac{1}{4}(5 + 1 + 4 + 2) = 3, \qquad
@@ -81,7 +81,7 @@ that it can be added back at the end.
 
 The \emph{variance} of a variable is the mean of its squared deviations from its mean:
 \[
-\operatorname{var}(x_1) = \tfrac{1}{n}\sum_{i=1}^{n}\big(x^{(i)}_1 - \bar{x}_1\big)^2
+\operatorname{var}(x_1) = \tfrac{1}{N}\sum_{i=1}^{N}\big(x^{(i)}_1 - \bar{x}_1\big)^2
 = \tfrac{1}{4}(4 + 4 + 1 + 1) = 2.5, \qquad
 \operatorname{var}(x_2) = \tfrac{1}{4}(4 + 4 + 1 + 1) = 2.5 .
 \]
@@ -89,13 +89,13 @@ The \emph{standard deviation} $\sigma$ is its square root, $\sigma_1 = \sigma_2 
 \sqrt{2.5} \approx 1.58$, and has the units of the data; the variance has those units
 squared.
 
-\textbf{$n$ or $n-1$.} Software usually divides by $n - 1$ rather than $n$ (NumPy's
-\texttt{np.var} divides by $n$ unless told \texttt{ddof=1}; \texttt{np.cov} and
-Assignment~2's \texttt{fit\_pca} divide by $n - 1$). The $n - 1$ version is the unbiased
-estimate of the variance of the population the sample came from; the $n$ version is the
-variance of the sample itself. With $n - 1$ every variance and covariance in this handout
+\textbf{$N$ or $N-1$.} Software usually divides by $N - 1$ rather than $N$ (NumPy's
+\texttt{np.var} divides by $N$ unless told \texttt{ddof=1}; \texttt{np.cov} and
+Assignment~2's \texttt{fit\_pca} divide by $N - 1$). The $N - 1$ version is the unbiased
+estimate of the variance of the population the sample came from; the $N$ version is the
+variance of the sample itself. With $N - 1$ every variance and covariance in this handout
 is multiplied by $4/3$, and \emph{nothing else changes}: the eigenvectors are identical and
-the eigenvalues all scale by the same factor. The lecture slides use $1/n$ because the
+the eigenvalues all scale by the same factor. The lecture slides use $1/N$ because the
 formulas read more simply.
 
 \subsection{z-scores}
@@ -114,7 +114,7 @@ PCA when every feature is z-scored first.
 
 The \emph{covariance} of two variables is the mean product of their deviations:
 \[
-\operatorname{cov}(x_1, x_2) = \tfrac{1}{n}\sum_{i}\big(x^{(i)}_1 - \bar{x}_1\big)\big(x^{(i)}_2 - \bar{x}_2\big)
+\operatorname{cov}(x_1, x_2) = \tfrac{1}{N}\sum_{i}\big(x^{(i)}_1 - \bar{x}_1\big)\big(x^{(i)}_2 - \bar{x}_2\big)
 = \tfrac{1}{4}(4 + 4 - 1 - 1) = 1.5 ,
 \]
 the four products being $2\cdot2$, $(-2)(-2)$, $1\cdot(-1)$ and $(-1)\cdot1$.
@@ -145,14 +145,14 @@ Put the variances on the diagonal and the covariances off it:
 \mC = \begin{pmatrix} \operatorname{var}(x_1) & \operatorname{cov}(x_1,x_2) \\ \operatorname{cov}(x_2,x_1) & \operatorname{var}(x_2) \end{pmatrix}
 = \begin{pmatrix} 2.5 & 1.5 \\ 1.5 & 2.5 \end{pmatrix}.
 \]
-For $d$ features $\mC$ is $d\times d$ and \emph{symmetric}, $C_{jk} = C_{kj}$. The whole
+For $D$ features $\mC$ is $D\times D$ and \emph{symmetric}, $C_{jk} = C_{kj}$. The whole
 matrix is one product of the centred data with its own transpose,
 \[
-\mC = \tfrac{1}{n}\,\tilde{\mX}^{\top}\tilde{\mX} = \tfrac{1}{n}\sum_{i=1}^{n}\tilde{\vx}^{(i)}\tilde{\vx}^{(i)\top},
+\mC = \tfrac{1}{N}\,\tilde{\mX}^{\top}\tilde{\mX} = \tfrac{1}{N}\sum_{i=1}^{N}\tilde{\vx}^{(i)}\tilde{\vx}^{(i)\top},
 \]
 which is the formula on the lecture's eigendecomposition slide. Check the $(1,2)$ entry:
 $\tfrac{1}{4}(2\cdot2 + (-2)(-2) + 1\cdot(-1) + (-1)\cdot1) = 1.5$. For a $64\times64$ face
-image $d = 4{,}096$ and $\mC$ has sixteen million entries, which is why
+image $D = 4{,}096$ and $\mC$ has sixteen million entries, which is why
 Section~\ref{sec:svd} computes PCA without ever forming it.
 
 \np{C = Xc.T @ Xc / len(Xc)  (or np.cov(Xc.T), which divides by n - 1).}
@@ -165,8 +165,8 @@ The one property of $\mC$ that makes PCA work: for any unit vector $\vw$ ($\norm
 is two lines. The coordinate of point $i$ along $\vw$ is $z^{(i)} = \vw^{\top}\tilde{\vx}^{(i)}$,
 a dot product; these coordinates have mean zero because the $\tilde{\vx}^{(i)}$ do; so
 \[
-\operatorname{var}(z) = \tfrac{1}{n}\sum_i \big(\vw^{\top}\tilde{\vx}^{(i)}\big)^2
-= \vw^{\top}\Big(\tfrac{1}{n}\sum_i \tilde{\vx}^{(i)}\tilde{\vx}^{(i)\top}\Big)\vw
+\operatorname{var}(z) = \tfrac{1}{N}\sum_i \big(\vw^{\top}\tilde{\vx}^{(i)}\big)^2
+= \vw^{\top}\Big(\tfrac{1}{N}\sum_i \tilde{\vx}^{(i)}\tilde{\vx}^{(i)\top}\Big)\vw
 = \vw^{\top}\mC\vw .
 \]
 \textbf{Example.} Along the first axis, $\vw = (1, 0)$: $\vw^{\top}\mC\vw = 2.5$, the
@@ -237,7 +237,7 @@ Two facts about symmetric matrices, stated without proof: their eigenvalues are 
 their eigenvectors can be chosen \emph{orthonormal}, unit length and mutually
 perpendicular. (Check: $\vv_1\cdot\vv_2 = \tfrac12(1\cdot1 + 1\cdot(-1)) = 0$.) So the
 eigenvectors form a basis, and any unit vector can be written in it,
-$\vw = a_1\vv_1 + a_2\vv_2 + \dots + a_d\vv_d$ with $\sum_k a_k^2 = 1$. Now compute the
+$\vw = a_1\vv_1 + a_2\vv_2 + \dots + a_D\vv_D$ with $\sum_k a_k^2 = 1$. Now compute the
 variance along $\vw$ using $\mC\vv_k = \lambda_k\vv_k$ and the orthonormality:
 \[
 \vw^{\top}\mC\vw = \Big(\sum_j a_j\vv_j\Big)^{\top}\Big(\sum_k a_k\lambda_k\vv_k\Big)
@@ -245,7 +245,7 @@ variance along $\vw$ using $\mC\vv_k = \lambda_k\vv_k$ and the orthonormality:
 \]
 This is a weighted average of the eigenvalues with non-negative weights $a_k^2$ that sum
 to one. Its largest possible value is the largest eigenvalue, $\lambda_1$, reached when all
-the weight sits on $\vv_1$ ($a_1 = \pm1$, the rest zero); its smallest is $\lambda_d$.
+the weight sits on $\vv_1$ ($a_1 = \pm1$, the rest zero); its smallest is $\lambda_D$.
 \emph{The direction of greatest variance is the top eigenvector, and the variance along it
 is the top eigenvalue.} Among directions perpendicular to $\vv_1$ the same argument gives
 $\vv_2$, and so on. That is the whole justification of PCA, in four lines.
@@ -259,15 +259,15 @@ by the direct product.
 
 The sum of the variances of all the features, $\operatorname{tr}\mC = \sum_j C_{jj}$, is
 the \emph{total variance}; it is also the mean squared distance of the centred points from
-the origin, $\tfrac1n\sum_i\norm{\tilde{\vx}^{(i)}}^2$. It equals the sum of the
+the origin, $\tfrac1N\sum_i\norm{\tilde{\vx}^{(i)}}^2$. It equals the sum of the
 eigenvalues (a fact about every square matrix): here $2.5 + 2.5 = 4 + 1 = 5$.
 
 Project every point onto $\vw$ and it splits into a part along $\vw$ and a perpendicular
 remainder. By Pythagoras the squared lengths add, and averaging over the cloud,
 \[
-\underbrace{\tfrac1n\sum_i\norm{\tilde{\vx}^{(i)}}^2}_{\text{total, } 5}
+\underbrace{\tfrac1N\sum_i\norm{\tilde{\vx}^{(i)}}^2}_{\text{total, } 5}
 = \underbrace{\vw^{\top}\mC\vw}_{\text{projected variance}}
-+ \underbrace{\tfrac1n\sum_i\norm{\tilde{\vx}^{(i)} - z^{(i)}\vw}^2}_{\text{reconstruction error}} .
++ \underbrace{\tfrac1N\sum_i\norm{\tilde{\vx}^{(i)} - z^{(i)}\vw}^2}_{\text{reconstruction error}} .
 \]
 The left side does not depend on $\vw$. So whichever $\vw$ captures the most variance
 leaves the least error: \emph{maximising projected variance and minimising reconstruction
@@ -280,12 +280,12 @@ $2.5$.
 
 \subsection{Coordinates in the new basis}
 
-Collect the top $K$ eigenvectors as the columns of $\mV_K$ ($d\times K$). The
+Collect the top $K$ eigenvectors as the columns of $\mV_K$ ($D\times K$). The
 \emph{coordinates} of a point in the new basis, its PCA scores, are the $K$ dot products
 \[
 \vz = \mV_K^{\top}(\vx - \vmu), \qquad z_k = \vv_k^{\top}(\vx - \vmu).
 \]
-With $K = d$ this is a pure rotation: nothing is lost. With $K = 1$ and our four points,
+With $K = D$ this is a pure rotation: nothing is lost. With $K = 1$ and our four points,
 $z = \vv_1^{\top}\tilde{\vx}$ gives $(2.83, -2.83, 0, 0)$: two points far out along the
 diagonal, two at the origin. Points 3 and 4, which differ from each other by $(2, -2)$,
 receive the same single coordinate, because that difference lies entirely along $\vv_2$.
@@ -315,20 +315,20 @@ here $1/5 = 20\%$ for $K=1$. The complementary number, $\lambda_1 / \sum_k\lambd
 \label{sec:svd}
 
 Every matrix has a \emph{singular value decomposition}, $\tilde{\mX} = \bm{U}\bm{S}\mV^{\top}$,
-with $\bm{U}$ ($n\times r$) and $\mV$ ($d\times r$) having orthonormal columns and $\bm S$
+with $\bm{U}$ ($N\times r$) and $\mV$ ($D\times r$) having orthonormal columns and $\bm S$
 a diagonal matrix of non-negative \emph{singular values} $s_1 \ge s_2 \ge \dots$, where $r$
 is the rank of $\tilde{\mX}$. Substitute it into the covariance:
 \[
-\mC = \tfrac1n\tilde{\mX}^{\top}\tilde{\mX} = \tfrac1n\,\mV\bm S\bm U^{\top}\bm U\bm S\mV^{\top}
-= \mV\Big(\tfrac{1}{n}\bm S^2\Big)\mV^{\top},
+\mC = \tfrac1N\tilde{\mX}^{\top}\tilde{\mX} = \tfrac1N\,\mV\bm S\bm U^{\top}\bm U\bm S\mV^{\top}
+= \mV\Big(\tfrac{1}{N}\bm S^2\Big)\mV^{\top},
 \]
 using $\bm U^{\top}\bm U = \mI$. Compare with the eigendecomposition $\mC = \mV\mL\mV^{\top}$:
 the right singular vectors of the centred data \emph{are} the eigenvectors of $\mC$, and
-$\lambda_k = s_k^2/n$ (or $s_k^2/(n-1)$ with the other convention). This is how
-scikit-learn and Assignment~2's \texttt{fit\_pca} compute PCA: the SVD of the $n\times d$
-data never builds the $d\times d$ covariance, which for images would not fit in memory.
+$\lambda_k = s_k^2/N$ (or $s_k^2/(N-1)$ with the other convention). This is how
+scikit-learn and Assignment~2's \texttt{fit\_pca} compute PCA: the SVD of the $N\times D$
+data never builds the $D\times D$ covariance, which for images would not fit in memory.
 
-The rank is at most $\min(n - 1, d)$: the $-1$ is because centring removes one degree of
+The rank is at most $\min(N - 1, D)$: the $-1$ is because centring removes one degree of
 freedom (the rows sum to zero). With four points in two dimensions, $r \le 2$; with $400$
 faces of $4{,}096$ pixels, at most $399$ eigenvalues are non-zero however many pixels
 there are, a fact that surprises people the first time a scree plot stops early.
@@ -367,7 +367,7 @@ more active. Assignment~1 standardizes the IT units before PCA for the first rea
 
 \section{Whitening: one step further}
 
-Projecting onto all $d$ eigenvectors rotates the cloud so that its coordinates are
+Projecting onto all $D$ eigenvectors rotates the cloud so that its coordinates are
 \emph{uncorrelated}: the covariance of $\vz = \mV^{\top}\tilde{\vx}$ is $\mV^{\top}\mC\mV =
 \mL$, diagonal, with the eigenvalues down the diagonal. Dividing coordinate $k$ by
 $\sqrt{\lambda_k}$ then gives every coordinate variance $1$:
@@ -388,7 +388,7 @@ second removes correlations.
 \section{All of it in code}
 
 The following function is, line for line, the PCA of Assignment~2 (its \texttt{fit\_pca}
-helper divides by $n-1$ and fixes eigenvector signs; both are included). Run it on the
+helper divides by $N-1$ and fixes eigenvector signs; both are included). Run it on the
 four points and every number in this handout comes back, multiplied by $4/3$ where the
 convention says so.
 
@@ -420,7 +420,7 @@ print(lam[1:].sum() / lam.sum())  # 0.2: discarded fraction, either convention
 \end{tcolorbox}
 
 Two habits worth keeping from this. Never compare eigenvalues across two analyses without
-checking they used the same $n$ or $n-1$ convention, and never compare eigenvector signs
+checking they used the same $N$ or $N-1$ convention, and never compare eigenvector signs
 across two analyses at all; compare the variance fractions and the absolute values of the
 projections instead.
 
@@ -439,7 +439,7 @@ component.
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}ll@{\quad}ll@{}}
 \toprule
-$\mX$, $\tilde{\mX}$ & $n\times d$ data; the same, centred & $\mC$ & $d\times d$ covariance matrix, $\tfrac1n\tilde{\mX}^{\top}\tilde{\mX}$ \\
+$\mX$, $\tilde{\mX}$ & $N\times D$ data; the same, centred & $\mC$ & $D\times D$ covariance matrix, $\tfrac1N\tilde{\mX}^{\top}\tilde{\mX}$ \\
 $\vmu$, $\bar{x}_j$ & mean vector; mean of feature $j$ & $\lambda_k$, $\vv_k$ & $k$-th eigenvalue and unit eigenvector of $\mC$ \\
 $\sigma_j$, var, cov & standard deviation; variance; covariance & $\mV_K$, $\mL$ & top $K$ eigenvectors; diagonal of eigenvalues \\
 $r$ & Pearson correlation, $\operatorname{cov}/(\sigma_1\sigma_2)$ & $\vz$, $z_k$ & PCA coordinates (scores); the $k$-th one \\
