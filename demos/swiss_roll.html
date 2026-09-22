@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unroll the Swiss roll · L04 · CPSY 1291</title>
+<!--
+  Static steps (?static=1&step=N):
+    0 — rolled (unroll=0), default view, probes A/B in place
+    1 — unroll = 0.5
+    2 — fully unrolled (unroll = 1)
+    3 — rolled, alternate view angle
+  Query: ?embed=1  ?static=1  ?step=N
+-->
+<style>
+:root{
+  --paper:#FAF9F5;--ink:#1E293B;--body:#334155;--slate:#64748B;
+  --blue:#3E6D8E;--magenta:#B5396B;--green:#3F7A6B;--pop:#B23A2E;--gold:#FFC72C;
+  --rule:#E7E3DA;--focus:#0969da;color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--body);
+  font:20px/1.35 "Poppins",system-ui,-apple-system,sans-serif}
+a{color:#80431c}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1680px;margin:0 auto;padding:12px 14px 16px}
+h1{margin:0 0 4px;font-size:28px;line-height:1.2;color:var(--ink)}
+.lede{margin:0 0 10px;font-size:17px;color:var(--slate)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:0 0 8px}
+.toolbar .ctl{display:inline-flex;align-items:center;gap:8px}
+.toolbar label{font-size:17px;color:var(--ink);font-weight:600;white-space:nowrap}
+button,select{font:inherit;font-size:17px;color:var(--ink);background:var(--paper);
+  border:1px solid var(--slate);border-radius:4px;padding:5px 12px;min-height:38px;cursor:pointer}
+button[aria-pressed=true]{background:var(--blue);color:#fff;border-color:var(--blue)}
+button:disabled{opacity:.45;cursor:default}
+input[type=range]{width:160px;accent-color:var(--blue)}
+output{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink);min-width:3ch}
+.stage{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;align-items:stretch;min-height:480px}
+.panel{min-width:0;min-height:0;display:flex;flex-direction:column}
+.panel h2{margin:0 0 4px;font-size:20px;color:var(--ink);flex-shrink:0}
+/* Container height must NOT depend on the canvas (avoids ResizeObserver feedback). */
+.canvas-frame{flex:1 1 auto;border:1px solid var(--rule);background:var(--paper);position:relative;
+  min-height:0;aspect-ratio:16/10;max-height:560px;overflow:hidden}
+.canvas-frame canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+.canvas-frame canvas:active{cursor:grabbing}
+.embeds{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;flex:1 1 auto;min-height:0}
+.emb{display:flex;flex-direction:column;min-width:0;min-height:0;border:1px solid var(--rule);padding:6px 6px 4px}
+.emb h3{margin:0 0 2px;font-size:16px;color:var(--ink);font-weight:600;flex-shrink:0}
+.emb-frame{flex:1 1 auto;min-height:0;aspect-ratio:1/1;max-height:220px;position:relative;overflow:hidden;background:var(--paper)}
+.emb canvas{display:block;width:100%;height:100%}
+.emb .d2{margin:2px 0 0;font-size:14px;font-variant-numeric:tabular-nums;color:var(--ink);min-height:1.3em;flex-shrink:0}
+.caption{margin:8px 0 0;font-size:15px;color:var(--body);line-height:1.35;flex-shrink:0}
+.status{margin:8px 0 0;font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums;min-height:1.4em;flex-shrink:0}
+.hint{margin:4px 0 0;font-size:14px;color:var(--slate);flex-shrink:0}
+.footer{margin-top:10px;font-size:13px;color:var(--slate);flex-shrink:0}
+.toolbar{flex-shrink:0}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.swatch{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:middle;margin:0 2px}
+body.embed,html.embed body{overflow:hidden}
+body.embed .wrap,html.embed .wrap{max-width:none;width:100%;height:100vh;padding:6px 10px;display:flex;flex-direction:column;min-height:0}
+body.embed h1,body.embed .lede,body.embed .footer,
+html.embed h1,html.embed .lede,html.embed .footer{display:none}
+body.embed .stage,html.embed .stage{flex:1;min-height:0;gap:10px}
+body.embed .panel,html.embed .panel{min-height:0}
+body.embed .canvas-frame,html.embed .canvas-frame{aspect-ratio:auto;max-height:none;min-height:0;flex:1}
+body.embed .embeds,html.embed .embeds{min-height:0}
+body.embed .emb,html.embed .emb{min-height:0}
+body.embed .emb-frame,html.embed .emb-frame{aspect-ratio:auto;max-height:none;min-height:0;flex:1}
+body.embed .panel h2,html.embed .panel h2{font-size:18px}
+body.embed .toolbar label,body.embed button,body.embed output,
+html.embed .toolbar label,html.embed button,html.embed output{font-size:16px}
+body.embed .status,html.embed .status{font-size:16px}
+body.embed .caption,html.embed .caption{font-size:15px}
+body.embed .emb h3,html.embed .emb h3{font-size:16px}
+body.embed .emb .d2,html.embed .emb .d2{font-size:15px}
+body.static .toolbar{display:none}
+body.static .canvas-frame canvas{cursor:default}
+@media(max-width:900px){
+  .stage{grid-template-columns:1fr}
+  .canvas-frame{max-height:420px}
+  .emb-frame{max-height:180px}
+  .embeds{min-height:0}
+  body.embed .wrap{height:auto;overflow:auto}
+  body.embed .canvas-frame,body.embed .emb-frame{aspect-ratio:16/10;max-height:none}
+}
+</style>
+<script>
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(q.has('embed'))document.documentElement.classList.add('embed');
+  document.addEventListener('DOMContentLoaded',()=>{
+    if(q.has('embed'))document.body.classList.add('embed');
+    if(q.has('static'))document.body.classList.add('static');
+  });
+})();
+</script>
+</head>
+<body>
+<main class="wrap">
+  <h1>Unroll the Swiss roll</h1>
+  <p class="lede">A 2-D sheet curled into 3-D. Points are coloured by the intrinsic angle <i>t</i>
+    (<span class="swatch" style="background:#3E6D8E"></span> blue →
+     <span class="swatch" style="background:#B5396B"></span> magenta →
+     <span class="swatch" style="background:#FFC72C"></span> gold). Drag to rotate; the unroll slider
+    flattens the sheet. Probes A and B start one turn apart at the same height — close in 3-D, far along the sheet.</p>
+
+  <div class="toolbar" role="group" aria-label="Swiss-roll controls">
+    <span class="ctl"><label for="unroll">Unroll</label>
+      <input type="range" id="unroll" min="0" max="1" step="0.01" value="0" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0" aria-describedby="status">
+      <output for="unroll" id="unroll-out">0.00</output></span>
+    <button type="button" id="play" aria-label="Animate unroll from rolled to flat">Play</button>
+    <span class="ctl"><label id="probe-label">Move probe</label>
+      <span role="group" aria-labelledby="probe-label">
+        <button type="button" id="probeA" aria-pressed="true">A</button>
+        <button type="button" id="probeB" aria-pressed="false">B</button>
+      </span></span>
+    <button type="button" id="reset-view" aria-label="Reset camera angle">Reset view</button>
+  </div>
+
+  <div class="stage">
+    <section class="panel" aria-labelledby="h-3d">
+      <h2 id="h-3d">3-D roll <span style="font-weight:400;font-size:0.85em;color:var(--slate)">(drag · arrows)</span></h2>
+      <div class="canvas-frame">
+        <canvas id="c3d" width="900" height="520" role="img"
+          aria-label="Swiss-roll point cloud. Drag to rotate. Click a point to place the active probe. Arrow keys rotate."></canvas>
+      </div>
+      <p class="hint">Straight segment <span style="color:var(--pop)">——</span> Euclidean · path
+        <span style="color:var(--green)">——</span> along-the-sheet (10-NN graph)</p>
+    </section>
+    <section class="panel" aria-labelledby="h-2d">
+      <h2 id="h-2d">2-D embeddings</h2>
+      <div class="embeds">
+        <div class="emb"><h3>PCA</h3><div class="emb-frame"><canvas id="c-pca" width="280" height="200" role="img" aria-label="PCA embedding"></canvas></div><p class="d2" id="d-pca"></p></div>
+        <div class="emb"><h3>Isomap</h3><div class="emb-frame"><canvas id="c-iso" width="280" height="200" role="img" aria-label="Isomap embedding"></canvas></div><p class="d2" id="d-iso"></p></div>
+        <div class="emb"><h3>UMAP</h3><div class="emb-frame"><canvas id="c-umap" width="280" height="200" role="img" aria-label="UMAP embedding"></canvas></div><p class="d2" id="d-umap"></p></div>
+      </div>
+      <p class="caption">PCA keeps the straight-line distance and folds the sheet; Isomap keeps the along-the-sheet distance; UMAP keeps neighbourhoods.</p>
+    </section>
+  </div>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+  <div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
+  <p class="footer" id="footer"></p>
+</main>
+
+<script src="swiss_roll_data.js"></script>
+<script>
+'use strict';
+const D=window.SwissRollData;
+if(!D) throw new Error('swiss_roll_data.js did not load');
+const N=D.xyz.length;
+const XYZ=D.xyz, T=D.t, H=D.height;
+const PCA=D.pca2, ISO=D.isomap2, UMAP=D.umap2;
+const Q=new URLSearchParams(location.search);
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=id=>document.getElementById(id);
+
+/* —— colour by t: blue → magenta → gold —— */
+const tMin=Math.min(...T), tMax=Math.max(...T);
+function colourT(t){
+  const u=(t-tMin)/(tMax-tMin||1);
+  const stops=[[0x3E,0x6D,0x8E],[0xB5,0x39,0x6B],[0xFF,0xC7,0x2C]];
+  const s=u<0.5?0:1, f=u<0.5?u*2:(u-0.5)*2;
+  const a=stops[s], b=stops[s+1];
+  const r=(a[0]+(b[0]-a[0])*f)|0, g=(a[1]+(b[1]-a[1])*f)|0, bl=(a[2]+(b[2]-a[2])*f)|0;
+  return [r,g,bl];
+}
+const COL=T.map(colourT);
+
+/* —— flat coordinates (t·scale, height, 0), scaled to roll span —— */
+const tSpan=tMax-tMin||1;
+let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity,minZ=Infinity,maxZ=-Infinity;
+for(let i=0;i<N;i++){
+  const p=XYZ[i];
+  if(p[0]<minX)minX=p[0]; if(p[0]>maxX)maxX=p[0];
+  if(p[1]<minY)minY=p[1]; if(p[1]>maxY)maxY=p[1];
+  if(p[2]<minZ)minZ=p[2]; if(p[2]>maxZ)maxZ=p[2];
+}
+const xzSpan=Math.max(maxX-minX,maxZ-minZ);
+const SCALE=xzSpan/tSpan;
+const yMid=(Math.min(...H)+Math.max(...H))/2;
+const yCloud=(minY+maxY)/2;
+const FLAT=T.map((t,i)=>[(t-tMin)*SCALE - xzSpan/2, H[i]-yMid + yCloud, 0]);
+
+/* —— 10-NN graph + Dijkstra (once) —— */
+function buildKNN(k){
+  const adj=Array.from({length:N},()=>({}));
+  const di=new Float64Array(N);
+  const idx=new Int32Array(N);
+  for(let i=0;i<N;i++){
+    const xi=XYZ[i];
+    for(let j=0;j<N;j++){
+      if(i===j){di[j]=Infinity;continue;}
+      const dx=xi[0]-XYZ[j][0], dy=xi[1]-XYZ[j][1], dz=xi[2]-XYZ[j][2];
+      di[j]=Math.sqrt(dx*dx+dy*dy+dz*dz);
+    }
+    for(let j=0;j<N;j++) idx[j]=j;
+    // partial select: keep the k smallest at the front
+    for(let n=0;n<k;n++){
+      let best=n;
+      for(let j=n+1;j<N;j++) if(di[idx[j]]<di[idx[best]]) best=j;
+      const tmp=idx[n]; idx[n]=idx[best]; idx[best]=tmp;
+    }
+    for(let n=0;n<k;n++){
+      const j=idx[n], w=di[j];
+      if(!Number.isFinite(w)) continue;
+      adj[i][j]=w;
+      const prev=adj[j][i];
+      if(prev===undefined||w<prev) adj[j][i]=w;
+    }
+  }
+  return adj;
+}
+const ADJ=buildKNN(10);
+function dijkstra(s,t){
+  const dist=new Float64Array(N).fill(Infinity), prev=new Int32Array(N).fill(-1);
+  dist[s]=0;
+  const heap=[[0,s]];
+  while(heap.length){
+    let bi=0; for(let i=1;i<heap.length;i++) if(heap[i][0]<heap[bi][0]) bi=i;
+    const [d,u]=heap.splice(bi,1)[0];
+    if(d>dist[u]) continue;
+    if(u===t) break;
+    for(const [vs,w] of Object.entries(ADJ[u])){
+      const v=+vs, nd=d+w;
+      if(nd<dist[v]){dist[v]=nd;prev[v]=u;heap.push([nd,v]);}
+    }
+  }
+  const path=[];
+  if(!Number.isFinite(dist[t])) return {dist:NaN,path};
+  for(let u=t;u>=0;u=prev[u]) path.push(u);
+  path.reverse();
+  return {dist:dist[t],path};
+}
+
+/* —— default probes: same height, one turn apart —— */
+function pickProbes(){
+  const TWO_PI=Math.PI*2;
+  let best=null;
+  for(let i=0;i<N;i++) for(let j=i+1;j<N;j++){
+    const dt=Math.abs(T[i]-T[j]);
+    if(Math.abs(dt-TWO_PI)>1.2) continue;
+    const dh=Math.abs(H[i]-H[j]);
+    if(dh>2) continue;
+    const dx=XYZ[i][0]-XYZ[j][0], dy=XYZ[i][1]-XYZ[j][1], dz=XYZ[i][2]-XYZ[j][2];
+    const d3=Math.sqrt(dx*dx+dy*dy+dz*dz);
+    const score=d3+0.2*dh;
+    if(!best||score<best.score) best={score,i,j,d3};
+  }
+  return best||{i:0,j:1};
+}
+const probes0=pickProbes();
+
+const state={
+  unroll:0, yaw:0.85, pitch:0.35,
+  a:probes0.i, b:probes0.j, active:'A',
+  dragging:null, // 'rot' | 'probe'
+  playing:false, playToken:0,
+};
+
+function pos3(i){
+  const u=state.unroll, p=XYZ[i], f=FLAT[i];
+  return [p[0]+(f[0]-p[0])*u, p[1]+(f[1]-p[1])*u, p[2]+(f[2]-p[2])*u];
+}
+function euclid3(i,j){
+  // ambient Euclidean on the original rolled cloud (pedagogical contrast)
+  const dx=XYZ[i][0]-XYZ[j][0], dy=XYZ[i][1]-XYZ[j][1], dz=XYZ[i][2]-XYZ[j][2];
+  return Math.sqrt(dx*dx+dy*dy+dz*dz);
+}
+function euclid2(Z,i,j){
+  const dx=Z[i][0]-Z[j][0], dy=Z[i][1]-Z[j][1];
+  return Math.sqrt(dx*dx+dy*dy);
+}
+
+let geoCache={a:-1,b:-1,dist:0,path:[]};
+function geodesic(){
+  if(geoCache.a===state.a&&geoCache.b===state.b) return geoCache;
+  const r=dijkstra(state.a,state.b);
+  geoCache={a:state.a,b:state.b,dist:r.dist,path:r.path};
+  return geoCache;
+}
+
+/* Size backing store from CSS box; never write style width/height (that drove the growth loop). */
+const _boxSize=new WeakMap();
+function sizeFromBox(canvas){
+  const rect=canvas.getBoundingClientRect();
+  const dpr=Math.min(devicePixelRatio||1,2);
+  const W=Math.max(1,Math.floor(rect.width));
+  const Hgt=Math.max(1,Math.floor(rect.height));
+  const prev=_boxSize.get(canvas);
+  if(prev && Math.abs(prev.w-W)<=1 && Math.abs(prev.h-Hgt)<=1 && prev.dpr===dpr
+     && canvas.width===prev.bw && canvas.height===prev.bh){
+    return {W:prev.w, Hgt:prev.h, dpr, skipped:true};
+  }
+  const bw=Math.round(W*dpr), bh=Math.round(Hgt*dpr);
+  if(canvas.width!==bw||canvas.height!==bh){ canvas.width=bw; canvas.height=bh; }
+  _boxSize.set(canvas,{w:W,h:Hgt,dpr,bw,bh});
+  return {W, Hgt, dpr, skipped:false};
+}
+
+function draw3d(){
+  const canvas=$('c3d');
+  const {W,Hgt,dpr}=sizeFromBox(canvas);
+  if(W<2||Hgt<2) return;
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,Hgt);
+
+  const pts=new Array(N);
+  for(let i=0;i<N;i++) pts[i]=pos3(i);
+
+  // rotate into camera space (zoom=1, origin), then fit
+  const cyaw=Math.cos(state.yaw), syaw=Math.sin(state.yaw);
+  const cp=Math.cos(state.pitch), sp=Math.sin(state.pitch);
+  const cam=new Array(N);
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity,d0=Infinity,d1=-Infinity;
+  for(let i=0;i<N;i++){
+    const p=pts[i];
+    const xr=p[0]*cyaw - p[2]*syaw;
+    const zr=p[0]*syaw + p[2]*cyaw;
+    const yr=p[1]*cp - zr*sp;
+    const depth=p[1]*sp + zr*cp;
+    cam[i]={xr,yr,depth};
+    if(xr<x0)x0=xr; if(xr>x1)x1=xr;
+    if(yr<y0)y0=yr; if(yr>y1)y1=yr;
+    if(depth<d0)d0=depth; if(depth>d1)d1=depth;
+  }
+  const span=Math.max(x1-x0,y1-y0,1e-6);
+  const zoom=Math.min((W-48)/span,(Hgt-48)/span);
+  const midX=(x0+x1)/2, midY=(y0+y1)/2;
+  const cx=W/2, cy=Hgt/2;
+  const dSpan=(d1-d0)||1;
+
+  const projected=cam.map((c,i)=>({
+    i, x:cx+(c.xr-midX)*zoom, y:cy-(c.yr-midY)*zoom, depth:c.depth
+  }));
+  projected.sort((a,b)=>a.depth-b.depth);
+
+  for(const pr of projected){
+    const [r,g,b]=COL[pr.i];
+    const depthU=(pr.depth-d0)/dSpan;
+    const alpha=0.45+0.55*depthU;
+    const rad=2.2+2.4*depthU;
+    ctx.beginPath();
+    ctx.fillStyle=`rgba(${r},${g},${b},${alpha})`;
+    ctx.arc(pr.x,pr.y,rad,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  const geo=geodesic();
+  const screenOf=i=>{
+    const c=cam[i];
+    return {x:cx+(c.xr-midX)*zoom, y:cy-(c.yr-midY)*zoom, depth:c.depth};
+  };
+
+  if(geo.path.length>1){
+    ctx.beginPath();
+    ctx.strokeStyle='#3F7A6B';
+    ctx.lineWidth=2.2;
+    ctx.globalAlpha=0.9;
+    geo.path.forEach((idx,k)=>{
+      const s=screenOf(idx);
+      if(k===0) ctx.moveTo(s.x,s.y); else ctx.lineTo(s.x,s.y);
+    });
+    ctx.stroke();
+    ctx.globalAlpha=1;
+  }
+
+  const sa=screenOf(state.a), sb=screenOf(state.b);
+  ctx.beginPath();
+  ctx.setLineDash([7,5]);
+  ctx.strokeStyle='#B23A2E';
+  ctx.lineWidth=2.4;
+  ctx.moveTo(sa.x,sa.y); ctx.lineTo(sb.x,sb.y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  function marker(s,label,shape){
+    ctx.save();
+    ctx.translate(s.x,s.y);
+    ctx.fillStyle='#FAF9F5';
+    ctx.strokeStyle='#1E293B';
+    ctx.lineWidth=2;
+    if(shape==='circle'){ctx.beginPath();ctx.arc(0,0,9,0,Math.PI*2);ctx.fill();ctx.stroke();}
+    else{ctx.fillRect(-8,-8,16,16);ctx.strokeRect(-8,-8,16,16);}
+    ctx.fillStyle='#1E293B';
+    ctx.font='700 13px Poppins,system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(label,0,1);
+    ctx.restore();
+  }
+  marker(sa,'A','circle');
+  marker(sb,'B','square');
+
+  canvas._hit={projected,W,Hgt,sa,sb};
+}
+
+function drawEmbed(canvasId,Z,distId,showAxes){
+  const canvas=$(canvasId);
+  const {W,Hgt,dpr}=sizeFromBox(canvas);
+  if(W<2||Hgt<2) return;
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,Hgt);
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  for(let i=0;i<N;i++){
+    const x=Z[i][0], y=Z[i][1];
+    if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y;
+  }
+  const pad=14;
+  const sx=(W-2*pad)/((x1-x0)||1), sy=(Hgt-2*pad)/((y1-y0)||1);
+  const s=Math.min(sx,sy);
+  const ox=pad+(W-2*pad-s*(x1-x0))/2, oy=pad+(Hgt-2*pad-s*(y1-y0))/2;
+  const map=(i)=>({x:ox+(Z[i][0]-x0)*s, y:oy+(y1-Z[i][1])*s});
+
+  if(showAxes){
+    ctx.strokeStyle='#E7E3DA'; ctx.lineWidth=1;
+    ctx.strokeRect(pad/2,pad/2,W-pad,Hgt-pad);
+  }
+
+  for(let i=0;i<N;i++){
+    const [r,g,b]=COL[i], p=map(i);
+    ctx.fillStyle=`rgb(${r},${g},${b})`;
+    ctx.beginPath(); ctx.arc(p.x,p.y,2.2,0,Math.PI*2); ctx.fill();
+  }
+  const pa=map(state.a), pb=map(state.b);
+  ctx.setLineDash([4,3]); ctx.strokeStyle='#B23A2E'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.stroke();
+  ctx.setLineDash([]);
+  function mark(p,lab,sq){
+    ctx.fillStyle='#FAF9F5'; ctx.strokeStyle='#1E293B'; ctx.lineWidth=1.5;
+    if(sq){ctx.fillRect(p.x-6,p.y-6,12,12);ctx.strokeRect(p.x-6,p.y-6,12,12);}
+    else{ctx.beginPath();ctx.arc(p.x,p.y,6.5,0,Math.PI*2);ctx.fill();ctx.stroke();}
+    ctx.fillStyle='#1E293B'; ctx.font='700 11px Poppins,system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(lab,p.x,p.y+0.5);
+  }
+  mark(pa,'A',false); mark(pb,'B',true);
+
+  const d=euclid2(Z,state.a,state.b);
+  $(distId).textContent='A–B = '+d.toFixed(2);
+}
+
+function fmt(x){return Number.isFinite(x)?x.toFixed(2):'—';}
+
+function updateStatus(){
+  const d3=euclid3(state.a,state.b);
+  const g=geodesic();
+  const line='Euclidean distance in 3-D: '+fmt(d3)+
+    ' · along-the-sheet distance (10-NN graph): '+fmt(g.dist)+
+    ' · unroll '+state.unroll.toFixed(2)+
+    ' · probes A=#'+state.a+', B=#'+state.b;
+  $('status').textContent=line;
+  $('live').textContent='Point A index '+state.a+', point B index '+state.b+
+    '. Euclidean distance in three dimensions '+fmt(d3)+
+    '. Along the sheet distance on the ten nearest neighbour graph '+fmt(g.dist)+
+    '. Unroll amount '+state.unroll.toFixed(2)+'.';
+  $('unroll-out').textContent=state.unroll.toFixed(2);
+  $('unroll').setAttribute('aria-valuenow',String(state.unroll));
+  $('unroll').value=String(state.unroll);
+}
+
+function redraw(){
+  draw3d();
+  drawEmbed('c-pca',PCA,'d-pca',true);
+  drawEmbed('c-iso',ISO,'d-iso',false);
+  drawEmbed('c-umap',UMAP,'d-umap',false);
+  updateStatus();
+}
+
+/* —— interaction —— */
+function nearestHit(clientX,clientY){
+  const canvas=$('c3d'), hit=canvas._hit;
+  if(!hit) return -1;
+  const rect=canvas.getBoundingClientRect();
+  const x=(clientX-rect.left)*(hit.W/rect.width);
+  const y=(clientY-rect.top)*(hit.Hgt/rect.height);
+  let best=-1, bestD=14*14;
+  // prefer front-most among close hits
+  for(let k=hit.projected.length-1;k>=0;k--){
+    const p=hit.projected[k];
+    const dx=p.x-x, dy=p.y-y, d=dx*dx+dy*dy;
+    if(d<bestD){bestD=d;best=p.i;}
+  }
+  return best;
+}
+
+function setProbe(idx){
+  if(idx<0) return;
+  if(state.active==='A'){ if(idx===state.b) return; state.a=idx; }
+  else { if(idx===state.a) return; state.b=idx; }
+  redraw();
+}
+
+const c3d=$('c3d');
+let lastX=0,lastY=0;
+c3d.addEventListener('pointerdown',e=>{
+  if(document.body.classList.contains('static')) return;
+  c3d.setPointerCapture(e.pointerId);
+  lastX=e.clientX; lastY=e.clientY;
+  const hit=c3d._hit, near=nearestHit(e.clientX,e.clientY);
+  if(!hit){state.dragging='rot';return;}
+  const rect=c3d.getBoundingClientRect();
+  const x=(e.clientX-rect.left)*(hit.W/rect.width);
+  const y=(e.clientY-rect.top)*(hit.Hgt/rect.height);
+  const nearA=(hit.sa.x-x)**2+(hit.sa.y-y)**2 < 20*20;
+  const nearB=(hit.sb.x-x)**2+(hit.sb.y-y)**2 < 20*20;
+  if(nearA){state.active='A';$('probeA').setAttribute('aria-pressed','true');$('probeB').setAttribute('aria-pressed','false');state.dragging='probe';}
+  else if(nearB){state.active='B';$('probeB').setAttribute('aria-pressed','true');$('probeA').setAttribute('aria-pressed','false');state.dragging='probe';}
+  else if(near>=0){setProbe(near);state.dragging='probe';}
+  else state.dragging='rot';
+});
+c3d.addEventListener('pointermove',e=>{
+  if(!state.dragging||document.body.classList.contains('static')) return;
+  if(state.dragging==='rot'){
+    const dx=e.clientX-lastX, dy=e.clientY-lastY;
+    state.yaw+=dx*0.008; state.pitch=Math.max(-1.2,Math.min(1.2,state.pitch+dy*0.008));
+    lastX=e.clientX; lastY=e.clientY; redraw();
+  } else {
+    const i=nearestHit(e.clientX,e.clientY);
+    if(i>=0) setProbe(i);
+  }
+});
+c3d.addEventListener('pointerup',()=>{state.dragging=null;});
+c3d.addEventListener('pointercancel',()=>{state.dragging=null;});
+
+$('unroll').addEventListener('input',()=>{
+  state.unroll=Math.max(0,Math.min(1,+($('unroll').value)||0));
+  stopPlay(); redraw();
+});
+$('probeA').onclick=()=>{state.active='A';$('probeA').setAttribute('aria-pressed','true');$('probeB').setAttribute('aria-pressed','false');};
+$('probeB').onclick=()=>{state.active='B';$('probeB').setAttribute('aria-pressed','true');$('probeA').setAttribute('aria-pressed','false');};
+$('reset-view').onclick=()=>{state.yaw=0.85;state.pitch=0.35;redraw();};
+
+function stopPlay(){state.playing=false;state.playToken++;$('play').textContent='Play';}
+function playUnroll(){
+  if(REDUCED){state.unroll=1;redraw();return;}
+  const token=++state.playToken;
+  state.playing=true; $('play').textContent='Stop';
+  const t0=performance.now(), start=state.unroll, dur=1800*(1-start);
+  const tick=now=>{
+    if(token!==state.playToken) return;
+    const u=dur<=0?1:Math.min(1,(now-t0)/dur);
+    const v=u*u*(3-2*u);
+    state.unroll=start+(1-start)*v;
+    redraw();
+    if(u<1) requestAnimationFrame(tick);
+    else {state.playing=false;$('play').textContent='Play';}
+  };
+  if(state.unroll>=0.999){state.unroll=0;redraw();}
+  requestAnimationFrame(tick);
+}
+$('play').onclick=()=>{ if(state.playing) stopPlay(); else playUnroll(); };
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&parent!==window){
+    parent.postMessage({type:'cpsy-exit-interactive'},'*');
+    return;
+  }
+  if(document.body.classList.contains('static')) return;
+  const rot={ArrowLeft:[-0.08,0],ArrowRight:[0.08,0],ArrowUp:[0,-0.06],ArrowDown:[0,0.06]}[e.key];
+  if(rot && !['INPUT','SELECT','TEXTAREA'].includes(document.activeElement?.tagName)){
+    e.preventDefault();
+    state.yaw+=rot[0]; state.pitch=Math.max(-1.2,Math.min(1.2,state.pitch+rot[1]));
+    redraw();
+  }
+});
+
+/* —— static / step —— */
+function applyStep(n){
+  state.unroll=0; state.yaw=0.85; state.pitch=0.35;
+  state.a=probes0.i; state.b=probes0.j;
+  if(n===1) state.unroll=0.5;
+  else if(n===2) state.unroll=1;
+  else if(n===3){ state.unroll=0; state.yaw=-0.55; state.pitch=0.55; }
+}
+
+$('footer').textContent=D.source+' · colour = intrinsic angle t · Escape exits when embedded';
+
+const step=Q.has('step')?parseInt(Q.get('step'),10):0;
+if(Q.has('embed')) document.body.classList.add('embed');
+if(Q.has('static')) document.body.classList.add('static');
+if(Q.has('static')||Q.has('step')) applyStep(Number.isFinite(step)?step:0);
+
+/* ResizeObserver → rAF, ignore sub-pixel jitter so sizing cannot re-trigger itself. */
+let _raf=0;
+const _lastObs=new WeakMap();
+function scheduleRedraw(el){
+  if(el){
+    const r=el.getBoundingClientRect();
+    const prev=_lastObs.get(el);
+    if(prev && Math.abs(prev.w-r.width)<=1 && Math.abs(prev.h-r.height)<=1) return;
+    _lastObs.set(el,{w:r.width,h:r.height});
+  }
+  if(_raf) return;
+  _raf=requestAnimationFrame(()=>{ _raf=0; redraw(); });
+}
+const ro=new ResizeObserver(entries=>{
+  for(const e of entries) scheduleRedraw(e.target);
+});
+ro.observe($('c3d').parentElement);
+document.querySelectorAll('.emb-frame').forEach(e=>ro.observe(e));
+
+scheduleRedraw();
+window.SwissRollDemo={state,redraw,geodesic,euclid3,probes0};
+</script>
+</body>
+</html>

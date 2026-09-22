@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t-SNE on 120 animals · CPSY 1291</title>
+<!--
+  Static steps (?static=1&step=N):
+    0 = PCA layout, coloured dots + shapes
+    1 = t-SNE finished, perplexity 15, seed 1, thumbnails
+    2 = t-SNE finished, perplexity 5, seed 1, thumbnails
+    3 = MDS layout, coloured dots + shapes
+  Query: ?embed=1  hide h1/lede/footer, fill viewport
+         ?static=1&step=N  non-interactive PDF frame
+-->
+<style>
+:root{
+  --paper:#FAF9F5;--ink:#1E293B;--body:#334155;--muted:#5B6B7A;--rule:#E7E3DA;
+  --slate:#64748B;--blue:#3E6D8E;--mag:#B5396B;--green:#3F7A6B;--red:#B23A2E;
+  --gold:#FFC72C;--focus:#0969da;color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--paper);color:var(--body);
+  font:20px/1.35 Poppins,system-ui,-apple-system,sans-serif}
+a{color:#80431c}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1680px;margin:0 auto;padding:12px 14px 16px}
+h1{margin:0 0 2px;font-size:28px;line-height:1.2;color:var(--ink)}
+.lede{margin:0 0 8px;font-size:16px;color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 8px}
+.ctl{display:inline-flex;align-items:center;gap:6px}
+.ctl label{font-size:16px;color:var(--ink);font-weight:600;white-space:nowrap}
+select,button,input[type=range],input[type=number]{font:inherit;font-size:16px;color:var(--ink);background:var(--paper)}
+select,button,input[type=number]{border:1px solid var(--slate);border-radius:4px;padding:4px 10px;min-height:36px}
+button{cursor:pointer}
+button:disabled{opacity:.45;cursor:default}
+input[type=range]{width:110px;accent-color:var(--blue)}
+input[type=number]{width:72px}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--blue)}
+output{font-variant-numeric:tabular-nums;min-width:2ch;color:var(--ink);font-weight:600}
+.seg{display:inline-flex;border:1px solid var(--slate);border-radius:4px;overflow:hidden}
+.seg button{border:0;border-radius:0;min-height:34px;padding:3px 11px}
+.seg button+button{border-left:1px solid var(--slate)}
+.seg button[aria-pressed=true]{background:var(--blue);color:#fff}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:14px;align-items:stretch;min-height:480px}
+.panel{min-width:0;display:flex;flex-direction:column}
+.panel h2{margin:0 0 4px;font-size:18px;color:var(--ink);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.panel h2 .sub{font-size:14px;font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+.frame{flex:1;border:1px solid var(--rule);background:var(--paper);position:relative;min-height:440px;aspect-ratio:1/1;max-height:560px}
+.frame canvas{display:block;width:100%;height:100%}
+.warn{margin:4px 0 0;font-size:14px;color:var(--red);min-height:1.2em;flex-shrink:0}
+.side{display:flex;flex-direction:column;gap:8px;min-height:0}
+.meter{border:1px solid var(--rule);padding:8px 10px;border-radius:4px;flex-shrink:0}
+.meter h3{margin:0 0 4px;font-size:15px;color:var(--ink)}
+.meter .val{font-size:26px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.meter .bar{height:12px;background:#E7E3DA;margin:6px 0 4px;border-radius:2px;overflow:hidden}
+.meter .fill{height:100%;background:var(--blue);width:0%;transition:width .15s linear}
+.meter .hint{font-size:12px;color:var(--muted);line-height:1.25}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;font-size:12px;margin-top:2px}
+.legend span{display:inline-flex;align-items:center;gap:5px;color:var(--ink)}
+.legend canvas{width:14px;height:14px;flex-shrink:0}
+.status{margin:6px 0 0;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums;min-height:1.35em;flex-shrink:0}
+.footer{margin-top:6px;font-size:13px;color:var(--muted);flex-shrink:0}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.tsne-only.hidden-ctl{display:none!important}
+body.embed{overflow:hidden}
+body.embed .wrap{max-width:none;width:100%;height:100vh;padding:4px 8px;display:flex;flex-direction:column}
+body.embed h1,body.embed .lede,body.embed .footer{display:none}
+body.embed .toolbar{margin:0 0 4px;gap:4px 10px;flex-shrink:0}
+body.embed .stage{flex:1;min-height:0;gap:10px}
+body.embed .frame{min-height:0;max-height:none;aspect-ratio:auto}
+body.embed .panel{min-height:0}
+body.embed .ctl label,body.embed select,body.embed button,body.embed input[type=number]{font-size:16px}
+body.embed .status{font-size:16px;margin:4px 0 0}
+body.embed .warn{font-size:13px;margin:2px 0 0}
+body.embed .meter .val{font-size:22px}
+body.embed .meter .hint{display:none}
+body.embed .meter{padding:6px 8px}
+body.embed input[type=range]{width:90px}
+body.static .toolbar button,
+body.static .toolbar input,
+body.static .toolbar select{pointer-events:none}
+body.static .tsne-run{display:none}
+@media (prefers-reduced-motion:reduce){.meter .fill{transition:none}}
+@media (max-width:900px){
+  .stage{grid-template-columns:1fr;min-height:0}
+  .frame{max-height:420px;aspect-ratio:1/1}
+  body.embed .wrap{height:auto;overflow:auto}
+}
+</style>
+<script>
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(q.has('embed'))document.documentElement.classList.add('embed');
+})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <h1>t-SNE, PCA and MDS on 120 animals</h1>
+  <p class="lede">Late-layer activations of a trained network on the Assignment&nbsp;1 photographs, reduced to 50 PCs.
+  Compare a live t-SNE layout with the linear PCA plane and a metric MDS map of the same 50-D points.</p>
+
+  <div class="toolbar" role="group" aria-label="Layout controls">
+    <span class="ctl"><label id="method-label">Method</label>
+      <span class="seg" role="group" aria-labelledby="method-label" id="methods">
+        <button type="button" data-m="tsne" aria-pressed="true">t-SNE</button>
+        <button type="button" data-m="pca" aria-pressed="false">PCA</button>
+        <button type="button" data-m="mds" aria-pressed="false">MDS</button>
+      </span></span>
+    <span class="ctl"><label id="view-label">Show</label>
+      <span class="seg" role="group" aria-labelledby="view-label" id="views">
+        <button type="button" data-v="thumbs" aria-pressed="true">Thumbnails</button>
+        <button type="button" data-v="dots" aria-pressed="false">Dots</button>
+      </span></span>
+    <span class="ctl tsne-only"><label for="perp">Perplexity</label>
+      <input type="range" id="perp" min="2" max="50" value="15" step="1" aria-describedby="status">
+      <output for="perp" id="perp-out">15</output></span>
+    <span class="ctl tsne-only"><label for="steps">Steps</label>
+      <input type="range" id="steps" min="50" max="1000" value="1000" step="50" aria-describedby="status">
+      <output for="steps" id="steps-out">1000</output></span>
+    <span class="ctl tsne-only tsne-run">
+      <button type="button" id="run" aria-label="Run t-SNE">Run</button>
+      <button type="button" id="pause" aria-label="Pause t-SNE" disabled>Pause</button>
+      <button type="button" id="rerun" aria-label="Rerun with a new seed">New seed</button>
+    </span>
+    <span class="ctl tsne-only"><label for="seed">Seed</label>
+      <input type="number" id="seed" min="0" max="999999" value="1" aria-label="Random seed"></span>
+    <span class="ctl tsne-only"><input type="checkbox" id="compare" aria-label="Compare two runs">
+      <label for="compare">Compare two runs</label></span>
+    <span class="ctl"><label for="k">k</label>
+      <input type="range" id="k" min="3" max="15" value="5" step="1" aria-describedby="status">
+      <output for="k" id="k-out">5</output></span>
+  </div>
+
+  <div class="stage">
+    <section class="panel" aria-labelledby="h-map">
+      <h2 id="h-map"><span id="map-title">t-SNE</span><span class="sub" id="map-sub">step 0</span></h2>
+      <div class="frame"><canvas id="canvas" width="560" height="560" role="img" aria-labelledby="h-map" aria-describedby="status"></canvas></div>
+      <p class="warn" id="warn" aria-live="polite">Cluster sizes and gaps between clusters are not measurements</p>
+    </section>
+    <aside class="side" aria-label="Neighbourhood quality">
+      <div class="meter">
+        <h3 id="h-knn"><span id="knn-k">5</span>-NN agreement</h3>
+        <div class="val" id="knn-val">—</div>
+        <div class="bar" aria-hidden="true"><div class="fill" id="knn-fill"></div></div>
+        <p class="hint">Mean fraction of each image’s k nearest neighbours in 50-D that remain among its k nearest in this 2-D layout.</p>
+      </div>
+      <div class="meter">
+        <h3>Category purity</h3>
+        <div class="val" id="pur-val">—</div>
+        <div class="bar" aria-hidden="true"><div class="fill" id="pur-fill" style="background:var(--green)"></div></div>
+        <p class="hint">Mean fraction of each image’s k nearest 2-D neighbours that share its animal category.</p>
+      </div>
+      <div class="meter" id="legend-box">
+        <h3>Categories</h3>
+        <div class="legend" id="legend"></div>
+      </div>
+    </aside>
+  </div>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+  <div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
+  <p class="footer" id="footer"></p>
+</div>
+
+<script src="tsne_animals_data.js"></script>
+<script>
+'use strict';
+const DATA=window.TsneAnimalsData;
+if(!DATA) throw new Error('tsne_animals_data.js did not load');
+
+const N=DATA.names.length;
+const CATS=[...new Set(DATA.category)].sort();
+const CAT_I=Object.fromEntries(CATS.map((c,i)=>[c,i]));
+const COLORS=['#3E6D8E','#B5396B','#3F7A6B','#B23A2E','#7A5AA8','#FFC72C','#2F9BB0','#64748B'];
+const SHAPES=['circle','square','triangle','diamond','cross','star','pent','hex'];
+
+const Q=new URLSearchParams(location.search);
+const EMBED=Q.has('embed'), STATIC=Q.has('static');
+const STEP=Math.max(0,Math.min(3,parseInt(Q.get('step')||'0',10)||0));
+if(EMBED) document.body.classList.add('embed');
+if(STATIC) document.body.classList.add('static');
+if(document.documentElement.classList.contains('embed')) document.body.classList.add('embed');
+
+const $=id=>document.getElementById(id);
+const reduceMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- PRNG ---------- */
+function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+
+/* ---------- distances & knn in 50-D (once) ---------- */
+const X=DATA.pcs50;
+const D50=new Float64Array(N*N);
+(function(){
+  for(let i=0;i<N;i++){
+    D50[i*N+i]=0;
+    for(let j=i+1;j<N;j++){
+      let s=0; const a=X[i], b=X[j];
+      for(let d=0;d<50;d++){const v=a[d]-b[d]; s+=v*v}
+      D50[i*N+j]=D50[j*N+i]=s;
+    }
+  }
+})();
+
+function knnFromDist(distMat,k){
+  const out=Array.from({length:N},()=>new Int16Array(k));
+  const row=new Float64Array(N), idx=new Int16Array(N);
+  for(let i=0;i<N;i++){
+    for(let j=0;j<N;j++){row[j]=distMat[i*N+j]; idx[j]=j}
+    // partial selection: k+1 smallest (skip self)
+    for(let t=0;t<=k;t++){
+      let best=t;
+      for(let j=t+1;j<N;j++) if(row[j]<row[best]) best=j;
+      const tr=row[t], ti=idx[t]; row[t]=row[best]; idx[t]=idx[best]; row[best]=tr; idx[best]=ti;
+    }
+    let w=0;
+    for(let t=0;t<=k && w<k;t++){ if(idx[t]!==i) out[i][w++]=idx[t] }
+  }
+  return out;
+}
+
+const knn50Cache={};
+function knn50(k){ return knn50Cache[k]||(knn50Cache[k]=knnFromDist(D50,k)) }
+
+function knn2D(Y,k){
+  const dist=new Float64Array(N*N);
+  for(let i=0;i<N;i++){
+    const xi=Y[i*2], yi=Y[i*2+1];
+    for(let j=i+1;j<N;j++){
+      const dx=xi-Y[j*2], dy=yi-Y[j*2+1], s=dx*dx+dy*dy;
+      dist[i*N+j]=dist[j*N+i]=s;
+    }
+  }
+  return knnFromDist(dist,k);
+}
+
+function metrics(Y,k){
+  const a=knn50(k), b=knn2D(Y,k);
+  let agree=0, pure=0;
+  for(let i=0;i<N;i++){
+    const set=new Set(a[i]);
+    let hit=0, same=0;
+    for(let t=0;t<k;t++){
+      if(set.has(b[i][t])) hit++;
+      if(DATA.category[b[i][t]]===DATA.category[i]) same++;
+    }
+    agree+=hit/k; pure+=same/k;
+  }
+  return {agree:agree/N, pure:pure/N};
+}
+
+/* ---------- t-SNE ---------- */
+function computeP(perp){
+  const P=new Float64Array(N*N);
+  const row=new Float64Array(N);
+  const logU=Math.log(perp);
+  for(let i=0;i<N;i++){
+    let beta=1, betamin=-Infinity, betamax=Infinity;
+    for(let iter=0;iter<50;iter++){
+      let sum=0;
+      for(let j=0;j<N;j++){
+        if(j===i){row[j]=0; continue}
+        row[j]=Math.exp(-beta*D50[i*N+j]); sum+=row[j];
+      }
+      let H=0, sumP=sum||1e-12;
+      for(let j=0;j<N;j++){ const pj=row[j]/sumP; row[j]=pj; if(pj>1e-12) H-=pj*Math.log(pj) }
+      const diff=H-logU;
+      if(Math.abs(diff)<1e-5) break;
+      if(diff>0){ betamin=beta; beta=isFinite(betamax)?(beta+betamax)/2:beta*2 }
+      else { betamax=beta; beta=isFinite(betamin)?(beta+betamin)/2:beta/2 }
+    }
+    for(let j=0;j<N;j++) if(j!==i) P[i*N+j]=row[j];
+  }
+  // Symmetrise: p_ij = (p_j|i + p_i|j) / (2n); entries then sum to 1.
+  for(let i=0;i<N;i++) for(let j=i+1;j<N;j++){
+    const v=(P[i*N+j]+P[j*N+i])/(2*N);
+    P[i*N+j]=P[j*N+i]=v;
+  }
+  return P;
+}
+
+function initY(seed){
+  const rnd=mulberry32(seed>>>0);
+  const Y=new Float64Array(N*2);
+  for(let i=0;i<N*2;i++) Y[i]=(rnd()-0.5)*1e-4;
+  return Y;
+}
+
+function tsneStep(Y,P,gains,dY,iter,lr){
+  const Q=new Float64Array(N*N);
+  let sumQ=0;
+  for(let i=0;i<N;i++){
+    for(let j=i+1;j<N;j++){
+      const dx=Y[i*2]-Y[j*2], dy=Y[i*2+1]-Y[j*2+1];
+      const inv=1/(1+dx*dx+dy*dy);
+      Q[i*N+j]=Q[j*N+i]=inv; sumQ+=2*inv;
+    }
+  }
+  sumQ=Math.max(sumQ,1e-12);
+  const exager=iter<100?4:1;
+  const mom=iter<250?0.5:0.8;
+  const grad=new Float64Array(N*2);
+  for(let i=0;i<N;i++){
+    let gx=0, gy=0;
+    for(let j=0;j<N;j++){
+      if(i===j) continue;
+      const q=Q[i*N+j]/sumQ;
+      const mult=4*(exager*P[i*N+j]-q)*Q[i*N+j];
+      gx+=mult*(Y[i*2]-Y[j*2]);
+      gy+=mult*(Y[i*2+1]-Y[j*2+1]);
+    }
+    grad[i*2]=gx; grad[i*2+1]=gy;
+  }
+  for(let i=0;i<N*2;i++){
+    gains[i]=(grad[i]*dY[i]>0)?Math.max(0.01,gains[i]*0.8):gains[i]+0.2;
+    dY[i]=mom*dY[i]-lr*gains[i]*grad[i];
+    Y[i]+=dY[i];
+  }
+  // centre
+  let mx=0, my=0;
+  for(let i=0;i<N;i++){mx+=Y[i*2]; my+=Y[i*2+1]}
+  mx/=N; my/=N;
+  for(let i=0;i<N;i++){Y[i*2]-=mx; Y[i*2+1]-=my}
+}
+
+function runTsneSync(perp, maxSteps, seed){
+  const P=computeP(perp);
+  const Y=initY(seed);
+  const gains=new Float64Array(N*2).fill(1);
+  const dY=new Float64Array(N*2);
+  for(let t=0;t<maxSteps;t++) tsneStep(Y,P,gains,dY,t,100);
+  return Y;
+}
+
+/* ---------- state ---------- */
+const state={
+  method:'tsne', view:'thumbs', perp:15, maxSteps:1000, k:5, seed:1,
+  running:false, step:0, converged:false,
+  Y:null, P:null, gains:null, dY:null, prevY:null, compare:false,
+  raf:0, metrics:{agree:0,pure:0}
+};
+
+/* ---------- thumbs ---------- */
+const thumbs=DATA.thumbs.map(b=>{
+  const img=new Image();
+  img.src='data:image/jpeg;base64,'+b;
+  return img;
+});
+let thumbsReady=0;
+const thumbsWait=new Promise(res=>{
+  const done=()=>{thumbsReady++; if(thumbsReady>=N) res()};
+  thumbs.forEach(im=>{ if(im.complete&&im.naturalWidth) done(); else im.onload=done; im.onerror=done });
+});
+
+/* ---------- drawing ---------- */
+const canvas=$('canvas'), ctx=canvas.getContext('2d');
+
+function layoutCoords(){
+  if(state.method==='pca'){
+    const Y=new Float64Array(N*2);
+    for(let i=0;i<N;i++){Y[i*2]=DATA.pca2[i][0]; Y[i*2+1]=DATA.pca2[i][1]}
+    return Y;
+  }
+  if(state.method==='mds'){
+    const Y=new Float64Array(N*2);
+    for(let i=0;i<N;i++){Y[i*2]=DATA.mds2[i][0]; Y[i*2+1]=DATA.mds2[i][1]}
+    return Y;
+  }
+  return state.Y;
+}
+
+function bounds(Y){
+  let xmin=Infinity,xmax=-Infinity,ymin=Infinity,ymax=-Infinity;
+  for(let i=0;i<N;i++){
+    const x=Y[i*2], y=Y[i*2+1];
+    if(x<xmin)xmin=x; if(x>xmax)xmax=x; if(y<ymin)ymin=y; if(y>ymax)ymax=y;
+  }
+  const dx=(xmax-xmin)||1, dy=(ymax-ymin)||1;
+  return {xmin,xmax,ymin,ymax,dx,dy};
+}
+
+function drawShape(c,x,y,r,shape,color,alpha){
+  c.save(); c.globalAlpha=alpha; c.fillStyle=color; c.strokeStyle='#FAF9F5'; c.lineWidth=1.2;
+  c.beginPath();
+  if(shape==='circle') c.arc(x,y,r,0,Math.PI*2);
+  else if(shape==='square'){c.rect(x-r,y-r,2*r,2*r)}
+  else if(shape==='triangle'){c.moveTo(x,y-r);c.lineTo(x+r,y+r);c.lineTo(x-r,y+r);c.closePath()}
+  else if(shape==='diamond'){c.moveTo(x,y-r);c.lineTo(x+r,y);c.lineTo(x,y+r);c.lineTo(x-r,y);c.closePath()}
+  else if(shape==='cross'){
+    c.lineWidth=Math.max(2,r*0.55); c.strokeStyle=color;
+    c.moveTo(x-r,y);c.lineTo(x+r,y);c.moveTo(x,y-r);c.lineTo(x,y+r);c.stroke(); c.restore(); return;
+  }
+  else if(shape==='star'){
+    for(let i=0;i<5;i++){const a=-Math.PI/2+i*2*Math.PI/5, a2=a+Math.PI/5;
+      const x1=x+Math.cos(a)*r,y1=y+Math.sin(a)*r,x2=x+Math.cos(a2)*r*0.45,y2=y+Math.sin(a2)*r*0.45;
+      if(i===0)c.moveTo(x1,y1); else c.lineTo(x1,y1); c.lineTo(x2,y2)}
+    c.closePath();
+  }
+  else if(shape==='pent'||shape==='hex'){
+    const n=shape==='pent'?5:6;
+    for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n; const px=x+Math.cos(a)*r,py=y+Math.sin(a)*r; i?c.lineTo(px,py):c.moveTo(px,py)}
+    c.closePath();
+  }
+  c.fill(); c.stroke(); c.restore();
+}
+
+function project(Y,w,h,pad){
+  const b=bounds(Y);
+  const scale=Math.min((w-2*pad)/b.dx,(h-2*pad)/b.dy);
+  const ox=(w-b.dx*scale)/2, oy=(h-b.dy*scale)/2;
+  return i=>{
+    const x=ox+(Y[i*2]-b.xmin)*scale;
+    const y=oy+(b.ymax-Y[i*2+1])*scale; // flip y
+    return [x,y];
+  };
+}
+
+function drawPanel(Y,x0,y0,w,h,alpha,showAxes){
+  const pad=state.view==='thumbs'?36:24;
+  const to=project(Y,w,h,pad);
+  if(showAxes){
+    ctx.save(); ctx.translate(x0,y0);
+    ctx.strokeStyle='#D7D2C6'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad,h-pad); ctx.lineTo(w-pad,h-pad); ctx.moveTo(pad,h-pad); ctx.lineTo(pad,pad); ctx.stroke();
+    const b=bounds(Y);
+    ctx.fillStyle='#5B6B7A'; ctx.font='12px Poppins,system-ui,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText(b.xmin.toFixed(1), pad, h-6);
+    ctx.fillText(b.xmax.toFixed(1), w-pad, h-6);
+    ctx.textAlign='right';
+    ctx.fillText(b.ymin.toFixed(1), pad-4, h-pad);
+    ctx.fillText(b.ymax.toFixed(1), pad-4, pad+10);
+    ctx.restore();
+  }
+  const order=[...Array(N).keys()];
+  for(const i of order){
+    const [x,y]=to(i);
+    const ci=CAT_I[DATA.category[i]], col=COLORS[ci%COLORS.length], sh=SHAPES[ci%SHAPES.length];
+    if(state.view==='thumbs' && thumbs[i].complete && thumbs[i].naturalWidth){
+      const s=48;
+      ctx.save(); ctx.globalAlpha=alpha;
+      ctx.drawImage(thumbs[i], x0+x-s/2, y0+y-s/2, s, s);
+      ctx.strokeStyle=col; ctx.lineWidth=2;
+      ctx.strokeRect(x0+x-s/2+0.5, y0+y-s/2+0.5, s-1, s-1);
+      ctx.restore();
+    } else {
+      drawShape(ctx, x0+x, y0+y, 6, sh, col, alpha);
+    }
+  }
+}
+
+function draw(){
+  const rect=canvas.parentElement.getBoundingClientRect();
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  const W=Math.max(200,Math.floor(rect.width)), H=Math.max(200,Math.floor(rect.height));
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#FAF9F5'; ctx.fillRect(0,0,W,H);
+
+  const Y=layoutCoords();
+  if(!Y) return;
+  const showAxes=state.method!=='tsne';
+  const compare=state.method==='tsne' && state.compare && state.prevY;
+
+  if(compare){
+    const gap=8, half=(W-gap)/2;
+    ctx.fillStyle='#E7E3DA'; ctx.fillRect(half,0,gap,H);
+    ctx.fillStyle='#5B6B7A'; ctx.font='13px Poppins,system-ui,sans-serif';
+    ctx.fillText('previous', 10, 16);
+    ctx.fillText('current', half+gap+10, 16);
+    drawPanel(state.prevY, 0, 0, half, H, 0.45, false);
+    drawPanel(Y, half+gap, 0, half, H, 1, false);
+  } else {
+    drawPanel(Y, 0, 0, W, H, 1, showAxes);
+  }
+}
+
+function refreshMetrics(){
+  const Y=layoutCoords();
+  if(!Y) return;
+  state.metrics=metrics(Y, state.k);
+  const a=Math.round(state.metrics.agree*100), p=Math.round(state.metrics.pure*100);
+  $('knn-val').textContent=a+' %';
+  $('pur-val').textContent=p+' %';
+  $('knn-fill').style.width=a+'%';
+  $('pur-fill').style.width=p+'%';
+  $('knn-k').textContent=String(state.k);
+  writeStatus();
+}
+
+function writeStatus(){
+  const a=Math.round(state.metrics.agree*100), p=Math.round(state.metrics.pure*100);
+  let msg;
+  if(state.method==='tsne'){
+    const tag=state.converged?'converged':(state.running?'running':'paused');
+    msg=`t-SNE, perplexity ${state.perp}, step ${state.step} of ${state.maxSteps}, seed ${state.seed} (${tag}): ${state.k}-NN agreement ${a} %, category purity ${p} %`;
+    $('map-sub').textContent=`step ${state.step}${state.converged?' · converged':''}`;
+    $('map-title').textContent='t-SNE';
+    $('warn').hidden=false;
+  } else if(state.method==='pca'){
+    msg=`PCA (first two of 50 PCs): ${state.k}-NN agreement ${a} %, category purity ${p} %`;
+    $('map-sub').textContent='PC₁ × PC₂';
+    $('map-title').textContent='PCA';
+    $('warn').hidden=true;
+  } else {
+    msg=`Metric MDS on 50-D distances: ${state.k}-NN agreement ${a} %, category purity ${p} %`;
+    $('map-sub').textContent='MDS 1 × MDS 2';
+    $('map-title').textContent='MDS';
+    $('warn').hidden=true;
+  }
+  $('status').textContent=msg;
+  $('live').textContent=msg;
+}
+
+function setMethod(m){
+  stopRun();
+  state.method=m;
+  document.querySelectorAll('#methods button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m?'true':'false'));
+  document.querySelectorAll('.tsne-only').forEach(el=>el.classList.toggle('hidden-ctl', m!=='tsne'));
+  if(m==='tsne' && !state.Y) resetTsne(false);
+  draw(); refreshMetrics();
+}
+
+function setView(v){
+  state.view=v;
+  document.querySelectorAll('#views button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v?'true':'false'));
+  draw();
+}
+
+function resetTsne(newSeed){
+  stopRun();
+  if(state.Y) state.prevY=state.Y.slice(0);
+  if(newSeed) state.seed=(((state.seed*1103515245+12345)>>>0)%100000)||1;
+  $('seed').value=state.seed;
+  state.P=computeP(state.perp);
+  state.Y=initY(state.seed);
+  state.gains=new Float64Array(N*2).fill(1);
+  state.dY=new Float64Array(N*2);
+  state.step=0; state.converged=false;
+  draw(); refreshMetrics();
+}
+
+function stopRun(){
+  state.running=false;
+  cancelAnimationFrame(state.raf);
+  $('run').disabled=false; $('pause').disabled=true;
+}
+
+function startRun(){
+  if(state.method!=='tsne') return;
+  if(!state.P) resetTsne(false);
+  state.running=true; state.converged=false;
+  $('run').disabled=true; $('pause').disabled=false;
+  const batch=reduceMotion()?state.maxSteps:8;
+  const tick=()=>{
+    if(!state.running) return;
+    const end=Math.min(state.maxSteps, state.step+batch);
+    for(; state.step<end; state.step++) tsneStep(state.Y,state.P,state.gains,state.dY,state.step,100);
+    draw();
+    if(state.step%40===0 || state.step>=state.maxSteps) refreshMetrics();
+    else writeStatus();
+    if(state.step>=state.maxSteps){
+      state.converged=true; stopRun(); refreshMetrics(); return;
+    }
+    state.raf=requestAnimationFrame(tick);
+  };
+  state.raf=requestAnimationFrame(tick);
+}
+
+/* ---------- legend ---------- */
+(function buildLegend(){
+  const box=$('legend');
+  CATS.forEach((c,i)=>{
+    const span=document.createElement('span');
+    const cv=document.createElement('canvas'); cv.width=28; cv.height=28; cv.width=28;
+    const c2=cv.getContext('2d');
+    drawShape(c2,14,14,9,SHAPES[i%SHAPES.length],COLORS[i%COLORS.length],1);
+    span.append(cv, document.createTextNode(c));
+    box.append(span);
+  });
+})();
+
+$('footer').textContent=
+  `${DATA.source}. 50 PCs keep ${(DATA.variance_kept_by_50_pcs*100).toFixed(1)} % of late-layer variance. Escape exits when embedded.`;
+
+/* ---------- controls ---------- */
+document.querySelectorAll('#methods button').forEach(b=>b.addEventListener('click',()=>setMethod(b.dataset.m)));
+document.querySelectorAll('#views button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.v)));
+$('perp').addEventListener('input',()=>{
+  state.perp=+$('perp').value; $('perp-out').value=state.perp;
+  if(state.method==='tsne') resetTsne(false);
+});
+$('steps').addEventListener('input',()=>{
+  state.maxSteps=+$('steps').value; $('steps-out').value=state.maxSteps; writeStatus();
+});
+$('k').addEventListener('input',()=>{
+  state.k=+$('k').value; $('k-out').value=state.k; refreshMetrics();
+});
+$('seed').addEventListener('change',()=>{
+  state.seed=Math.max(0,parseInt($('seed').value,10)||0);
+  $('seed').value=state.seed;
+  if(state.method==='tsne') resetTsne(false);
+});
+$('compare').addEventListener('change',()=>{state.compare=$('compare').checked; draw()});
+$('run').addEventListener('click',startRun);
+$('pause').addEventListener('click',()=>{stopRun(); writeStatus()});
+$('rerun').addEventListener('click',()=>resetTsne(true));
+
+addEventListener('keydown',e=>{
+  if(e.key==='Escape' && window.parent!==window)
+    window.parent.postMessage({type:'cpsy-exit-interactive'},'*');
+});
+addEventListener('resize',()=>requestAnimationFrame(draw));
+new ResizeObserver(()=>requestAnimationFrame(draw)).observe(canvas.parentElement);
+
+/* ---------- boot ---------- */
+function bootInteractive(){
+  state.perp=15; state.maxSteps=1000; state.k=5; state.seed=1; state.method='tsne'; state.view='thumbs';
+  $('perp').value=15; $('perp-out').value=15;
+  $('steps').value=1000; $('steps-out').value=1000;
+  $('k').value=5; $('k-out').value=5;
+  $('seed').value=1;
+  resetTsne(false);
+  setMethod('tsne');
+  setView('thumbs');
+}
+
+function bootStatic(){
+  // 0 PCA dots; 1 t-SNE p=15 seed=1 thumbs; 2 t-SNE p=5 seed=1 thumbs; 3 MDS dots
+  if(STEP===0){
+    state.method='pca'; state.view='dots'; state.k=5;
+    setMethod('pca'); setView('dots');
+  } else if(STEP===3){
+    state.method='mds'; state.view='dots'; state.k=5;
+    setMethod('mds'); setView('dots');
+  } else {
+    state.method='tsne'; state.view='thumbs'; state.seed=1;
+    state.perp=STEP===2?5:15; state.maxSteps=1000; state.k=5;
+    $('perp').value=state.perp; $('perp-out').value=state.perp;
+    $('seed').value=1;
+    state.Y=runTsneSync(state.perp, state.maxSteps, 1);
+    state.step=state.maxSteps; state.converged=true; state.P=null;
+    document.querySelectorAll('#methods button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m==='tsne'?'true':'false'));
+    document.querySelectorAll('.tsne-only').forEach(el=>el.classList.remove('hidden-ctl'));
+    setView('thumbs');
+    draw(); refreshMetrics();
+  }
+}
+
+if(STATIC) bootStatic();
+else bootInteractive();
+thumbsWait.then(()=>draw());
+
+window.TsneAnimals={state, metrics, draw, DATA};
+</script>
+</body>
+</html>

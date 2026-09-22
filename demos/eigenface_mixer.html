@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<!--
+  eigenface_mixer.html — L03 eigenface mixer and navigable face space
+  Static steps (?static=1&step=N):
+    0  Mix tab, all zₖ = 0 (mean face)
+    1  Mix tab, z₁ = +2σ₁ (other zₖ = 0)
+    2  K tab, face index 0 (Olivetti id 0), K = 20
+    3  Plane tab, probe at (2σ₁, 0)
+  Query: ?embed=1 | ?static=1&step=N | ?tab=mix|k|plane
+-->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eigenface mixer · CPSY 1291</title>
+<style>
+:root{
+  --paper:#FAF9F5;--ink:#1E293B;--body:#334155;--slate:#64748B;--blue:#3E6D8E;
+  --magenta:#B5396B;--green:#3F7A6B;--red:#B23A2E;--gold:#FFC72C;--line:#E7E3DA;
+  --focus:#0969da;color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--body);
+  font:20px/1.35 Poppins,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:#80431c}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1680px;margin:0 auto;padding:12px 16px 16px}
+h1{margin:0 0 4px;font-size:28px;color:var(--ink)}
+.lede{margin:0 0 10px;font-size:17px;color:var(--slate)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px;flex-shrink:0}
+.tabs button,.btn,button.chip{
+  font:inherit;font-size:18px;color:var(--ink);background:var(--paper);
+  border:1px solid var(--slate);border-radius:4px;padding:6px 14px;min-height:40px;cursor:pointer}
+.tabs button[aria-pressed=true],button.chip[aria-pressed=true]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn:hover,.tabs button:hover,button.chip:hover{border-color:var(--blue)}
+.panel{display:none;min-height:0}
+.panel.active{display:flex;flex-direction:column;flex:1;min-height:0}
+.face{image-rendering:pixelated;image-rendering:crisp-edges;background:#ddd;display:block;border:1px solid var(--line)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.status{margin:8px 0 0;font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums;min-height:1.4em;flex-shrink:0}
+.footer{margin-top:10px;font-size:14px;color:var(--slate)}
+b.vec{font-weight:700;font-style:normal}
+i.sc{font-style:italic;font-weight:400}
+
+/* Mix */
+.mix{display:grid;grid-template-columns:220px minmax(0,1.35fr) minmax(420px,1fr);gap:18px;align-items:start;flex:1;min-height:0}
+.mix .col{min-width:0;display:flex;flex-direction:column;align-items:center;min-height:0}
+.mix .col-sliders{align-items:stretch;justify-content:stretch}
+.mix .label{font-size:16px;color:var(--slate);margin:8px 0 0;text-align:center}
+.mix .sliders{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 18px;flex:1;align-content:space-evenly;grid-auto-rows:max-content}
+.mix .row{min-width:0;display:grid;grid-template-columns:100px minmax(0,1fr);gap:10px;align-items:center;min-height:0}
+.mix .thumb-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;width:100px}
+.mix .thumb-wrap canvas{width:56px;height:56px;image-rendering:pixelated;outline:1px solid var(--line);display:block}
+.mix .pc-lab,.mix .sig-lab{font-size:16px;line-height:1.15;color:var(--slate);font-variant-numeric:tabular-nums;margin:0;white-space:nowrap}
+.mix .ctrl{display:flex;flex-direction:column;gap:4px;min-width:0}
+.mix .ctrl-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mix .ctrl-top .zname{flex-shrink:0}
+.mix .ctrl-top .zval{text-align:right;color:var(--body)}
+.mix .ctrl input[type=range]{width:100%;accent-color:var(--magenta);margin:0}
+.mix .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;flex-shrink:0}
+.mix .big{width:420px;height:420px;max-width:100%;outline:1px solid var(--line);border:0}
+.mix .mean{width:200px;height:200px;outline:1px solid var(--line);border:0}
+
+/* K */
+.kpanel{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,320px);gap:18px;align-items:start;flex:1;min-height:0}
+.gallery{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px;flex-shrink:0}
+.gallery button{padding:2px;border:2px solid transparent;border-radius:4px;background:transparent;cursor:pointer;line-height:0}
+.gallery button[aria-pressed=true]{border-color:var(--blue)}
+.gallery canvas{width:48px;height:48px;image-rendering:pixelated;display:block}
+.k-faces{display:flex;gap:28px;justify-content:center;align-items:flex-start}
+.k-faces figure{margin:0;text-align:center}
+.k-faces canvas{width:300px;height:300px;outline:1px solid var(--line);border:0}
+.k-faces figcaption{font-size:16px;margin-top:6px;color:var(--ink)}
+.k-controls{display:flex;flex-direction:column;gap:10px}
+.k-controls label{display:flex;flex-direction:column;gap:4px;font-size:17px;color:var(--ink)}
+.k-controls input[type=range]{width:100%;accent-color:var(--blue)}
+.k-presets{display:flex;flex-wrap:wrap;gap:6px}
+.note{font-size:16px;color:var(--slate);margin:6px 0 0;line-height:1.35}
+
+/* Plane */
+.plane{display:grid;grid-template-columns:minmax(0,1.2fr) 320px;gap:16px;align-items:stretch;flex:1;min-height:0}
+.plane-frame{border:1px solid var(--line);background:var(--paper);position:relative;min-height:420px;touch-action:none}
+.plane-frame svg{display:block;width:100%;height:100%;min-height:420px}
+.plane-side{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.plane-side canvas{width:300px;height:300px;outline:1px solid var(--line);border:0}
+.coords{font-size:17px;font-variant-numeric:tabular-nums;color:var(--ink);text-align:center}
+.hover-tip{font-size:16px;color:var(--slate);min-height:1.3em;text-align:center}
+
+html.embed,html.embed body{overflow:hidden;height:100%}
+html.embed .wrap{max-width:none;width:100%;height:100vh;padding:6px 10px;display:flex;flex-direction:column}
+html.embed h1,html.embed .lede,html.embed .footer{display:none}
+html.embed .panel.active{flex:1;min-height:0}
+html.embed .tabs{margin:0 0 6px}
+html.embed .mix{height:100%;grid-template-columns:210px minmax(0,1.4fr) 430px;gap:12px;align-items:center}
+html.embed .mix .big{width:420px;height:420px}
+html.embed .mix .mean{width:200px;height:200px}
+html.embed .mix .sliders{gap:6px 14px}
+html.embed .mix .pc-lab,html.embed .mix .sig-lab{font-size:16px}
+html.embed .mix .actions{margin-top:6px}
+html.embed .status{margin:4px 0 0}
+html.embed .kpanel{height:100%;align-items:center}
+html.embed .k-faces canvas{width:300px;height:300px}
+html.embed .plane{height:100%}
+html.embed .plane-frame,html.embed .plane-frame svg{min-height:0;height:100%}
+html.embed .plane-side canvas{width:300px;height:300px}
+html.embed .status,html.embed .note,html.embed .hover-tip,html.embed .coords{font-size:16px}
+html.embed .mix .ctrl-top,html.embed .mix .label,html.embed .k-faces figcaption{font-size:16px}
+html.embed .tabs button,html.embed .btn,html.embed button.chip{font-size:17px;min-height:38px;padding:4px 12px}
+body.static .tabs,body.static .actions,body.static .k-presets,body.static .gallery,
+body.static .k-controls input,body.static .mix input{pointer-events:none}
+@media(max-width:1100px){
+  .mix{grid-template-columns:1fr;justify-items:center}
+  .mix .sliders{width:100%}
+  .mix .big{width:min(420px,90vw);height:min(420px,90vw)}
+  .kpanel,.plane{grid-template-columns:1fr}
+  .k-faces canvas,.plane-side canvas{width:min(300px,80vw);height:min(300px,80vw)}
+  .plane-frame, .plane-frame svg{min-height:360px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script>if(new URLSearchParams(location.search).has('embed'))document.documentElement.classList.add('embed');</script>
+</head>
+<body>
+<div class="wrap">
+  <h1>Eigenface mixer and face space</h1>
+  <p class="lede">Mix the first eight principal components of the Olivetti faces, watch reconstruction improve with
+  <i class="sc">K</i>, and walk the (<i class="sc">z</i><sub>1</sub>, <i class="sc">z</i><sub>2</sub>) plane.
+  Escape exits when embedded.</p>
+
+  <div class="tabs" role="tablist" aria-label="Eigenface views">
+    <button type="button" role="tab" id="tab-mix" aria-controls="panel-mix" aria-pressed="true" data-tab="mix">Mix</button>
+    <button type="button" role="tab" id="tab-k" aria-controls="panel-k" aria-pressed="false" data-tab="k">K</button>
+    <button type="button" role="tab" id="tab-plane" aria-controls="panel-plane" aria-pressed="false" data-tab="plane">Plane</button>
+  </div>
+
+  <section class="panel active" id="panel-mix" role="tabpanel" aria-labelledby="tab-mix">
+    <div class="mix">
+      <div class="col">
+        <canvas id="meanFace" class="face mean" width="64" height="64" role="img" aria-label="Mean face"></canvas>
+        <p class="label">Mean face <b class="vec">μ</b></p>
+      </div>
+      <div class="col col-sliders">
+        <div class="sliders" id="sliders"></div>
+        <div class="actions">
+          <button type="button" class="btn" id="resetMean">Reset to mean</button>
+          <button type="button" class="btn" id="randomFace">Random face</button>
+        </div>
+      </div>
+      <div class="col">
+        <canvas id="mixOut" class="face big" width="64" height="64" role="img" aria-label="Reconstructed face"></canvas>
+        <p class="label">Reconstruction · mean + Σ <i class="sc">z</i><sub>k</sub><b class="vec">v</b><sub>k</sub></p>
+      </div>
+    </div>
+    <p class="status" id="mixStatus" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="panel" id="panel-k" role="tabpanel" aria-labelledby="tab-k" hidden>
+    <div class="gallery" id="gallery" role="listbox" aria-label="Twelve example faces"></div>
+    <div class="kpanel">
+      <div class="k-faces">
+        <figure>
+          <canvas id="kOrig" class="face" width="64" height="64" role="img" aria-label="Original face"></canvas>
+          <figcaption>Original <b class="vec">x</b></figcaption>
+        </figure>
+        <figure>
+          <canvas id="kRecon" class="face" width="64" height="64" role="img" aria-label="Reconstruction with K components"></canvas>
+          <figcaption>Reconstruction <b class="vec">x̂</b></figcaption>
+        </figure>
+      </div>
+      <div class="k-controls">
+        <label for="kSlider">Components <i class="sc">K</i>
+          <input type="range" id="kSlider" min="0" max="100" value="0" step="1">
+        </label>
+        <div class="k-presets" role="group" aria-label="K presets">
+          <button type="button" class="chip" data-k="1">K = 1</button>
+          <button type="button" class="chip" data-k="5">K = 5</button>
+          <button type="button" class="chip" data-k="20">K = 20</button>
+          <button type="button" class="chip" data-k="50">K = 50</button>
+          <button type="button" class="chip" data-k="100">K = 100</button>
+        </div>
+        <p class="status" id="kStatus" role="status" aria-live="polite"></p>
+        <p class="note">Centred residual ‖(<b class="vec">x</b> − <b class="vec">μ</b>) − (<b class="vec">x̂</b> − <b class="vec">μ</b>)‖² / ‖<b class="vec">x</b> − <b class="vec">μ</b>‖², comparable with the eigenvalue tail.</p>
+        <p class="note">Tail uses the first 100 components only (hits 0 at <i class="sc">K</i> = 100); the pixel residual stays above 0 because the truncated basis cannot recover the full image.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-plane" role="tabpanel" aria-labelledby="tab-plane" hidden>
+    <div class="plane">
+      <div class="plane-frame" id="planeFrame" tabindex="0" aria-label="Face-space plane. Click or drag to set the probe; arrow keys move it.">
+        <svg id="planeSvg" role="img" aria-labelledby="planeTitle">
+          <title id="planeTitle">PC1–PC2 scatter of 400 Olivetti faces</title>
+        </svg>
+      </div>
+      <div class="plane-side">
+        <canvas id="planeFace" class="face" width="64" height="64" role="img" aria-label="Face at the probe"></canvas>
+        <p class="coords" id="planeCoords"></p>
+        <p class="hover-tip" id="planeHover" aria-live="polite"></p>
+        <p class="status" id="planeStatus" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <div class="sr-only" id="live" role="status" aria-live="polite" aria-atomic="true"></div>
+  <p class="footer" id="footer"></p>
+</div>
+
+<script src="eigenface_data.js"></script>
+<script>
+(function(){
+'use strict';
+const D=window.EigenfaceData;
+if(!D) throw new Error('eigenface_data.js did not load');
+const N=D.side*D.side, Kmax=D.n_components, MIX=8;
+const q=new URLSearchParams(location.search);
+if(q.has('embed')) document.body.classList.add('embed');
+if(q.has('static')) document.body.classList.add('static');
+
+function b64u8(s){const b=atob(s),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
+function b64i8(s){const u=b64u8(s);return new Int8Array(u.buffer,u.byteOffset,u.byteLength);}
+
+const meanU8=b64u8(D.mean);
+const mean=new Float32Array(N);
+for(let i=0;i<N;i++) mean[i]=meanU8[i]/255;
+const Vq=b64i8(D.eigenfaces);
+const V=new Float32Array(Kmax*N);
+for(let k=0;k<Kmax;k++){
+  const s=D.eigenface_scale[k]/127, off=k*N;
+  for(let i=0;i<N;i++) V[off+i]=Vq[off+i]*s;
+}
+const sigma=D.coef_std, vf=D.variance_fraction, lam=D.eigenvalues;
+const totalVariance=D.total_variance;
+const faces=D.faces.map(f=>({
+  id:f.id, person:f.person, coef:f.coef,
+  pix:(()=>{const u=b64u8(f.pixels),o=new Float32Array(N);for(let i=0;i<N;i++)o[i]=u[i]/255;return o;})()
+}));
+const highlight=new Set(faces.map(f=>f.id));
+
+const buf=new Float32Array(N);
+const rgba=new Uint8ClampedArray(N*4);
+const imgData=new ImageData(rgba,D.side,D.side);
+
+function fillRgba(src){
+  for(let i=0;i<N;i++){
+    const g=Math.max(0,Math.min(255,Math.round(src[i]*255)));
+    const j=i*4; rgba[j]=g; rgba[j+1]=g; rgba[j+2]=g; rgba[j+3]=255;
+  }
+}
+function paint(canvas,src){
+  fillRgba(src);
+  const ctx=canvas.getContext('2d');
+  ctx.putImageData(imgData,0,0);
+}
+function reconstruct(coefs,kUse){
+  buf.set(mean);
+  const K=Math.max(0,Math.min(Kmax,kUse|0));
+  for(let k=0;k<K;k++){
+    const z=coefs[k]||0; if(z===0) continue;
+    const off=k*N;
+    for(let i=0;i<N;i++) buf[i]+=z*V[off+i];
+  }
+}
+function clipBuf(){
+  for(let i=0;i<N;i++){const v=buf[i]; buf[i]=v<0?0:v>1?1:v;}
+}
+/** Centred residual: ‖(x−μ)−(x̂−μ)‖² / ‖x−μ‖² = ‖x−x̂‖² / ‖x−μ‖² */
+function residualCentered(orig,hat){
+  let num=0,den=0;
+  for(let i=0;i<N;i++){
+    const d=orig[i]-hat[i];
+    const c=orig[i]-mean[i];
+    num+=d*d; den+=c*c;
+  }
+  return den?num/den:0;
+}
+function fmt(x,d){
+  const f=10**d;
+  return (Math.round(Number(x)*f+Number.EPSILON)/f).toFixed(d);
+}
+function pct(x){return (100*x).toFixed(1)+' %';}
+function signed(x,d){const s=x>=0?'+':''; return s+fmt(x,d);}
+
+const state={
+  tab:'mix',
+  z:new Float32Array(MIX),
+  faceIdx:0,
+  K:0,
+  probeZ1:0, probeZ2:0,
+  hoverPerson:-1
+};
+
+/* ---------- Mix ---------- */
+const slidersEl=document.getElementById('sliders');
+const mixRows=[];
+for(let k=0;k<MIX;k++){
+  const row=document.createElement('div'); row.className='row';
+  const wrap=document.createElement('div'); wrap.className='thumb-wrap';
+  const thumb=document.createElement('canvas'); thumb.width=56; thumb.height=56;
+  thumb.setAttribute('aria-hidden','true');
+  drawEigenThumb(thumb,k);
+  const pc=document.createElement('p'); pc.className='pc-lab';
+  pc.textContent=`PC${k+1} · ${pct(vf[k])}`;
+  const sig=document.createElement('p'); sig.className='sig-lab';
+  sig.innerHTML=`σ<sub>${k+1}</sub> = ${fmt(sigma[k],2)}`;
+  wrap.appendChild(thumb); wrap.appendChild(pc); wrap.appendChild(sig);
+
+  const ctrl=document.createElement('div'); ctrl.className='ctrl';
+  const top=document.createElement('div'); top.className='ctrl-top';
+  const zname=document.createElement('span'); zname.className='zname';
+  zname.innerHTML=`<i class="sc">z</i><sub>${k+1}</sub>`;
+  const zval=document.createElement('span'); zval.className='zval'; zval.id='zmeta'+k;
+  top.appendChild(zname); top.appendChild(zval);
+  const inp=document.createElement('input');
+  inp.type='range'; inp.id='z'+k; inp.min=-3; inp.max=3; inp.step=0.05; inp.value=0;
+  inp.setAttribute('aria-label',`Coefficient z${k+1}, range ±3σ`);
+  ctrl.appendChild(top); ctrl.appendChild(inp);
+
+  row.appendChild(wrap); row.appendChild(ctrl);
+  slidersEl.appendChild(row);
+  inp.addEventListener('input',()=>{state.z[k]=(+inp.value)*sigma[k]; updateMix();});
+  mixRows.push({inp,zval});
+}
+function drawEigenThumb(canvas,k){
+  const off=k*N, ctx=canvas.getContext('2d'), side=canvas.width;
+  let m=0; for(let i=0;i<N;i++){const a=Math.abs(V[off+i]); if(a>m)m=a;}
+  const step=D.side/side;
+  for(let y=0;y<side;y++) for(let x=0;x<side;x++){
+    const src=Math.floor(y*step)*D.side+Math.floor(x*step);
+    const t=m?V[off+src]/m:0; // [-1,1]
+    let r,g,b;
+    if(t>=0){r=255; g=Math.round(255*(1-t)); b=Math.round(255*(1-t));} // white→red
+    else{const u=-t; r=Math.round(255*(1-u)); g=Math.round(255*(1-u)); b=255;} // white→blue
+    ctx.fillStyle=`rgb(${r},${g},${b})`;
+    ctx.fillRect(x,y,1,1);
+  }
+}
+paint(document.getElementById('meanFace'),mean);
+
+function updateMix(){
+  reconstruct(state.z,MIX);
+  clipBuf();
+  paint(document.getElementById('mixOut'),buf);
+  let best=0,bestAbs=0;
+  for(let k=0;k<MIX;k++){
+    const n=sigma[k]?state.z[k]/sigma[k]:0;
+    mixRows[k].inp.value=String(n);
+    mixRows[k].zval.innerHTML=
+      `${fmt(state.z[k],2)}`;
+    mixRows[k].zval.title=`z${k+1} = ${fmt(state.z[k],2)} (${signed(n,1)} standard deviations)`;
+    mixRows[k].inp.setAttribute("aria-valuetext",mixRows[k].zval.title);
+    const a=Math.abs(n); if(a>bestAbs){bestAbs=a;best=k;}
+  }
+  const msg=bestAbs<1e-6
+    ? `At the mean face. Largest |zₖ/σₖ| is 0.`
+    : `Largest |zₖ/σₖ| is |z${best+1}/σ${best+1}| = ${fmt(bestAbs,2)}; that eigenface carries ${pct(vf[best])} of total variance.`;
+  document.getElementById('mixStatus').textContent=msg;
+  document.getElementById('live').textContent=msg;
+}
+
+document.getElementById('resetMean').onclick=()=>{state.z.fill(0);updateMix();};
+document.getElementById('randomFace').onclick=()=>{
+  for(let k=0;k<MIX;k++) state.z[k]=(Math.random()*2-1)*sigma[k];
+  updateMix();
+};
+
+/* ---------- K ---------- */
+const gallery=document.getElementById('gallery');
+faces.forEach((f,i)=>{
+  const b=document.createElement('button');
+  b.type='button'; b.setAttribute('role','option');
+  b.setAttribute('aria-label',`Person ${f.person}, face id ${f.id}`);
+  b.setAttribute('aria-pressed',i===0?'true':'false');
+  const c=document.createElement('canvas'); c.width=64; c.height=64; c.className='face';
+  paint(c,f.pix); b.appendChild(c);
+  b.onclick=()=>{state.faceIdx=i; [...gallery.children].forEach((el,j)=>el.setAttribute('aria-pressed',j===i?'true':'false')); updateK();};
+  gallery.appendChild(b);
+});
+const kSlider=document.getElementById('kSlider');
+kSlider.oninput=()=>{state.K=+kSlider.value; updateK();};
+document.querySelectorAll('.k-presets .chip').forEach(b=>{
+  b.onclick=()=>{state.K=+b.dataset.k; kSlider.value=String(state.K); updateK();};
+});
+function updateK(){
+  const f=faces[state.faceIdx];
+  kSlider.value=String(state.K);
+  document.querySelectorAll('.k-presets .chip').forEach(b=>{
+    b.setAttribute('aria-pressed',(+b.dataset.k===state.K)?'true':'false');
+  });
+  paint(document.getElementById('kOrig'),f.pix);
+  reconstruct(f.coef,state.K);
+  const res=residualCentered(f.pix,buf);
+  clipBuf();
+  paint(document.getElementById('kRecon'),buf);
+  const tail=Math.max(0, 1-lam.slice(0,state.K).reduce((a,b)=>a+b,0)/totalVariance);
+  const msg=`Person ${f.person} (id ${f.id}) · K = ${state.K} · centred residual = ${fmt(res,4)} · eigenvalue tail Σₖ>K λₖ / Σ λₖ = ${fmt(tail,4)}`;
+  document.getElementById('kStatus').textContent=msg;
+  document.getElementById('live').textContent=msg;
+}
+
+/* ---------- Plane ---------- */
+const NS='http://www.w3.org/2000/svg';
+const svg=document.getElementById('planeSvg');
+const planeFrame=document.getElementById('planeFrame');
+const z1=D.plane.z1, z2=D.plane.z2, person=D.plane.person;
+let pad={l:56,r:18,t:28,b:48}, plotW=0, plotH=0;
+const xMin=Math.min(...z1), xMax=Math.max(...z1), yMin=Math.min(...z2), yMax=Math.max(...z2);
+function sx(v){return pad.l+(v-xMin)/(xMax-xMin)*plotW;}
+function sy(v){return pad.t+(1-(v-yMin)/(yMax-yMin))*plotH;}
+function invX(px){return xMin+(px-pad.l)/plotW*(xMax-xMin);}
+function invY(py){return yMin+(1-(py-pad.t)/plotH)*(yMax-yMin);}
+
+function drawPlane(){
+  const rect=planeFrame.getBoundingClientRect();
+  const W=Math.max(320,Math.floor(rect.width)||640);
+  const H=Math.max(320,Math.floor(rect.height)||420);
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  pad={l:56,r:18,t:28,b:48}; plotW=W-pad.l-pad.r; plotH=H-pad.t-pad.b;
+  while(svg.lastChild) svg.removeChild(svg.lastChild);
+  const mk=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+  svg.appendChild(mk('rect',{x:0,y:0,width:W,height:H,fill:'#FAF9F5'}));
+  const ox=sx(0), oy=sy(0);
+  if(ox>=pad.l&&ox<=pad.l+plotW) svg.appendChild(mk('line',{x1:ox,x2:ox,y1:pad.t,y2:pad.t+plotH,stroke:'#E7E3DA','stroke-width':1}));
+  if(oy>=pad.t&&oy<=pad.t+plotH) svg.appendChild(mk('line',{x1:pad.l,x2:pad.l+plotW,y1:oy,y2:oy,stroke:'#E7E3DA','stroke-width':1}));
+  svg.appendChild(mk('line',{x1:pad.l,x2:pad.l+plotW,y1:pad.t+plotH,y2:pad.t+plotH,stroke:'#64748B','stroke-width':1.5}));
+  svg.appendChild(mk('line',{x1:pad.l,x2:pad.l,y1:pad.t,y2:pad.t+plotH,stroke:'#64748B','stroke-width':1.5}));
+  const ax=mk('text',{x:pad.l+plotW/2,y:H-10,'text-anchor':'middle',fill:'#1E293B','font-size':'16'});
+  ax.textContent=`z₁ (PC1, ${pct(vf[0])})`; svg.appendChild(ax);
+  const ay=mk('text',{x:16,y:pad.t+plotH/2,'text-anchor':'middle',fill:'#1E293B','font-size':'16',
+    transform:`rotate(-90 16 ${pad.t+plotH/2})`});
+  ay.textContent=`z₂ (PC2, ${pct(vf[1])})`; svg.appendChild(ay);
+
+  for(let i=0;i<z1.length;i++){
+    const hi=highlight.has(i);
+    const c=mk('circle',{
+      cx:sx(z1[i]), cy:sy(z2[i]), r:hi?5:2.5,
+      fill:hi?'#3E6D8E':'#64748B', opacity:hi?1:0.55,
+      'data-i':String(i)
+    });
+    if(hi){
+      c.setAttribute('stroke','#1E293B'); c.setAttribute('stroke-width','1');
+    }
+    c.addEventListener('mouseenter',()=>{
+      state.hoverPerson=person[i];
+      document.getElementById('planeHover').textContent=`Person ${person[i]} · face ${i}`;
+    });
+    c.addEventListener('mouseleave',()=>{
+      state.hoverPerson=-1;
+      document.getElementById('planeHover').textContent='';
+    });
+    svg.appendChild(c);
+  }
+  faces.forEach(f=>{
+    const i=f.id;
+    svg.appendChild(mk('rect',{
+      x:sx(z1[i])-6, y:sy(z2[i])-6, width:12, height:12,
+      fill:'none', stroke:'#3E6D8E', 'stroke-width':1.5, 'pointer-events':'none'
+    }));
+  });
+  const probe=mk('g',{id:'probe','pointer-events':'none'});
+  probe.appendChild(mk('line',{id:'probeH',stroke:'#B5396B','stroke-width':1.5,'stroke-dasharray':'4 3'}));
+  probe.appendChild(mk('line',{id:'probeV',stroke:'#B5396B','stroke-width':1.5,'stroke-dasharray':'4 3'}));
+  probe.appendChild(mk('circle',{id:'probeDot',r:7,fill:'#FFC72C',stroke:'#1E293B','stroke-width':2}));
+  svg.appendChild(probe);
+  placeProbe();
+}
+function placeProbe(){
+  const x=sx(state.probeZ1), y=sy(state.probeZ2);
+  const dot=document.getElementById('probeDot');
+  if(!dot) return;
+  dot.setAttribute('cx',x); dot.setAttribute('cy',y);
+  document.getElementById('probeH').setAttribute('x1',pad.l);
+  document.getElementById('probeH').setAttribute('x2',pad.l+plotW);
+  document.getElementById('probeH').setAttribute('y1',y);
+  document.getElementById('probeH').setAttribute('y2',y);
+  document.getElementById('probeV').setAttribute('x1',x);
+  document.getElementById('probeV').setAttribute('x2',x);
+  document.getElementById('probeV').setAttribute('y1',pad.t);
+  document.getElementById('probeV').setAttribute('y2',pad.t+plotH);
+}
+function updatePlaneFace(){
+  const coefs=new Float32Array(2); coefs[0]=state.probeZ1; coefs[1]=state.probeZ2;
+  reconstruct(coefs,2);
+  clipBuf();
+  paint(document.getElementById('planeFace'),buf);
+  document.getElementById('planeCoords').innerHTML=
+    `(<i class="sc">z</i><sub>1</sub>, <i class="sc">z</i><sub>2</sub>) = (${fmt(state.probeZ1,2)}, ${fmt(state.probeZ2,2)})`;
+  const msg=`Probe at z₁ = ${fmt(state.probeZ1,2)}, z₂ = ${fmt(state.probeZ2,2)}. Face is mean + z₁v₁ + z₂v₂.`;
+  document.getElementById('planeStatus').textContent=msg;
+  document.getElementById('live').textContent=msg;
+  placeProbe();
+}
+function setProbeFromEvent(e){
+  const r=svg.getBoundingClientRect();
+  const px=(e.clientX-r.left)/r.width*(+svg.viewBox.baseVal.width||r.width);
+  const py=(e.clientY-r.top)/r.height*(+svg.viewBox.baseVal.height||r.height);
+  state.probeZ1=Math.max(xMin,Math.min(xMax,invX(px)));
+  state.probeZ2=Math.max(yMin,Math.min(yMax,invY(py)));
+  updatePlaneFace();
+}
+let dragging=false;
+planeFrame.addEventListener('pointerdown',e=>{
+  if(document.body.classList.contains('static')) return;
+  dragging=true; planeFrame.setPointerCapture(e.pointerId); setProbeFromEvent(e);
+});
+planeFrame.addEventListener('pointermove',e=>{if(dragging) setProbeFromEvent(e);});
+planeFrame.addEventListener('pointerup',()=>{dragging=false;});
+planeFrame.addEventListener('keydown',e=>{
+  const step=(e.shiftKey?0.5:0.15)*sigma[0];
+  const map={ArrowLeft:[-step,0],ArrowRight:[step,0],ArrowUp:[0,step],ArrowDown:[0,-step]};
+  const d=map[e.key]; if(!d) return;
+  e.preventDefault();
+  state.probeZ1=Math.max(xMin,Math.min(xMax,state.probeZ1+d[0]));
+  state.probeZ2=Math.max(yMin,Math.min(yMax,state.probeZ2+d[1]));
+  updatePlaneFace();
+});
+
+/* ---------- Tabs ---------- */
+function setTab(name){
+  state.tab=name;
+  ['mix','k','plane'].forEach(t=>{
+    const panel=document.getElementById('panel-'+t);
+    const tab=document.getElementById('tab-'+t);
+    const on=t===name;
+    panel.classList.toggle('active',on);
+    panel.hidden=!on;
+    tab.setAttribute('aria-pressed',on?'true':'false');
+    tab.setAttribute('aria-selected',on?'true':'false');
+  });
+  if(name==='mix') updateMix();
+  if(name==='k') updateK();
+  if(name==='plane'){ drawPlane(); updatePlaneFace(); }
+}
+document.querySelectorAll('.tabs [data-tab]').forEach(b=>{
+  b.addEventListener('click',()=>setTab(b.dataset.tab));
+});
+
+document.getElementById('footer').textContent=D.source;
+
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&parent!==window) parent.postMessage({type:'cpsy-exit-interactive'},'*');
+});
+
+const ro=new ResizeObserver(()=>{ if(state.tab==='plane'){ drawPlane(); updatePlaneFace(); }});
+ro.observe(planeFrame);
+
+/* ---------- Boot from query / static steps ---------- */
+function applyStep(n){
+  if(n===0){ state.z.fill(0); setTab('mix'); }
+  else if(n===1){ state.z.fill(0); state.z[0]=2*sigma[0]; setTab('mix'); }
+  else if(n===2){
+    state.faceIdx=0; state.K=20;
+    [...gallery.children].forEach((el,j)=>el.setAttribute('aria-pressed',j===0?'true':'false'));
+    setTab('k');
+  }
+  else if(n===3){ state.probeZ1=2*sigma[0]; state.probeZ2=0; setTab('plane'); }
+  else setTab('mix');
+}
+
+const tabQ=q.get('tab');
+if(q.has('static')||q.has('step')){
+  applyStep(q.has('step')?parseInt(q.get('step'),10)||0:0);
+}else if(tabQ==='k'||tabQ==='plane'||tabQ==='mix'){
+  if(tabQ==='plane'){ state.probeZ1=0; state.probeZ2=0; }
+  setTab(tabQ);
+}else{
+  setTab('mix');
+}
+})();
+</script>
+</body>
+</html>

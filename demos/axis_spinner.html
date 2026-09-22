@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spin the axis — CPSY 1291</title>
+<!--
+  axis_spinner.html — L03 PCA geometrically: rotate a unit direction w and watch
+  projected variance vs reconstruction error trade off at constant total variance.
+
+  Query parameters:
+    ?embed=1          hide h1 / lede / footer; fill viewport; no page scroll
+    ?static=1&step=N  non-interactive PDF frame
+    ?set=halves|stats|pixels   optional dataset override
+
+  Static steps:
+    0 = w along x₁ (0°)
+    1 = w at PC1
+    2 = w at PC1 + 90° (PC2)
+
+  Data: axis_spinner_data.js → window.AxisSpinnerData
+-->
+<style>
+:root{
+  --paper:#FAF9F5; --ink:#1E293B; --body:#334155; --muted:#5B6B7A;
+  --rule:#E7E3DA; --slate:#64748B; --blue:#3E6D8E; --magenta:#B5396B;
+  --green:#3F7A6B; --pop:#B23A2E; --gold:#FFC72C; --focus:#0969da;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--paper);color:var(--body);
+  font:20px/1.35 Poppins,system-ui,-apple-system,sans-serif}
+a{color:#80431c}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1680px;margin:0 auto;padding:14px 16px 18px}
+h1{margin:0 0 4px;font-size:28px;line-height:1.2;color:var(--ink)}
+.lede{margin:0 0 10px;font-size:17px;color:var(--muted);max-width:72ch}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 8px}
+.toolbar .ctl{display:inline-flex;align-items:center;gap:7px}
+.toolbar label{font-size:16px;color:var(--ink);font-weight:600;white-space:nowrap}
+select,button,input[type=number]{font:inherit;font-size:16px;color:var(--ink);background:var(--paper);
+  border:1px solid var(--slate);border-radius:4px;padding:5px 10px;min-height:38px}
+button{cursor:pointer}
+input[type=number]{width:5.5rem;font-variant-numeric:tabular-nums}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,0.95fr);gap:16px;align-items:stretch;
+  min-height:480px}
+.panel{min-width:0;display:flex;flex-direction:column;gap:4px}
+.panel h2{margin:0;font-size:20px;color:var(--ink);display:flex;justify-content:space-between;
+  align-items:baseline;gap:10px}
+.panel h2 .sub{font-size:15px;font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+.frame{flex:1;border:1px solid var(--rule);background:var(--paper);position:relative;min-height:420px;
+  touch-action:none}
+.frame canvas{display:block;width:100%;height:100%;min-height:420px;cursor:crosshair}
+.right-stack{display:flex;flex-direction:column;gap:10px;min-height:0;flex:1}
+.meters{border:1px solid var(--rule);padding:12px 14px 10px;background:var(--paper)}
+.meters h3{margin:0 0 8px;font-size:16px;color:var(--ink);font-weight:600}
+.bar-wrap{position:relative;height:36px;background:#E7E3DA;border-radius:2px;overflow:hidden}
+.bar-seg{position:absolute;top:0;bottom:0}
+.bar-seg.proj{left:0;background:var(--green)}
+.bar-seg.err{background:var(--pop)}
+.bar-label{display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:14px;
+  font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.bar-label .g{color:var(--green);font-weight:600}
+.bar-label .r{color:var(--pop);font-weight:600}
+.bar-label .t{color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:10px 16px;font-size:14px;margin:4px 0 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:10px;border-radius:1px;display:inline-block}
+.sw.g{background:var(--green)}.sw.r{background:var(--pop)}.sw.line{background:transparent;
+  border-bottom:3px solid var(--ink);height:0;width:18px}
+.sweep-frame{flex:1;border:1px solid var(--rule);min-height:220px;position:relative}
+.sweep-frame canvas{display:block;width:100%;height:100%;min-height:220px;cursor:default}
+.status{margin:8px 0 0;font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums;min-height:2.6em}
+.status .muted{color:var(--muted)}
+.sel-name{font-weight:600;color:var(--blue)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.footer{margin-top:8px;font-size:13px;color:var(--muted)}
+html.embed,body.embed{overflow:hidden}
+body.embed .wrap{max-width:none;width:100%;height:100vh;padding:6px 10px;display:flex;flex-direction:column}
+body.embed h1,body.embed .lede,body.embed .footer{display:none}
+body.embed .stage{flex:1;min-height:0;gap:12px}
+body.embed .frame,body.embed .frame canvas{min-height:0}
+body.embed .sweep-frame,body.embed .sweep-frame canvas{min-height:0}
+body.embed .panel{min-height:0}
+body.embed .panel h2{font-size:18px}
+body.embed .toolbar label,body.embed select,body.embed button,body.embed input[type=number]{font-size:16px}
+body.embed .status{font-size:16px}
+body.static .toolbar{pointer-events:none;opacity:.55}
+body.static .frame canvas{cursor:default}
+@media (max-width:900px){
+  .stage{grid-template-columns:1fr;min-height:0}
+  .frame,.frame canvas{min-height:360px}
+  .sweep-frame,.sweep-frame canvas{min-height:200px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+<script>
+(()=>{const q=new URLSearchParams(location.search);
+  if(q.has('embed')){document.documentElement.classList.add('embed');}
+})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <h1>Spin the axis</h1>
+  <p class="lede">A centred cloud of 120 animal photographs in two coordinates. Drag the left panel (or use
+    ← →) to rotate a unit direction <b>w</b>. What the direction keeps and what it leaves over trade off;
+    their sum never moves. One angle leaves the least.</p>
+
+  <div class="toolbar" role="group" aria-label="Axis spinner controls">
+    <span class="ctl"><label for="dataset">Data</label>
+      <select id="dataset" aria-describedby="status"></select></span>
+    <span class="ctl"><label for="angle">Angle of <b>w</b></label>
+      <input id="angle" type="number" min="0" max="179" step="1" value="20" aria-describedby="status">
+      <span aria-hidden="true">°</span></span>
+    <span class="ctl">
+      <button type="button" id="snap-pc1" aria-label="Snap w to the direction with the smallest error">snap to the best direction</button>
+      <button type="button" id="snap-pc2" aria-label="Snap w to the direction with the largest error">snap to the worst</button>
+      <button type="button" id="snap-x1" aria-label="Snap w to the x1 axis">snap to <i>x</i><sub>1</sub> axis</button>
+    </span>
+  </div>
+
+  <div class="stage">
+    <section class="panel" aria-labelledby="h-cloud">
+      <h2 id="h-cloud"><span>Centred cloud</span><span class="sub" id="axes-line"></span></h2>
+      <div class="frame" id="cloud-frame">
+        <canvas id="cloud" role="img" aria-labelledby="h-cloud" aria-describedby="status"
+          tabindex="0" aria-label="Centred scatter. Drag to rotate w. Click a point to select it. Arrow keys rotate w."></canvas>
+      </div>
+    </section>
+    <section class="panel" aria-labelledby="h-meters">
+      <h2 id="h-meters"><span>What this direction keeps</span><span class="sub" id="best-chip"></span></h2>
+      <div class="right-stack">
+        <div class="meters" aria-hidden="true">
+          <h3>The two always add to the same total</h3>
+          <div class="bar-wrap" id="bar">
+            <div class="bar-seg proj" id="bar-proj"></div>
+            <div class="bar-seg err" id="bar-err"></div>
+          </div>
+          <div class="bar-label">
+            <span class="g" id="lab-proj">projected variance</span>
+            <span class="r" id="lab-err">reconstruction error</span>
+            <span class="t" id="lab-tot">total</span>
+          </div>
+        </div>
+        <div class="sweep-frame">
+          <canvas id="sweep" role="img" aria-label="Projected variance and reconstruction error against the angle of w from 0 to 180 degrees"></canvas>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+  <div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
+
+  <p class="footer">Data: 120 A1 animal photographs (left/right half means; mean intensity vs RMS contrast;
+    two neighbouring 64×64 pixels). Numbers computed in the browser from the centred cloud — Escape exits when embedded.</p>
+</div>
+
+<script src="axis_spinner_data.js"></script>
+<script>
+(function(){
+'use strict';
+const DATA=window.AxisSpinnerData;
+if(!DATA||!DATA.sets) throw new Error('axis_spinner_data.js did not load');
+
+const q=new URLSearchParams(location.search);
+if(q.has('embed')) document.body.classList.add('embed');
+if(q.has('static')) document.body.classList.add('static');
+const isStatic=document.body.classList.contains('static');
+
+const $=id=>document.getElementById(id);
+const cloud=$('cloud'), sweep=$('sweep');
+const cctx=cloud.getContext('2d'), sctx=sweep.getContext('2d');
+
+const COL={
+  paper:'#FAF9F5', ink:'#1E293B', body:'#334155', slate:'#64748B',
+  blue:'#3E6D8E', magenta:'#B5396B', green:'#3F7A6B', pop:'#B23A2E', gold:'#FFC72C', rule:'#E7E3DA'
+};
+
+const state={
+  setIdx:0,
+  angle:20,          // degrees in [0,180)
+  selected:-1,
+  pts:null,          // centred points {x,y}[]
+  mean:{x:0,y:0},
+  cov:null,          // {c00,c01,c11,total,lam1,lam2,pc1,pc2Ang,round}
+  sweep:null         // {angles, proj, err}
+};
+
+function clampAng(a){
+  a=Number(a);
+  if(!Number.isFinite(a)) a=0;
+  a=((a%180)+180)%180;
+  return a;
+}
+
+/** Closed-form eigh of symmetric 2×2 covariance; returns unit PC1 and eigenvalues. */
+function eigh2(c00,c01,c11){
+  const tr=c00+c11, det=c00*c11-c01*c01;
+  const disc=Math.sqrt(Math.max(0, tr*tr/4 - det));
+  let lam1=tr/2+disc, lam2=tr/2-disc;
+  let vx, vy;
+  if(Math.abs(c01)>1e-12){ vx=lam1-c11; vy=c01; }
+  else if(c00>=c11){ vx=1; vy=0; }
+  else { vx=0; vy=1; }
+  const n=Math.hypot(vx,vy)||1;
+  vx/=n; vy/=n;
+  // Prefer the half-plane with non-negative x so the angle sits in [0,180)
+  if(vx<0 || (vx===0 && vy<0)){ vx=-vx; vy=-vy; }
+  let ang=Math.atan2(vy,vx)*180/Math.PI;
+  if(ang<0) ang+=180;
+  if(ang>=180) ang-=180;
+  return {lam1, lam2, vx, vy, ang};
+}
+
+function loadSet(idx){
+  const set=DATA.sets[idx];
+  const n=set.x.length;
+  let mx=0, my=0;
+  for(let i=0;i<n;i++){ mx+=set.x[i]; my+=set.y[i]; }
+  mx/=n; my/=n;
+  const pts=new Array(n);
+  let c00=0,c01=0,c11=0;
+  for(let i=0;i<n;i++){
+    const x=set.x[i]-mx, y=set.y[i]-my;
+    pts[i]={x,y};
+    c00+=x*x; c01+=x*y; c11+=y*y;
+  }
+  c00/=n; c01/=n; c11/=n;
+  const eig=eigh2(c00,c01,c11);
+  const total=c00+c11;
+  const ratio=eig.lam2>1e-12 ? eig.lam1/eig.lam2 : Infinity;
+  const round=ratio<1.25;
+  state.setIdx=idx;
+  state.pts=pts;
+  state.mean={x:mx,y:my};
+  state.cov={
+    c00,c01,c11,total,
+    lam1:eig.lam1, lam2:eig.lam2,
+    pc1:eig.ang, pc2Ang:clampAng(eig.ang+90),
+    vx:eig.vx, vy:eig.vy, round, ratio
+  };
+  // Precompute sweep curves from the actual points
+  const angles=[], proj=[], err=[];
+  for(let a=0;a<=180;a+=1){
+    const th=a*Math.PI/180, wx=Math.cos(th), wy=Math.sin(th);
+    let mz2=0;
+    for(let i=0;i<n;i++){
+      const z=pts[i].x*wx+pts[i].y*wy;
+      mz2+=z*z;
+    }
+    mz2/=n;
+    angles.push(a); proj.push(mz2); err.push(total-mz2);
+  }
+  state.sweep={angles,proj,err};
+  // "centred" stated once here; axis ticks use the raw names only
+  $('axes-line').textContent='centred · '+set.axes[0]+' × '+set.axes[1];
+}
+
+function metricsAt(ang){
+  const th=ang*Math.PI/180, wx=Math.cos(th), wy=Math.sin(th);
+  const pts=state.pts, n=pts.length;
+  let mz2=0;
+  for(let i=0;i<n;i++){
+    const z=pts[i].x*wx+pts[i].y*wy;
+    mz2+=z*z;
+  }
+  mz2/=n;
+  return {wx,wy,proj:mz2, err:state.cov.total-mz2, total:state.cov.total};
+}
+
+/** Half-extent of the centred cloud in data units (max |x| or |y|). */
+function fitCloud(){
+  const pts=state.pts;
+  let m=0;
+  for(let i=0;i<pts.length;i++){
+    m=Math.max(m, Math.abs(pts[i].x), Math.abs(pts[i].y));
+  }
+  return m || 1;
+}
+
+/**
+ * Equal-aspect layout: the cloud's axis-aligned half-extent maps to 85 % of the
+ * panel's shorter side. Shared by drawCloud and hit-testing.
+ */
+function cloudLayout(w, h){
+  const lim=fitCloud();
+  const short=Math.min(w, h);
+  const s=(0.85*short)/(2*lim);
+  return {ox:w/2, oy:h/2, lim, s, short, w, h};
+}
+
+/** Farthest t≥0 along screen ray (ox,oy)+t·(dx,dy) still inside the panel. */
+function rayToEdge(ox, oy, dx, dy, w, h){
+  let t=Infinity;
+  if(dx>1e-12) t=Math.min(t, (w-ox)/dx);
+  else if(dx<-1e-12) t=Math.min(t, (0-ox)/dx);
+  if(dy>1e-12) t=Math.min(t, (h-oy)/dy);
+  else if(dy<-1e-12) t=Math.min(t, (0-oy)/dy);
+  return Number.isFinite(t) ? t : 0;
+}
+
+function resizeCanvas(cv, cssW, cssH){
+  const dpr=Math.min(window.devicePixelRatio||1, 2);
+  const w=Math.max(1, Math.floor(cssW)), h=Math.max(1, Math.floor(cssH));
+  if(cv.width!==Math.floor(w*dpr) || cv.height!==Math.floor(h*dpr)){
+    cv.width=Math.floor(w*dpr); cv.height=Math.floor(h*dpr);
+  }
+  cv.style.width=w+'px'; cv.style.height=h+'px';
+  return {w,h,dpr};
+}
+
+function drawArrow(ctx, x0,y0,x1,y1, color, lw){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=lw;
+  ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();
+  const ang=Math.atan2(y1-y0,x1-x0);
+  const ah=10;
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(x1-ah*Math.cos(ang-0.4), y1-ah*Math.sin(ang-0.4));
+  ctx.lineTo(x1-ah*Math.cos(ang+0.4), y1-ah*Math.sin(ang+0.4));
+  ctx.closePath(); ctx.fill();
+}
+
+function drawCloud(){
+  const frame=$('cloud-frame');
+  const {w,h,dpr}=resizeCanvas(cloud, frame.clientWidth, frame.clientHeight);
+  const ctx=cctx;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle=COL.paper; ctx.fillRect(0,0,w,h);
+
+  const L=cloudLayout(w,h);
+  const {ox,oy,s}=L;
+  const tx=x=>ox+x*s, ty=y=>oy-y*s;
+
+  // Axes: span nearly the full panel; labels sit outside the cloud at the tips
+  const axPad=10;
+  const xRight=w-axPad, xLeft=axPad;
+  const yTop=axPad, yBot=h-axPad;
+  ctx.strokeStyle=COL.body; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(xLeft, oy); ctx.lineTo(xRight, oy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox, yBot); ctx.lineTo(ox, yTop); ctx.stroke();
+  drawArrow(ctx, xRight-14, oy, xRight, oy, COL.body, 1.5);
+  drawArrow(ctx, ox, yTop+14, ox, yTop, COL.body, 1.5);
+
+  const set=DATA.sets[state.setIdx];
+  // Axis names at the tips, outside the cloud (muted slate; "centred" is in the subtitle)
+  ctx.fillStyle=COL.slate; ctx.font='16px Poppins,system-ui,sans-serif';
+  ctx.textAlign='right'; ctx.textBaseline='top';
+  ctx.fillText(set.axes[0], w-12, oy+8);           // +x tip, below the axis
+  ctx.textAlign='right'; ctx.textBaseline='top';
+  ctx.fillText(set.axes[1], ox-10, 8);              // +y tip, left of the axis
+  ctx.textBaseline='alphabetic';
+
+  const m=metricsAt(state.angle);
+  const {wx,wy}=m;
+
+  // Direction line spans the panel (clipped to edges) with arrowhead at the rim
+  const sdx=wx, sdy=-wy; // screen-space unit direction of +w
+  const tPos=rayToEdge(ox, oy, sdx, sdy, w, h);
+  const tNeg=rayToEdge(ox, oy, -sdx, -sdy, w, h);
+  const xA=ox-sdx*tNeg, yA=oy-sdy*tNeg;
+  const xB=ox+sdx*tPos, yB=oy+sdy*tPos;
+  ctx.setLineDash([]);
+  ctx.strokeStyle=COL.magenta; ctx.lineWidth=2.6;
+  ctx.beginPath(); ctx.moveTo(xA, yA); ctx.lineTo(xB, yB); ctx.stroke();
+  const ahBack=18;
+  drawArrow(ctx, xB-sdx*ahBack, yB-sdy*ahBack, xB, yB, COL.magenta, 2.6);
+  ctx.fillStyle=COL.magenta; ctx.font='bold 17px Poppins,system-ui,sans-serif';
+  ctx.textAlign='left';
+  const labOff=8;
+  let lx=xB+sdx*labOff, ly=yB+sdy*labOff;
+  // keep the "w" glyph inside the panel
+  lx=Math.max(14, Math.min(w-14, lx));
+  ly=Math.max(16, Math.min(h-8, ly));
+  ctx.fillText('w', lx, ly); // bold weight = whole-vector notation
+
+  const pts=state.pts, n=pts.length;
+  // Residuals for every point (thin dashed)
+  for(let i=0;i<n;i++){
+    if(i===state.selected) continue;
+    const p=pts[i];
+    const z=p.x*wx+p.y*wy;
+    const fx=z*wx, fy=z*wy;
+    ctx.strokeStyle='rgba(178,58,46,0.35)'; ctx.lineWidth=1;
+    ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(tx(p.x), ty(p.y)); ctx.lineTo(tx(fx), ty(fy)); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // Projection feet (open circles) and points
+  for(let i=0;i<n;i++){
+    if(i===state.selected) continue;
+    const p=pts[i];
+    const z=p.x*wx+p.y*wy;
+    const fx=z*wx, fy=z*wy;
+    ctx.beginPath(); ctx.arc(tx(fx), ty(fy), 2.4, 0, Math.PI*2);
+    ctx.strokeStyle=COL.slate; ctx.lineWidth=1.2; ctx.stroke();
+    ctx.beginPath(); ctx.arc(tx(p.x), ty(p.y), 3.2, 0, Math.PI*2);
+    ctx.fillStyle=COL.slate; ctx.fill();
+  }
+
+  // Selected point
+  if(state.selected>=0){
+    const p=pts[state.selected];
+    const z=p.x*wx+p.y*wy;
+    const fx=z*wx, fy=z*wy;
+    // residual thick
+    ctx.strokeStyle=COL.pop; ctx.lineWidth=2.8; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(tx(p.x), ty(p.y)); ctx.lineTo(tx(fx), ty(fy)); ctx.stroke();
+    ctx.setLineDash([]);
+    // projection segment along w (subtle)
+    ctx.strokeStyle=COL.green; ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(tx(fx), ty(fy)); ctx.stroke();
+    // foot
+    ctx.beginPath(); ctx.arc(tx(fx), ty(fy), 5, 0, Math.PI*2);
+    ctx.fillStyle=COL.paper; ctx.fill();
+    ctx.strokeStyle=COL.green; ctx.lineWidth=2; ctx.stroke();
+    // point (blue, larger)
+    ctx.beginPath(); ctx.arc(tx(p.x), ty(p.y), 7, 0, Math.PI*2);
+    ctx.fillStyle=COL.blue; ctx.fill();
+    ctx.strokeStyle=COL.ink; ctx.lineWidth=1; ctx.stroke();
+    // labels z and r (letter + colour; name goes in the status line)
+    ctx.font='bold 16px Poppins,system-ui,sans-serif';
+    ctx.textAlign='left';
+    const mx=(p.x+fx)/2, my=(p.y+fy)/2;
+    ctx.fillStyle=COL.pop;
+    ctx.fillText('r', tx(mx)+8, ty(my)-6);
+    ctx.fillStyle=COL.green;
+    ctx.fillText('z', tx(fx)+8, ty(fy)-8);
+  }
+
+  // Origin
+  ctx.beginPath(); ctx.arc(ox, oy, 3, 0, Math.PI*2);
+  ctx.fillStyle=COL.ink; ctx.fill();
+}
+
+function drawSweep(){
+  const frame=sweep.parentElement;
+  const {w,h,dpr}=resizeCanvas(sweep, frame.clientWidth, frame.clientHeight);
+  const ctx=sctx;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle=COL.paper; ctx.fillRect(0,0,w,h);
+
+  const pad={l:34,r:14,t:28,b:36};
+  const iw=w-pad.l-pad.r, ih=h-pad.t-pad.b;
+  const total=state.cov.total;
+  const ymax=total*1.15;
+  const xAt=a=>pad.l+(a/180)*iw;
+  const yAt=v=>pad.t+ih-(v/ymax)*ih;
+
+  // axes
+  ctx.strokeStyle=COL.body; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t+ih); ctx.lineTo(pad.l+iw, pad.t+ih); ctx.stroke();
+
+  // total variance dashed
+  ctx.setLineDash([5,4]); ctx.strokeStyle=COL.body; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(pad.l, yAt(total)); ctx.lineTo(pad.l+iw, yAt(total)); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=COL.body; ctx.font='12px Poppins,system-ui,sans-serif';
+  ctx.textAlign='right'; ctx.fillText('total variance', pad.l+iw-2, yAt(total)-4);
+
+  // the angle that leaves the least: a gold band, so the answer is visible before you find it
+  const best=state.cov.pc1;
+  const bx=xAt(best);
+  ctx.fillStyle='rgba(255,199,44,0.30)';
+  ctx.fillRect(bx-7, pad.t, 14, ih);
+  ctx.setLineDash([3,3]); ctx.strokeStyle=COL.gold; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(bx, pad.t); ctx.lineTo(bx, pad.t+ih); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=COL.ink; ctx.font='600 12px Poppins,system-ui,sans-serif';
+  ctx.textAlign = bx > pad.l+iw*0.62 ? 'right' : 'left';
+  ctx.fillText('smallest error: '+Math.round(best)+'\u00b0',
+               bx + (ctx.textAlign==='right' ? -10 : 10), pad.t+ih*0.52);
+  ctx.font='12px Poppins,system-ui,sans-serif';
+
+  // curves
+  const {angles,proj,err}=state.sweep;
+  function path(vals, color){
+    ctx.beginPath();
+    for(let i=0;i<angles.length;i++){
+      const x=xAt(angles[i]), y=yAt(vals[i]);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle=color; ctx.lineWidth=2.4; ctx.stroke();
+  }
+  path(proj, COL.green);
+  path(err, COL.pop);
+
+  // current angle marker
+  const m=metricsAt(state.angle);
+  const cx=xAt(state.angle);
+  const onBest=Math.abs(((state.angle-best+90+180)%180)-90)<=1.0;
+  const rad=onBest?8:5.5;
+  ctx.fillStyle=COL.gold;
+  ctx.beginPath(); ctx.arc(cx, yAt(m.proj), rad, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle=COL.ink; ctx.lineWidth=onBest?2:1; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, yAt(m.err), rad, 0, Math.PI*2);
+  ctx.fillStyle=COL.gold; ctx.fill(); ctx.stroke();
+
+  // vertical guide at current angle
+  ctx.strokeStyle='rgba(30,41,59,0.35)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(cx, pad.t); ctx.lineTo(cx, pad.t+ih); ctx.stroke();
+
+  // ticks
+  ctx.fillStyle=COL.body; ctx.font='12px Poppins,system-ui,sans-serif';
+  ctx.textAlign='center';
+  for(const a of [0,45,90,135,180]){
+    ctx.fillText(a+'°', xAt(a), pad.t+ih+16);
+  }
+  ctx.textAlign='right';
+  ctx.fillText('0', pad.l-8, yAt(0)+4);
+  // no numeric tick at the top: the dashed line is already labelled "total variance", and the
+  // four-digit number used to sit directly on the rotated axis title
+  ctx.save();
+  ctx.translate(15, pad.t+ih/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center'; ctx.fillText('variance', 0, 0);
+  ctx.restore();
+  ctx.textAlign='center';
+  ctx.fillText('direction of w (angle from x₁)', pad.l+iw/2, h-6);
+
+  // legend
+  ctx.font='12px Poppins,system-ui,sans-serif';
+  ctx.textAlign='left';
+  ctx.strokeStyle=COL.green; ctx.lineWidth=2.4;
+  ctx.beginPath(); ctx.moveTo(pad.l+4, 12); ctx.lineTo(pad.l+22, 12); ctx.stroke();
+  ctx.fillStyle=COL.green; ctx.fillText('projected variance', pad.l+26, 16);
+  ctx.strokeStyle=COL.pop;
+  ctx.beginPath(); ctx.moveTo(pad.l+170, 12); ctx.lineTo(pad.l+188, 12); ctx.stroke();
+  ctx.fillStyle=COL.pop; ctx.fillText('reconstruction error', pad.l+192, 16);
+}
+
+function updateMeters(m){
+  const tot=m.total||1;
+  const pPct=Math.max(0, Math.min(100, 100*m.proj/tot));
+  const ePct=Math.max(0, 100-pPct);
+  const bp=$('bar-proj'), be=$('bar-err');
+  bp.style.width=pPct+'%';
+  be.style.left=pPct+'%';
+  be.style.width=ePct+'%';
+  $('lab-proj').textContent='kept '+Math.round(pPct)+'%';
+  $('lab-err').textContent='left over '+Math.round(ePct)+'%';
+  $('lab-tot').textContent='total is the same at every angle';
+}
+
+function updateStatus(m){
+  const cov=state.cov;
+  const a=Math.round(state.angle);
+  const pc=cov.pc1;
+  const pct=Math.round(100*m.proj/(m.total||1));
+  const onBest=Math.abs(((a-pc+90+180)%180)-90)<=1.0;
+  let msg=`w at ${a}°: this direction keeps ${pct}% of the variation and leaves ${100-pct}% over. `;
+  msg+= onBest ? 'This is the direction that leaves the least.'
+               : `The smallest error is at ${Math.round(pc)}°.`;
+  const chip=$('best-chip');
+  if(chip){ chip.textContent = onBest ? 'you are at the best direction' : ''; }
+  if(cov.round){
+    msg+=' In this cloud no direction is much better than another.';
+  }
+  if(state.selected>=0){
+    msg+=` Selected ${DATA.names[state.selected]} (${DATA.category[state.selected]}).`;
+  }
+  $('status').textContent=msg;
+  $('live').textContent=msg;
+  // keep angle input in sync without fighting typing
+  const inp=$('angle');
+  if(document.activeElement!==inp) inp.value=String(a);
+}
+
+function render(){
+  const m=metricsAt(state.angle);
+  drawCloud();
+  drawSweep();
+  updateMeters(m);
+  updateStatus(m);
+}
+
+function setAngle(a, fromInput){
+  state.angle=clampAng(a);
+  if(!fromInput) $('angle').value=String(Math.round(state.angle));
+  render();
+}
+
+function nearestPoint(cssX, cssY){
+  const frame=$('cloud-frame');
+  const L=cloudLayout(frame.clientWidth, frame.clientHeight);
+  const dx=(cssX-L.ox)/L.s, dy=-(cssY-L.oy)/L.s;
+  let best=-1, bestD=Infinity;
+  const pts=state.pts;
+  for(let i=0;i<pts.length;i++){
+    const d=Math.hypot(pts[i].x-dx, pts[i].y-dy);
+    if(d<bestD){ bestD=d; best=i; }
+  }
+  // ~14 px hit radius in data units (generous enough for the small dots)
+  const thresh=14/L.s;
+  return bestD<=thresh ? best : -1;
+}
+
+function angleFromPointer(cssX, cssY){
+  const frame=$('cloud-frame');
+  const ox=frame.clientWidth/2, oy=frame.clientHeight/2;
+  let ang=Math.atan2(-(cssY-oy), cssX-ox)*180/Math.PI;
+  return clampAng(ang);
+}
+
+// ---- controls ----
+const sel=$('dataset');
+DATA.sets.forEach((s,i)=>{
+  const o=document.createElement('option');
+  o.value=s.id; o.textContent=s.title;
+  sel.appendChild(o);
+});
+
+function applySet(idOrIdx){
+  let idx=typeof idOrIdx==='number' ? idOrIdx : DATA.sets.findIndex(s=>s.id===idOrIdx);
+  if(idx<0) idx=0;
+  sel.value=DATA.sets[idx].id;
+  state.selected=-1;
+  loadSet(idx);
+  render();
+}
+
+sel.addEventListener('change',()=>applySet(sel.value));
+$('angle').addEventListener('input',()=>{
+  setAngle($('angle').value, true);
+});
+$('snap-pc1').addEventListener('click',()=>setAngle(state.cov.pc1));
+$('snap-pc2').addEventListener('click',()=>setAngle(state.cov.pc2Ang));
+$('snap-x1').addEventListener('click',()=>setAngle(0));
+
+// Pointer interaction on cloud
+let drag=null;
+cloud.addEventListener('pointerdown', e=>{
+  if(isStatic) return;
+  cloud.setPointerCapture(e.pointerId);
+  const rect=cloud.getBoundingClientRect();
+  const x=e.clientX-rect.left, y=e.clientY-rect.top;
+  drag={x0:x,y0:y, moved:false};
+});
+cloud.addEventListener('pointermove', e=>{
+  if(!drag||isStatic) return;
+  const rect=cloud.getBoundingClientRect();
+  const x=e.clientX-rect.left, y=e.clientY-rect.top;
+  if(Math.hypot(x-drag.x0,y-drag.y0)>5) drag.moved=true;
+  if(drag.moved) setAngle(angleFromPointer(x,y));
+});
+function endPointer(e){
+  if(!drag||isStatic) return;
+  const rect=cloud.getBoundingClientRect();
+  const x=e.clientX-rect.left, y=e.clientY-rect.top;
+  if(!drag.moved){
+    const hit=nearestPoint(x,y);
+    state.selected = hit===state.selected ? -1 : hit;
+    render();
+  }
+  drag=null;
+}
+cloud.addEventListener('pointerup', endPointer);
+cloud.addEventListener('pointercancel', ()=>{drag=null;});
+
+cloud.addEventListener('keydown', e=>{
+  if(isStatic) return;
+  const step=e.shiftKey?10:1;
+  if(e.key==='ArrowLeft'){ e.preventDefault(); setAngle(state.angle-step); }
+  else if(e.key==='ArrowRight'){ e.preventDefault(); setAngle(state.angle+step); }
+});
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && window.parent!==window){
+    window.parent.postMessage({type:'cpsy-exit-interactive'}, '*');
+  }
+  if(isStatic) return;
+  if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='BUTTON')) return;
+  if(e.target===cloud) return;
+  const step=e.shiftKey?10:1;
+  if(e.key==='ArrowLeft'){ e.preventDefault(); setAngle(state.angle-step); }
+  else if(e.key==='ArrowRight'){ e.preventDefault(); setAngle(state.angle+step); }
+});
+
+const ro=new ResizeObserver(()=>requestAnimationFrame(render));
+ro.observe($('cloud-frame'));
+ro.observe(sweep.parentElement);
+
+// Boot: dataset, angle, static step
+let bootSet=0;
+if(q.has('set')){
+  const i=DATA.sets.findIndex(s=>s.id===q.get('set'));
+  if(i>=0) bootSet=i;
+}
+applySet(bootSet);
+
+let bootAng=20;
+if(isStatic){
+  const step=Math.max(0, Math.min(2, parseInt(q.get('step')||'0',10)||0));
+  if(step===0) bootAng=0;
+  else if(step===1) bootAng=state.cov.pc1;
+  else bootAng=state.cov.pc2Ang;
+}else if(q.has('angle')){
+  bootAng=parseFloat(q.get('angle'));
+}
+setAngle(bootAng);
+
+window.AxisSpinner={
+  get state(){ return {set:DATA.sets[state.setIdx].id, angle:state.angle, selected:state.selected, cov:state.cov}; },
+  setAngle, applySet, render,
+  selectPoint(i){ state.selected=i; render(); },
+  /** Screen coords of point i inside the cloud canvas (for tests). */
+  pointScreen(i){
+    const frame=$('cloud-frame');
+    const L=cloudLayout(frame.clientWidth, frame.clientHeight);
+    const p=state.pts[i];
+    return {x:L.ox+p.x*L.s, y:L.oy-p.y*L.s};
+  }
+};
+})();
+</script>
+</body>
+</html>
