@@ -28,7 +28,10 @@ jobs:
             b=$(basename "$f" .md)
             npx --yes @marp-team/marp-cli@latest "$f" -o "_site/recitations/$b.html" --html --theme-set recitations/theme/cpsy1291-recitation.css
           done
-          cp -f recitations/handout-*.pdf recitations/linear-algebra-notes.pdf recitations/a1-programming-notes.pdf _site/recitations/ 2>/dev/null || true
+          # An explicit allowlist silently dropped pca-statistics-notes.pdf: it was committed
+          # and pushed for weeks but never reached the site. Match by pattern instead, so a new
+          # set of notes is published by existing there rather than by editing this file.
+          cp -f recitations/handout-*.pdf recitations/*-notes.pdf _site/recitations/ 2>/dev/null || true
           cp -f recitations/follow-along-*.ipynb recitations/python-warmup.ipynb _site/recitations/ 2>/dev/null || true
           cp -f colab-setup.html _site/ 2>/dev/null || true
           cp -f syllabus.pdf notation-reference.pdf _site/ 2>/dev/null || true
