@@ -82,3 +82,10 @@ work because they are short and everything in them pays off within a fortnight.
 Deliberately absent: lecture content (a recitation never re-teaches a lecture),
 assignment solutions (every worked example uses different data), and anything
 students do not need yet.
+
+## Worked-examples supplements (not tied to a week)
+
+| Handout | Serves | What it is |
+|---|---|---|
+| `linear-algebra-notes` | L01–L02, A1 | vectors, dot products, distances, RDMs, with the numbers written out |
+| `pca-statistics-notes` | L03, A1–A2 | mean, variance, covariance, eigenvectors, projection/reconstruction, SVD, standardization, whitening, on four points by hand; the `fit_pca` code |

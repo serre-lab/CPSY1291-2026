@@ -1,0 +1,452 @@
+\DocumentMetadata{lang=en-US, pdfversion=2.0, pdfstandard=ua-2, testphase={phase-III,math,title,table,firstaid}}
+% CPSY 1291 -- Mean, covariance, eigenvectors: the mathematics of PCA
+% Worked examples for the PCA lecture, with the numbers written out and the NumPy beside them.
+% Compile:  latexmk -lualatex pca-statistics-notes.tex
+\documentclass[11pt]{article}
+\usepackage{cpsy1291-handout}
+\hypersetup{pdftitle={CPSY 1291: Mean, covariance, eigenvectors: the mathematics of PCA}, pdfauthor={CPSY 1291, Brown University}}
+
+\newcommand{\vx}{\bm{x}}
+\newcommand{\vw}{\bm{w}}
+\newcommand{\vv}{\bm{v}}
+\newcommand{\vz}{\bm{z}}
+\newcommand{\vmu}{\bm{\mu}}
+\newcommand{\mX}{\bm{X}}
+\newcommand{\mC}{\bm{C}}
+\newcommand{\mV}{\bm{V}}
+\newcommand{\mI}{\bm{I}}
+\newcommand{\mL}{\bm{\Lambda}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\np}[1]{{\small\color{lightgray}In NumPy: \texttt{#1}}\par}
+
+\begin{document}
+
+\begin{center}
+{\sffamily\small\color{accent}\MakeUppercase{CPSY 1291 \ $\cdot$\ Worked examples}}\\[5pt]
+{\sffamily\LARGE\bfseries\color{brown} Mean, covariance, eigenvectors: the mathematics of PCA}\\[3pt]
+{\sffamily\large\color{ink} The statistics and linear algebra behind the PCA lecture and Assignments 1--2, with the numbers written out}\\[6pt]
+{\color{lightgray}\small Fall 2026}
+\end{center}
+\vspace{4pt}\hrule\vspace{10pt}
+
+\section*{Who this is for}
+\addcontentsline{toc}{section}{Who this is for}
+
+The PCA lecture paired every formula with a picture and left the algebra to one slide.
+This handout does the algebra, one object at a time, on a data set of four points in two
+dimensions so that every number can be checked by hand. It goes a little beyond the lecture
+in three places: it derives why the top eigenvector is the direction of greatest variance,
+it explains where the singular value decomposition comes in, and it works out what
+standardization and whitening do to the same four points. The NumPy line after each
+definition is the one that Assignment~2's \texttt{fit\_pca} helper uses. Cover each
+calculation and try it before reading on; the answers to ``Try it'' are at the end.
+
+\begin{keybox}
+\ask{PCA in one sentence.} Centre the data, form the covariance matrix, take its
+eigenvectors, sort them by eigenvalue. The eigenvectors are the directions along which the
+cloud is spread; the eigenvalues are the variances along those directions.
+\end{keybox}
+
+\textbf{The running example.} Four responses to four stimuli, each a vector of two
+entries (two neurons, or two pixels):
+\[
+\vx^{(1)} = (5, 3),\qquad \vx^{(2)} = (1, -1),\qquad \vx^{(3)} = (4, 0),\qquad \vx^{(4)} = (2, 2).
+\]
+Stacked as rows they form the $4\times2$ response matrix $\mX$, stimuli down, features
+across, the convention used throughout the course.
+
+\section{The statistics of one variable}
+
+\subsection{Mean and deviations}
+
+The \emph{mean} of $n$ numbers is their sum divided by $n$. The first feature (the first
+column of $\mX$) has values $5, 1, 4, 2$:
+\[
+\bar{x}_1 = \tfrac{1}{4}(5 + 1 + 4 + 2) = 3, \qquad
+\bar{x}_2 = \tfrac{1}{4}(3 - 1 + 0 + 2) = 1 .
+\]
+The \emph{mean vector} $\vmu = (\bar{x}_1, \bar{x}_2) = (3, 1)$ is the average response,
+one point standing in for all four. Subtracting it from every row \emph{centres} the data:
+\[
+\tilde{\vx}^{(1)} = (2, 2),\qquad \tilde{\vx}^{(2)} = (-2, -2),\qquad
+\tilde{\vx}^{(3)} = (1, -1),\qquad \tilde{\vx}^{(4)} = (-1, 1).
+\]
+The centred rows sum to zero in each column, always: that is what subtracting the mean
+does. Everything that follows is computed on $\tilde{\mX}$, and the mean is kept aside so
+that it can be added back at the end.
+
+\np{mu = X.mean(axis=0); Xc = X - mu}
+
+\subsection{Variance and standard deviation}
+
+The \emph{variance} of a variable is the mean of its squared deviations from its mean:
+\[
+\operatorname{var}(x_1) = \tfrac{1}{n}\sum_{i=1}^{n}\big(x^{(i)}_1 - \bar{x}_1\big)^2
+= \tfrac{1}{4}(4 + 4 + 1 + 1) = 2.5, \qquad
+\operatorname{var}(x_2) = \tfrac{1}{4}(4 + 4 + 1 + 1) = 2.5 .
+\]
+The \emph{standard deviation} $\sigma$ is its square root, $\sigma_1 = \sigma_2 =
+\sqrt{2.5} \approx 1.58$, and has the units of the data; the variance has those units
+squared.
+
+\textbf{$n$ or $n-1$.} Software usually divides by $n - 1$ rather than $n$ (NumPy's
+\texttt{np.var} divides by $n$ unless told \texttt{ddof=1}; \texttt{np.cov} and
+Assignment~2's \texttt{fit\_pca} divide by $n - 1$). The $n - 1$ version is the unbiased
+estimate of the variance of the population the sample came from; the $n$ version is the
+variance of the sample itself. With $n - 1$ every variance and covariance in this handout
+is multiplied by $4/3$, and \emph{nothing else changes}: the eigenvectors are identical and
+the eigenvalues all scale by the same factor. The lecture slides use $1/n$ because the
+formulas read more simply.
+
+\subsection{z-scores}
+
+A \emph{z-score} rescales a variable so that its mean is $0$ and its standard deviation
+is $1$: $z^{(i)} = (x^{(i)} - \bar{x})/\sigma$. For the first feature,
+$z_1 = (2, -2, 1, -1)/1.58 = (1.26, -1.26, 0.63, -0.63)$. A z-score of $1.26$ means ``1.26
+standard deviations above the mean''. Section~\ref{sec:standardize} shows what happens to
+PCA when every feature is z-scored first.
+
+\np{(X - X.mean(0)) / X.std(0)}
+
+\section{Two variables: covariance and correlation}
+
+\subsection{Covariance}
+
+The \emph{covariance} of two variables is the mean product of their deviations:
+\[
+\operatorname{cov}(x_1, x_2) = \tfrac{1}{n}\sum_{i}\big(x^{(i)}_1 - \bar{x}_1\big)\big(x^{(i)}_2 - \bar{x}_2\big)
+= \tfrac{1}{4}(4 + 4 - 1 - 1) = 1.5 ,
+\]
+the four products being $2\cdot2$, $(-2)(-2)$, $1\cdot(-1)$ and $(-1)\cdot1$.
+A positive covariance says that when one variable is above its mean the other tends to be
+too; here the two large points $(2,2)$ and $(-2,-2)$ agree in sign and outweigh the two
+small ones that disagree. The covariance of a variable with itself is its variance.
+
+\subsection{Correlation}
+
+Covariance has the units of the two variables multiplied. Dividing by both standard
+deviations removes the units and gives the \emph{Pearson correlation},
+\[
+r = \frac{\operatorname{cov}(x_1, x_2)}{\sigma_1\,\sigma_2} = \frac{1.5}{\sqrt{2.5}\sqrt{2.5}} = 0.6,
+\]
+a number between $-1$ and $1$. Equivalently, $r$ is the covariance of the two z-scored
+variables, and (as the first worked-examples handout showed) it is the cosine of the angle
+between the two centred columns. On the lecture slide that plotted every pixel against its
+neighbour, $r = 0.81$ for the photograph and $-0.01$ for random pixels: that $r$ is this
+formula applied to $4{,}032$ pairs.
+
+\np{np.cov(X.T, ddof=0) gives the 2 x 2 matrix; np.corrcoef(X.T) the correlations.}
+
+\subsection{The covariance matrix}
+\label{sec:cov}
+
+Put the variances on the diagonal and the covariances off it:
+\[
+\mC = \begin{pmatrix} \operatorname{var}(x_1) & \operatorname{cov}(x_1,x_2) \\ \operatorname{cov}(x_2,x_1) & \operatorname{var}(x_2) \end{pmatrix}
+= \begin{pmatrix} 2.5 & 1.5 \\ 1.5 & 2.5 \end{pmatrix}.
+\]
+For $d$ features $\mC$ is $d\times d$ and \emph{symmetric}, $C_{jk} = C_{kj}$. The whole
+matrix is one product of the centred data with its own transpose,
+\[
+\mC = \tfrac{1}{n}\,\tilde{\mX}^{\top}\tilde{\mX} = \tfrac{1}{n}\sum_{i=1}^{n}\tilde{\vx}^{(i)}\tilde{\vx}^{(i)\top},
+\]
+which is the formula on the lecture's eigendecomposition slide. Check the $(1,2)$ entry:
+$\tfrac{1}{4}(2\cdot2 + (-2)(-2) + 1\cdot(-1) + (-1)\cdot1) = 1.5$. For a $64\times64$ face
+image $d = 4{,}096$ and $\mC$ has sixteen million entries, which is why
+Section~\ref{sec:svd} computes PCA without ever forming it.
+
+\np{C = Xc.T @ Xc / len(Xc)  (or np.cov(Xc.T), which divides by n - 1).}
+
+\subsection{The variance along any direction}
+\label{sec:quadratic}
+
+The one property of $\mC$ that makes PCA work: for any unit vector $\vw$ ($\norm{\vw} =
+1$), the variance of the data \emph{projected onto} $\vw$ is $\vw^{\top}\mC\vw$. The proof
+is two lines. The coordinate of point $i$ along $\vw$ is $z^{(i)} = \vw^{\top}\tilde{\vx}^{(i)}$,
+a dot product; these coordinates have mean zero because the $\tilde{\vx}^{(i)}$ do; so
+\[
+\operatorname{var}(z) = \tfrac{1}{n}\sum_i \big(\vw^{\top}\tilde{\vx}^{(i)}\big)^2
+= \vw^{\top}\Big(\tfrac{1}{n}\sum_i \tilde{\vx}^{(i)}\tilde{\vx}^{(i)\top}\Big)\vw
+= \vw^{\top}\mC\vw .
+\]
+\textbf{Example.} Along the first axis, $\vw = (1, 0)$: $\vw^{\top}\mC\vw = 2.5$, the
+variance of $x_1$, as it should be. Along the diagonal, $\vw = (1, 1)/\sqrt{2}$:
+\[
+\vw^{\top}\mC\vw = \tfrac{1}{2}\,(1, 1)\begin{pmatrix} 2.5 & 1.5 \\ 1.5 & 2.5 \end{pmatrix}\begin{pmatrix}1\\1\end{pmatrix}
+= \tfrac{1}{2}(1, 1)\cdot(4, 4) = 4 .
+\]
+Along the anti-diagonal, $\vw = (1, -1)/\sqrt{2}$: $\tfrac{1}{2}(1,-1)\cdot(1,-1) = 1$.
+Check the first one directly: the coordinates along $(1,1)/\sqrt 2$ are
+$z = (4, -4, 0, 0)/\sqrt{2} = (2.83, -2.83, 0, 0)$, whose mean square is $(8 + 8)/4 = 4$.
+The cloud is four times as spread along the diagonal as across it.
+
+\textit{Try it.} Compute $\vw^{\top}\mC\vw$ for $\vw = (0, 1)$ and for $\vw = (0.6, 0.8)$.
+
+\np{w @ C @ w, with w a unit vector; np.var(Xc @ w).}
+
+\section{Eigenvectors and eigenvalues}
+
+\subsection{Definition, and the 2 x 2 case by hand}
+
+A vector $\vv \neq \bm{0}$ is an \emph{eigenvector} of a square matrix $\mC$ if
+multiplying by $\mC$ only rescales it:
+\[
+\mC\vv = \lambda\vv ,
+\]
+and the scale factor $\lambda$ is its \emph{eigenvalue}. Most vectors are turned by $\mC$;
+eigenvectors are the ones that keep their direction.
+
+For a $2\times2$ matrix the eigenvalues can be found by hand. $\mC\vv = \lambda\vv$ means
+$(\mC - \lambda\mI)\vv = \bm{0}$ with $\vv \neq \bm 0$, which is only possible when the
+matrix $\mC - \lambda\mI$ squashes some direction to zero, that is, when its determinant is
+zero:
+\[
+\det\begin{pmatrix} 2.5-\lambda & 1.5 \\ 1.5 & 2.5-\lambda \end{pmatrix}
+= (2.5-\lambda)^2 - 1.5^2 = 0
+\quad\Longrightarrow\quad 2.5 - \lambda = \pm 1.5
+\quad\Longrightarrow\quad \lambda_1 = 4,\ \lambda_2 = 1 .
+\]
+For $\lambda_1 = 4$, solve $(\mC - 4\mI)\vv = \bm 0$: the first row reads
+$-1.5\,v_1 + 1.5\,v_2 = 0$, so $v_1 = v_2$ and the unit eigenvector is
+$\vv_1 = (1, 1)/\sqrt{2}$. For $\lambda_2 = 1$ the first row reads
+$1.5\,v_1 + 1.5\,v_2 = 0$, so $\vv_2 = (1, -1)/\sqrt{2}$. Check:
+\[
+\mC\vv_1 = \tfrac{1}{\sqrt2}\begin{pmatrix} 2.5 + 1.5 \\ 1.5 + 2.5\end{pmatrix}
+= \tfrac{1}{\sqrt2}\begin{pmatrix}4\\4\end{pmatrix} = 4\,\vv_1, \qquad
+\mC\vv_2 = \tfrac{1}{\sqrt2}\begin{pmatrix} 2.5 - 1.5 \\ 1.5 - 2.5\end{pmatrix} = 1\cdot\vv_2 .
+\]
+These are exactly the two directions of Section~\ref{sec:quadratic}, and the eigenvalues
+are exactly the variances found there: $4$ along the diagonal, $1$ across it. That is not a
+coincidence, and the next subsection says why.
+
+Beyond $2\times2$ nobody solves the polynomial; the computer does it numerically. Two things
+to know about the call: \texttt{np.linalg.eigh} is for symmetric matrices (the \texttt{h}
+is for Hermitian) and is faster and more accurate than the general \texttt{eig}, and it
+returns the eigenvalues in \emph{ascending} order, so the columns have to be reversed to
+put the largest first. An eigenvector is only defined up to sign: $-\vv_1$ satisfies the
+same equation, and different libraries, or the same library on different machines, may
+return either. Assignment~2's helper fixes the sign so that the largest entry of each
+eigenvector is positive.
+
+\np{lam, V = np.linalg.eigh(C); lam, V = lam[::-1], V[:, ::-1]}
+
+\subsection{Why the eigenvectors of C are the principal axes}
+\label{sec:why}
+
+Two facts about symmetric matrices, stated without proof: their eigenvalues are real, and
+their eigenvectors can be chosen \emph{orthonormal}, unit length and mutually
+perpendicular. (Check: $\vv_1\cdot\vv_2 = \tfrac12(1\cdot1 + 1\cdot(-1)) = 0$.) So the
+eigenvectors form a basis, and any unit vector can be written in it,
+$\vw = a_1\vv_1 + a_2\vv_2 + \dots + a_d\vv_d$ with $\sum_k a_k^2 = 1$. Now compute the
+variance along $\vw$ using $\mC\vv_k = \lambda_k\vv_k$ and the orthonormality:
+\[
+\vw^{\top}\mC\vw = \Big(\sum_j a_j\vv_j\Big)^{\top}\Big(\sum_k a_k\lambda_k\vv_k\Big)
+= \sum_k \lambda_k a_k^2 .
+\]
+This is a weighted average of the eigenvalues with non-negative weights $a_k^2$ that sum
+to one. Its largest possible value is the largest eigenvalue, $\lambda_1$, reached when all
+the weight sits on $\vv_1$ ($a_1 = \pm1$, the rest zero); its smallest is $\lambda_d$.
+\emph{The direction of greatest variance is the top eigenvector, and the variance along it
+is the top eigenvalue.} Among directions perpendicular to $\vv_1$ the same argument gives
+$\vv_2$, and so on. That is the whole justification of PCA, in four lines.
+
+\textbf{Example.} $\vw = (0.6, 0.8)$ has $a_1 = \vw\cdot\vv_1 = 1.4/\sqrt2 = 0.99$ and
+$a_2 = \vw\cdot\vv_2 = -0.2/\sqrt2 = -0.14$, so
+$\vw^{\top}\mC\vw = 4\,(0.99)^2 + 1\,(0.14)^2 = 3.92 + 0.02 = 3.94$, which you can confirm
+by the direct product.
+
+\subsection{Total variance, and the Pythagorean split}
+
+The sum of the variances of all the features, $\operatorname{tr}\mC = \sum_j C_{jj}$, is
+the \emph{total variance}; it is also the mean squared distance of the centred points from
+the origin, $\tfrac1n\sum_i\norm{\tilde{\vx}^{(i)}}^2$. It equals the sum of the
+eigenvalues (a fact about every square matrix): here $2.5 + 2.5 = 4 + 1 = 5$.
+
+Project every point onto $\vw$ and it splits into a part along $\vw$ and a perpendicular
+remainder. By Pythagoras the squared lengths add, and averaging over the cloud,
+\[
+\underbrace{\tfrac1n\sum_i\norm{\tilde{\vx}^{(i)}}^2}_{\text{total, } 5}
+= \underbrace{\vw^{\top}\mC\vw}_{\text{projected variance}}
++ \underbrace{\tfrac1n\sum_i\norm{\tilde{\vx}^{(i)} - z^{(i)}\vw}^2}_{\text{reconstruction error}} .
+\]
+The left side does not depend on $\vw$. So whichever $\vw$ captures the most variance
+leaves the least error: \emph{maximising projected variance and minimising reconstruction
+error are the same problem}, and $\vv_1$ solves both. For $\vw = \vv_1$ the projected
+variance is $4$ and the error is $1 = \lambda_2$; for $\vw = (1, 0)$ they are $2.5$ and
+$2.5$.
+
+\section{Projection and reconstruction}
+\label{sec:proj}
+
+\subsection{Coordinates in the new basis}
+
+Collect the top $K$ eigenvectors as the columns of $\mV_K$ ($d\times K$). The
+\emph{coordinates} of a point in the new basis, its PCA scores, are the $K$ dot products
+\[
+\vz = \mV_K^{\top}(\vx - \vmu), \qquad z_k = \vv_k^{\top}(\vx - \vmu).
+\]
+With $K = d$ this is a pure rotation: nothing is lost. With $K = 1$ and our four points,
+$z = \vv_1^{\top}\tilde{\vx}$ gives $(2.83, -2.83, 0, 0)$: two points far out along the
+diagonal, two at the origin. Points 3 and 4, which differ from each other by $(2, -2)$,
+receive the same single coordinate, because that difference lies entirely along $\vv_2$.
+
+\subsection{The way back, and what is lost}
+
+Reconstruction reverses the projection and adds the mean back:
+\[
+\hat{\vx} = \vmu + \mV_K\vz = \vmu + \sum_{k=1}^{K} z_k\vv_k .
+\]
+With $K = 1$: $\hat{\vx}^{(1)} = (3, 1) + 2.83\,(1, 1)/\sqrt2 = (3, 1) + (2, 2) = (5, 3)$,
+exact, because point 1 lay on the $\vv_1$ line to begin with. But
+$\hat{\vx}^{(3)} = (3, 1) + 0 = (3, 1)$, while the true point is $(4, 0)$: the error
+vector is $(1, -1)$, of squared length $2$. Point 4's error is $(-1, 1)$, also $2$; points
+1 and 2 have none. Mean squared error over the four points: $(0 + 0 + 2 + 2)/4 = 1 =
+\lambda_2$. In general the mean squared reconstruction error with $K$ components is the
+sum of the discarded eigenvalues, $\sum_{k > K}\lambda_k$, which is what the lecture's
+``residual fraction'' curves plot: the fraction $\sum_{k>K}\lambda_k / \sum_k\lambda_k$,
+here $1/5 = 20\%$ for $K=1$. The complementary number, $\lambda_1 / \sum_k\lambda_k =
+80\%$, is the ``variance explained'' of the scree plot.
+
+\np{Z = Xc @ V[:, :K]; X\_hat = mu + Z @ V[:, :K].T}
+
+\textit{Try it.} Reconstruct point 2 with $K = 1$ and with $K = 2$.
+
+\section{Computing PCA without forming C: the SVD}
+\label{sec:svd}
+
+Every matrix has a \emph{singular value decomposition}, $\tilde{\mX} = \bm{U}\bm{S}\mV^{\top}$,
+with $\bm{U}$ ($n\times r$) and $\mV$ ($d\times r$) having orthonormal columns and $\bm S$
+a diagonal matrix of non-negative \emph{singular values} $s_1 \ge s_2 \ge \dots$, where $r$
+is the rank of $\tilde{\mX}$. Substitute it into the covariance:
+\[
+\mC = \tfrac1n\tilde{\mX}^{\top}\tilde{\mX} = \tfrac1n\,\mV\bm S\bm U^{\top}\bm U\bm S\mV^{\top}
+= \mV\Big(\tfrac{1}{n}\bm S^2\Big)\mV^{\top},
+\]
+using $\bm U^{\top}\bm U = \mI$. Compare with the eigendecomposition $\mC = \mV\mL\mV^{\top}$:
+the right singular vectors of the centred data \emph{are} the eigenvectors of $\mC$, and
+$\lambda_k = s_k^2/n$ (or $s_k^2/(n-1)$ with the other convention). This is how
+scikit-learn and Assignment~2's \texttt{fit\_pca} compute PCA: the SVD of the $n\times d$
+data never builds the $d\times d$ covariance, which for images would not fit in memory.
+
+The rank is at most $\min(n - 1, d)$: the $-1$ is because centring removes one degree of
+freedom (the rows sum to zero). With four points in two dimensions, $r \le 2$; with $400$
+faces of $4{,}096$ pixels, at most $399$ eigenvalues are non-zero however many pixels
+there are, a fact that surprises people the first time a scree plot stops early.
+
+\np{U, s, Vt = np.linalg.svd(Xc, full\_matrices=False); lam = s**2 / len(Xc); V = Vt.T}
+
+\section{Standardization: the same points, different units}
+\label{sec:standardize}
+
+PCA maximises variance, and variance depends on units. Suppose the first feature had been
+recorded in different units, ten times larger: $x_1 = 50, 10, 40, 20$. Then
+$\operatorname{var}(x_1) = 250$, $\operatorname{cov}(x_1, x_2) = 15$, and
+\[
+\mC' = \begin{pmatrix} 250 & 15 \\ 15 & 2.5 \end{pmatrix}, \qquad
+\lambda_1 \approx 250.9,\ \vv_1 \approx (0.998, 0.060) .
+\]
+The first component now points almost exactly along the first feature and carries $99\%$
+of the variance: the second feature has become invisible, although the \emph{shape} of the
+cloud, in the sense of which points are near which, has not changed at all. (Check the
+eigenvalues quickly: $\lambda_1 + \lambda_2 = 252.5$ and $\lambda_1\lambda_2 = \det\mC' =
+625 - 225 = 400$.)
+
+Z-scoring each feature first (Section 1.3) gives every feature variance $1$, so the
+covariance matrix of the z-scores is the \emph{correlation matrix},
+\[
+\mC_z = \begin{pmatrix} 1 & r \\ r & 1 \end{pmatrix} = \begin{pmatrix} 1 & 0.6 \\ 0.6 & 1\end{pmatrix},
+\qquad \lambda_1 = 1.6,\ \lambda_2 = 0.4,\ \vv_1 = (1, 1)/\sqrt 2 ,
+\]
+whatever the original units were (for a $2\times2$ correlation matrix the eigenvalues are
+always $1 \pm r$). Standardize when features are in different units or have variances that
+differ for uninteresting reasons; do not standardize when the differences in variance are
+the signal, as when every feature is a neuron's firing rate and some neurons really are
+more active. Assignment~1 standardizes the IT units before PCA for the first reason.
+
+\np{Xz = (X - X.mean(0)) / X.std(0); then PCA as before.}
+
+\section{Whitening: one step further}
+
+Projecting onto all $d$ eigenvectors rotates the cloud so that its coordinates are
+\emph{uncorrelated}: the covariance of $\vz = \mV^{\top}\tilde{\vx}$ is $\mV^{\top}\mC\mV =
+\mL$, diagonal, with the eigenvalues down the diagonal. Dividing coordinate $k$ by
+$\sqrt{\lambda_k}$ then gives every coordinate variance $1$:
+\[
+\vz_w = \mL^{-1/2}\mV^{\top}(\vx - \vmu), \qquad \operatorname{cov}(\vz_w) = \mI .
+\]
+This is \emph{whitening}: the cloud becomes a round ball of unit radius, every direction
+equally spread. On the four points, the whitened coordinates are
+$z_1/\sqrt4 = (1.41, -1.41, 0, 0)$ and $z_2/\sqrt1 = (0, 0, 1.41, -1.41)$, and both have
+mean square $1$. Whitening is what a learner wants as input when no direction should be
+privileged; it is also, to a first approximation, what the retina does to the
+correlations between neighbouring pixels. It is not the same as z-scoring: z-scoring
+rescales the original features, whitening rescales the principal coordinates, and only the
+second removes correlations.
+
+\np{Zw = (Xc @ V) / np.sqrt(lam)}
+
+\section{All of it in code}
+
+The following function is, line for line, the PCA of Assignment~2 (its \texttt{fit\_pca}
+helper divides by $n-1$ and fixes eigenvector signs; both are included). Run it on the
+four points and every number in this handout comes back, multiplied by $4/3$ where the
+convention says so.
+
+\begin{tcolorbox}[colback=codebg, colframe=codebg, arc=0pt, boxrule=0pt, left=4pt, right=4pt, top=2pt, bottom=2pt]
+\small\begin{verbatim}
+import numpy as np
+
+X = np.array([[5, 3], [1, -1], [4, 0], [2, 2]], dtype=float)  # (n, d)
+
+def fit_pca(X):
+    mean = X.mean(axis=0)                             # section 1.1
+    centred = X - mean
+    _, s, Vt = np.linalg.svd(centred, full_matrices=False)  # section 6
+    eigenvalues = s**2 / (len(X) - 1)                 # n - 1 convention
+    eigenvectors = Vt.T                               # one unit eigenvector per column
+    for j in range(eigenvectors.shape[1]):            # deterministic sign
+        if eigenvectors[np.argmax(np.abs(eigenvectors[:, j])), j] < 0:
+            eigenvectors[:, j] *= -1
+    return mean, eigenvalues, eigenvectors
+
+mean, lam, V = fit_pca(X)
+print(lam)                      # [5.333 1.333]  = (4, 1) * 4/3
+print(V[:, 0])                  # [0.707 0.707]  = v1
+Z = (X - mean) @ V[:, :1]       # section 5.1: one coordinate per point
+X_hat = mean + Z @ V[:, :1].T   # section 5.2: reconstruction with K = 1
+print(((X - X_hat)**2).sum(1))  # [0. 0. 2. 2.]: residuals, point by point
+print(lam[1:].sum() / lam.sum())  # 0.2: discarded fraction, either convention
+\end{verbatim}
+\end{tcolorbox}
+
+Two habits worth keeping from this. Never compare eigenvalues across two analyses without
+checking they used the same $n$ or $n-1$ convention, and never compare eigenvector signs
+across two analyses at all; compare the variance fractions and the absolute values of the
+projections instead.
+
+\subsection*{Answers to ``Try it''}
+\S\ref{sec:quadratic}: $\vw = (0, 1)$ gives $2.5$, the variance of $x_2$;
+$\vw = (0.6, 0.8)$ gives $0.36\cdot2.5 + 2\cdot0.48\cdot1.5 + 0.64\cdot2.5 = 0.9 + 1.44 + 1.6 = 3.94$,
+matching \S\ref{sec:why}.\quad
+\S\ref{sec:proj}: point 2 has $z_1 = -2.83$ and $z_2 = 0$, so
+$\hat{\vx}^{(2)} = (3, 1) - 2.83\,(1,1)/\sqrt2 = (1, -1)$ already with $K = 1$; $K = 2$ adds
+$0\cdot\vv_2$ and changes nothing. Points 3 and 4 are the ones that need the second
+component.
+
+\subsection*{Symbols used in this handout}
+\begin{center}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}ll@{\quad}ll@{}}
+\toprule
+$\mX$, $\tilde{\mX}$ & $n\times d$ data; the same, centred & $\mC$ & $d\times d$ covariance matrix, $\tfrac1n\tilde{\mX}^{\top}\tilde{\mX}$ \\
+$\vmu$, $\bar{x}_j$ & mean vector; mean of feature $j$ & $\lambda_k$, $\vv_k$ & $k$-th eigenvalue and unit eigenvector of $\mC$ \\
+$\sigma_j$, var, cov & standard deviation; variance; covariance & $\mV_K$, $\mL$ & top $K$ eigenvectors; diagonal of eigenvalues \\
+$r$ & Pearson correlation, $\operatorname{cov}/(\sigma_1\sigma_2)$ & $\vz$, $z_k$ & PCA coordinates (scores); the $k$-th one \\
+$\vw$, $\vw^{\top}\mC\vw$ & a unit direction; the variance along it & $\hat{\vx}$ & reconstruction, $\vmu + \mV_K\vz$ \\
+$\operatorname{tr}\mC$ & total variance, $\sum_j C_{jj} = \sum_k\lambda_k$ & $\bm U\bm S\mV^{\top}$, $s_k$ & the SVD; singular values \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}
