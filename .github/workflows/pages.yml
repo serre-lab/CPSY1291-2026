@@ -35,7 +35,7 @@ jobs:
           cp -f recitations/follow-along-*.ipynb recitations/python-warmup.ipynb _site/recitations/ 2>/dev/null || true
           cp -f colab-setup.html _site/ 2>/dev/null || true
           cp -f syllabus.pdf notation-reference.pdf _site/ 2>/dev/null || true
-          for d in slides images demos figures; do
+          for d in slides images demos figures final-project; do
             [ -d "$d" ] && cp -R "$d" "_site/$d" || true
           done
           {
