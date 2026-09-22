@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCA &amp; eigendecomposition · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>PCA &amp; eigendecomposition</h1><p>Reader-friendly version of the 68 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L03_pca-eigendecomposition.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">PCA &amp; eigendecomposition</a></li><li><a href="#slide-2">Last time: comparing representational spaces</a></li><li><a href="#slide-3">How many dimensions describe the variation?</a></li><li><a href="#slide-4">Can fewer coordinates capture the variation?</a></li><li><a href="#slide-5">Why look for a direction at all?</a></li><li><a href="#slide-6">Why look for a direction at all?</a></li><li><a href="#slide-7">From the same cloud to one distribution</a></li><li><a href="#slide-8">From observed values to a Gaussian model</a></li><li><a href="#slide-9">The Gaussian model in two dimensions</a></li><li><a href="#slide-10">Where is the cloud, and how does it spread?</a></li><li><a href="#slide-11">Where is the cloud, and how does it spread?</a></li><li><a href="#slide-12">Centering, in code</a></li><li><a href="#slide-13">Covariance: do the deviations go together?</a></li><li><a href="#slide-14">The covariance matrix</a></li><li><a href="#slide-15">Projection onto a unit direction</a></li><li><a href="#slide-16">Projection onto a unit direction</a></li><li><a href="#slide-17">Projection onto a unit direction</a></li><li><a href="#slide-18">A direction keeps part of the spread</a></li><li><a href="#slide-19">Turn it until the leftovers are smallest</a></li><li><a href="#slide-20">Spin the axis yourself</a></li><li><a href="#slide-21">From turning the line to a calculation</a></li><li><a href="#slide-22">The covariance matrix changes a direction</a></li><li><a href="#slide-23">Most directions turn</a></li><li><a href="#slide-24">Eigenvectors are directions that do not turn</a></li><li><a href="#slide-25">An eigenvalue gives variance along its eigenvector</a></li><li><a href="#slide-26">PCA = eigendecomposition of 𝐂\mathbf{C}</a></li><li><a href="#slide-27">From a line to a plane</a></li><li><a href="#slide-28">The new coordinates are the PC scores</a></li><li><a href="#slide-29">Reconstruction: the way back</a></li><li><a href="#slide-30">What do we lose when we keep fewer components?</a></li><li><a href="#slide-31">How many components? The scree plot</a></li><li><a href="#slide-32">PCA in scikit-learn</a></li><li><a href="#slide-33">Can these directions help explain a neuron?</a></li><li><a href="#slide-34">Build an object space from network responses</a></li><li><a href="#slide-35">Test whether a direction predicts a response</a></li><li><a href="#slide-36">Neural preferences occupy different regions</a></li><li><a href="#slide-37">Use the space to make a new prediction</a></li><li><a href="#slide-38">What did PCA buy us?</a></li><li><a href="#slide-39">Further reading for the research trail</a></li><li><a href="#slide-40">Minute paper</a></li><li><a href="#slide-41">Appendix: examples and implementation details</a></li><li><a href="#slide-42">The measurement scale changes PCA</a></li><li><a href="#slide-43">Most variance need not mean most useful</a></li><li><a href="#slide-44">Which direction would you keep?</a></li><li><a href="#slide-45">Low variance can still separate the groups</a></li><li><a href="#slide-46">What if the variation follows a curve?</a></li><li><a href="#slide-47">One direction was not enough</a></li><li><a href="#slide-48">How far does the dependence reach?</a></li><li><a href="#slide-49">One object, many images</a></li><li><a href="#slide-50">The same picture, drawn by hand</a></li><li><a href="#slide-51">Two sheets, tangled</a></li><li><a href="#slide-52">Why more dimensions make learning harder</a></li><li><a href="#slide-53">Same images, different coordinates</a></li><li><a href="#slide-54">PCA in code: two routes to the same answer</a></li><li><a href="#slide-55">Eigenfaces</a></li><li><a href="#slide-56">PCA as compression — eigenfaces</a></li><li><a href="#slide-57">Face space: the plane, with real faces on it</a></li><li><a href="#slide-58">A face = mean + a few eigenfaces</a></li><li><a href="#slide-59">Mix your own face</a></li><li><a href="#slide-60">Two views, one answer</a></li><li><a href="#slide-61">PCA as decorrelation &amp; whitening</a></li><li><a href="#slide-62">What do the components look like?</a></li><li><a href="#slide-63">Dimension counts depend on sampling</a></li><li><a href="#slide-64">Identity and viewpoint contribute variance</a></li><li><a href="#slide-65">Testing an interpretation of a PC</a></li><li><a href="#slide-66">Preprocessing neural responses</a></li><li><a href="#slide-67">The rainbow cortex is three numbers per voxel</a></li><li><a href="#slide-68">PCA only ever finds a flat subspace</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCA &amp; eigendecomposition · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>PCA &amp; eigendecomposition</h1><p>Reader-friendly version of the 68 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L03_pca-eigendecomposition.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">PCA &amp; eigendecomposition</a></li><li><a href="#slide-2">Last time: comparing representational spaces</a></li><li><a href="#slide-3">How many dimensions describe the variation?</a></li><li><a href="#slide-4">Can fewer coordinates capture the variation?</a></li><li><a href="#slide-5">Why look for a direction at all?</a></li><li><a href="#slide-6">Why look for a direction at all?</a></li><li><a href="#slide-7">From the same cloud to one distribution</a></li><li><a href="#slide-8">From observed values to a Gaussian model</a></li><li><a href="#slide-9">The Gaussian model in two dimensions</a></li><li><a href="#slide-10">Where is the cloud, and how does it spread?</a></li><li><a href="#slide-11">Where is the cloud, and how does it spread?</a></li><li><a href="#slide-12">Centering, in code</a></li><li><a href="#slide-13">Covariance: do the deviations go together?</a></li><li><a href="#slide-14">The covariance matrix</a></li><li><a href="#slide-15">Projection onto a unit direction</a></li><li><a href="#slide-16">Projection onto a unit direction</a></li><li><a href="#slide-17">Projection onto a unit direction</a></li><li><a href="#slide-18">A direction keeps part of the spread</a></li><li><a href="#slide-19">Turn it until the leftovers are smallest</a></li><li><a href="#slide-20">Spin the axis yourself</a></li><li><a href="#slide-21">From turning the line to a calculation</a></li><li><a href="#slide-22">The covariance matrix changes a direction</a></li><li><a href="#slide-23">Most directions turn</a></li><li><a href="#slide-24">Eigenvectors are directions that do not turn</a></li><li><a href="#slide-25">An eigenvalue gives variance along its eigenvector</a></li><li><a href="#slide-26">PCA = eigendecomposition of 𝐂\mathbf{C}</a></li><li><a href="#slide-27">From a line to a plane</a></li><li><a href="#slide-28">The new coordinates are the PC scores</a></li><li><a href="#slide-29">Reconstruction: the way back</a></li><li><a href="#slide-30">What do we lose when we keep fewer components?</a></li><li><a href="#slide-31">How many components? The scree plot</a></li><li><a href="#slide-32">Most variance need not mean most useful</a></li><li><a href="#slide-33">Which direction would you keep?</a></li><li><a href="#slide-34">Low variance can still separate the groups</a></li><li><a href="#slide-35">PCA in scikit-learn</a></li><li><a href="#slide-36">Can these directions help explain a neuron?</a></li><li><a href="#slide-37">Build an object space from network responses</a></li><li><a href="#slide-38">Test whether a direction predicts a response</a></li><li><a href="#slide-39">Neural preferences occupy different regions</a></li><li><a href="#slide-40">Use the space to make a new prediction</a></li><li><a href="#slide-41">What did PCA buy us?</a></li><li><a href="#slide-42">What if the variation follows a curve?</a></li><li><a href="#slide-43">Further reading for the research trail</a></li><li><a href="#slide-44">Minute paper</a></li><li><a href="#slide-45">Appendix: examples and implementation details</a></li><li><a href="#slide-46">The measurement scale changes PCA</a></li><li><a href="#slide-47">One direction was not enough</a></li><li><a href="#slide-48">How far does the dependence reach?</a></li><li><a href="#slide-49">One object, many images</a></li><li><a href="#slide-50">The same picture, drawn by hand</a></li><li><a href="#slide-51">Two sheets, tangled</a></li><li><a href="#slide-52">Why more dimensions make learning harder</a></li><li><a href="#slide-53">Same images, different coordinates</a></li><li><a href="#slide-54">PCA in code: two routes to the same answer</a></li><li><a href="#slide-55">Eigenfaces</a></li><li><a href="#slide-56">PCA as compression — eigenfaces</a></li><li><a href="#slide-57">Face space: the plane, with real faces on it</a></li><li><a href="#slide-58">A face = mean + a few eigenfaces</a></li><li><a href="#slide-59">Mix your own face</a></li><li><a href="#slide-60">Two views, one answer</a></li><li><a href="#slide-61">PCA as decorrelation &amp; whitening</a></li><li><a href="#slide-62">What do the components look like?</a></li><li><a href="#slide-63">Dimension counts depend on sampling</a></li><li><a href="#slide-64">Identity and viewpoint contribute variance</a></li><li><a href="#slide-65">Testing an interpretation of a PC</a></li><li><a href="#slide-66">Preprocessing neural responses</a></li><li><a href="#slide-67">The rainbow cortex is three numbers per voxel</a></li><li><a href="#slide-68">PCA only ever finds a flat subspace</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
   <img src="../images/brown-crest-color.png" alt="Brown University crest">
   <div class="vrule"></div>
   <div>
@@ -306,7 +306,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <div class="row">
 <div class="col fig">
 <div class="capfig">
-<figure><img src="../images/L03/25_kept_and_left_2.svg" alt="The running pixel cloud with its best projection direction, which retains 90 percent of the variance and lies at 44 degrees" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>The running pixel cloud with its best projection direction, which retains 90 percent of the variance and lies at 44 degrees</p><a href="../images/L03/25_kept_and_left_2.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/26_best_direction_eigenvector.svg" alt="The same centred pixel cloud and the same 44-degree line as the best-direction slide, now with the eigenvector v1 drawn along it as an arrow and the variance along it given as 90 percent of the total" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>The same centred pixel cloud and the same 44-degree line as the best-direction slide, now with the eigenvector v1 drawn along it as an arrow and the variance along it given as 90 percent of the total</p><a href="../images/L03/26_best_direction_eigenvector.svg">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <div class="col">
@@ -406,7 +406,37 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 </ul>
 <div class="ref"><a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_olivetti_faces.html" rel="noopener">Olivetti faces · AT&amp;T Laboratories Cambridge</a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="68" aria-labelledby="heading-32"><p class="page">Slide 32</p>
-<h2 id="heading-32">PCA in scikit-learn</h2>
+<h2 id="heading-32">Most variance need not mean most useful</h2>
+<div class="capfig">
+<figure><img src="../images/L03/38_variance_is_not_usefulness.svg" alt="Left: the 120 photographs laid out along the leading direction of their pixel coordinates, running from dark pictures to bright ones with animals of different categories interspersed. Right: position along that direction plotted against the mean pixel value of each photograph, an almost perfect straight line, r equals 0.99" aria-describedby="figure-32-1"><figcaption id="figure-32-1"><p>Left: the 120 photographs laid out along the leading direction of their pixel coordinates, running from dark pictures to bright ones with animals of different categories interspersed. Right: position along that direction plotted against the mean pixel value of each photograph, an almost perfect straight line, r equals 0.99</p><a href="../images/L03/38_variance_is_not_usefulness.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>The largest direction in the 120 photographs carries <strong>29%</strong> of the variation and is strongly related to <strong>overall brightness</strong>: ordered along it they run dark to bright, different categories interspersed.</li>
+<li>Would this direction help distinguish the animals? This plot alone cannot answer.</li>
+<li><mark>PCA ranks directions by variance; the task determines what is useful.</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="68" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<h2 id="heading-33">Which direction would you keep?</h2>
+<div class="capfig">
+<figure><img src="../images/L03/arc_task_1.svg" alt="Toy classes with a high-variance horizontal direction and low-variance vertical separation; projection panels ask for a prediction" aria-describedby="figure-33-1"><figcaption id="figure-33-1"><p>Toy classes with a high-variance horizontal direction and low-variance vertical separation; projection panels ask for a prediction</p><a href="../images/L03/arc_task_1.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>The groups vary mainly from left to right. Their labels differ from top to bottom.</li>
+<li>Which direction would best reconstruct the points?</li>
+<li>Which direction would best distinguish the groups?</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="68" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<h2 id="heading-34">Low variance can still separate the groups</h2>
+<div class="capfig">
+<figure><img src="../images/L03/arc_task_2.svg" alt="Toy classes with a high-variance horizontal direction and low-variance vertical separation; PC1 scores overlap while PC2 scores separate the classes" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Toy classes with a high-variance horizontal direction and low-variance vertical separation; PC1 scores overlap while PC2 scores separate the classes</p><a href="../images/L03/arc_task_2.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>PC1 retains 97.8% of variance</strong>, but both groups have the same PC1 coordinates.</li>
+<li><strong>PC2 retains 2.2%</strong>, yet a threshold at zero separates the groups.</li>
+<li><mark>Variance measures spread. Task relevance depends on what we want to distinguish.</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="68" aria-labelledby="heading-35"><p class="page">Slide 35</p>
+<h2 id="heading-35">PCA in scikit-learn</h2>
 <marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">from</span> sklearn.decomposition <span class="hljs-keyword">import</span> PCA
 
 pca = PCA(n_components=K, svd_solver=<span class="hljs-string">"full"</span>)
@@ -420,10 +450,10 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li><strong>SVD</strong> computes the PCA directions and variances from the centered data without explicitly forming its covariance matrix.</li>
 </ul>
 <div class="ref"><a href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html" rel="noopener">scikit-learn · PCA</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="68" aria-labelledby="heading-33"><p class="page">Slide 33</p>
-<h2 id="heading-33">Can these directions help explain a neuron?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="68" aria-labelledby="heading-36"><p class="page">Slide 36</p>
+<h2 id="heading-36">Can these directions help explain a neuron?</h2>
 <div class="capfig">
-<figure><img src="../images/L03/bao2020_fig3b_row.png" alt="Three example IT cells from Bao and colleagues, each shown as a 24-view by 51-object response matrix with four views of the cell's preferred object picked out and shown underneath: an aeroplane, a swan and a basket" aria-describedby="figure-33-1"><figcaption id="figure-33-1"><p>Three example IT cells from Bao and colleagues, each shown as a 24-view by 51-object response matrix with four views of the cell's preferred object picked out and shown underneath: an aeroplane, a swan and a basket</p><a href="../images/L03/bao2020_fig3b_row.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/bao2020_fig3b_row.png" alt="Three example IT cells from Bao and colleagues, each shown as a 24-view by 51-object response matrix with four views of the cell's preferred object picked out and shown underneath: an aeroplane, a swan and a basket" aria-describedby="figure-36-1"><figcaption id="figure-36-1"><p>Three example IT cells from Bao and colleagues, each shown as a 24-view by 51-object response matrix with four views of the cell's preferred object picked out and shown underneath: an aeroplane, a swan and a basket</p><a href="../images/L03/bao2020_fig3b_row.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li><strong>Inferotemporal (IT) cortex</strong> is part of the primate visual pathway involved in object recognition.</li>
@@ -431,12 +461,12 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li>Can a space derived from a network's responses help organize these preferences?</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. <i>Nature</i> 2020 · Fig. 3b</a>, three of the example cells</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="68" aria-labelledby="heading-34"><p class="page">Slide 34</p>
-<h2 id="heading-34">Build an object space from network responses</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="68" aria-labelledby="heading-37"><p class="page">Slide 37</p>
+<h2 id="heading-37">Build an object space from network responses</h2>
 <div class="row">
 <div class="col fig">
 <div class="capfig">
-<figure><img src="../images/L03/bao2020_object_space_complete.png" alt="Complete published schematic of AlexNet object space with all four colored stimulus groups" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Complete published schematic of AlexNet object space with all four colored stimulus groups</p><a href="../images/L03/bao2020_object_space_complete.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/bao2020_object_space_complete.png" alt="Complete published schematic of AlexNet object space with all four colored stimulus groups" aria-describedby="figure-37-1"><figcaption id="figure-37-1"><p>Complete published schematic of AlexNet object space with all four colored stimulus groups</p><a href="../images/L03/bao2020_object_space_complete.png">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <div class="col">
@@ -449,21 +479,21 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. Nature 2020</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="68" aria-labelledby="heading-35"><p class="page">Slide 35</p>
-<h2 id="heading-35">Test whether a direction predicts a response</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="68" aria-labelledby="heading-38"><p class="page">Slide 38</p>
+<h2 id="heading-38">Test whether a direction predicts a response</h2>
 <div class="capfig">
-<figure><img src="../images/L03/arc_readout_schematic.svg" alt="Schematic simulated example: projecting points in model space onto a direction gives a scalar related to a simulated neural response" aria-describedby="figure-35-1"><figcaption id="figure-35-1"><p>Schematic simulated example: projecting points in model space onto a direction gives a scalar related to a simulated neural response</p><a href="../images/L03/arc_readout_schematic.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/arc_readout_schematic.svg" alt="Schematic simulated example: projecting points in model space onto a direction gives a scalar related to a simulated neural response" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>Schematic simulated example: projecting points in model space onto a direction gives a scalar related to a simulated neural response</p><a href="../images/L03/arc_readout_schematic.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li>The gold ring follows one image from its position in model space to its measured response.</li>
 <li>Choose a direction using training images, then ask whether each image's <strong>projection</strong> predicts the cell's response on held-out images.</li>
 <li>The preferred direction can combine several PCs; it need not coincide with PC1 or PC2.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="68" aria-labelledby="heading-36"><p class="page">Slide 36</p>
-<h2 id="heading-36">Neural preferences occupy different regions</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="68" aria-labelledby="heading-39"><p class="page">Slide 39</p>
+<h2 id="heading-39">Neural preferences occupy different regions</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/2026-a1-papers/bao2020_four_networks.png" alt="Grey stimulus points in the PC1-PC2 plane with four colored clouds — the preferred images of four IT patch systems — landing one per quadrant" aria-describedby="figure-36-1"><figcaption id="figure-36-1"><p>Grey stimulus points in the PC1-PC2 plane with four colored clouds — the preferred images of four IT patch systems — landing one per quadrant</p><a href="../images/2026-a1-papers/bao2020_four_networks.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/2026-a1-papers/bao2020_four_networks.png" alt="Grey stimulus points in the PC1-PC2 plane with four colored clouds — the preferred images of four IT patch systems — landing one per quadrant" aria-describedby="figure-39-1"><figcaption id="figure-39-1"><p>Grey stimulus points in the PC1-PC2 plane with four colored clouds — the preferred images of four IT patch systems — landing one per quadrant</p><a href="../images/2026-a1-papers/bao2020_four_networks.png">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -474,10 +504,10 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao, She, McGill &amp; Tsao <i>Nature</i> 2020</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="68" aria-labelledby="heading-37"><p class="page">Slide 37</p>
-<h2 id="heading-37">Use the space to make a new prediction</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="68" aria-labelledby="heading-40"><p class="page">Slide 40</p>
+<h2 id="heading-40">Use the space to make a new prediction</h2>
 <div class="capfig">
-<figure><img src="../images/L03/bao2020_cortical_prediction.png" alt="Published coronal fMRI maps from two monkeys, showing the four networks at posterior, middle and anterior IT; magenta marks the predicted stubby-object network" aria-describedby="figure-37-1"><figcaption id="figure-37-1"><p>Published coronal fMRI maps from two monkeys, showing the four networks at posterior, middle and anterior IT; magenta marks the predicted stubby-object network</p><a href="../images/L03/bao2020_cortical_prediction.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/bao2020_cortical_prediction.png" alt="Published coronal fMRI maps from two monkeys, showing the four networks at posterior, middle and anterior IT; magenta marks the predicted stubby-object network" aria-describedby="figure-40-1"><figcaption id="figure-40-1"><p>Published coronal fMRI maps from two monkeys, showing the four networks at posterior, middle and anterior IT; magenta marks the predicted stubby-object network</p><a href="../images/L03/bao2020_cortical_prediction.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li>The object space predicted a system responding to <strong>stubby, inanimate objects</strong>.</li>
@@ -485,12 +515,12 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li><mark>A description of a representation can guide a new experiment.</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. Nature 2020 · Fig. 4c</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="68" aria-labelledby="heading-38"><p class="page">Slide 38</p>
-<h2 id="heading-38">What did PCA buy us?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="68" aria-labelledby="heading-41"><p class="page">Slide 41</p>
+<h2 id="heading-41">What did PCA buy us?</h2>
 <div class="row">
 <div class="col fig">
 <div class="capfig">
-<figure><img src="../images/L03/04_two_measurements_one_direction_2.svg" alt="Return to the two neighboring pixels and the direction retaining approximately 90 percent of their variance" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>Return to the two neighboring pixels and the direction retaining approximately 90 percent of their variance</p><a href="../images/L03/04_two_measurements_one_direction_2.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/04_two_measurements_one_direction_2.svg" alt="Return to the two neighboring pixels and the direction retaining approximately 90 percent of their variance" aria-describedby="figure-41-1"><figcaption id="figure-41-1"><p>Return to the two neighboring pixels and the direction retaining approximately 90 percent of their variance</p><a href="../images/L03/04_two_measurements_one_direction_2.svg">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <div class="col">
@@ -501,8 +531,19 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="68" aria-labelledby="heading-39"><p class="page">Slide 39</p>
-<h2 id="heading-39">Further reading for the research trail</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="68" aria-labelledby="heading-42"><p class="page">Slide 42</p>
+<h2 id="heading-42">What if the variation follows a curve?</h2>
+<div class="capfig">
+<figure><img src="../images/L03/09_rotation_curve.svg" alt="Rotated, shifted and resized versions of an image projected into two PCA directions; rotation traces a closed curve" aria-describedby="figure-42-1"><figcaption id="figure-42-1"><p>Rotated, shifted and resized versions of an image projected into two PCA directions; rotation traces a closed curve</p><a href="../images/L03/09_rotation_curve.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Changing one stimulus parameter can trace a <strong>curved path</strong> in a large response space.</li>
+<li>Even one varying parameter can require <strong>two linear coordinates</strong> when the path bends back on itself.</li>
+<li>PCA approximates data with a <strong>flat subspace</strong>.</li>
+<li>Next: nonlinear maps, and how to check what their geometry preserves.</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-marpit-pagination="43" data-marpit-pagination-total="68" aria-labelledby="heading-43"><p class="page">Slide 43</p>
+<h2 id="heading-43">Further reading for the research trail</h2>
 <p class="meta"><b>Handout:</b> <a href="https://serre-lab.github.io/CPSY1291-2026/recitations/pca-statistics-notes.pdf" rel="noopener">Statistics and the mathematics of PCA</a> — variance, covariance, eigenvectors, projection and reconstruction, worked by hand in this lecture’s notation.</p>
 <ul>
 <li><strong>Bao et al. (2020):</strong> object-space axes and IT responses. <a href="https://doi.org/10.1038/s41586-020-2350-5">Nature</a></li>
@@ -511,9 +552,9 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li>DiCarlo &amp; Cox (2007): untangling object representations. <a href="https://doi.org/10.1016/j.tics.2007.06.010">Trends Cogn. Sci.</a></li>
 <li><strong>Stringer et al. (2019):</strong> a structured, high-dimensional neural spectrum. <a href="https://doi.org/10.1038/s41586-019-1346-5">Nature</a></li>
 </ul>
-<p>Pick one of these, read it, and use its reference list to find the two or three papers it builds on. That is your trail.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="68" aria-labelledby="heading-40"><p class="page">Slide 40</p>
-<h2 id="heading-40">Minute paper</h2>
+<p>Trail entry: pick <strong>any paper cited in a lecture so far</strong>, read it, and post <strong>four to six sentences</strong> on Ed under <strong>Research trail</strong> — what it did, and what surprised you or what question it left you with. <strong>Reply once</strong> to a classmate. Next deadline <strong>Fri 9/25</strong>, best three of four entries count.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="68" aria-labelledby="heading-44"><p class="page">Slide 44</p>
+<h2 id="heading-44">Minute paper</h2>
 <p>Submit on <strong>Canvas → Minute papers → Minute Paper 4</strong>.</p>
 <p>Write three brief points in your own words:</p>
 <ol>
@@ -522,15 +563,15 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 <li>Another idea you found interesting, and why it matters for brains, behavior or AI</li>
 </ol>
 <p>Credit for a thoughtful attempt, not for being correct.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="68" aria-labelledby="heading-41"><p class="page">Slide 41</p>
-<h2 id="heading-41">Appendix: examples and implementation details</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-marpit-pagination="45" data-marpit-pagination-total="68" aria-labelledby="heading-45"><p class="page">Slide 45</p>
+<h2 id="heading-45">Appendix: examples and implementation details</h2>
 <p>Additional examples, the PCA/SVD implementation, and assignment reference material.</p>
 <p>Use these explanations as needed while working through the notebooks. The live lecture develops the main geometric argument.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="68" aria-labelledby="heading-42"><p class="page">Slide 42</p>
-<h2 id="heading-42">The measurement scale changes PCA</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-marpit-pagination="46" data-marpit-pagination-total="68" aria-labelledby="heading-46"><p class="page">Slide 46</p>
+<h2 id="heading-46">The measurement scale changes PCA</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L03/47_scaling_matters.svg" alt="The same correlated cloud twice. Top, in raw units with feature 1 in millimetres and feature 2 in metres, PC1 equals 1.00 times feature 1 plus 0.00 times feature 2 and carries 100 percent of the variance. Bottom, after z-scoring, PC1 is 0.71 times each feature and carries 89 percent" aria-describedby="figure-42-1"><figcaption id="figure-42-1"><p>The same correlated cloud twice. Top, in raw units with feature 1 in millimetres and feature 2 in metres, PC1 equals 1.00 times feature 1 plus 0.00 times feature 2 and carries 100 percent of the variance. Bottom, after z-scoring, PC1 is 0.71 times each feature and carries 89 percent</p><a href="../images/L03/47_scaling_matters.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/47_scaling_matters.svg" alt="The same correlated cloud twice. Top, in raw units with feature 1 in millimetres and feature 2 in metres, PC1 equals 1.00 times feature 1 plus 0.00 times feature 2 and carries 100 percent of the variance. Bottom, after z-scoring, PC1 is 0.71 times each feature and carries 89 percent" aria-describedby="figure-46-1"><figcaption id="figure-46-1"><p>The same correlated cloud twice. Top, in raw units with feature 1 in millimetres and feature 2 in metres, PC1 equals 1.00 times feature 1 plus 0.00 times feature 2 and carries 100 percent of the variance. Bottom, after z-scoring, PC1 is 0.71 times each feature and carries 89 percent</p><a href="../images/L03/47_scaling_matters.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -540,47 +581,6 @@ axes = pca.components_        <span class="hljs-comment"># one principal directi
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-marpit-pagination="43" data-marpit-pagination-total="68" aria-labelledby="heading-43"><p class="page">Slide 43</p>
-<h2 id="heading-43">Most variance need not mean most useful</h2>
-<div class="capfig">
-<figure><img src="../images/L03/38_variance_is_not_usefulness.svg" alt="Left: the 120 photographs laid out along the leading direction of their pixel coordinates, running from dark pictures to bright ones with animals of different categories interspersed. Right: position along that direction plotted against the mean pixel value of each photograph, an almost perfect straight line, r equals 0.99" aria-describedby="figure-43-1"><figcaption id="figure-43-1"><p>Left: the 120 photographs laid out along the leading direction of their pixel coordinates, running from dark pictures to bright ones with animals of different categories interspersed. Right: position along that direction plotted against the mean pixel value of each photograph, an almost perfect straight line, r equals 0.99</p><a href="../images/L03/38_variance_is_not_usefulness.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li>The largest direction in the 120 photographs carries <strong>29%</strong> of the variation and is strongly related to <strong>overall brightness</strong>: ordered along it they run dark to bright, different categories interspersed.</li>
-<li>Would this direction help distinguish the animals? This plot alone cannot answer.</li>
-<li><mark>PCA ranks directions by variance; the task determines what is useful.</mark></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="68" aria-labelledby="heading-44"><p class="page">Slide 44</p>
-<h2 id="heading-44">Which direction would you keep?</h2>
-<div class="capfig">
-<figure><img src="../images/L03/arc_task_1.svg" alt="Toy classes with a high-variance horizontal direction and low-variance vertical separation; projection panels ask for a prediction" aria-describedby="figure-44-1"><figcaption id="figure-44-1"><p>Toy classes with a high-variance horizontal direction and low-variance vertical separation; projection panels ask for a prediction</p><a href="../images/L03/arc_task_1.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li>The groups vary mainly from left to right. Their labels differ from top to bottom.</li>
-<li>Which direction would best reconstruct the points?</li>
-<li>Which direction would best distinguish the groups?</li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-marpit-pagination="45" data-marpit-pagination-total="68" aria-labelledby="heading-45"><p class="page">Slide 45</p>
-<h2 id="heading-45">Low variance can still separate the groups</h2>
-<div class="capfig">
-<figure><img src="../images/L03/arc_task_2.svg" alt="Toy classes with a high-variance horizontal direction and low-variance vertical separation; PC1 scores overlap while PC2 scores separate the classes" aria-describedby="figure-45-1"><figcaption id="figure-45-1"><p>Toy classes with a high-variance horizontal direction and low-variance vertical separation; PC1 scores overlap while PC2 scores separate the classes</p><a href="../images/L03/arc_task_2.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li><strong>PC1 retains 97.8% of variance</strong>, but both groups have the same PC1 coordinates.</li>
-<li><strong>PC2 retains 2.2%</strong>, yet a threshold at zero separates the groups.</li>
-<li><mark>Variance measures spread. Task relevance depends on what we want to distinguish.</mark></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-marpit-pagination="46" data-marpit-pagination-total="68" aria-labelledby="heading-46"><p class="page">Slide 46</p>
-<h2 id="heading-46">What if the variation follows a curve?</h2>
-<div class="capfig">
-<figure><img src="../images/L03/09_rotation_curve.svg" alt="Rotated, shifted and resized versions of an image projected into two PCA directions; rotation traces a closed curve" aria-describedby="figure-46-1"><figcaption id="figure-46-1"><p>Rotated, shifted and resized versions of an image projected into two PCA directions; rotation traces a closed curve</p><a href="../images/L03/09_rotation_curve.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li>Changing one stimulus parameter can trace a <strong>curved path</strong> in a large response space.</li>
-<li>Even one varying parameter can require <strong>two linear coordinates</strong> when the path bends back on itself.</li>
-<li>PCA approximates data with a <strong>flat subspace</strong>.</li>
-<li>Next: nonlinear maps, and how to check what their geometry preserves.</li>
-</ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-paginate="true" data-marpit-pagination="47" data-marpit-pagination-total="68" aria-labelledby="heading-47"><p class="page">Slide 47</p>
 <h2 id="heading-47">One direction was not enough</h2>
 <div class="capfig">
