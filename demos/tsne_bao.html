@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>t-SNE on 120 animals · CPSY 1291</title>
+<title>t-SNE on the Bao objects · CPSY 1291</title>
 <!--
   Static steps (?static=1&step=N):
     0 = PCA layout, coloured dots + shapes
@@ -63,7 +63,7 @@ output{font-variant-numeric:tabular-nums;min-width:2ch;color:var(--ink);font-wei
 .status{margin:6px 0 0;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums;min-height:1.35em;flex-shrink:0}
 .footer{margin-top:6px;font-size:13px;color:var(--muted);flex-shrink:0}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.tsne-only.hidden-ctl{display:none!important}
+.tsne-only.hidden-ctl,.umap-only.hidden-ctl{display:none!important}
 body.embed{overflow:hidden}
 body.embed .wrap{max-width:none;width:100%;height:100vh;padding:4px 8px;display:flex;flex-direction:column}
 body.embed h1,body.embed .lede,body.embed .footer{display:none}
@@ -88,6 +88,7 @@ body.static .tsne-run{display:none}
   .frame{max-height:420px;aspect-ratio:1/1}
   body.embed .wrap{height:auto;overflow:auto}
 }
+.toolbar{gap:6px 12px!important} .toolbar input[type=range]{width:110px!important}
 </style>
 <script>
 (function(){
@@ -98,9 +99,9 @@ body.static .tsne-run{display:none}
 </head>
 <body>
 <div class="wrap">
-  <h1>t-SNE, PCA and MDS on 120 animals</h1>
-  <p class="lede">Late-layer activations of a trained network on the Assignment&nbsp;1 photographs, reduced to 50 PCs.
-  Compare a live t-SNE layout with the linear PCA plane and a metric MDS map of the same 50-D points.</p>
+  <h1>t-SNE, UMAP, PCA and MDS on the Bao objects</h1>
+  <p class="lede">AlexNet fc6 responses to the Assignment&nbsp;1 Part&nbsp;4 images (51 objects, 8 views each), reduced to 50 PCs.
+  A live t-SNE layout next to UMAP, the linear PCA plane and a metric MDS map of the same 50-D points.</p>
 
   <div class="toolbar" role="group" aria-label="Layout controls">
     <span class="ctl"><label id="method-label">Method</label>
@@ -108,15 +109,18 @@ body.static .tsne-run{display:none}
         <button type="button" data-m="tsne" aria-pressed="true">t-SNE</button>
         <button type="button" data-m="pca" aria-pressed="false">PCA</button>
         <button type="button" data-m="mds" aria-pressed="false">MDS</button>
+        <button type="button" data-m="umap" aria-pressed="false">UMAP</button>
       </span></span>
-    <span class="ctl"><label id="view-label">Show</label>
+    <span class="ctl umap-only hidden-ctl"><label for="unn">n_neighbors</label>
+      <select id="unn"><option>5</option><option selected>15</option><option>50</option></select></span>
+    <span class="ctl"><label id="view-label">View</label>
       <span class="seg" role="group" aria-labelledby="view-label" id="views">
         <button type="button" data-v="thumbs" aria-pressed="true">Thumbnails</button>
         <button type="button" data-v="dots" aria-pressed="false">Dots</button>
       </span></span>
     <span class="ctl tsne-only"><label for="perp">Perplexity</label>
-      <input type="range" id="perp" min="2" max="50" value="15" step="1" aria-describedby="status">
-      <output for="perp" id="perp-out">15</output></span>
+      <input type="range" id="perp" min="2" max="80" value="30" step="1" aria-describedby="status">
+      <output for="perp" id="perp-out">30</output></span>
     <span class="ctl tsne-only"><label for="steps">Steps</label>
       <input type="range" id="steps" min="50" max="1000" value="1000" step="50" aria-describedby="status">
       <output for="steps" id="steps-out">1000</output></span>
@@ -128,7 +132,7 @@ body.static .tsne-run{display:none}
     <span class="ctl tsne-only"><label for="seed">Seed</label>
       <input type="number" id="seed" min="0" max="999999" value="1" aria-label="Random seed"></span>
     <span class="ctl tsne-only"><input type="checkbox" id="compare" aria-label="Compare two runs">
-      <label for="compare">Compare two runs</label></span>
+      <label for="compare">Compare</label></span>
     <span class="ctl"><label for="k">k</label>
       <input type="range" id="k" min="3" max="15" value="10" step="1" aria-describedby="status">
       <output for="k" id="k-out">10</output></span>
@@ -142,16 +146,16 @@ body.static .tsne-run{display:none}
     </section>
     <aside class="side" aria-label="Neighborhood quality">
       <div class="meter">
-        <h3 id="h-knn"><span id="knn-k">10</span>-NN agreement</h3>
+        <h3 id="h-knn"><span id="knn-k">10</span>-NN agreement <span style="font-weight:400;font-size:.85em">(k = neighbors)</span></h3>
         <div class="val" id="knn-val">—</div>
         <div class="bar" aria-hidden="true"><div class="fill" id="knn-fill"></div></div>
         <p class="hint">Mean fraction of each image’s k nearest neighbors in 50-D that remain among its k nearest in this 2-D layout. Hover over an image to see its k true neighbors highlighted.</p>
       </div>
       <div class="meter">
-        <h3>Category purity</h3>
+        <h3>Object purity</h3>
         <div class="val" id="pur-val">—</div>
         <div class="bar" aria-hidden="true"><div class="fill" id="pur-fill" style="background:var(--green)"></div></div>
-        <p class="hint">Mean fraction of each image’s k nearest 2-D neighbors that share its animal category. This set has one photograph per animal, so this is category purity, not the object purity of Assignment 1 Part 4.</p>
+        <p class="hint">Mean fraction of each image’s k nearest neighbors in this layout that are other views of the same object, as in Assignment 1 Part 4. Colors show the six categories.</p>
       </div>
       <div class="meter" id="legend-box">
         <h3>Categories</h3>
@@ -165,7 +169,7 @@ body.static .tsne-run{display:none}
   <p class="footer" id="footer"></p>
 </div>
 
-<script src="tsne_animals_data.js"></script>
+<script src="tsne_bao_data.js"></script>
 <script>
 'use strict';
 const DATA=window.TsneAnimalsData;
@@ -244,7 +248,7 @@ function metrics(Y,k){
     let hit=0, same=0;
     for(let t=0;t<k;t++){
       if(set.has(b[i][t])) hit++;
-      if(DATA.category[b[i][t]]===DATA.category[i]) same++;
+      if(DATA.object[b[i][t]]===DATA.object[i]) same++;
     }
     agree+=hit/k; pure+=same/k;
   }
@@ -336,7 +340,7 @@ function runTsneSync(perp, maxSteps, seed){
 
 /* ---------- state ---------- */
 const state={
-  method:'tsne', view:'thumbs', perp:15, maxSteps:1000, k:10, seed:1,
+  method:'tsne', view:'thumbs', perp:30, maxSteps:1000, k:10, seed:1, unn:15,
   running:false, step:0, converged:false,
   Y:null, P:null, gains:null, dY:null, prevY:null, compare:false,
   raf:0, metrics:{agree:0,pure:0}
@@ -361,6 +365,11 @@ function layoutCoords(){
   if(state.method==='pca'){
     const Y=new Float64Array(N*2);
     for(let i=0;i<N;i++){Y[i*2]=DATA.pca2[i][0]; Y[i*2+1]=DATA.pca2[i][1]}
+    return Y;
+  }
+  if(state.method==='umap'){
+    const U=DATA.umap2[String(state.unn)], Y=new Float64Array(N*2);
+    for(let i=0;i<N;i++){Y[i*2]=U[i][0]; Y[i*2+1]=U[i][1]}
     return Y;
   }
   if(state.method==='mds'){
@@ -444,7 +453,7 @@ function drawPanel(Y,x0,y0,w,h,alpha,showAxes){
     const ci=CAT_I[DATA.category[i]], col=COLORS[ci%COLORS.length], sh=SHAPES[ci%SHAPES.length];
     const focus=H==null?1:(i===H||nb.has(i)?1:0.18);
     if(state.view==='thumbs' && thumbs[i].complete && thumbs[i].naturalWidth){
-      const s=i===H?120:(H!=null&&nb.has(i)?52:36);
+      const s=i===H?40:(H!=null&&nb.has(i)?40:30);
       ctx.save(); ctx.globalAlpha=alpha*(H==null?0.7:focus);
       ctx.drawImage(thumbs[i], x0+x-s/2, y0+y-s/2, s, s);
       ctx.globalAlpha=alpha*(H==null?0.9:focus);
@@ -454,6 +463,17 @@ function drawPanel(Y,x0,y0,w,h,alpha,showAxes){
     } else {
       drawShape(ctx, x0+x, y0+y, i===H?11:(H!=null&&nb.has(i)?8:6), sh, i===H?'#1E293B':col, alpha*focus);
     }
+  }
+  if(H!=null && pos[H]){
+    ctx.save(); ctx.strokeStyle='#1E293B'; ctx.globalAlpha=0.5; ctx.lineWidth=1.5;
+    nb.forEach(j=>{if(pos[j]){ctx.beginPath();ctx.moveTo(pos[H][0],pos[H][1]);ctx.lineTo(pos[j][0],pos[j][1]);ctx.stroke();}});
+    ctx.globalAlpha=1; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(pos[H][0],pos[H][1],26,0,Math.PI*2); ctx.stroke();
+    const P=150, px=x0+10, py=y0+10;
+    if(thumbs[H].complete){ctx.fillStyle='#FAF9F5'; ctx.fillRect(px-4,py-4,P+8,P+30);
+      ctx.drawImage(thumbs[H],px,py,P,P); ctx.strokeStyle='#1E293B'; ctx.lineWidth=2; ctx.strokeRect(px,py,P,P);
+      ctx.fillStyle='#1E293B'; ctx.font='13px Poppins,system-ui,sans-serif'; ctx.textAlign='left';
+      ctx.fillText(DATA.category[H]+' · lines: its '+state.k+' true neighbors',px,py+P+18);}
+    ctx.restore();
   }
   lastPos=pos;
 }
@@ -484,7 +504,7 @@ function draw(){
 
   const Y=layoutCoords();
   if(!Y) return;
-  const showAxes=state.method!=='tsne';
+  const showAxes=state.method==='pca'||state.method==='mds';
   const compare=state.method==='tsne' && state.compare && state.prevY;
 
   if(compare){
@@ -518,17 +538,22 @@ function writeStatus(){
   let msg;
   if(state.method==='tsne'){
     const tag=state.converged?`${state.maxSteps.toLocaleString('en-US')} steps completed`:(state.running?'running':'paused');
-    msg=`t-SNE, perplexity ${state.perp}, step ${state.step} of ${state.maxSteps}, seed ${state.seed} (${tag}): ${state.k}-NN agreement ${a} %, category purity ${p} %`;
+    msg=`t-SNE, perplexity ${state.perp}, step ${state.step} of ${state.maxSteps}, seed ${state.seed} (${tag}): ${state.k}-NN agreement ${a} %, object purity ${p} %`;
     $('map-sub').textContent=`step ${state.step}${state.converged?' · budget completed':''}`;
     $('map-title').textContent='t-SNE';
     $('warn').hidden=false;
   } else if(state.method==='pca'){
-    msg=`PCA (first two of 50 PCs): ${state.k}-NN agreement ${a} %, category purity ${p} %`;
+    msg=`PCA (first two of 50 PCs): ${state.k}-NN agreement ${a} %, object purity ${p} %`;
     $('map-sub').textContent='PC₁ × PC₂';
     $('map-title').textContent='PCA';
     $('warn').hidden=true;
+  } else if(state.method==='umap'){
+    msg=`UMAP, n_neighbors ${state.unn}: ${state.k}-NN agreement ${a} %, object purity ${p} %`;
+    $('map-sub').textContent=`n_neighbors ${state.unn}`;
+    $('map-title').textContent='UMAP';
+    $('warn').hidden=false;
   } else {
-    msg=`Metric MDS on 50-D distances: ${state.k}-NN agreement ${a} %, category purity ${p} %`;
+    msg=`Metric MDS on 50-D distances: ${state.k}-NN agreement ${a} %, object purity ${p} %`;
     $('map-sub').textContent='MDS 1 × MDS 2';
     $('map-title').textContent='MDS';
     $('warn').hidden=true;
@@ -542,6 +567,7 @@ function setMethod(m){
   state.method=m;
   document.querySelectorAll('#methods button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m?'true':'false'));
   document.querySelectorAll('.tsne-only').forEach(el=>el.classList.toggle('hidden-ctl', m!=='tsne'));
+  document.querySelectorAll('.umap-only').forEach(el=>el.classList.toggle('hidden-ctl', m!=='umap'));
   if(m==='tsne' && !state.Y) resetTsne(false);
   draw(); refreshMetrics();
 }
@@ -618,6 +644,7 @@ $('perp').addEventListener('input',()=>{
 $('steps').addEventListener('input',()=>{
   state.maxSteps=+$('steps').value; $('steps-out').value=state.maxSteps; writeStatus();
 });
+$('unn').addEventListener('change',()=>{state.unn=+$('unn').value; draw(); refreshMetrics();});
 $('k').addEventListener('input',()=>{
   state.k=+$('k').value; $('k-out').value=state.k; refreshMetrics();
 });
@@ -640,8 +667,8 @@ new ResizeObserver(()=>requestAnimationFrame(draw)).observe(canvas.parentElement
 
 /* ---------- boot ---------- */
 function bootInteractive(){
-  state.perp=15; state.maxSteps=1000; state.k=10; state.seed=1; state.method='tsne'; state.view='thumbs';
-  $('perp').value=15; $('perp-out').value=15;
+  state.perp=30; state.maxSteps=1000; state.k=10; state.seed=1; state.method='tsne'; state.view='thumbs';
+  $('perp').value=30; $('perp-out').value=30;
   $('steps').value=1000; $('steps-out').value=1000;
   $('k').value=10; $('k-out').value=10;
   $('seed').value=1;
@@ -660,7 +687,7 @@ function bootStatic(){
     setMethod('mds'); setView('dots');
   } else {
     state.method='tsne'; state.view=Q.get('view')==='dots'?'dots':'thumbs'; state.seed=1;
-    state.perp=STEP===2?5:15; state.maxSteps=1000; state.k=10;
+    state.perp=STEP===2?5:30; state.maxSteps=1000; state.k=10;
     $('perp').value=state.perp; $('perp-out').value=state.perp;
     $('seed').value=1;
     state.Y=runTsneSync(state.perp, state.maxSteps, 1);
