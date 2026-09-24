@@ -3145,7 +3145,7 @@
     ]
   },
   "spike_to_rate.svg": {
-    "caption": "Illustrative schematic only: seven cartoon spikes in a 60–220 ms window → firing rate = 7/0.16 s.",
+    "caption": "Illustrative spike-to-rate conversion: seven spikes in a 60–220 ms window give a firing rate of 7/0.16 s.",
     "headers": [
       "Quantity",
       "Value"
@@ -3166,7 +3166,7 @@
     ]
   },
   "neural_response.svg": {
-    "caption": "All 482 unit positions for Bao stimulus 1: 479 values and unavailable measurements at positions 429, 430 and 457. Original shared values are preserved; exact scaling and baseline processing are undocumented.",
+    "caption": "All 482 unit positions for the Bao cat stimulus: 479 values; positions 429, 430 and 457 are missing measurements.",
     "headers": [
       "Unit (1-based)",
       "Response (shared value)"
@@ -5103,7 +5103,7 @@
     ]
   },
   "matched_network.svg": {
-    "caption": "First 32 of 4,096 stored late ResNet18 activations for the same Bao stimulus 1.",
+    "caption": "First 32 of the 4,096 stored late ResNet-18 activations for the same Bao stimulus.",
     "headers": [
       "Stored index (1-based)",
       "Activation"
@@ -5240,7 +5240,7 @@
     ]
   },
   "bold_response.svg": {
-    "caption": "CSI1 trial index 8; first 16 voxels of each region. Release 1 processed BOLD responses, not firing rates.",
+    "caption": "Participant CSI1: first 16 voxels of each region; processed BOLD responses.",
     "headers": [
       "Voxel index (1-based)",
       "Early visual region",
@@ -5355,7 +5355,7 @@
     ]
   },
   "response_matrix.svg": {
-    "caption": "Six animal images × first 12 stored late ResNet18 activation entries; values rounded to six significant digits.",
+    "caption": "Six animal images × first 12 stored late ResNet-18 activations; values rounded to six significant digits.",
     "headers": [
       "Image",
       "1",
@@ -5465,7 +5465,7 @@
     ]
   },
   "animal_rdm.svg": {
-    "caption": "Euclidean dissimilarities computed from all 4,096 stored late ResNet18 entries; display rounded to six significant digits.",
+    "caption": "Euclidean dissimilarities computed from all 4,096 stored late ResNet-18 activations; rounded to six significant digits.",
     "headers": [
       "Image",
       "Frog",
@@ -5533,7 +5533,7 @@
     ]
   },
   "bold_surface_vectors.svg": {
-    "caption": "CSI1 trial 8: all left-hemisphere voxel responses, in stored order (Release 1 processed units)",
+    "caption": "Participant CSI1: all left-hemisphere voxel responses to the dog photograph, in stored order (processed BOLD).",
     "headers": [
       "Region",
       "Voxel index (1-based)",
@@ -7353,7 +7353,7 @@
     ]
   },
   "electrode_to_rate.svg": {
-    "caption": "Illustrative spike-to-rate conversion; these events are not an experimental trial",
+    "caption": "Illustrative spike-to-rate conversion.",
     "headers": [
       "Quantity",
       "Value"
@@ -7382,7 +7382,7 @@
     ]
   },
   "network_maps.svg": {
-    "caption": "All activations in the six displayed ResNet-18 maps; channels are numbered from 1, rows and columns from 0. Same Bao cat input.",
+    "caption": "All activations in the six displayed ResNet-18 maps for the Bao cat image; channels are numbered from 1, rows and columns from 0.",
     "headers": [
       "Stage and spatial unit",
       "Activation"
@@ -34644,7 +34644,7 @@
     ]
   },
   "features_point.svg": {
-    "caption": "The same six image measurements in both coordinate figures, before and after drawing the vector.",
+    "caption": "The six images' mean intensity and RMS contrast.",
     "headers": [
       "Image",
       "Mean intensity",
@@ -34684,7 +34684,7 @@
     ]
   },
   "features_vector.svg": {
-    "caption": "The same six image measurements in both coordinate figures, before and after drawing the vector.",
+    "caption": "The six images' mean intensity and RMS contrast.",
     "headers": [
       "Image",
       "Mean intensity",
@@ -34724,7 +34724,7 @@
     ]
   },
   "imagenet-ensemble-history.svg": {
-    "caption": "Selected historical ensemble top-5 test accuracies; protocols differ across submissions.",
+    "caption": "Selected ImageNet top-5 test accuracies; the submissions are ensembles evaluated under different protocols.",
     "headers": [
       "Submission",
       "Benchmark year",
@@ -34817,7 +34817,7 @@
     ]
   },
   "similarity_fallback.svg": {
-    "caption": "Display coordinates for both independently normalized MDS maps; all 120 matched images, rounded as displayed",
+    "caption": "Coordinates of both MDS maps, each centered and scaled separately; all 120 images, rounded as displayed.",
     "headers": [
       "Image ID",
       "Label",
@@ -35790,7 +35790,7 @@
     ]
   },
   "pixel_scaling.svg": {
-    "caption": "Tiger image: all 784 ordered pixel entries before and after multiplication by 0.5. Entry indices start at 1; rows of 28 pixels are flattened in order. These are mathematical values before display rounding.",
+    "caption": "Tiger image: all 784 pixel entries, in row order, before and after multiplication by 0.5. Entries are numbered from 1; scaled values are unrounded.",
     "headers": [
       "Entry",
       "Original intensity",
@@ -39720,7 +39720,7 @@
     ]
   },
   "image_blend.svg": {
-    "caption": "Pixelwise mean of the same tiger and gorilla images, all 784 entries in row order, before display rounding.",
+    "caption": "Pixelwise mean of the tiger and gorilla images, all 784 entries in row order, unrounded.",
     "headers": [
       "Entry",
       "Tiger",
@@ -44435,7 +44435,7 @@
     ]
   },
   "mixup_targets.svg": {
-    "caption": "Constructed training target for an equal mixture, not network output probabilities.",
+    "caption": "Training target for an equal mixture of the tiger and gorilla images.",
     "headers": [
       "Class",
       "Target weight"
@@ -44456,7 +44456,7 @@
     ]
   },
   "animal_distances.svg": {
-    "caption": "Euclidean distances computed from all features of each representation. Image indices 28, 41 and 64 (zero-based), in matching order. Pixel intensities use 0–255; network responses use their stored activation scale. Absolute distances across the two representations have different units.",
+    "caption": "Euclidean distances computed from all features of each representation. Pixel intensities are on the 0–255 scale and network activations on their own scale, so distances cannot be compared across the two columns.",
     "headers": [
       "Pair",
       "Pixel distance (784 entries)",
@@ -44481,7 +44481,7 @@
     ]
   },
   "image_blend_live.png": {
-    "caption": "Pixelwise mean of the same tiger and gorilla images, all 784 entries in row order, before display rounding.",
+    "caption": "Pixelwise mean of the tiger and gorilla images, all 784 entries in row order, unrounded.",
     "headers": [
       "Entry",
       "Tiger",
@@ -49196,7 +49196,7 @@
     ]
   },
   "shared_zeros.svg": {
-    "caption": "All 4096 matched late ResNet-18 entries for tiger stim-0354 and gorilla stim-1059. The shared-zero flag is an annotation, not a replacement of activation values by binary codes.",
+    "caption": "All 4,096 late ResNet-18 activations for the tiger and gorilla; the last column flags entries that are zero for both.",
     "headers": [
       "Stored entry",
       "Tiger activation",
@@ -73783,7 +73783,7 @@
     ]
   },
   "same_accuracy.svg": {
-    "caption": "Constructed predictions for ten real photographs; both classifiers score 7/10",
+    "caption": "Predictions of classifiers A and B for ten photographs; both score 7/10.",
     "headers": [
       "Image",
       "True label",
@@ -80177,7 +80177,7 @@
     ]
   },
   "tiger_relu.svg": {
-    "caption": "Exact cached ResNet-18 layer4 responses for the tiger, all 4096 stored entries in stored order. Green zero markers are display annotations only.",
+    "caption": "Late ResNet-18 (layer4) activations for the tiger, all 4,096 entries in stored order, with exact zeros flagged.",
     "headers": [
       "Stored entry",
       "Activation",
