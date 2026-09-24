@@ -14,7 +14,7 @@
 <h2 id="heading-2">Your questions from Tuesday</h2>
 <ul>
 <li><em>"If there are 50 principle components, why is it/how can it be represented by just 2 axes as on the ppt slides?"</em>: it cannot. A PCA plot keeps the two directions along which the points <strong>vary most</strong> over the whole data set and drops the other 48. Points that differ only along the dropped directions <strong>land on top of each other</strong>. That is where today's <strong>nonlinear</strong> methods come in: instead of keeping a few directions, they keep <strong>relationships</strong> between points, above all who is whose <strong>neighbor</strong>.</li>
-<li><em>"Does this mean neural signals are operating in 2 dimensional space"</em>: no. For the Bao et al. objects in AlexNet fc6 (Assignment 1 Part 3), the first two components hold only <strong>22%</strong> of the variance, and 85% takes <strong>87</strong> (Bao et al. report about 50). Counting components to a threshold measures the <strong>linear</strong> dimension and treats the rest as noise. If the data lie on a curved surface, the <strong>intrinsic</strong> dimension, the number of values that locate a point on it, can be far smaller.</li>
+<li><em>"Does this mean neural signals are operating in 2 dimensional space"</em>: no. For the Bao et al. objects in AlexNet fc6 (Assignment 1 Part 3), the first two components hold only <strong>22%</strong> of the variance, and 85% takes <strong>87</strong> (Bao et al. report about 50). Counting components to a threshold measures the <strong>linear</strong> dimension and treats the rest as noise. If the data lie on a curved surface, the <strong>intrinsic</strong> dimension, the number of dimensions needed to locate a point on it, can be far smaller.</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="57" aria-labelledby="heading-3"><p class="page">Slide 3</p>
 <h2 id="heading-3">Every low-dimensional picture is an approximation</h2>
@@ -96,7 +96,7 @@
 <ul>
 <li>Turn <strong>and</strong> enlarge one photograph: red rings are one size turned round; green spokes are one angle enlarged.</li>
 <li>The images fill a curved <strong>surface</strong>: a <strong>manifold</strong>. Up close (the gold cell) it is <strong>flat</strong>.</li>
-<li><strong>Intrinsic dimension</strong>: how many numbers are needed to locate a point on it? Here <strong>2</strong>, the angle and the size.</li>
+<li><strong>Intrinsic dimension</strong>: how many dimensions are needed to locate a point on it? Here <strong>2</strong>, the angle and the size.</li>
 <li><strong>Ambient space</strong>: where it sits, 9,216 pixel values.</li>
 </ul>
 </div>
@@ -243,7 +243,7 @@
 <td>24 PCs for 90%</td>
 </tr>
 <tr>
-<td><strong>Intrinsic</strong>: numbers needed to locate a point <em>on</em> the manifold</td>
+<td><strong>Intrinsic</strong>: dimensions needed to locate a point <em>on</em> the manifold</td>
 <td>2</td>
 <td>1 (the angle)</td>
 </tr>
