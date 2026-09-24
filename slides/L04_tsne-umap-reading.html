@@ -473,8 +473,9 @@
 <p>Suppose we plot the <strong>same network responses</strong> twice: in the PCA map the objects overlap, in the t-SNE map they form separate islands.</p>
 <ul>
 <li>Did the network's responses change? <strong>No</strong>: only the plotting method did.</li>
-<li>Did the PCA map hide groups that are really there?</li>
-<li>Or did t-SNE exaggerate the groups to make them easier to see?</li>
+<li>Did the PCA map hide groups that are really there? <strong>Possibly</strong>: groups that differ only along the dropped directions overlap in two PCs.</li>
+<li>Or did t-SNE exaggerate the groups? <strong>Possibly</strong> too: it can make clumps, and its gaps are not distances.</li>
+<li><strong>Only the original responses can tell:</strong> check each image's nearest neighbors there, or train a classifier on some images and test it on others.</li>
 </ul>
 <p><mark>A map that looks cleaner does not mean the responses carry more information.</mark></p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="58" aria-labelledby="heading-40"><p class="page">Slide 40</p>
