@@ -1,0 +1,530 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nonlinear dimensionality reduction · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Nonlinear dimensionality reduction</h1><p>Reader-friendly version of the 40 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L04_tsne-umap.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Nonlinear dimensionality reduction</a></li><li><a href="#slide-2">Your questions from Tuesday</a></li><li><a href="#slide-3">When the variation follows a curve</a></li><li><a href="#slide-4">When a linear shadow is the wrong shadow</a></li><li><a href="#slide-5">Three ways to count dimensions</a></li><li><a href="#slide-6">Isomap: measure along the sheet, then run MDS</a></li><li><a href="#slide-7">Unroll the Swiss roll</a></li><li><a href="#slide-8">Objects seen from many viewpoints</a></li><li><a href="#slide-9">One object, many images</a></li><li><a href="#slide-10">The same picture, drawn by hand</a></li><li><a href="#slide-11">Two sheets, tangled</a></li><li><a href="#slide-12">Same responses, different pictures</a></li><li><a href="#slide-13">t-SNE</a></li><li><a href="#slide-14">The setup: from a cloud to a picture</a></li><li><a href="#slide-15">Step 1 — neighbor probabilities in high-D</a></li><li><a href="#slide-16">Perplexity ≈ the effective number of neighbors</a></li><li><a href="#slide-17">Step 2 — the crowding problem, and the heavy tail</a></li><li><a href="#slide-18">Step 3 — make QQ look like PP</a></li><li><a href="#slide-19">UMAP: a related way to build a neighborhood map</a></li><li><a href="#slide-20">Match the method to the relationship</a></li><li><a href="#slide-21">The same 120 animals, three ways — live</a></li><li><a href="#slide-22">Which claims survive a change of map?</a></li><li><a href="#slide-23">Map spread need not reflect response variability</a></li><li><a href="#slide-24">Check group distances in the response space</a></li><li><a href="#slide-25">Noise can look like structure</a></li><li><a href="#slide-26">Too few steps look like structure too</a></li><li><a href="#slide-27">One picture is never the result</a></li><li><a href="#slide-28">Measuring neighborhood agreement</a></li><li><a href="#slide-29">Object purity asks a different question</a></li><li><a href="#slide-30">A map can be stable and still distort the data</a></li><li><a href="#slide-31">Sometimes the curved shape is the answer</a></li><li><a href="#slide-32">PCA says six; a nonlinear map says torus</a></li><li><a href="#slide-33">From a map to a test of the representation</a></li><li><a href="#slide-34">What have we learned about a representation?</a></li><li><a href="#slide-35">Further reading</a></li><li><a href="#slide-36">Minute paper</a></li><li><a href="#slide-37">Appendix: extra examples and assignment reference</a></li><li><a href="#slide-38">Are vocal repertoires discrete or continuous?</a></li><li><a href="#slide-39">Centroid gaps across runs</a></li><li><a href="#slide-40">The t-SNE call used in Assignment 1</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+  <img src="../images/brown-crest-color.png" alt="Brown University crest">
+  <div class="vrule"></div>
+  <div>
+    <span class="code">CPSY 1291</span>
+    <span class="name">Computational Methods for Mind, Brain &amp; Behavior</span>
+  </div>
+</div>
+<div class="eyebrow">Lecture 4 · Theme 1: Representational spaces</div>
+<h2 id="heading-1">Nonlinear dimensionality reduction</h2>
+<p class="meta">Thursday, September 24 · Fall 2026</p>
+
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="40" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<h2 id="heading-2">Your questions from Tuesday</h2>
+<ul>
+<li><em>"If there are 50 principle components, why is it/how can it be represented by just 2 axes as on the ppt slides?"</em>: it cannot. A 2-axis plot shows two of the 50 coordinates and drops the rest. Today: maps that choose <strong>which relationships</strong> to keep in two dimensions</li>
+<li><em>"Does this mean neural signals are operating in 2 dimensional space"</em>: no. Two components captured most of the variance <strong>in that example</strong>, so the points lie close to a plane, not on it. How many coordinates the data really need is the <strong>intrinsic dimension</strong>, today</li>
+<li><em>"So far I feel like we have not gone into real brain stuff."</em>: today ends with <strong>head-direction cells</strong> in the thalamus, where the shape of the map is the finding</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="40" aria-labelledby="heading-3"><p class="page">Slide 3</p>
+<h2 id="heading-3">When the variation follows a curve</h2>
+<div class="capfig">
+<figure><img src="../images/L03/09_rotation_curve.svg" alt="Rotated, shifted and resized versions of an image projected into two PCA directions; rotation traces a closed curve" aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>Rotated, shifted and resized versions of an image projected into two PCA directions; rotation traces a closed curve</p><a href="../images/L03/09_rotation_curve.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Changing one stimulus parameter can trace a <strong>curved path</strong> in a large response space.</li>
+<li>Even one varying parameter can require <strong>two linear coordinates</strong> when the path bends back on itself.</li>
+<li>PCA approximates data with a <strong>flat subspace</strong>.</li>
+<li>Next: nonlinear maps, and how to check what their geometry preserves.</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="40" aria-labelledby="heading-4"><p class="page">Slide 4</p>
+<h2 id="heading-4">When a linear shadow is the wrong shadow</h2>
+<div class="capfig">
+<figure><img src="../images/L04/05_swissroll_pca.svg" alt="Left, 800 points on a Swiss roll: a sheet curled into a spiral in 3-D, colored from blue at the inner end through magenta to gold at the outer end. Right, its projection onto the first two principal components: the inner and outer turns land on top of each other, so blue, magenta and gold points mix" aria-describedby="figure-4-1"><figcaption id="figure-4-1"><p>Left, 800 points on a Swiss roll: a sheet curled into a spiral in 3-D, colored from blue at the inner end through magenta to gold at the outer end. Right, its projection onto the first two principal components: the inner and outer turns land on top of each other, so blue, magenta and gold points mix</p><a href="../images/L04/05_swissroll_pca.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>The <strong>Swiss roll</strong>: a 2-D sheet rolled up in 3-D. Points far apart <em>along the sheet</em> can be near in the ambient space.</li>
+<li><strong>PCA</strong> takes the best flat shadow (here 71% of the variance), and the shadow <strong>folds the roll onto itself</strong>. A different rotation cannot unroll the sheet.</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-marpit-pagination="5" data-marpit-pagination-total="40" aria-labelledby="heading-5"><p class="page">Slide 5</p>
+<h2 id="heading-5">Three ways to count dimensions</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Three ways to count dimensions — table"><table><caption>Three ways to count dimensions — table</caption>
+<thead>
+<tr>
+<th scope="col"></th>
+<th scope="col">Swiss roll</th>
+<th scope="col">Grid cells</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ambient</strong>: coordinates you record</td>
+<td>3</td>
+<td>100+ neurons</td>
+</tr>
+<tr>
+<td><strong>Embedding</strong>: flat subspace PCA needs</td>
+<td>3</td>
+<td>about 6</td>
+</tr>
+<tr>
+<td><strong>Intrinsic</strong>: coordinates <em>on</em> the surface</td>
+<td>2</td>
+<td>2 (a torus)</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>A <strong>manifold</strong> is a space that is locally flat, like a line or a plane, even if it curves overall. Its own dimension is the <strong>intrinsic</strong> one.</li>
+<li>Fold a printed page into an origami crane: it now sits in 3-D, yet it is still a 2-D page. PCA shows the crane's shape; only a nonlinear method <strong>unfolds the sheet</strong> so you can read the text.</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.53053/FTEU9810" rel="noopener">Perich <b>2026</b></a> · <i>The Transmitter</i></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="40" aria-labelledby="heading-6"><p class="page">Slide 6</p>
+<h2 id="heading-6">Isomap: measure along the sheet, then run MDS</h2>
+<div class="capfig">
+<figure><img src="../images/L04/06_isomap.svg" alt="Left, the Swiss roll with two probe points one turn apart: a short dashed red segment joins them straight through the roll, and a long black path joins them by hopping between nearest neighbors around the spiral. Right, the Isomap layout: a flat strip ordered blue to gold, with the two probes at opposite ends" aria-describedby="figure-6-1"><figcaption id="figure-6-1"><p>Left, the Swiss roll with two probe points one turn apart: a short dashed red segment joins them straight through the roll, and a long black path joins them by hopping between nearest neighbors around the spiral. Right, the Isomap layout: a flat strip ordered blue to gold, with the two probes at opposite ends</p><a href="../images/L04/06_isomap.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Connect each point to its <strong>10 nearest neighbors</strong>. Only short hops, which stay on the sheet.</li>
+<li>The <strong>along-the-sheet distance</strong> is the shortest path through that graph: 71.3 for the two probes, against 6.1 in a straight line.</li>
+<li>Run <strong>MDS</strong>, from the second lecture, on those path lengths. The roll unrolls.</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1126/science.290.5500.2319" rel="noopener">Tenenbaum, de Silva &amp; Langford <b>2000</b></a> · <i>Science</i></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-marpit-pagination="7" data-marpit-pagination-total="40" aria-labelledby="heading-7"><p class="page">Slide 7</p>
+<h2 id="heading-7">Unroll the Swiss roll</h2>
+<div class="demo">Live demo · <a href="../demos/swiss_roll.html" rel="noopener"><code>demos/swiss_roll.html</code></a></div>
+<div class="interactive-figure interactive-wide">
+
+<div class="print-figure">
+<figure><img src="../images/L04/demo_swiss_roll.png" alt="The Swiss-roll demo half unrolled: the sheet flattening out in the 3-D view with the two probe points and their straight-line and along-the-sheet paths, beside the PCA, Isomap and UMAP layouts" aria-describedby="figure-7-1"><figcaption id="figure-7-1"><p>The Swiss-roll demo half unrolled: the sheet flattening out in the 3-D view with the two probe points and their straight-line and along-the-sheet paths, beside the PCA, Isomap and UMAP layouts</p><a href="../images/L04/demo_swiss_roll.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<p class="explorer-links"><a href="../demos/swiss_roll.html">A rotatable Swiss roll with an unroll slider and two probe points showing straight-line distance against distance along the sheet, beside PCA, Isomap and UMAP embeddings of the same points — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="40" aria-labelledby="heading-8"><p class="page">Slide 8</p>
+<h2 id="heading-8">Objects seen from many viewpoints</h2>
+<div class="row">
+<div class="col fig">
+<div class="capfig">
+<figure><img src="../images/L04/08_bao_objects.png" alt="A grid of renderings: one object from each of six categories (a cat, an airliner, a head, a head of broccoli, a house, a man-made object) seen from six of its 24 viewpoints" aria-describedby="figure-8-1"><figcaption id="figure-8-1"><p>A grid of renderings: one object from each of six categories (a cat, an airliner, a head, a head of broccoli, a house, a man-made object) seen from six of its 24 viewpoints</p><a href="../images/L04/08_bao_objects.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="col">
+<ul>
+<li><strong>1,224 images</strong>: 51 objects, each rendered from <strong>24 views</strong>, in 6 categories.</li>
+<li>The stimulus set Bao, She, McGill &amp; Tsao used to map object space in monkey IT cortex; you also use it in Assignment 1.</li>
+<li>Each image is a point in <strong>fc6</strong>: a late layer of AlexNet, 4,096 responses per image.</li>
+<li>Two levels of grouping: views of the <strong>same object</strong>, and objects of the <strong>same category</strong>.</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao, She, McGill &amp; Tsao <b>2020</b></a> · <i>Nature</i></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="40" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<h2 id="heading-9">One object, many images</h2>
+<div class="capfig">
+<figure><img src="../images/L03/08_viewpoint_manifold.svg" alt="Left: the 24 viewpoints of one object plotted in two directions of its own responses, filling a single compact patch, with four of the views shown. Right: three objects, each of whose 24 viewpoints occupies a separate patch of the same plane" aria-describedby="figure-9-1"><figcaption id="figure-9-1"><p>Left: the 24 viewpoints of one object plotted in two directions of its own responses, filling a single compact patch, with four of the views shown. Right: three objects, each of whose 24 viewpoints occupies a separate patch of the same plane</p><a href="../images/L03/08_viewpoint_manifold.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Photograph one object from 24 viewpoints: 24 very different images, and in the network's response space they fill one small <strong>patch</strong>.</li>
+<li>For these three objects, the views occupy different regions. Viewpoint varies <strong>within</strong> each object; identity differs <strong>between</strong> objects.</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-class="l03-paper-panel" data-marpit-pagination="10" data-marpit-pagination-total="40" aria-labelledby="heading-10"><p class="page">Slide 10</p>
+<h2 id="heading-10">The same picture, drawn by hand</h2>
+<div class="capfig">
+<figure><img src="../images/L03/dicarlo2007_a.png" alt="One person's face images trace a curved sheet, a manifold, inside image space, with three example heads at different poses sitting on it" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>One person's face images trace a curved sheet, a manifold, inside image space, with three example heads at different poses sitting on it</p><a href="../images/L03/dicarlo2007_a.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>As DiCarlo and Cox drew it: every image of one person forms a <strong>curved sheet</strong>, and the sheet has far fewer dimensions than the space holding it.</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <i>Trends Cogn. Sci.</i> 2007</a> · Fig. 1a</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-class="l03-paper-panel" data-marpit-pagination="11" data-marpit-pagination-total="40" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<h2 id="heading-11">Two sheets, tangled</h2>
+<div class="capfig">
+<figure><img src="../images/L03/dicarlo2007_d.png" alt="In actual pixel space the sheets of two different people are interleaved, and no flat plane separates them" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>In actual pixel space the sheets of two different people are interleaved, and no flat plane separates them</p><a href="../images/L03/dicarlo2007_d.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>In <strong>pixel</strong> coordinates the sheets of two people are interleaved, which is why no simple rule separates them there.</li>
+<li>Perception can be read as <strong>untangling</strong>: finding coordinates in which the sheets pull apart. <mark>PCA finds linear directions. Nonlinear maps can reveal other relationships, but do not guarantee recognition.</mark></li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <i>Trends Cogn. Sci.</i> 2007</a> · Fig. 1d</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="40" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<h2 id="heading-12">Same responses, different pictures</h2>
+<p>Imagine that two maps of the <strong>same network responses</strong> give different impressions: objects overlap in a PCA plot but form islands in t-SNE.</p>
+<ul>
+<li>Did the network gain information when we changed the plotting method?</li>
+<li>Were useful relationships hidden by the PCA projection?</li>
+<li>Did t-SNE distort the relationships to make the groups easier to see?</li>
+</ul>
+<p><mark>We need to distinguish a clearer picture from a better representation.</mark></p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-class="lead" data-marpit-pagination="13" data-marpit-pagination-total="40" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<h2 id="heading-13">t-SNE</h2>
+<p>Convert distances into <strong>neighbor probabilities</strong>, then find a 2-D layout that approximates those neighbor probabilities.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="40" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<h2 id="heading-14">The setup: from a cloud to a picture</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L04/01_tsne_setup.svg" alt="Left, 24 points in three tight groups in a plane (blue, red, green). Right, the 1-D t-SNE map of the same points: a single line on which each group occupies its own stretch, red, then green, then blue" aria-describedby="figure-14-1"><figcaption id="figure-14-1"><p>Left, 24 points in three tight groups in a plane (blue, red, green). Right, the 1-D t-SNE map of the same points: a single line on which each group occupies its own stretch, red, then green, then blue</p><a href="../images/L04/01_tsne_setup.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Input: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> points <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup><mo>∈</mo><msup><mi mathvariant="normal" data-original-mathvariant="double-struck">ℝ</mi><mi>d</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf{x}^{(i)}\in\mathbb{R}^{d}</annotation></semantics></math> — voxels, neurons, or a hidden layer <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐚</mi><mrow><mo stretchy="false">[</mo><mi>l</mi><mo stretchy="false">]</mo></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{a}^{[l]}</annotation></semantics></math>.</li>
+<li>Output: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> points <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup><mo>∈</mo><msup><mi mathvariant="normal" data-original-mathvariant="double-struck">ℝ</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\mathbf{y}^{(i)}\in\mathbb{R}^{2}</annotation></semantics></math> (here <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="double-struck">ℝ</mi><mn>1</mn></msup></mrow><annotation encoding="application/x-tex">\mathbb{R}^{1}</annotation></semantics></math>), one per input point, placed to <strong>favor preservation of neighborhoods</strong>.</li>
+<li>The standard scikit-learn implementation optimizes the <strong>coordinates themselves</strong>; it does not provide a <code>transform</code> for new points.</li>
+<li>Contrast with PCA, which gives you a fixed projection you can apply to new response vectors with the same features and centering.</li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="40" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<h2 id="heading-15">Step 1 — neighbor probabilities in high-D</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li>Center a <strong>Gaussian</strong> on each point <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{x}^{(i)}</annotation></semantics></math> and normalize:</li>
+</ul>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>p</mi><mrow><mi>j</mi><mo>∣</mo><mi>i</mi></mrow></msub><mtext>  </mtext><mo>∝</mo><mtext>  </mtext><mi>exp</mi><mo>⁡</mo><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><mo>−</mo><mfrac><mrow><mo stretchy="false">∥</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup><mo>−</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mi>j</mi><mo stretchy="false">)</mo></mrow></msup><msup><mo stretchy="false">∥</mo><mn>2</mn></msup></mrow><mrow><mn>2</mn><msubsup><mi>σ</mi><mi>i</mi><mn>2</mn></msubsup></mrow></mfrac><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">p_{j\mid i}\;\propto\;\exp\!\left(-\frac{\lVert\mathbf{x}^{(i)}-\mathbf{x}^{(j)}\rVert^{2}}{2\sigma_i^{2}}\right)
+</annotation></semantics></math></div></span></p><ul>
+<li>Read it as: <em>"if I am point <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math>, how likely am I to pick <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi></mrow><annotation encoding="application/x-tex">j</annotation></semantics></math> as my neighbor?"</em></li>
+<li>Each point gets its <strong>own</strong> bandwidth <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\sigma_i</annotation></semantics></math>: narrow in dense regions, wide in sparse ones.</li>
+<li>Make it symmetric: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><msub><mi>p</mi><mrow><mi>j</mi><mo>∣</mo><mi>i</mi></mrow></msub><mo>+</mo><msub><mi>p</mi><mrow><mi>i</mi><mo>∣</mo><mi>j</mi></mrow></msub></mrow><mrow><mn>2</mn><mi>N</mi></mrow></mfrac></mstyle></mrow><annotation encoding="application/x-tex">p_{ij}=\dfrac{p_{j\mid i}+p_{i\mid j}}{2N}</annotation></semantics></math>, one probability per pair.</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/L04/02_neighbor_probs.svg" alt="Left, the three-group data with one point starred; the other points are drawn larger the more neighbor probability the starred point gives them, so only its own blue group is visibly large. Right, a Gaussian curve of similarity against distance from the starred point, with every other point placed on it: the blue points sit on the steep part, the red and green points at almost zero" aria-describedby="figure-15-1"><figcaption id="figure-15-1"><p>Left, the three-group data with one point starred; the other points are drawn larger the more neighbor probability the starred point gives them, so only its own blue group is visibly large. Right, a Gaussian curve of similarity against distance from the starred point, with every other point placed on it: the blue points sit on the steep part, the red and green points at almost zero</p><a href="../images/L04/02_neighbor_probs.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="ref"><a href="https://www.jmlr.org/papers/v9/vandermaaten08a.html" rel="noopener">van der Maaten &amp; Hinton <b>JMLR 2008</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="40" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<h2 id="heading-16">Perplexity ≈ the effective number of neighbors</h2>
+<ul>
+<li>Each <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\sigma_i</annotation></semantics></math> is set so that <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mrow><mi>H</mi><mo stretchy="false">(</mo><msub><mi>P</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></msup></mrow><annotation encoding="application/x-tex">2^{H(P_i)}</annotation></semantics></math> equals a target <strong>perplexity</strong>, where <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mo stretchy="false">(</mo><msub><mi>P</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><msub><mo>∑</mo><mi>j</mi></msub><msub><mi>p</mi><mrow><mi>j</mi><mo>∣</mo><mi>i</mi></mrow></msub><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><msub><mi>p</mi><mrow><mi>j</mi><mo>∣</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">H(P_i)=-\sum_j p_{j\mid i}\log_2 p_{j\mid i}</annotation></semantics></math>: roughly, <em>how many neighbors point <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math> spreads its probability over</em>.</li>
+<li>Typical range <strong>5–50</strong>; it sets the <strong>neighborhood scale</strong>. <strong>Run a sweep</strong>: structure that appears at one value only needs particular scrutiny.</li>
+</ul>
+<div class="capfig">
+<figure><img src="../images/2026-10-01/s148_img00.png" alt="The same two clusters embedded at perplexity 2, 5, 30, 50 and 100: fragmented shards at low values, two clean clusters near 30 to 50, and mixed points at 100" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>The same two clusters embedded at perplexity 2, 5, 30, 50 and 100: fragmented shards at low values, two clean clusters near 30 to 50, and mixed points at 100</p><a href="../images/2026-10-01/s148_img00.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="ref"><a href="https://doi.org/10.23915/distill.00002" rel="noopener">Wattenberg, Viégas &amp; Johnson <b>2016</b></a> · <i>Distill</i> · CC BY 4.0</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="40" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<h2 id="heading-17">Step 2 — the crowding problem, and the heavy tail</h2>
+<ul>
+<li>In the map, similarities use a <strong>Student-<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></strong> kernel instead of a Gaussian: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>  </mtext><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mtext>  </mtext><mo>∝</mo><mtext>  </mtext><msup><mrow><mo fence="true">(</mo><mn>1</mn><mo>+</mo><mo stretchy="false">∥</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup><mo>−</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mrow><mo stretchy="false">(</mo><mi>j</mi><mo stretchy="false">)</mo></mrow></msup><msup><mo stretchy="false">∥</mo><mn>2</mn></msup><mo fence="true">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\;q_{ij}\;\propto\;\left(1+\lVert\mathbf{y}^{(i)}-\mathbf{y}^{(j)}\rVert^{2}\right)^{-1}</annotation></semantics></math></li>
+<li><strong>Why?</strong> A high-dimensional ball has far more room at moderate radius than a 2-D disc. With Gaussians on both ends, moderately distant points pile up: the <strong>crowding problem</strong>. The <strong>heavy tail</strong> lets them sit farther apart. <mark>The "t" in t-SNE is this, and only this.</mark></li>
+</ul>
+<div class="capfig">
+<figure><img src="../images/L04/03_heavy_tail.svg" alt="Left, a Gaussian and a Student-t similarity curve against distance; the t curve stays higher at large distances, shaded as the heavy tail. Middle and right, 24-by-24 matrices of pair probabilities for the three-group data: P in the data and Q in the 1-D map, both with three bright diagonal blocks, one per group" aria-describedby="figure-17-1"><figcaption id="figure-17-1"><p>Left, a Gaussian and a Student-t similarity curve against distance; the t curve stays higher at large distances, shaded as the heavy tail. Middle and right, 24-by-24 matrices of pair probabilities for the three-group data: P in the data and Q in the 1-D map, both with three bright diagonal blocks, one per group</p><a href="../images/L04/03_heavy_tail.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="40" aria-labelledby="heading-18"><p class="page">Slide 18</p>
+<h2 id="heading-18">Step 3 — make <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi></mrow><annotation encoding="application/x-tex">Q</annotation></semantics></math> look like <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></h2>
+<div class="row">
+<div class="col">
+<ul>
+<li>Two distributions over pairs: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math> in high-D (fixed), <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi></mrow><annotation encoding="application/x-tex">Q</annotation></semantics></math> in the map (moveable). Minimize their <strong>KL divergence</strong> by gradient descent on the coordinates <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{y}^{(i)}</annotation></semantics></math>:</li>
+</ul>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="script">L</mi><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mrow><mi mathvariant="normal">K</mi><mi mathvariant="normal">L</mi></mrow><mo stretchy="false">(</mo><mi>P</mi><mtext> </mtext><mi mathvariant="normal">∥</mi><mtext> </mtext><mi>Q</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>=</mo><mtext>  </mtext><munder><mo>∑</mo><mrow><mi>i</mi><mo mathvariant="normal">≠</mo><mi>j</mi></mrow></munder><msub><mi>p</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mtext> </mtext><mi>log</mi><mo>⁡</mo><mfrac><msub><mi>p</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mfrac></mrow><annotation encoding="application/x-tex">\mathcal{L} \;=\; \mathrm{KL}(P\,\Vert\,Q)\;=\;\sum_{i\neq j} p_{ij}\,\log\frac{p_{ij}}{q_{ij}}
+</annotation></semantics></math></div></span></p><ul>
+<li>The cost is <strong>lopsided</strong>: tearing neighbors apart is expensive, crowding strangers together is almost free.</li>
+<li>A fixed number of steps does not guarantee convergence.</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/L04/04_kl_asymmetry.svg" alt="Two panels. Left, neighbors in the data placed far apart in the map: p equals 0.10, q equals 0.01, p log p over q equals plus 0.230, expensive. Right, points far apart in the data placed close in the map: p equals 0.01, q equals 0.10, p log p over q equals minus 0.023, almost free" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>Two panels. Left, neighbors in the data placed far apart in the map: p equals 0.10, q equals 0.01, p log p over q equals plus 0.230, expensive. Right, points far apart in the data placed close in the map: p equals 0.01, q equals 0.10, p log p over q equals minus 0.023, almost free</p><a href="../images/L04/04_kl_asymmetry.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="40" aria-labelledby="heading-19"><p class="page">Slide 19</p>
+<h2 id="heading-19">UMAP: a related way to build a neighborhood map</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li>Connect each point to nearby points in the original space, giving stronger connections to closer neighbors.</li>
+<li>Lay out the map to favor those connections, while keeping unrelated points from collapsing together.</li>
+<li><strong><code>n_neighbors</code></strong> sets the neighborhood scale; <strong><code>min_dist</code></strong> how tightly points pack.</li>
+<li>Same data, same lesson: both maps keep local neighbors and <strong>tear the sheet</strong> in places.</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/L04/07_tsne_umap_roll.svg" alt="t-SNE at perplexity 30 and UMAP with 15 neighbors applied to the same Swiss roll. Both keep neighboring colors together, and both break the sheet into pieces rather than unrolling it into one strip" aria-describedby="figure-19-1"><figcaption id="figure-19-1"><p>t-SNE at perplexity 30 and UMAP with 15 neighbors applied to the same Swiss roll. Both keep neighboring colors together, and both break the sheet into pieces rather than unrolling it into one strip</p><a href="../images/L04/07_tsne_umap_roll.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/1802.03426" rel="noopener">McInnes, Healy &amp; Melville 2018</a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="40" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<h2 id="heading-20">Match the method to the relationship</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Match the method to the relationship — table"><table><caption>Match the method to the relationship — table</caption>
+<thead>
+<tr>
+<th scope="col">Method</th>
+<th scope="col">Main aim</th>
+<th scope="col">What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PCA</strong></td>
+<td>Retain variance in a linear projection</td>
+<td>Variance retained; task information lost</td>
+</tr>
+<tr>
+<td><strong>MDS</strong></td>
+<td>Approximate supplied dissimilarities</td>
+<td>Fit errors; dependence on the metric</td>
+</tr>
+<tr>
+<td><strong>Isomap</strong></td>
+<td>MDS on along-the-sheet distances</td>
+<td>Neighbor graph; shortcut edges</td>
+</tr>
+<tr>
+<td><strong>t-SNE</strong></td>
+<td>Match local pairwise similarities</td>
+<td>Neighborhood fidelity; settings and seeds</td>
+</tr>
+<tr>
+<td><strong>UMAP</strong></td>
+<td>Lay out a weighted neighborhood graph</td>
+<td>Neighborhood fidelity; settings and seeds</td>
+</tr>
+</tbody>
+</table></div>
+<p>A measurement of a map describes <strong>the map</strong>. A claim about the representation needs evidence that the relevant relationship was preserved.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="40" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<h2 id="heading-21">The same 120 animals, three ways — live</h2>
+<div class="demo">Live demo · <a href="../demos/tsne_animals.html" rel="noopener"><code>demos/tsne_animals.html</code></a></div>
+<div class="interactive-figure interactive-wide">
+
+<div class="print-figure">
+<figure><img src="../images/L04/demo_tsne_animals.png" alt="The t-SNE demo after 1,000 steps at perplexity 15: the 120 animal thumbnails arranged by the trained network's late-layer responses, with the nearest-neighbor agreement and category purity meters beside them" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>The t-SNE demo after 1,000 steps at perplexity 15: the 120 animal thumbnails arranged by the trained network's late-layer responses, with the nearest-neighbor agreement and category purity meters beside them</p><a href="../images/L04/demo_tsne_animals.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<p class="explorer-links"><a href="../demos/tsne_animals.html">t-SNE running live in the browser on the trained network's responses to the 120 Assignment 1 photographs, with perplexity and step sliders, a new-seed button, PCA and MDS layouts of the same points for comparison, and a nearest-neighbor agreement meter — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-class="lead" data-marpit-pagination="22" data-marpit-pagination-total="40" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<h2 id="heading-22">Which claims survive a change of map?</h2>
+<p>Wattenberg, Viégas &amp; Johnson (2016) built toy data with <strong>known</strong> structure and swept every setting. Their examples show what a visualization can change.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-marpit-pagination="23" data-marpit-pagination-total="40" aria-labelledby="heading-23"><p class="page">Slide 23</p>
+<h2 id="heading-23">Map spread need not reflect response variability</h2>
+<ul>
+<li>A tight cluster and a diffuse one come out <strong>about the same apparent size</strong>. <strong>Why:</strong> the per-point bandwidth <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\sigma_i</annotation></semantics></math> from Step 1 narrows in dense regions and widens in sparse ones, so the map expands dense groups and contracts sparse ones.</li>
+<li>"Cluster A is more variable than cluster B" does not follow from the map alone. Measure spread in the original space.</li>
+</ul>
+<div class="capfig">
+<figure><img src="../images/2026-10-01/s150_img00.png" alt="Two clusters of very different spread in the original data come out the same apparent size in the t-SNE embedding at every perplexity" aria-describedby="figure-23-1"><figcaption id="figure-23-1"><p>Two clusters of very different spread in the original data come out the same apparent size in the t-SNE embedding at every perplexity</p><a href="../images/2026-10-01/s150_img00.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="ref"><a href="https://doi.org/10.23915/distill.00002" rel="noopener">Wattenberg, Viégas &amp; Johnson <b>2016</b></a> · <i>Distill</i> · CC BY 4.0</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="40" aria-labelledby="heading-24"><p class="page">Slide 24</p>
+<h2 id="heading-24">Check group distances in the response space</h2>
+<ul>
+<li>Two clusters far apart on the page are not necessarily far apart in the data, and the ordering can <strong>invert</strong> between runs or perplexities. <strong>Why:</strong> Step 3's cost barely penalizes getting far-apart pairs wrong.</li>
+<li>To test <em>"category A is closer to B than to C,"</em> compare dissimilarities in the original response space, with a clearly defined metric.</li>
+</ul>
+<div class="capfig">
+<figure><img src="../images/2026-10-01/s151_img00.png" alt="Three clusters, two close together and one far away in the original data; across perplexities the embedding places them at misleading distances, and the ordering changes" aria-describedby="figure-24-1"><figcaption id="figure-24-1"><p>Three clusters, two close together and one far away in the original data; across perplexities the embedding places them at misleading distances, and the ordering changes</p><a href="../images/2026-10-01/s151_img00.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="ref"><a href="https://doi.org/10.23915/distill.00002" rel="noopener">Wattenberg, Viégas &amp; Johnson <b>2016</b></a> · <i>Distill</i> · CC BY 4.0</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="40" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<h2 id="heading-25">Noise can look like structure</h2>
+<div class="capfig">
+<figure><img src="../images/2026-10-01/s152_img00.png" alt="Uniform random noise embedded at perplexity 2, 5, 30, 50 and 100; at low perplexity the featureless cloud comes out lumpy, with small clumps" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>Uniform random noise embedded at perplexity 2, 5, 30, 50 and 100; at low perplexity the featureless cloud comes out lumpy, with small clumps</p><a href="../images/2026-10-01/s152_img00.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>At low perplexity t-SNE makes clumps from data with <strong>no clusters at all</strong>.</li>
+<li>Always ask what the <strong>null</strong> looks like: run the same pipeline on data with no structure.</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.23915/distill.00002" rel="noopener">Wattenberg, Viégas &amp; Johnson <b>2016</b></a> · <i>Distill</i> · CC BY 4.0</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="40" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<h2 id="heading-26">Too few steps look like structure too</h2>
+<div class="capfig">
+<figure><img src="../images/2026-10-01/s149_img00.png" alt="Two clusters at perplexity 30 after 10, 20, 60, 120 and 1,000 steps; early in the run the clusters are pinched lines that change substantially as optimization proceeds" aria-describedby="figure-26-1"><figcaption id="figure-26-1"><p>Two clusters at perplexity 30 after 10, 20, 60, 120 and 1,000 steps; early in the run the clusters are pinched lines that change substantially as optimization proceeds</p><a href="../images/2026-10-01/s149_img00.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>Pinched shapes</strong> early in a run are optimization artifacts, not data.</li>
+<li>A <strong>new seed gives a new picture</strong>: re-run before you make a claim.</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.23915/distill.00002" rel="noopener">Wattenberg, Viégas &amp; Johnson <b>2016</b></a> · <i>Distill</i> · CC BY 4.0</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-marpit-pagination="27" data-marpit-pagination-total="40" aria-labelledby="heading-27"><p class="page">Slide 27</p>
+<h2 id="heading-27">One picture is never the result</h2>
+<div class="capfig">
+<figure><img src="../images/2026-a1-papers/misread-tsne_trefoil-runs.png" alt="Five t-SNE runs on the same trefoil-knot points: at perplexity 2 each seed cuts the loop somewhere different; at perplexity 50 every run returns the same closed loop" aria-describedby="figure-27-1"><figcaption id="figure-27-1"><p>Five t-SNE runs on the same trefoil-knot points: at perplexity 2 each seed cuts the loop somewhere different; at perplexity 50 every run returns the same closed loop</p><a href="../images/2026-a1-papers/misread-tsne_trefoil-runs.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>The hardest case is a <strong>trefoil knot</strong>: one closed loop in 3-D. At <strong>perplexity 2</strong> five runs on the <em>same points</em> disagree; at <strong>perplexity 50</strong> every run returns the same loop.</li>
+<li><mark>A t-SNE plot is a function of the data, the settings and the seed.</mark> Report the sweep, not the screenshot.</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.23915/distill.00002" rel="noopener">Wattenberg, Viégas &amp; Johnson <b>2016</b></a> · <i>Distill</i> · figures 12–13 · CC BY 4.0</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="40" aria-labelledby="heading-28"><p class="page">Slide 28</p>
+<h2 id="heading-28">Measuring neighborhood agreement</h2>
+<div class="row">
+<div class="col">
+<p>A point's <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math> nearest neighbors</strong> are the <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math> other points closest to it. Exclude the point itself.</p>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mtext>overlap</mtext><mi>i</mi></msub><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∣</mi><msubsup><mi mathvariant="script">N</mi><mi>k</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msubsup><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo><mo>∩</mo><msubsup><mi mathvariant="script">N</mi><mi>k</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msubsup><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo><mi mathvariant="normal">∣</mi></mrow><mi>k</mi></mfrac><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\text{overlap}_i=\frac{|\mathcal N_k^{(1)}(i)\cap\mathcal N_k^{(2)}(i)|}{k}.
+</annotation></semantics></math></div></span></p><ul>
+<li>Toy example: 2 shared neighbors out of 4 gives <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.50</mn></mrow><annotation encoding="application/x-tex">0.50</annotation></semantics></math>.</li>
+<li>Average over points to summarize two runs.</li>
+<li>Run-to-run agreement measures stability. Comparing a map with the original space measures preservation.</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/A1-coverage-2026-09/neighbor_overlap.svg" alt="Two four-neighbor sets share A and B, giving an overlap of one half" aria-describedby="figure-28-1"><figcaption id="figure-28-1"><p>Two four-neighbor sets share A and B, giving an overlap of one half</p><a href="../images/A1-coverage-2026-09/neighbor_overlap.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="40" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<h2 id="heading-29">Object purity asks a different question</h2>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mtext>purity</mtext><mi>i</mi></msub><mo>=</mo><mfrac><mrow><mtext>neighbors&nbsp;that&nbsp;are&nbsp;views&nbsp;of&nbsp;the&nbsp;same&nbsp;object&nbsp;as&nbsp;image&nbsp;</mtext><mi>i</mi></mrow><mi>k</mi></mfrac><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\text{purity}_i=\frac{\text{neighbors that are views of the same object as image }i}{k}.
+</annotation></semantics></math></div></span></p><ul>
+<li>Six views of the same object among ten neighbors gives purity <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.60</mn></mrow><annotation encoding="application/x-tex">0.60</annotation></semantics></math>.</li>
+<li><strong>Identity</strong> distinguishes two individual objects in the same category: two different cats are not the same object.</li>
+<li>Compare purity in the original response space and in each map.</li>
+<li>A method can preserve object purity while rearranging which particular views are neighbors.</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="40" aria-labelledby="heading-30"><p class="page">Slide 30</p>
+<h2 id="heading-30">A map can be stable and still distort the data</h2>
+<p>Suppose two runs give the same ten nearest neighbors for an image, but only four are among its ten nearest neighbors in the original space.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="A map can be stable and still distort the data — table"><table><caption>A map can be stable and still distort the data — table</caption>
+<thead>
+<tr>
+<th scope="col">Check</th>
+<th scope="col">Result</th>
+<th scope="col">What it supports</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Map versus map</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>10</mn><mi mathvariant="normal">/</mi><mn>10</mn><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">10/10=1.0</annotation></semantics></math></td>
+<td>Stable neighborhoods across these runs</td>
+</tr>
+<tr>
+<td>Map versus original space</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4</mn><mi mathvariant="normal">/</mi><mn>10</mn><mo>=</mo><mn>0.4</mn></mrow><annotation encoding="application/x-tex">4/10=0.4</annotation></semantics></math></td>
+<td>Limited neighborhood fidelity here</td>
+</tr>
+<tr>
+<td>Six neighbors show the same object</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>6</mn><mi mathvariant="normal">/</mi><mn>10</mn><mo>=</mo><mn>0.6</mn></mrow><annotation encoding="application/x-tex">6/10=0.6</annotation></semantics></math> purity</td>
+<td>Object grouping within this map</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>Repeatability, fidelity and object grouping are different questions.</mark></p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="40" aria-labelledby="heading-31"><p class="page">Slide 31</p>
+<h2 id="heading-31">Sometimes the curved shape is the answer</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/2026-illustrations/attractor-manifold.png" alt="Population activity of head-direction cells embedded nonlinearly: the states close into a ring, colored by the animal's heading running once around the loop" aria-describedby="figure-31-1"><figcaption id="figure-31-1"><p>Population activity of head-direction cells embedded nonlinearly: the states close into a ring, colored by the animal's heading running once around the loop</p><a href="../images/2026-illustrations/attractor-manifold.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Head-direction cells in the mouse <strong>anterodorsal thalamus</strong>: one point per time bin, one dimension per neuron.</li>
+<li><strong>Isomap</strong> closes that cloud into a <strong>ring</strong>: one curved dimension, the shape a circular variable <em>should</em> have. A topological test (persistent homology) confirms the loop without trusting the picture.</li>
+<li>Position around the ring tracks the animal's <strong>head direction</strong>, and the ring persists in <strong>REM sleep</strong>: a circuit that maintains an internal direction.</li>
+<li>Language models do it too: days of the week and months sit on <strong>circles</strong> inside GPT-2 and Mistral.</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1038/s41593-019-0460-x" rel="noopener">Chaudhuri, Gerçek, Pandey, Peyrache &amp; Fiete <b>2019</b></a> · <i>Nature Neuroscience</i> · <a href="https://arxiv.org/abs/2405.14860" rel="noopener">Engels et al. <b>ICLR 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="40" aria-labelledby="heading-32"><p class="page">Slide 32</p>
+<h2 id="heading-32">PCA says six; a nonlinear map says torus</h2>
+<div class="row">
+<div class="col fig">
+<div class="capfig">
+<figure><img src="../images/2026-illustrations/gardner2022_torus.png" alt="Grid-cell population activity embedded in 3-D, seen from two angles: the points form a torus, a ring-shaped surface with a hole, with a five-second stretch of the rat's trajectory drawn on it in red and yellow" aria-describedby="figure-32-1"><figcaption id="figure-32-1"><p>Grid-cell population activity embedded in 3-D, seen from two angles: the points form a torus, a ring-shaped surface with a hole, with a five-second stretch of the rat's trajectory drawn on it in red and yellow</p><a href="../images/2026-illustrations/gardner2022_torus.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="col">
+<div class="capfig">
+<figure><img src="../images/2026-illustrations/gardner2022_barcode.png" alt="Persistence barcodes for the same data: one long bar in the H0 row, two long bars in the H1 row and one long bar in the H2 row, marked with arrows" aria-describedby="figure-32-2"><figcaption id="figure-32-2"><p>Persistence barcodes for the same data: one long bar in the H0 row, two long bars in the H1 row and one long bar in the H2 row, marked with arrows</p><a href="../images/2026-illustrations/gardner2022_barcode.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>Grid cells</strong> in rat entorhinal cortex: PCA puts the activity of hundreds of cells in about <strong>6</strong> embedding dimensions.</li>
+<li>UMAP shows a <strong>torus</strong>: an intrinsically <strong>2-D</strong> surface, as theory predicted. Persistent homology counts one piece, two loops, one cavity: a torus, <strong>tested, not eyeballed</strong>.</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1038/s41586-021-04268-7" rel="noopener">Gardner et al. <b>2022</b></a> · <i>Nature</i> · Fig. 1b, e · CC BY 4.0</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="40" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<h2 id="heading-33">From a map to a test of the representation</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="From a map to a test of the representation — table"><table><caption>From a map to a test of the representation — table</caption>
+<thead>
+<tr>
+<th scope="col">Question</th>
+<th scope="col">Evidence to seek</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Do views of the same object stay together?</td>
+<td>Neighbors and object purity in the response space</td>
+</tr>
+<tr>
+<td>Can object identity be read out?</td>
+<td>Accuracy on held-out images with a specified readout</td>
+</tr>
+<tr>
+<td>Does a model resemble human judgments or brain responses?</td>
+<td>Compare responses or dissimilarities for matched stimuli</td>
+</tr>
+<tr>
+<td>Does learning change the representation?</td>
+<td>Compare before and after learning under the same tests</td>
+</tr>
+</tbody>
+</table></div>
+<p>A map suggests the question; the response space answers it.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="40" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<h2 id="heading-34">What have we learned about a representation?</h2>
+<ul>
+<li><strong>t-SNE and UMAP</strong> are local by construction: tearing neighbors apart is expensive, crowding strangers is cheap. Sizes and gaps in the map are not measurements.</li>
+<li>Dimension is <strong>ambient</strong>, <strong>embedding</strong> (what PCA sees) or <strong>intrinsic</strong> (the surface's own). <strong>Isomap</strong> keeps along-the-sheet distances and can recover the intrinsic shape when the neighbor graph stays on the sheet.</li>
+<li>A map can reveal what a two-component PCA projection hides, and it can invent structure. <strong>Stability does not establish fidelity.</strong></li>
+<li>To interpret grouping, check neighborhoods and labels in the response space. To interpret task information, test a readout on new data.</li>
+</ul>
+<p><mark>A useful map helps us formulate a claim that we can test.</mark></p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="40" aria-labelledby="heading-35"><p class="page">Slide 35</p>
+<h2 id="heading-35">Further reading</h2>
+<ul>
+<li><strong>Required reading:</strong> Wattenberg, Viégas &amp; Johnson, <a href="https://distill.pub/2016/misread-tsne/">How to Use t-SNE Effectively</a> (2016)</li>
+<li><strong>Short essay:</strong> Perich, <a href="https://doi.org/10.53053/FTEU9810">Dimensionality: neuroscience's red herring?</a> (2026)</li>
+<li><strong>Research-trail options:</strong> Chaudhuri et al., <a href="https://doi.org/10.1038/s41593-019-0460-x">head-direction ring</a> (2019) · Gardner et al., <a href="https://doi.org/10.1038/s41586-021-04268-7">grid-cell torus</a> (2022) · Nieh et al., <a href="https://doi.org/10.1038/s41586-021-03652-7">abstract knowledge in the hippocampus</a> (2021) · Engels et al., <a href="https://arxiv.org/abs/2405.14860">circles in language models</a> (2025)</li>
+<li><strong>Optional:</strong> Sainburg, Thielk &amp; Gentner, <a href="https://doi.org/10.1371/journal.pcbi.1008228">vocal repertoires</a> (2020) · Chari &amp; Pachter, <a href="https://doi.org/10.1371/journal.pcbi.1011288">The specious art of single-cell genomics</a> (2023)</li>
+</ul>
+<p>The paper you select for your research trail is required; the other research papers are optional.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="40" aria-labelledby="heading-36"><p class="page">Slide 36</p>
+<h2 id="heading-36">Minute paper</h2>
+<p>Submit on <strong>Canvas → Minute papers → Minute Paper 5</strong> (access code read out in class).</p>
+<p>Write three brief points in your own words:</p>
+<ol>
+<li>Two networks' t-SNE maps of the same images: one has cleaner islands. Name one test of <strong>map fidelity</strong> and one test of <strong>task information</strong>.</li>
+<li>Something you do not yet understand, or a question still open</li>
+<li>Another idea you found interesting, and why it matters for brains, behavior or AI</li>
+</ol>
+<p>Credit for a thoughtful attempt, not for being correct.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="40" aria-labelledby="heading-37"><p class="page">Slide 37</p>
+<h2 id="heading-37">Appendix: extra examples and assignment reference</h2>
+<p>A second application of UMAP, and two details for working through the t-SNE part of Assignment 1.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="40" aria-labelledby="heading-38"><p class="page">Slide 38</p>
+<h2 id="heading-38">Are vocal repertoires discrete or continuous?</h2>
+<div class="row"><div class="col fig">
+<div class="capfig">
+<figure><img src="../images/2026-illustrations/vocal-repertoires.png" alt="UMAP maps of vocal elements from twelve species, with different degrees of apparent grouping" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>UMAP maps of vocal elements from twelve species, with different degrees of apparent grouping</p><a href="../images/2026-illustrations/vocal-repertoires.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div><div class="col">
+<ul>
+<li>Each point represents a <strong>vocal element</strong>, described by its spectrogram.</li>
+<li>The maps suggest differences in how strongly vocal elements form groups.</li>
+<li>The paper also measures <strong>clusterability in UMAP space</strong>. A number makes the description precise, but still depends on the embedding.</li>
+<li>What would support a claim about the animals? Check acoustic relationships, labels or behavior as well.</li>
+</ul>
+</div></div>
+<div class="ref"><a href="https://doi.org/10.1371/journal.pcbi.1008228">Sainburg, Thielk &amp; Gentner 2020</a> · Fig. 8 · CC BY 4.0</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="40" aria-labelledby="heading-39"><p class="page">Slide 39</p>
+<h2 id="heading-39">Centroid gaps across runs</h2>
+<p>A <strong>centroid</strong> is a group's mean position. The cloud's root-mean-square radius is</p>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>r</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">M</mi><mi mathvariant="normal">S</mi></mrow></msub><mo>=</mo><msqrt><mrow><mfrac><mn>1</mn><mi>N</mi></mfrac><munder><mo>∑</mo><mi>i</mi></munder><mi mathvariant="normal">∥</mi><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup><mo>−</mo><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mo>ˉ</mo></mover><msup><mi mathvariant="normal">∥</mi><mn>2</mn></msup></mrow></msqrt><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">r_{\mathrm{RMS}}=\sqrt{\frac{1}{N}\sum_i\|\mathbf y^{(i)}-\bar{\mathbf y}\|^2}.
+</annotation></semantics></math></div></span></p><ul>
+<li>Compare centroid gaps as <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∥</mi><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐜</mi><mi>A</mi></msub><mo>−</mo><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐜</mi><mi>B</mi></msub><mi mathvariant="normal">∥</mi><mi mathvariant="normal">/</mi><msub><mi>r</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">M</mi><mi mathvariant="normal">S</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\|\mathbf c_A-\mathbf c_B\|/r_{\mathrm{RMS}}</annotation></semantics></math>.</li>
+<li>A gap of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>6</mn></mrow><annotation encoding="application/x-tex">6</annotation></semantics></math> in a cloud of radius <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn></mrow><annotation encoding="application/x-tex">3</annotation></semantics></math> is <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn></mrow><annotation encoding="application/x-tex">2</annotation></semantics></math> radius units. Doubling the whole map leaves that ratio unchanged.</li>
+<li>A1 reports each ratio's minimum, maximum and range across seeds. Variation diagnoses unstable global arrangements.</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="40" aria-labelledby="heading-40"><p class="page">Slide 40</p>
+<h2 id="heading-40">The t-SNE call used in Assignment 1</h2>
+<marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">from</span> sklearn.manifold <span class="hljs-keyword">import</span> TSNE
+
+embedding = TSNE(
+    n_components=<span class="hljs-number">2</span>,
+    perplexity=<span class="hljs-number">30</span>,
+    init=<span class="hljs-string">"pca"</span>,
+    random_state=<span class="hljs-number">0</span>,
+    max_iter=<span class="hljs-number">1000</span>,
+).fit_transform(fc6)
+</code></marp-pre>
+<ul>
+<li>Input is <strong>raw fc6</strong>. PCA initialization chooses starting coordinates; it does not replace fc6 by 50-dimensional features.</li>
+<li>Sweep perplexities <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5</mn><mo separator="true">,</mo><mn>15</mn><mo separator="true">,</mo><mn>30</mn><mo separator="true">,</mo><mn>50</mn></mrow><annotation encoding="application/x-tex">5,15,30,50</annotation></semantics></math>. Compare eight seeds under both PCA and random initialization.</li>
+<li>The fixed iteration budget makes runs comparable; it does not guarantee convergence.</li>
+</ul>
+<div class="ref"><a href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html" rel="noopener">scikit-learn · TSNE</a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section></main></body></html>

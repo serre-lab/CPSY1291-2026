@@ -130,8 +130,8 @@ body.static .tsne-run{display:none}
     <span class="ctl tsne-only"><input type="checkbox" id="compare" aria-label="Compare two runs">
       <label for="compare">Compare two runs</label></span>
     <span class="ctl"><label for="k">k</label>
-      <input type="range" id="k" min="3" max="15" value="5" step="1" aria-describedby="status">
-      <output for="k" id="k-out">5</output></span>
+      <input type="range" id="k" min="3" max="15" value="10" step="1" aria-describedby="status">
+      <output for="k" id="k-out">10</output></span>
   </div>
 
   <div class="stage">
@@ -140,18 +140,18 @@ body.static .tsne-run{display:none}
       <div class="frame"><canvas id="canvas" width="560" height="560" role="img" aria-labelledby="h-map" aria-describedby="status"></canvas></div>
       <p class="warn" id="warn" aria-live="polite">Cluster sizes and gaps between clusters are not measurements</p>
     </section>
-    <aside class="side" aria-label="Neighbourhood quality">
+    <aside class="side" aria-label="Neighborhood quality">
       <div class="meter">
-        <h3 id="h-knn"><span id="knn-k">5</span>-NN agreement</h3>
+        <h3 id="h-knn"><span id="knn-k">10</span>-NN agreement</h3>
         <div class="val" id="knn-val">—</div>
         <div class="bar" aria-hidden="true"><div class="fill" id="knn-fill"></div></div>
-        <p class="hint">Mean fraction of each image’s k nearest neighbours in 50-D that remain among its k nearest in this 2-D layout.</p>
+        <p class="hint">Mean fraction of each image’s k nearest neighbors in 50-D that remain among its k nearest in this 2-D layout.</p>
       </div>
       <div class="meter">
         <h3>Category purity</h3>
         <div class="val" id="pur-val">—</div>
         <div class="bar" aria-hidden="true"><div class="fill" id="pur-fill" style="background:var(--green)"></div></div>
-        <p class="hint">Mean fraction of each image’s k nearest 2-D neighbours that share its animal category.</p>
+        <p class="hint">Mean fraction of each image’s k nearest 2-D neighbors that share its animal category. This set has one photograph per animal, so this is category purity, not the object purity of Assignment 1 Part 4.</p>
       </div>
       <div class="meter" id="legend-box">
         <h3>Categories</h3>
@@ -336,7 +336,7 @@ function runTsneSync(perp, maxSteps, seed){
 
 /* ---------- state ---------- */
 const state={
-  method:'tsne', view:'thumbs', perp:15, maxSteps:1000, k:5, seed:1,
+  method:'tsne', view:'thumbs', perp:15, maxSteps:1000, k:10, seed:1,
   running:false, step:0, converged:false,
   Y:null, P:null, gains:null, dY:null, prevY:null, compare:false,
   raf:0, metrics:{agree:0,pure:0}
@@ -619,10 +619,10 @@ new ResizeObserver(()=>requestAnimationFrame(draw)).observe(canvas.parentElement
 
 /* ---------- boot ---------- */
 function bootInteractive(){
-  state.perp=15; state.maxSteps=1000; state.k=5; state.seed=1; state.method='tsne'; state.view='thumbs';
+  state.perp=15; state.maxSteps=1000; state.k=10; state.seed=1; state.method='tsne'; state.view='thumbs';
   $('perp').value=15; $('perp-out').value=15;
   $('steps').value=1000; $('steps-out').value=1000;
-  $('k').value=5; $('k-out').value=5;
+  $('k').value=10; $('k-out').value=10;
   $('seed').value=1;
   resetTsne(false);
   setMethod('tsne');
@@ -632,14 +632,14 @@ function bootInteractive(){
 function bootStatic(){
   // 0 PCA dots; 1 t-SNE p=15 seed=1 thumbs; 2 t-SNE p=5 seed=1 thumbs; 3 MDS dots
   if(STEP===0){
-    state.method='pca'; state.view='dots'; state.k=5;
+    state.method='pca'; state.view='dots'; state.k=10;
     setMethod('pca'); setView('dots');
   } else if(STEP===3){
-    state.method='mds'; state.view='dots'; state.k=5;
+    state.method='mds'; state.view='dots'; state.k=10;
     setMethod('mds'); setView('dots');
   } else {
     state.method='tsne'; state.view='thumbs'; state.seed=1;
-    state.perp=STEP===2?5:15; state.maxSteps=1000; state.k=5;
+    state.perp=STEP===2?5:15; state.maxSteps=1000; state.k=10;
     $('perp').value=state.perp; $('perp-out').value=state.perp;
     $('seed').value=1;
     state.Y=runTsneSync(state.perp, state.maxSteps, 1);
