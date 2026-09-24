@@ -35,10 +35,11 @@
 <figure><img src="../images/L03/21c_eigenbasis_mds.svg" alt="MDS on the Euclidean distances between the same points: a two-dimensional map that looks the same as the PCA map, with the same point in green" aria-describedby="figure-4-3"><figcaption id="figure-4-3"><p>MDS on the Euclidean distances between the same points: a two-dimensional map that looks the same as the PCA map, with the same point in green</p><a href="../images/L03/21c_eigenbasis_mds.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li><strong>PCA</strong> finds the plane on which the projected points have the <strong>largest variance</strong>, and keeps each point's <strong>projection</strong> onto it. <strong>MDS</strong> instead keeps the <strong>distances</strong> between points.</li>
-<li><strong>Lost in both PCA and MDS:</strong> each point's distance from the plane, the dashed red <span><b>residual</b></span>, assumed to be noise.</li>
-<li>The MDS map comes out turned and mirrored; the green point, far above the plane, is pushed outward.</li>
+<li><strong>PCA</strong> keeps each point's <strong>projection</strong> onto the plane of <strong>largest variance</strong>; <strong>MDS</strong> keeps the <strong>distances</strong> between points.</li>
+<li><strong>PCA drops</strong> each point's distance from the plane, the dashed red <span><b>residual</b></span>, assuming it is noise.</li>
+<li><strong>MDS cannot drop it:</strong> to keep every distance, it spreads the residual into the map, which <strong>distorts</strong> it.</li>
 </ul>
+<p>Green point, far above the plane: PCA drops it among the others; MDS pushes it to the edge.</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-marpit-pagination="5" data-marpit-pagination-total="57" aria-labelledby="heading-5"><p class="page">Slide 5</p>
 <h2 id="heading-5">One knob, one curve: turning</h2>
 <div class="capfig">
