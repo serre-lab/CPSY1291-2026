@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One knob, one curve · L04 · CPSY 1291</title>
+<!--
+  Static steps (?static=1&step=N):
+    0 — fish (marlin), turn, 40°
+    1 — fish (marlin), shift, +6 px
+    2 — fish (marlin), enlarge, ×1.17
+    3 — house, turn, 90°
+  Query: ?embed=1  ?static=1  ?step=N
+  Data: transform_curves_data.js (pixel vectors of each image family projected onto that
+  family's first two principal components; var2 = variance kept by 2 PCs, n90 = PCs for 90%).
+-->
+<style>
+:root{
+  --paper:#FAF9F5;--ink:#1E293B;--body:#334155;--slate:#64748B;
+  --blue:#3E6D8E;--magenta:#B5396B;--green:#3F7A6B;--pop:#B23A2E;--gold:#FFC72C;
+  --rule:#E7E3DA;--focus:#0969da;--knob:var(--pop);color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--body);
+  font:20px/1.35 "Poppins",system-ui,-apple-system,sans-serif}
+a{color:#80431c}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1680px;margin:0 auto;padding:12px 14px 16px}
+h1{margin:0 0 4px;font-size:28px;line-height:1.2;color:var(--ink)}
+.lede{margin:0 0 10px;font-size:17px;color:var(--slate)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:0 0 8px;flex-shrink:0}
+.toolbar .ctl{display:inline-flex;align-items:center;gap:8px}
+.toolbar label,.toolbar .lbl{font-size:17px;color:var(--ink);font-weight:600;white-space:nowrap}
+button,select{font:inherit;font-size:17px;color:var(--ink);background:var(--paper);
+  border:1px solid var(--slate);border-radius:4px;padding:5px 12px;min-height:38px;cursor:pointer}
+button[aria-pressed=true]{background:var(--blue);color:#fff;border-color:var(--blue)}
+button.knob[data-knob=turn][aria-pressed=true]{background:var(--pop);border-color:var(--pop)}
+button.knob[data-knob=shift][aria-pressed=true]{background:var(--blue);border-color:var(--blue)}
+button.knob[data-knob=enlarge][aria-pressed=true]{background:var(--green);border-color:var(--green)}
+.knobs{display:inline-flex;gap:6px}
+input[type=range]{width:260px;accent-color:var(--knob)}
+output{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink);min-width:5ch;display:inline-block}
+#play{min-width:5.5em}
+.stage{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:stretch}
+.panel{min-width:0;min-height:0;display:flex;flex-direction:column}
+.panel h2{margin:0 0 4px;font-size:20px;color:var(--ink);flex-shrink:0}
+.panel h2 .sub{font-weight:400;font-size:.85em;color:var(--slate)}
+.imgbox{--s:420px;width:var(--s);height:var(--s);border:5px solid var(--knob);background:#fff;
+  position:relative;flex-shrink:0}
+.imgbox img{display:block;width:100%;height:100%;image-rendering:auto}
+.imgbox .val{position:absolute;right:0;bottom:0;background:var(--knob);color:#fff;
+  font-weight:600;font-size:20px;padding:2px 12px;font-variant-numeric:tabular-nums}
+/* Container height must NOT depend on the canvas (avoids ResizeObserver feedback). */
+.canvas-frame{flex:1 1 auto;border:1px solid var(--rule);background:var(--paper);position:relative;
+  min-height:0;aspect-ratio:16/9;max-height:520px;overflow:hidden}
+.canvas-frame canvas{display:block;width:100%;height:100%;cursor:pointer;touch-action:none}
+.stats{margin:8px 0 0;font-size:19px;color:var(--ink);font-variant-numeric:tabular-nums;flex-shrink:0}
+.stats b{color:var(--knob)}
+.status{margin:2px 0 0;font-size:15px;color:var(--body);font-variant-numeric:tabular-nums;min-height:1.3em;flex-shrink:0}
+.caption{margin:2px 0 0;font-size:15px;color:var(--slate);line-height:1.35;flex-shrink:0}
+.footer{margin-top:10px;font-size:13px;color:var(--slate);flex-shrink:0}
+body.embed,html.embed body{overflow:hidden}
+body.embed .wrap,html.embed .wrap{max-width:none;width:100%;height:100vh;padding:6px 10px;display:flex;flex-direction:column;min-height:0}
+body.embed h1,body.embed .lede,body.embed .footer,
+html.embed h1,html.embed .lede,html.embed .footer{display:none}
+body.embed .stage,html.embed .stage{flex:1;min-height:0}
+body.embed .canvas-frame,html.embed .canvas-frame{aspect-ratio:auto;max-height:none;flex:1}
+body.embed .imgbox,html.embed .imgbox{--s:min(430px,calc(100vh - 118px))}
+body.static.embed .imgbox,html.embed body.static .imgbox{--s:min(470px,calc(100vh - 72px))}
+body.embed .toolbar label,body.embed .toolbar .lbl,body.embed button,body.embed select,body.embed output{font-size:16px}
+body.static .toolbar{display:none}
+body.static .canvas-frame canvas{cursor:default}
+@media(max-width:900px){
+  .stage{grid-template-columns:1fr}
+  .imgbox{--s:min(420px,calc(100vw - 40px))}
+  body.embed .wrap{height:auto;overflow:auto}
+  body.embed .canvas-frame{aspect-ratio:16/10}
+}
+</style>
+<script>
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(q.has('embed'))document.documentElement.classList.add('embed');
+  document.addEventListener('DOMContentLoaded',()=>{
+    if(q.has('embed'))document.body.classList.add('embed');
+    if(q.has('static'))document.body.classList.add('static');
+  });
+})();
+</script>
+</head>
+<body>
+<main class="wrap">
+  <h1>One knob, one curve</h1>
+  <p class="lede">Pick an object and one image change, then drag the slider. Every image is a point in
+    pixel space (96 × 96 = 9,216 numbers). Changing one knob traces a curve through that space; the
+    right panel shows the curve projected onto its first two principal components.</p>
+
+  <div class="toolbar" role="group" aria-label="Image-change controls">
+    <span class="ctl"><label for="obj">Object</label><select id="obj"></select></span>
+    <span class="ctl"><span class="lbl" id="knob-label">Change</span>
+      <span class="knobs" role="group" aria-labelledby="knob-label">
+        <button type="button" class="knob" data-knob="turn" aria-pressed="true">Turn</button>
+        <button type="button" class="knob" data-knob="shift" aria-pressed="false">Shift</button>
+        <button type="button" class="knob" data-knob="enlarge" aria-pressed="false">Enlarge</button>
+      </span></span>
+    <span class="ctl"><label for="amount">Amount</label>
+      <input type="range" id="amount" min="0" max="35" step="1" value="0" aria-describedby="status">
+      <output for="amount" id="amount-out"></output></span>
+    <button type="button" id="play" aria-label="Play through all amounts">Play</button>
+  </div>
+
+  <div class="stage">
+    <section class="panel" aria-labelledby="h-img">
+      <h2 id="h-img">Image <span class="sub" id="img-sub"></span></h2>
+      <div class="imgbox"><img id="frame" alt=""><span class="val" id="img-val" aria-hidden="true"></span></div>
+    </section>
+    <section class="panel" aria-labelledby="h-plot">
+      <h2 id="h-plot">All images of this change, on the first two principal components <span class="sub">(click or drag the curve)</span></h2>
+      <div class="canvas-frame">
+        <canvas id="plot" role="img" aria-label="Curve traced by the images in the plane of the first two principal components"></canvas>
+      </div>
+      <p class="stats" id="stats" aria-hidden="true"></p>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+      <p class="caption">One knob traces a curve: intrinsic dimension 1. The curve bends, so a flat plane (PCA) keeps only part of it.</p>
+    </section>
+  </div>
+  <p class="footer">Each family's images are 96 × 96 grayscale; PCA is fit separately per object and change. Escape exits when embedded.</p>
+</main>
+
+<script src="transform_curves_data.js"></script>
+<script>
+'use strict';
+const D=window.TransformCurvesData;
+if(!D) throw new Error('transform_curves_data.js did not load');
+const Q=new URLSearchParams(location.search);
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=id=>document.getElementById(id);
+const COLORS={turn:'#B23A2E',shift:'#3E6D8E',enlarge:'#3F7A6B'};
+const VERB={turn:'turned',shift:'shifted',enlarge:'enlarged'};
+
+/* Python-style '{:.0f}°', '{:+.0f} px', '×{:.2f}' → formatted string */
+function fmtVal(pattern,v){
+  return pattern.replace(/\{:(\+?)\.(\d+)f\}/,(m,plus,dp)=>{
+    let s=Number(v).toFixed(+dp);
+    if(/^-0(\.0*)?$/.test(s)) s=s.slice(1);
+    if(plus && !s.startsWith('-')) s='+'+s;
+    return s.replace('-','−');
+  });
+}
+
+const state={obj:0,knob:'turn',i:0,playing:false,timer:0};
+const K=()=>D.stimuli[state.obj].knobs[state.knob];
+
+/* image cache for thumbnails */
+const imgCache=new Map();
+function img(src){
+  let im=imgCache.get(src);
+  if(!im){ im=new Image(); im.onload=()=>scheduleRedraw(); im.src=src; imgCache.set(src,im); }
+  return im;
+}
+
+const sel=$('obj');
+D.stimuli.forEach((s,k)=>{const o=document.createElement('option');o.value=k;o.textContent=s.name;sel.appendChild(o);});
+
+/* Size backing store from CSS box; never write style width/height (that drove the growth loop). */
+const _boxSize=new WeakMap();
+function sizeFromBox(canvas){
+  const rect=canvas.getBoundingClientRect();
+  const dpr=Math.min(devicePixelRatio||1,2);
+  const W=Math.max(1,Math.floor(rect.width)), H=Math.max(1,Math.floor(rect.height));
+  const prev=_boxSize.get(canvas);
+  if(prev && Math.abs(prev.w-W)<=1 && Math.abs(prev.h-H)<=1 && prev.dpr===dpr
+     && canvas.width===prev.bw && canvas.height===prev.bh) return {W:prev.w,H:prev.h,dpr};
+  const bw=Math.round(W*dpr), bh=Math.round(H*dpr);
+  if(canvas.width!==bw||canvas.height!==bh){canvas.width=bw;canvas.height=bh;}
+  _boxSize.set(canvas,{w:W,h:H,dpr,bw,bh});
+  return {W,H,dpr};
+}
+
+let geom=null;   // screen positions of the points, for hit-testing
+function drawPlot(){
+  const cv=$('plot');
+  const {W,H,dpr}=sizeFromBox(cv);
+  if(W<4||H<4) return;
+  const ctx=cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+  const k=K(), xy=k.xy, n=xy.length, col=COLORS[state.knob];
+
+  // thumbnails every ~6th frame sit outside the curve: reserve a margin for them
+  const T=Math.round(Math.max(44,Math.min(84,H*0.16)));
+  const off=T*0.5+16;
+  const padX=T+off*0.55+20, padY=T*0.5+off+6;
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  for(const [x,y] of xy){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}
+  const s=Math.min((W-2*padX)/((x1-x0)||1),(H-2*padY)/((y1-y0)||1));
+  const cx=W/2-(x0+x1)/2*s, cy=H/2+(y0+y1)/2*s;
+  const P=xy.map(([x,y])=>({x:cx+x*s,y:cy-y*s}));
+  geom={P,W,H};
+
+  // axes: L-shaped arrows at the lower-left edge, clear of the data
+  ctx.strokeStyle='#94A3B8';ctx.fillStyle='#64748B';ctx.lineWidth=1.5;
+  const ax=14, ay=H-14, L=Math.min(120,W*0.18);
+  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax+L,ay);ctx.moveTo(ax,ay);ctx.lineTo(ax,ay-L);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ax+L+7,ay);ctx.lineTo(ax+L-2,ay-5);ctx.lineTo(ax+L-2,ay+5);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(ax,ay-L-7);ctx.lineTo(ax-5,ay-L+2);ctx.lineTo(ax+5,ay-L+2);ctx.closePath();ctx.fill();
+  ctx.font='600 15px Poppins,system-ui,sans-serif';
+  ctx.textBaseline='middle';ctx.textAlign='left';
+  ctx.fillText('PC1',ax+L+11,ay);
+  ctx.textBaseline='bottom';ctx.textAlign='center';
+  ctx.fillText('PC2',ax,ay-L-9);
+
+  // centroid of the curve (for pushing thumbnails outward)
+  let mx=0,my=0; for(const p of P){mx+=p.x;my+=p.y;} mx/=n; my/=n;
+  // candidates every 6th frame first, then the in-between 3rds; skip any that would overlap
+  // (a turn can trace its loop twice, so every-6th frames may land on the same spot)
+  const cand=[]; for(let j=0;j<n;j+=6) cand.push(j); for(let j=3;j<n;j+=6) cand.push(j);
+  const placed=[]; const dirs={};
+  for(const j of cand){
+    const p=P[j];
+    let dx=p.x-mx, dy=p.y-my, d=Math.hypot(dx,dy);
+    const a=P[Math.max(0,j-1)], b=P[Math.min(n-1,j+1)];
+    if(d<1e-3){dx=-(b.y-a.y); dy=b.x-a.x; d=Math.hypot(dx,dy)||1;}
+    const ux=dx/d, uy=dy/d;
+    let tx=ux, ty=uy;
+    if(!k.closed){ // open curves: offset perpendicular to the curve, on the outer side
+      let nx=-(b.y-a.y), ny=b.x-a.x; const nd=Math.hypot(nx,ny)||1; nx/=nd; ny/=nd;
+      if(nx*ux+ny*uy<0){nx=-nx;ny=-ny;}
+      tx=nx; ty=ny;
+    }
+    const qx=p.x+tx*off, qy=p.y+ty*off;
+    if(placed.some(o=>Math.abs(o.x-qx)<T+8&&Math.abs(o.y-qy)<T+8)) continue;
+    if(placed.length>=8) break;
+    placed.push({x:qx,y:qy,j}); dirs[j]=[tx,ty];
+    ctx.strokeStyle='rgba(100,116,139,.45)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(qx,qy);ctx.stroke();
+    const im=img(k.frames[j]);
+    ctx.globalAlpha=0.6;
+    ctx.fillStyle='#fff';ctx.fillRect(qx-T/2,qy-T/2,T,T);
+    if(im.complete&&im.naturalWidth) ctx.drawImage(im,qx-T/2,qy-T/2,T,T);
+    ctx.globalAlpha=1;
+    ctx.strokeStyle='rgba(100,116,139,.5)';ctx.strokeRect(qx-T/2+.5,qy-T/2+.5,T-1,T-1);
+  }
+
+  // the curve
+  ctx.strokeStyle=col;ctx.lineWidth=3;ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.beginPath();P.forEach((p,j)=>j?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+  if(k.closed) ctx.closePath();
+  ctx.stroke();
+  ctx.fillStyle=col;
+  for(const p of P){ctx.beginPath();ctx.arc(p.x,p.y,3.6,0,Math.PI*2);ctx.fill();}
+
+  // endpoint labels for open curves
+  if(!k.closed){
+    ctx.font='500 14px Poppins,system-ui,sans-serif';ctx.fillStyle='#334155';
+    ctx.textBaseline='middle';
+    for(const j of [0,n-1]){
+      const p=P[j], q=P[j===0?1:n-2];
+      let dx=p.x-q.x, dy=p.y-q.y; const d=Math.hypot(dx,dy)||1; dx/=d; dy/=d;
+      if(dirs[j]){dx=-dirs[j][0]; dy=-dirs[j][1];}  // keep clear of the thumbnail
+      const lx=p.x+dx*18, ly=p.y+dy*18;
+      ctx.textAlign=dx>0.3?'left':dx<-0.3?'right':'center';
+      ctx.fillText(fmtVal(k.label,k.values[j]),lx,ly);
+    }
+  }
+
+  // current frame
+  const c=P[state.i];
+  ctx.beginPath();ctx.arc(c.x,c.y,12,0,Math.PI*2);
+  ctx.fillStyle=col;ctx.fill();ctx.lineWidth=3.5;ctx.strokeStyle='#FAF9F5';ctx.stroke();
+  ctx.beginPath();ctx.arc(c.x,c.y,14,0,Math.PI*2);ctx.lineWidth=1.5;ctx.strokeStyle='#1E293B';ctx.stroke();
+}
+
+function update(){
+  const s=D.stimuli[state.obj], k=K(), n=k.values.length;
+  state.i=Math.max(0,Math.min(n-1,state.i));
+  const col=COLORS[state.knob];
+  document.documentElement.style.setProperty('--knob',col);
+  const v=fmtVal(k.label,k.values[state.i]);
+  const pct=Math.round(k.var2*100);
+  sel.value=String(state.obj);
+  document.querySelectorAll('.knob').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.knob===state.knob)));
+  const r=$('amount');
+  r.max=String(n-1); r.value=String(state.i);
+  r.setAttribute('aria-valuetext',v);
+  $('amount-out').textContent=v;
+  $('frame').src=k.frames[state.i];
+  $('frame').alt=`${s.name}, ${VERB[state.knob]} ${v}`;
+  $('img-val').textContent=v;
+  $('img-sub').textContent=`${s.name} · ${VERB[state.knob]} ${v}`;
+  $('stats').innerHTML=`2 PCs keep <b>${pct}%</b> of the variance · <b>${k.n90}</b> PCs needed for 90%`+
+    (k.closed?' · turning closes the loop':'');
+  $('status').textContent=`${s.name}, ${VERB[state.knob]} ${v}: 2 PCs keep ${pct}% of the variance; ${k.n90} PCs needed for 90%`;
+  drawPlot();
+}
+
+/* —— interaction —— */
+function nearest(e){
+  if(!geom) return -1;
+  const cv=$('plot'), rect=cv.getBoundingClientRect();
+  const x=(e.clientX-rect.left)*(geom.W/rect.width), y=(e.clientY-rect.top)*(geom.H/rect.height);
+  let best=-1,bd=Infinity;
+  geom.P.forEach((p,j)=>{const d=(p.x-x)**2+(p.y-y)**2; if(d<bd){bd=d;best=j;}});
+  return bd<60*60?best:-1;
+}
+const cv=$('plot'); let dragging=false;
+cv.addEventListener('pointerdown',e=>{
+  if(document.body.classList.contains('static')) return;
+  const j=nearest(e); if(j<0) return;
+  dragging=true; cv.setPointerCapture(e.pointerId); stopPlay(); state.i=j; update();
+});
+cv.addEventListener('pointermove',e=>{
+  if(!dragging) return; const j=nearest(e); if(j>=0&&j!==state.i){state.i=j;update();}
+});
+cv.addEventListener('pointerup',()=>{dragging=false;});
+cv.addEventListener('pointercancel',()=>{dragging=false;});
+
+sel.addEventListener('change',()=>{state.obj=+sel.value;update();});
+document.querySelectorAll('.knob').forEach(b=>b.addEventListener('click',()=>{
+  if(state.knob===b.dataset.knob) return;
+  state.knob=b.dataset.knob; state.i=0; update();
+}));
+$('amount').addEventListener('input',()=>{stopPlay();state.i=+$('amount').value;update();});
+
+function stopPlay(){state.playing=false;clearInterval(state.timer);state.timer=0;$('play').textContent='Play';}
+function startPlay(){
+  state.playing=true;$('play').textContent='Stop';
+  // reduced motion: one image per second instead of a fast sweep
+  state.timer=setInterval(()=>{
+    const n=K().values.length; state.i=(state.i+1)%n; update();
+  },REDUCED?1000:140);
+}
+$('play').onclick=()=>{state.playing?stopPlay():startPlay();};
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&parent!==window){parent.postMessage({type:'cpsy-exit-interactive'},'*');}
+});
+
+/* —— static / step —— */
+function nearestIdx(values,v){let b=0;values.forEach((x,j)=>{if(Math.abs(x-v)<Math.abs(values[b]-v))b=j;});return b;}
+function findObj(name){const j=D.stimuli.findIndex(s=>s.name.startsWith(name));return j<0?0:j;}
+function applyStep(n){
+  const steps=[['fish','turn',40],['fish','shift',6],['fish','enlarge',1.17],['house','turn',90]];
+  const [o,kn,v]=steps[n]||steps[0];
+  state.obj=findObj(o); state.knob=kn; state.i=nearestIdx(K().values,v);
+}
+const step=Q.has('step')?parseInt(Q.get('step'),10):0;
+if(Q.has('embed')) document.body.classList.add('embed');
+if(Q.has('static')) document.body.classList.add('static');
+applyStep(Number.isFinite(step)?step:0);
+
+/* ResizeObserver → rAF, ignore sub-pixel jitter so sizing cannot re-trigger itself. */
+let _raf=0; const _lastObs=new WeakMap();
+function scheduleRedraw(el){
+  if(el){
+    const r=el.getBoundingClientRect(), prev=_lastObs.get(el);
+    if(prev&&Math.abs(prev.w-r.width)<=1&&Math.abs(prev.h-r.height)<=1) return;
+    _lastObs.set(el,{w:r.width,h:r.height});
+  }
+  if(_raf) return;
+  _raf=requestAnimationFrame(()=>{_raf=0;drawPlot();});
+}
+new ResizeObserver(es=>{for(const e of es) scheduleRedraw(e.target);}).observe(cv.parentElement);
+if(document.fonts) document.fonts.ready.then(()=>scheduleRedraw());
+update();
+window.TransformCurvesDemo={state,update,applyStep};
+</script>
+</body>
+</html>
