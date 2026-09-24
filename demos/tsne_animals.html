@@ -496,9 +496,9 @@ function writeStatus(){
   const a=Math.round(state.metrics.agree*100), p=Math.round(state.metrics.pure*100);
   let msg;
   if(state.method==='tsne'){
-    const tag=state.converged?'converged':(state.running?'running':'paused');
+    const tag=state.converged?`${state.maxSteps.toLocaleString('en-US')} steps completed`:(state.running?'running':'paused');
     msg=`t-SNE, perplexity ${state.perp}, step ${state.step} of ${state.maxSteps}, seed ${state.seed} (${tag}): ${state.k}-NN agreement ${a} %, category purity ${p} %`;
-    $('map-sub').textContent=`step ${state.step}${state.converged?' · converged':''}`;
+    $('map-sub').textContent=`step ${state.step}${state.converged?' · budget completed':''}`;
     $('map-title').textContent='t-SNE';
     $('warn').hidden=false;
   } else if(state.method==='pca'){
@@ -638,7 +638,7 @@ function bootStatic(){
     state.method='mds'; state.view='dots'; state.k=10;
     setMethod('mds'); setView('dots');
   } else {
-    state.method='tsne'; state.view='thumbs'; state.seed=1;
+    state.method='tsne'; state.view=Q.get('view')==='dots'?'dots':'thumbs'; state.seed=1;
     state.perp=STEP===2?5:15; state.maxSteps=1000; state.k=10;
     $('perp').value=state.perp; $('perp-out').value=state.perp;
     $('seed').value=1;
@@ -646,7 +646,7 @@ function bootStatic(){
     state.step=state.maxSteps; state.converged=true; state.P=null;
     document.querySelectorAll('#methods button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m==='tsne'?'true':'false'));
     document.querySelectorAll('.tsne-only').forEach(el=>el.classList.remove('hidden-ctl'));
-    setView('thumbs');
+    setView(state.view);
     draw(); refreshMetrics();
   }
 }
