@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nonlinear dimensionality reduction · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Nonlinear dimensionality reduction</h1><p>Reader-friendly version of the 49 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L04_tsne-umap.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Nonlinear dimensionality reduction</a></li><li><a href="#slide-2">Your questions from Tuesday</a></li><li><a href="#slide-3">Every low-dimensional picture is an approximation</a></li><li><a href="#slide-4">One knob, one curve: turning</a></li><li><a href="#slide-5">Shifting traces a curve too</a></li><li><a href="#slide-6">Enlarging traces another curve</a></li><li><a href="#slide-7">All three changes in one PCA</a></li><li><a href="#slide-8">Turn the knobs yourself</a></li><li><a href="#slide-9">What is a manifold?</a></li><li><a href="#slide-10">PCA flattens the Swiss roll by folding it</a></li><li><a href="#slide-11">Perich's origami crane</a></li><li><a href="#slide-12">Three ways to count dimensions</a></li><li><a href="#slide-13">Isomap: measure along the sheet, then run MDS</a></li><li><a href="#slide-14">Folded paper: you cannot read it flat</a></li><li><a href="#slide-15">Objects seen from many viewpoints</a></li><li><a href="#slide-16">One object, 24 views: one patch</a></li><li><a href="#slide-17">Three objects, three patches</a></li><li><a href="#slide-18">The same picture, drawn by hand</a></li><li><a href="#slide-19">Two sheets, tangled</a></li><li><a href="#slide-20">t-SNE</a></li><li><a href="#slide-21">The setup: from a cloud to a picture</a></li><li><a href="#slide-22">Step 1 — neighbor probabilities in high-D</a></li><li><a href="#slide-23">Perplexity ≈ the effective number of neighbors</a></li><li><a href="#slide-24">Step 2 — the crowding problem, and the heavy tail</a></li><li><a href="#slide-25">Step 3 — make QQ look like PP</a></li><li><a href="#slide-26">UMAP: a related way to build a neighborhood map</a></li><li><a href="#slide-27">Match the method to the relationship</a></li><li><a href="#slide-28">Same responses, two different maps</a></li><li><a href="#slide-29">The same 120 animals, three ways — live</a></li><li><a href="#slide-30">Which claims survive a change of map?</a></li><li><a href="#slide-31">Map spread need not reflect response variability</a></li><li><a href="#slide-32">Check group distances in the response space</a></li><li><a href="#slide-33">Noise can look like structure</a></li><li><a href="#slide-34">Too few steps look like structure too</a></li><li><a href="#slide-35">One picture is never the result</a></li><li><a href="#slide-36">Measuring neighborhood agreement</a></li><li><a href="#slide-37">Object purity asks a different question</a></li><li><a href="#slide-38">A map can be stable and still distort the data</a></li><li><a href="#slide-39">From a map to a test of the representation</a></li><li><a href="#slide-40">What have we learned about a representation?</a></li><li><a href="#slide-41">Further reading</a></li><li><a href="#slide-42">Minute paper</a></li><li><a href="#slide-43">Appendix: extra examples and assignment reference</a></li><li><a href="#slide-44">Sometimes the curved shape is the answer</a></li><li><a href="#slide-45">PCA says six; a nonlinear map says torus</a></li><li><a href="#slide-46">Unroll the Swiss roll</a></li><li><a href="#slide-47">Are vocal repertoires discrete or continuous?</a></li><li><a href="#slide-48">Centroid gaps across runs</a></li><li><a href="#slide-49">The t-SNE call used in Assignment 1</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nonlinear dimensionality reduction · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Nonlinear dimensionality reduction</h1><p>Reader-friendly version of the 49 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L04_tsne-umap.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Nonlinear dimensionality reduction</a></li><li><a href="#slide-2">Your questions from Tuesday</a></li><li><a href="#slide-3">Every low-dimensional picture is an approximation</a></li><li><a href="#slide-4">One knob, one curve: turning</a></li><li><a href="#slide-5">Shifting traces a curve too</a></li><li><a href="#slide-6">Enlarging traces another curve</a></li><li><a href="#slide-7">All three changes in one PCA</a></li><li><a href="#slide-8">Turn the knobs yourself</a></li><li><a href="#slide-9">What is a manifold?</a></li><li><a href="#slide-10">Objects seen from many viewpoints</a></li><li><a href="#slide-11">One object, 24 views: one patch</a></li><li><a href="#slide-12">Three objects, three patches</a></li><li><a href="#slide-13">The same picture, drawn by hand</a></li><li><a href="#slide-14">Two sheets, tangled</a></li><li><a href="#slide-15">PCA flattens the Swiss roll by folding it</a></li><li><a href="#slide-16">Perich's origami crane</a></li><li><a href="#slide-17">Three ways to count dimensions</a></li><li><a href="#slide-18">Isomap: measure along the sheet, then run MDS</a></li><li><a href="#slide-19">Folded paper: you cannot read it flat</a></li><li><a href="#slide-20">t-SNE</a></li><li><a href="#slide-21">The setup: from a cloud to a picture</a></li><li><a href="#slide-22">Step 1 — neighbor probabilities in high-D</a></li><li><a href="#slide-23">Perplexity ≈ the effective number of neighbors</a></li><li><a href="#slide-24">Step 2 — the crowding problem, and the heavy tail</a></li><li><a href="#slide-25">Step 3 — make QQ look like PP</a></li><li><a href="#slide-26">UMAP: a related way to build a neighborhood map</a></li><li><a href="#slide-27">Match the method to the relationship</a></li><li><a href="#slide-28">Same responses, two different maps</a></li><li><a href="#slide-29">The same 120 animals, three ways — live</a></li><li><a href="#slide-30">Which claims survive a change of map?</a></li><li><a href="#slide-31">Map spread need not reflect response variability</a></li><li><a href="#slide-32">Check group distances in the response space</a></li><li><a href="#slide-33">Noise can look like structure</a></li><li><a href="#slide-34">Too few steps look like structure too</a></li><li><a href="#slide-35">One picture is never the result</a></li><li><a href="#slide-36">Measuring neighborhood agreement</a></li><li><a href="#slide-37">Object purity asks a different question</a></li><li><a href="#slide-38">A map can be stable and still distort the data</a></li><li><a href="#slide-39">From a map to a test of the representation</a></li><li><a href="#slide-40">What have we learned about a representation?</a></li><li><a href="#slide-41">Further reading</a></li><li><a href="#slide-42">Minute paper</a></li><li><a href="#slide-43">Appendix: extra examples and assignment reference</a></li><li><a href="#slide-44">Sometimes the curved shape is the answer</a></li><li><a href="#slide-45">PCA says six; a nonlinear map says torus</a></li><li><a href="#slide-46">Unroll the Swiss roll</a></li><li><a href="#slide-47">Are vocal repertoires discrete or continuous?</a></li><li><a href="#slide-48">Centroid gaps across runs</a></li><li><a href="#slide-49">The t-SNE call used in Assignment 1</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
   <img src="../images/brown-crest-color.png" alt="Brown University crest">
   <div class="vrule"></div>
   <div>
@@ -92,21 +92,90 @@
 </div>
 </div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="49" aria-labelledby="heading-10"><p class="page">Slide 10</p>
-<h2 id="heading-10">PCA flattens the Swiss roll by folding it</h2>
-<figure><img src="../images/2026-illustrations/swiss-roll-cake-cream.jpg" alt="A chocolate Swiss roll cake with the cream spiral visible at its cut end" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>A chocolate Swiss roll cake with the cream spiral visible at its cut end</p><a href="../images/2026-illustrations/swiss-roll-cake-cream.jpg">Open full-size figure</a></figcaption></figure>
+<h2 id="heading-10">Objects seen from many viewpoints</h2>
+<div class="row">
+<div class="col fig">
 <div class="capfig">
-<figure><img src="../images/L04/05_swissroll_pca.svg" alt="Three panels. Left, the Swiss roll in 3-D with axes x1, x2, x3; points A and B lie on neighboring turns. Middle, the true structure: the same points laid out as the flat sheet before rolling, where A and B are far apart. Right, a flat 2-D plot with axes PC1 and PC2: the PCA projection, where the turns overlap, colors mix and A and B land on the same spot" aria-describedby="figure-10-2"><figcaption id="figure-10-2"><p>Three panels. Left, the Swiss roll in 3-D with axes x1, x2, x3; points A and B lie on neighboring turns. Middle, the true structure: the same points laid out as the flat sheet before rolling, where A and B are far apart. Right, a flat 2-D plot with axes PC1 and PC2: the PCA projection, where the turns overlap, colors mix and A and B land on the same spot</p><a href="../images/L04/05_swissroll_pca.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L04/08_bao_objects.png" alt="A grid of renderings, one row per category (animal, vehicle, face, vegetable or fruit, house, man-made object). Each row shows two different objects of that category, for example a cat and a duck, an airliner and a bicycle, each seen from three of its 24 viewpoints" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>A grid of renderings, one row per category (animal, vehicle, face, vegetable or fruit, house, man-made object). Each row shows two different objects of that category, for example a cat and a duck, an airliner and a bicycle, each seen from three of its 24 viewpoints</p><a href="../images/L04/08_bao_objects.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="col">
+<ul>
+<li><strong>1,224 images</strong>: 51 objects, each rendered from <strong>24 views</strong>, in 6 categories.</li>
+<li>Bao, She, McGill &amp; Tsao showed these images to monkeys while recording from <strong>IT cortex</strong>, the late stage of the visual system where neurons respond to whole objects. You also use them in Assignment 1.</li>
+<li>Here each image is a point in <strong>fc6</strong>, a late layer of the image network AlexNet: 4,096 numbers per image.</li>
+<li>Two levels of grouping: views of the <strong>same object</strong>, and objects of the <strong>same category</strong>.</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao, She, McGill &amp; Tsao <b>2020</b></a> · <i>Nature</i></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="49" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<h2 id="heading-11">One object, 24 views: one patch</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L04/15_one_object_patch.svg" alt="The 24 views of one excavator as points on two axes, PC1 and PC2, from a PCA of the network's responses to just these 24 images. The points form one compact triangular patch, shaded red. Eight of the views are drawn around the patch, each joined by a line to its own point" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>The 24 views of one excavator as points on two axes, PC1 and PC2, from a PCA of the network's responses to just these 24 images. The points form one compact triangular patch, shaded red. Eight of the views are drawn around the patch, each joined by a line to its own point</p><a href="../images/L04/15_one_object_patch.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Each <strong>dot</strong> is one photograph of the same excavator, placed by the network's response to it. The axes are the two principal directions of those <strong>24 responses</strong>.</li>
+<li>Very different images, one <strong>patch</strong>: all the ways this object can look.</li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="49" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<h2 id="heading-12">Three objects, three patches</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L04/16_three_object_patches.svg" alt="The 24 views of each of three objects, an excavator in red, a swan in blue and a teacup in green, on one shared pair of axes from a PCA of all 72 responses. Each object's views form a small separate patch, far from the other two; one photograph of each object is drawn beside its patch" aria-describedby="figure-12-1"><figcaption id="figure-12-1"><p>The 24 views of each of three objects, an excavator in red, a swan in blue and a teacup in green, on one shared pair of axes from a PCA of all 72 responses. Each object's views form a small separate patch, far from the other two; one photograph of each object is drawn beside its patch</p><a href="../images/L04/16_three_object_patches.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Now one PCA of all <strong>72 responses</strong> together. Each object keeps to its own small patch, and the patches are <strong>far apart</strong>.</li>
+<li>Viewpoint moves a response <strong>within</strong> a patch; identity moves it <strong>between</strong> patches.</li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-class="l03-paper-panel" data-marpit-pagination="13" data-marpit-pagination-total="49" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<h2 id="heading-13">The same picture, drawn by hand</h2>
+<div class="capfig">
+<figure><img src="../images/L03/dicarlo2007_a.png" alt="One person's face images trace a curved sheet, a manifold, inside image space, with three example heads at different poses sitting on it" aria-describedby="figure-13-1"><figcaption id="figure-13-1"><p>One person's face images trace a curved sheet, a manifold, inside image space, with three example heads at different poses sitting on it</p><a href="../images/L03/dicarlo2007_a.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>As DiCarlo and Cox drew it: every image of one person forms a <strong>curved sheet</strong>, and the sheet has far fewer dimensions than the space holding it.</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <i>Trends Cogn. Sci.</i> 2007</a> · Fig. 1a</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-class="l03-paper-panel" data-marpit-pagination="14" data-marpit-pagination-total="49" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<h2 id="heading-14">Two sheets, tangled</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L03/dicarlo2007_d.png" alt="In actual pixel space the sheets of two different people are interleaved, and a flat separating plane drawn through them fails to split them" aria-describedby="figure-14-1"><figcaption id="figure-14-1"><p>In actual pixel space the sheets of two different people are interleaved, and a flat separating plane drawn through them fails to split them</p><a href="../images/L03/dicarlo2007_d.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>In <strong>pixel</strong> coordinates the sheets of two people are interleaved.</li>
+<li><strong>Recognizing</strong> who it is means finding a flat boundary, a <strong>hyperplane</strong>, with one person's sheet on each side. Here none exists.</li>
+<li>That boundary is what a <strong>linear classifier</strong> learns. A good representation <strong>untangles</strong> the sheets so that one hyperplane separates them.</li>
+<li>Testing that with a classifier, a <strong>linear probe</strong>, is a later lecture.</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <i>Trends Cogn. Sci.</i> 2007</a> · Fig. 1d</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="49" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<h2 id="heading-15">PCA flattens the Swiss roll by folding it</h2>
+<figure><img src="../images/2026-illustrations/swiss-roll-cake-cream.jpg" alt="A chocolate Swiss roll cake with the cream spiral visible at its cut end" aria-describedby="figure-15-1"><figcaption id="figure-15-1"><p>A chocolate Swiss roll cake with the cream spiral visible at its cut end</p><a href="../images/2026-illustrations/swiss-roll-cake-cream.jpg">Open full-size figure</a></figcaption></figure>
+<div class="capfig">
+<figure><img src="../images/L04/05_swissroll_pca.svg" alt="Three panels. Left, the Swiss roll in 3-D with axes x1, x2, x3; points A and B lie on neighboring turns. Middle, the true structure: the same points laid out as the flat sheet before rolling, where A and B are far apart. Right, a flat 2-D plot with axes PC1 and PC2: the PCA projection, where the turns overlap, colors mix and A and B land on the same spot" aria-describedby="figure-15-2"><figcaption id="figure-15-2"><p>Three panels. Left, the Swiss roll in 3-D with axes x1, x2, x3; points A and B lie on neighboring turns. Middle, the true structure: the same points laid out as the flat sheet before rolling, where A and B are far apart. Right, a flat 2-D plot with axes PC1 and PC2: the PCA projection, where the turns overlap, colors mix and A and B land on the same spot</p><a href="../images/L04/05_swissroll_pca.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li><strong>1 → 2:</strong> the data are a 2-D sheet rolled up in 3-D. Unrolled, A and B are far apart along the sheet (59.5), though close through the air (11.5).</li>
 <li><strong>3:</strong> PCA is <strong>linear</strong>: it can only rotate the data and project onto a flat plane. It folds the roll, and A and B <strong>land on the same spot</strong>.</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="49" aria-labelledby="heading-11"><p class="page">Slide 11</p>
-<h2 id="heading-11">Perich's origami crane</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="49" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<h2 id="heading-16">Perich's origami crane</h2>
 <div class="row">
 <div class="col fig">
 <div class="capfig">
-<figure><img src="../images/2026-illustrations/origami-crane-white.jpg" alt="A white paper crane folded from one uncut square of paper, photographed on a plain blue background" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>A white paper crane folded from one uncut square of paper, photographed on a plain blue background</p><a href="../images/2026-illustrations/origami-crane-white.jpg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/2026-illustrations/origami-crane-white.jpg" alt="A white paper crane folded from one uncut square of paper, photographed on a plain blue background" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>A white paper crane folded from one uncut square of paper, photographed on a plain blue background</p><a href="../images/2026-illustrations/origami-crane-white.jpg">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <div class="col">
@@ -118,8 +187,8 @@
 </div>
 </div>
 <div class="ref">Photo: Andreas Bauer · CC BY-SA 2.5 · Wikimedia Commons · analogy from <a href="https://doi.org/10.53053/FTEU9810" rel="noopener">Perich <b>2026</b></a>, <i>The Transmitter</i></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="49" aria-labelledby="heading-12"><p class="page">Slide 12</p>
-<h2 id="heading-12">Three ways to count dimensions</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="49" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<h2 id="heading-17">Three ways to count dimensions</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Three ways to count dimensions — table"><table><caption>Three ways to count dimensions — table</caption>
 <thead>
 <tr>
@@ -151,95 +220,26 @@
 <li>PCA measures the <strong>embedding</strong> dimension. It overestimates the intrinsic one whenever the manifold curves.</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.53053/FTEU9810" rel="noopener">Perich <b>2026</b></a> · <i>The Transmitter</i></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="49" aria-labelledby="heading-13"><p class="page">Slide 13</p>
-<h2 id="heading-13">Isomap: measure along the sheet, then run MDS</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="49" aria-labelledby="heading-18"><p class="page">Slide 18</p>
+<h2 id="heading-18">Isomap: measure along the sheet, then run MDS</h2>
 <div class="capfig">
-<figure><img src="../images/L04/06_isomap.svg" alt="Left, the Swiss roll with two probe points one turn apart: a short dashed red segment joins them straight through the roll, and a long black path joins them by hopping between nearest neighbors around the spiral. Right, the Isomap layout: a flat strip ordered blue to gold, with the two probes at opposite ends" aria-describedby="figure-13-1"><figcaption id="figure-13-1"><p>Left, the Swiss roll with two probe points one turn apart: a short dashed red segment joins them straight through the roll, and a long black path joins them by hopping between nearest neighbors around the spiral. Right, the Isomap layout: a flat strip ordered blue to gold, with the two probes at opposite ends</p><a href="../images/L04/06_isomap.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L04/06_isomap.svg" alt="Left, the Swiss roll with two probe points one turn apart: a short dashed red segment joins them straight through the roll, and a long black path joins them by hopping between nearest neighbors around the spiral. Right, the Isomap layout: a flat strip ordered blue to gold, with the two probes at opposite ends" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>Left, the Swiss roll with two probe points one turn apart: a short dashed red segment joins them straight through the roll, and a long black path joins them by hopping between nearest neighbors around the spiral. Right, the Isomap layout: a flat strip ordered blue to gold, with the two probes at opposite ends</p><a href="../images/L04/06_isomap.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li>Connect each point to its <strong>10 nearest neighbors</strong>. The shortest path through that graph <strong>approximates the along-the-sheet distance</strong>: 71.3 for the two probes, 6.1 in a straight line.</li>
 <li>Run <strong>MDS</strong>, from the second lecture, on those path lengths. The roll unrolls <strong>if</strong> the points cover the sheet densely and no edge jumps between turns.</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1126/science.290.5500.2319" rel="noopener">Tenenbaum, de Silva &amp; Langford <b>2000</b></a> · <i>Science</i></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="49" aria-labelledby="heading-14"><p class="page">Slide 14</p>
-<h2 id="heading-14">Folded paper: you cannot read it flat</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="49" aria-labelledby="heading-19"><p class="page">Slide 19</p>
+<h2 id="heading-19">Folded paper: you cannot read it flat</h2>
 <div class="capfig">
-<figure><img src="../images/L04/14_printed_roll.svg" alt="Four panels. 1, a page printed with the word MANIFOLD. 2, the page rolled into a Swiss roll in 3-D, the letters wrapped around it. 3, the PCA projection: the turns land on top of each other and the letters pile up into an unreadable block. 4, the Isomap layout: the page unrolled, and MANIFOLD reads again" aria-describedby="figure-14-1"><figcaption id="figure-14-1"><p>Four panels. 1, a page printed with the word MANIFOLD. 2, the page rolled into a Swiss roll in 3-D, the letters wrapped around it. 3, the PCA projection: the turns land on top of each other and the letters pile up into an unreadable block. 4, the Isomap layout: the page unrolled, and MANIFOLD reads again</p><a href="../images/L04/14_printed_roll.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L04/14_printed_roll.svg" alt="Four panels. 1, a page printed with the word MANIFOLD. 2, the page rolled into a Swiss roll in 3-D, the letters wrapped around it. 3, the PCA projection: the turns land on top of each other and the letters pile up into an unreadable block. 4, the Isomap layout: the page unrolled, and MANIFOLD reads again" aria-describedby="figure-19-1"><figcaption id="figure-19-1"><p>Four panels. 1, a page printed with the word MANIFOLD. 2, the page rolled into a Swiss roll in 3-D, the letters wrapped around it. 3, the PCA projection: the turns land on top of each other and the letters pile up into an unreadable block. 4, the Isomap layout: the page unrolled, and MANIFOLD reads again</p><a href="../images/L04/14_printed_roll.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li>The crane, computed: a page printed with text, rolled into a Swiss roll.</li>
 <li>PCA gives the best <strong>flat view</strong>, but the letters pile up. To <strong>read the text</strong>, you must unfold the sheet: a nonlinear method such as Isomap (panel 4).</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.53053/FTEU9810" rel="noopener">Perich <b>2026</b></a> · <i>The Transmitter</i></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="49" aria-labelledby="heading-15"><p class="page">Slide 15</p>
-<h2 id="heading-15">Objects seen from many viewpoints</h2>
-<div class="row">
-<div class="col fig">
-<div class="capfig">
-<figure><img src="../images/L04/08_bao_objects.png" alt="A grid of renderings, one row per category (animal, vehicle, face, vegetable or fruit, house, man-made object). Each row shows two different objects of that category, for example a cat and a duck, an airliner and a bicycle, each seen from three of its 24 viewpoints" aria-describedby="figure-15-1"><figcaption id="figure-15-1"><p>A grid of renderings, one row per category (animal, vehicle, face, vegetable or fruit, house, man-made object). Each row shows two different objects of that category, for example a cat and a duck, an airliner and a bicycle, each seen from three of its 24 viewpoints</p><a href="../images/L04/08_bao_objects.png">Open full-size figure</a></figcaption></figure>
-</div>
-</div>
-<div class="col">
-<ul>
-<li><strong>1,224 images</strong>: 51 objects, each rendered from <strong>24 views</strong>, in 6 categories.</li>
-<li>Bao, She, McGill &amp; Tsao showed these images to monkeys while recording from <strong>IT cortex</strong>, the late stage of the visual system where neurons respond to whole objects. You also use them in Assignment 1.</li>
-<li>Here each image is a point in <strong>fc6</strong>, a late layer of the image network AlexNet: 4,096 numbers per image.</li>
-<li>Two levels of grouping: views of the <strong>same object</strong>, and objects of the <strong>same category</strong>.</li>
-</ul>
-</div>
-</div>
-<div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao, She, McGill &amp; Tsao <b>2020</b></a> · <i>Nature</i></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="49" aria-labelledby="heading-16"><p class="page">Slide 16</p>
-<h2 id="heading-16">One object, 24 views: one patch</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L04/15_one_object_patch.svg" alt="The 24 views of one excavator as points on two axes, PC1 and PC2, from a PCA of the network's responses to just these 24 images. The points form one compact triangular patch, shaded red. Eight of the views are drawn around the patch, each joined by a line to its own point" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>The 24 views of one excavator as points on two axes, PC1 and PC2, from a PCA of the network's responses to just these 24 images. The points form one compact triangular patch, shaded red. Eight of the views are drawn around the patch, each joined by a line to its own point</p><a href="../images/L04/15_one_object_patch.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<div class="col">
-<ul>
-<li>Each <strong>dot</strong> is one photograph of the same excavator, placed by the network's response to it. The axes are the two principal directions of those <strong>24 responses</strong>.</li>
-<li>Very different images, one <strong>patch</strong>: all the ways this object can look.</li>
-</ul>
-</div>
-</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="49" aria-labelledby="heading-17"><p class="page">Slide 17</p>
-<h2 id="heading-17">Three objects, three patches</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L04/16_three_object_patches.svg" alt="The 24 views of each of three objects, an excavator in red, a swan in blue and a teacup in green, on one shared pair of axes from a PCA of all 72 responses. Each object's views form a small separate patch, far from the other two; one photograph of each object is drawn beside its patch" aria-describedby="figure-17-1"><figcaption id="figure-17-1"><p>The 24 views of each of three objects, an excavator in red, a swan in blue and a teacup in green, on one shared pair of axes from a PCA of all 72 responses. Each object's views form a small separate patch, far from the other two; one photograph of each object is drawn beside its patch</p><a href="../images/L04/16_three_object_patches.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<div class="col">
-<ul>
-<li>Now one PCA of all <strong>72 responses</strong> together. Each object keeps to its own small patch, and the patches are <strong>far apart</strong>.</li>
-<li>Viewpoint moves a response <strong>within</strong> a patch; identity moves it <strong>between</strong> patches.</li>
-</ul>
-</div>
-</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-class="l03-paper-panel" data-marpit-pagination="18" data-marpit-pagination-total="49" aria-labelledby="heading-18"><p class="page">Slide 18</p>
-<h2 id="heading-18">The same picture, drawn by hand</h2>
-<div class="capfig">
-<figure><img src="../images/L03/dicarlo2007_a.png" alt="One person's face images trace a curved sheet, a manifold, inside image space, with three example heads at different poses sitting on it" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>One person's face images trace a curved sheet, a manifold, inside image space, with three example heads at different poses sitting on it</p><a href="../images/L03/dicarlo2007_a.png">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li>As DiCarlo and Cox drew it: every image of one person forms a <strong>curved sheet</strong>, and the sheet has far fewer dimensions than the space holding it.</li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <i>Trends Cogn. Sci.</i> 2007</a> · Fig. 1a</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-class="l03-paper-panel" data-marpit-pagination="19" data-marpit-pagination-total="49" aria-labelledby="heading-19"><p class="page">Slide 19</p>
-<h2 id="heading-19">Two sheets, tangled</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L03/dicarlo2007_d.png" alt="In actual pixel space the sheets of two different people are interleaved, and a flat separating plane drawn through them fails to split them" aria-describedby="figure-19-1"><figcaption id="figure-19-1"><p>In actual pixel space the sheets of two different people are interleaved, and a flat separating plane drawn through them fails to split them</p><a href="../images/L03/dicarlo2007_d.png">Open full-size figure</a></figcaption></figure>
-</div>
-<div class="col">
-<ul>
-<li>In <strong>pixel</strong> coordinates the sheets of two people are interleaved.</li>
-<li><strong>Recognizing</strong> who it is means finding a flat boundary, a <strong>hyperplane</strong>, with one person's sheet on each side. Here none exists.</li>
-<li>That boundary is what a <strong>linear classifier</strong> learns. A good representation <strong>untangles</strong> the sheets so that one hyperplane separates them.</li>
-<li>Testing that with a classifier, a <strong>linear probe</strong>, is a later lecture.</li>
-</ul>
-</div>
-</div>
-<div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <i>Trends Cogn. Sci.</i> 2007</a> · Fig. 1d</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-class="lead" data-marpit-pagination="20" data-marpit-pagination-total="49" aria-labelledby="heading-20"><p class="page">Slide 20</p>
 <h2 id="heading-20">t-SNE</h2>
 <p>Convert distances into <strong>neighbor probabilities</strong>, then find a 2-D layout that approximates those neighbor probabilities.</p>
