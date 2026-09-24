@@ -250,6 +250,9 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="48" aria-labelledby="heading-21"><p class="page">Slide 21</p>
 <h2 id="heading-21">Step 1 — neighbor probabilities in high-D</h2>
 <div class="row">
+<div class="col fig">
+<figure><img src="../images/L04/02_neighbor_probs.svg" alt="Top, the three-group data in the same positions as on the setup slide, with one point starred; the other points are drawn larger the more neighbor probability the starred point gives them, so only its own blue group is visibly large. Bottom, a Gaussian curve of similarity against distance from the starred point, with every other point placed on it (bottom): the blue points sit on the steep part, the red and green points at almost zero" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>Top, the three-group data in the same positions as on the setup slide, with one point starred; the other points are drawn larger the more neighbor probability the starred point gives them, so only its own blue group is visibly large. Bottom, a Gaussian curve of similarity against distance from the starred point, with every other point placed on it (bottom): the blue points sit on the steep part, the red and green points at almost zero</p><a href="../images/L04/02_neighbor_probs.svg">Open full-size figure</a></figcaption></figure>
+</div>
 <div class="col">
 <ul>
 <li>Center a <strong>Gaussian</strong> on each point <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{x}^{(i)}</annotation></semantics></math> and normalize:</li>
@@ -260,9 +263,6 @@
 <li>Each point gets its <strong>own</strong> bandwidth <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\sigma_i</annotation></semantics></math>: narrow in dense regions, wide in sparse ones.</li>
 <li>Make it symmetric: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><msub><mi>p</mi><mrow><mi>j</mi><mo>∣</mo><mi>i</mi></mrow></msub><mo>+</mo><msub><mi>p</mi><mrow><mi>i</mi><mo>∣</mo><mi>j</mi></mrow></msub></mrow><mrow><mn>2</mn><mi>N</mi></mrow></mfrac></mstyle></mrow><annotation encoding="application/x-tex">p_{ij}=\dfrac{p_{j\mid i}+p_{i\mid j}}{2N}</annotation></semantics></math>, one probability per pair.</li>
 </ul>
-</div>
-<div class="col fig">
-<figure><img src="../images/L04/02_neighbor_probs.svg" alt="Left, the three-group data with one point starred; the other points are drawn larger the more neighbor probability the starred point gives them, so only its own blue group is visibly large. Right, a Gaussian curve of similarity against distance from the starred point, with every other point placed on it: the blue points sit on the steep part, the red and green points at almost zero" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>Left, the three-group data with one point starred; the other points are drawn larger the more neighbor probability the starred point gives them, so only its own blue group is visibly large. Right, a Gaussian curve of similarity against distance from the starred point, with every other point placed on it: the blue points sit on the steep part, the red and green points at almost zero</p><a href="../images/L04/02_neighbor_probs.svg">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <div class="ref"><a href="https://www.jmlr.org/papers/v9/vandermaaten08a.html" rel="noopener">van der Maaten &amp; Hinton <b>JMLR 2008</b></a></div>
