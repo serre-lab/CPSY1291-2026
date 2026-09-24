@@ -220,25 +220,29 @@
 <thead>
 <tr>
 <th scope="col"></th>
-<th scope="col">Swiss roll</th>
-<th scope="col">Turned photograph</th>
+<th scope="col">Swiss&nbsp;roll</th>
+<th scope="col">Turned&nbsp;photo</th>
+<th scope="col">Grid&nbsp;cells</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Ambient</strong>: coordinates each point has</td>
+<td><strong>Ambient</strong>: coordinates per point</td>
 <td>3</td>
-<td>9,216 pixels</td>
+<td>9,216&nbsp;pixels</td>
+<td>100+&nbsp;neurons</td>
 </tr>
 <tr>
 <td><strong>Embedding</strong>: flat subspace PCA needs</td>
 <td>3</td>
-<td>24 PCs for 90%</td>
+<td>24&nbsp;PCs&nbsp;(90%)</td>
+<td>about&nbsp;6</td>
 </tr>
 <tr>
-<td><strong>Intrinsic</strong>: dimensions needed to locate a point <em>on</em> the manifold</td>
+<td><strong>Intrinsic</strong>: dimensions to locate a point <em>on</em> it</td>
 <td>2</td>
-<td>1 (the angle)</td>
+<td>1&nbsp;(angle)</td>
+<td>2&nbsp;(torus)</td>
 </tr>
 </tbody>
 </table></div>
@@ -246,8 +250,9 @@
 <ul>
 <li>The three numbers answer different questions; none is <em>the</em> dimension.</li>
 <li>PCA measures the <strong>embedding</strong> dimension. It overestimates the intrinsic one whenever the manifold curves.</li>
+<li><strong>Grid cells</strong>: neurons in the rat brain that fire at the corners of a triangular grid over the floor. Recorded together, their activity fills a <strong>torus</strong>, a 2-D surface.</li>
 </ul>
-<div class="ref"><a href="https://doi.org/10.53053/FTEU9810" rel="noopener">Perich <b>2026</b></a> · <i>The Transmitter</i></div>
+<div class="ref"><a href="https://doi.org/10.53053/FTEU9810" rel="noopener">Perich <b>2026</b></a> · <i>The Transmitter</i> · grid cells: <a href="https://doi.org/10.1038/s41586-021-04268-7" rel="noopener">Gardner et al. <b>2022</b></a> · <i>Nature</i></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-class="lead" data-marpit-pagination="22" data-marpit-pagination-total="57" aria-labelledby="heading-22"><p class="page">Slide 22</p>
 <h2 id="heading-22">How could we fix this?</h2>
 <p>Keep the MDS idea, but change the distances. Instead of measuring <strong>straight through the air</strong>, measure <strong>along the data</strong>: only step from a point to its nearest neighbors, and add up the steps.</p>
