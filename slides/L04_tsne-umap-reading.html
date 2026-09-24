@@ -307,7 +307,8 @@
 <div class="col">
 <ul>
 <li><strong>Like MDS</strong>, t-SNE places the points in a low-dimensional <strong>map</strong>, usually 2-D (here 1-D, a line, so the example is easy to see), so that relationships in the map match relationships in the <strong>data</strong>.</li>
-<li>MDS tries to match <strong>all distances</strong>. t-SNE matches <strong>neighbors</strong>: close in the data stays close in the map, so <strong>clusters</strong> stay together; large distances are not kept.</li>
+<li>MDS tries to match <strong>all distances</strong>. t-SNE matches <strong>neighbors</strong>: close in the data stays close in the map; large distances are not kept.</li>
+<li>t-SNE does <strong>not look for clusters</strong>: clusters survive because their members are each other's <strong>neighbors</strong>.</li>
 <li>Three steps: (1) <strong>data</strong>: distances → neighbor probabilities <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math>; (2) <strong>map</strong>: similarities <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi></mrow><annotation encoding="application/x-tex">Q</annotation></semantics></math>; (3) move the map points until <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi></mrow><annotation encoding="application/x-tex">Q</annotation></semantics></math> matches <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math>.</li>
 </ul>
 </div>
