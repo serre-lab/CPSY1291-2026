@@ -192,7 +192,7 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="57" aria-labelledby="heading-18"><p class="page">Slide 18</p>
 <h2 id="heading-18">Linear methods fold the roll</h2>
 <div class="capfig">
-<figure><img src="../images/L04/24_linear_methods_fold.svg" alt="Three panels. Left, the Swiss roll in 3-D, colored blue to gold along the sheet. Middle, its PCA projection: the turns overlap and the colors mix. Right, MDS on the straight-line distances between points: the map is still a spiral, with colors that should be far apart lying next to each other" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>Three panels. Left, the Swiss roll in 3-D, colored blue to gold along the sheet. Middle, its PCA projection: the turns overlap and the colors mix. Right, MDS on the straight-line distances between points: the map is still a spiral, with colors that should be far apart lying next to each other</p><a href="../images/L04/24_linear_methods_fold.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L04/24_linear_methods_fold.svg" alt="Three panels. Left, the Swiss roll in 3-D, colored blue to gold along the sheet, with points A and B on neighboring turns, exactly as on the previous slide. Middle, its PCA projection: the turns overlap, the colors mix, and A and B land together. Right, MDS on the straight-line distances between points: the map is still a spiral, with colors that should be far apart lying next to each other" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>Three panels. Left, the Swiss roll in 3-D, colored blue to gold along the sheet, with points A and B on neighboring turns, exactly as on the previous slide. Middle, its PCA projection: the turns overlap, the colors mix, and A and B land together. Right, MDS on the straight-line distances between points: the map is still a spiral, with colors that should be far apart lying next to each other</p><a href="../images/L04/24_linear_methods_fold.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li><strong>PCA</strong> keeps the directions of largest variance; <strong>MDS</strong> keeps the straight-line distances. Both see the data through a <strong>flat</strong> lens.</li>
@@ -217,8 +217,9 @@
 <div class="ref">Photo: Andreas Bauer · CC BY-SA 2.5 · Wikimedia Commons · analogy from <a href="https://doi.org/10.53053/FTEU9810" rel="noopener">Perich <b>2026</b></a>, <i>The Transmitter</i></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="57" aria-labelledby="heading-20"><p class="page">Slide 20</p>
 <h2 id="heading-20">Squashing is not unfolding</h2>
-<figure><img src="../images/2026-illustrations/accordion-comparison-gpt-v2_crop.png" alt="Three photographs of white paper on blue. Left, a sheet folded like an accordion, standing in 3-D. Middle, the same accordion pressed flat into a thin stack, all its panels on top of each other. Right, the sheet opened out flat, the fold lines visible between five panels" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>Three photographs of white paper on blue. Left, a sheet folded like an accordion, standing in 3-D. Middle, the same accordion pressed flat into a thin stack, all its panels on top of each other. Right, the sheet opened out flat, the fold lines visible between five panels</p><a href="../images/2026-illustrations/accordion-comparison-gpt-v2_crop.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/2026-illustrations/accordion-comparison-gpt-v2_warm.png" alt="Three photographs of white paper on blue. Left, a sheet folded like an accordion, standing in 3-D. Middle, the same accordion pressed flat into a thin stack, all its panels on top of each other. Right, the sheet opened out flat, the fold lines visible between five panels" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>Three photographs of white paper on blue. Left, a sheet folded like an accordion, standing in 3-D. Middle, the same accordion pressed flat into a thin stack, all its panels on top of each other. Right, the sheet opened out flat, the fold lines visible between five panels</p><a href="../images/2026-illustrations/accordion-comparison-gpt-v2_warm.png">Open full-size figure</a></figcaption></figure>
 <div><div><b>the data:</b> a sheet folded in 3-D</div><div><b>PCA:</b> squashed flat, the folds stacked</div><div><b>what we hope for:</b> the sheet, unfolded</div></div>
+<div></div>
 <ul>
 <li>PCA picks a flat view, so the panels land <strong>on top of each other</strong>. A nonlinear method aims to <strong>unfold</strong> the sheet.</li>
 </ul>
@@ -250,6 +251,7 @@
 </tr>
 </tbody>
 </table></div>
+<div></div>
 <ul>
 <li>The three numbers answer different questions; none is <em>the</em> dimension.</li>
 <li>PCA measures the <strong>embedding</strong> dimension. It overestimates the intrinsic one whenever the manifold curves.</li>
