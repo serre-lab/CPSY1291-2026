@@ -45,7 +45,7 @@ output{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink);min-wi
 .panel{min-width:0;min-height:0;display:flex;flex-direction:column}
 .panel h2{margin:0 0 4px;font-size:20px;color:var(--ink);flex-shrink:0}
 .panel h2 .sub{font-weight:400;font-size:.85em;color:var(--slate)}
-.imgbox{--s:420px;width:var(--s);height:var(--s);border:5px solid var(--knob);background:#fff;
+.imgbox{--s:460px;width:var(--s);height:var(--s);border:5px solid var(--knob);background:#fff;
   position:relative;flex-shrink:0}
 .imgbox img{display:block;width:100%;height:100%;image-rendering:auto}
 .imgbox .val{position:absolute;right:0;bottom:0;background:var(--knob);color:#fff;
@@ -65,8 +65,8 @@ body.embed h1,body.embed .lede,body.embed .footer,
 html.embed h1,html.embed .lede,html.embed .footer{display:none}
 body.embed .stage,html.embed .stage{flex:1;min-height:0}
 body.embed .canvas-frame,html.embed .canvas-frame{aspect-ratio:auto;max-height:none;flex:1}
-body.embed .imgbox,html.embed .imgbox{--s:min(430px,calc(100vh - 118px))}
-body.static.embed .imgbox,html.embed body.static .imgbox{--s:min(470px,calc(100vh - 72px))}
+body.embed .imgbox,html.embed .imgbox{--s:min(560px,calc(100vh - 118px))}
+body.static.embed .imgbox,html.embed body.static .imgbox{--s:min(620px,calc(100vh - 72px))}
 body.embed .toolbar label,body.embed .toolbar .lbl,body.embed button,body.embed select,body.embed output{font-size:16px}
 body.static .toolbar{display:none}
 body.static .canvas-frame canvas{cursor:default}
@@ -76,6 +76,15 @@ body.static .canvas-frame canvas{cursor:default}
   body.embed .wrap{height:auto;overflow:auto}
   body.embed .canvas-frame{aspect-ratio:16/10}
 }
+/* plot and its numbers side by side: the curve is roughly round, so a wide plot wastes space */
+.plotrow{display:flex;gap:18px;flex:1 1 auto;min-height:0;align-items:stretch}
+.plotrow .canvas-frame{flex:0 0 auto;height:100%;aspect-ratio:1.15/1;max-height:none;width:auto}
+.plottext{flex:1 1 0;min-width:180px;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.plottext .stats{font-size:22px;line-height:1.35;margin:0}
+.plottext .status{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}  /* read aloud, not shown: it repeats the numbers above */
+.plottext .caption{font-size:17px;margin:0}
+body.embed .plotrow .canvas-frame,html.embed .plotrow .canvas-frame{aspect-ratio:1.15/1;flex:0 0 auto;height:100%}
+@media(max-width:900px){.plotrow{flex-direction:column}.plotrow .canvas-frame{width:100%;height:auto}}
 </style>
 <script>
 (function(){
@@ -116,12 +125,16 @@ body.static .canvas-frame canvas{cursor:default}
     </section>
     <section class="panel" aria-labelledby="h-plot">
       <h2 id="h-plot">All images of this change, on the first two principal components <span class="sub">(click or drag the curve)</span></h2>
-      <div class="canvas-frame">
-        <canvas id="plot" role="img" aria-label="Curve traced by the images in the plane of the first two principal components"></canvas>
+      <div class="plotrow">
+        <div class="canvas-frame">
+          <canvas id="plot" role="img" aria-label="Curve traced by the images in the plane of the first two principal components"></canvas>
+        </div>
+        <div class="plottext">
+          <p class="stats" id="stats" aria-hidden="true"></p>
+          <p class="status" id="status" role="status" aria-live="polite"></p>
+          <p class="caption">One knob traces a curve: intrinsic dimension 1. The curve bends, so a flat plane (PCA) keeps only part of it.</p>
+        </div>
       </div>
-      <p class="stats" id="stats" aria-hidden="true"></p>
-      <p class="status" id="status" role="status" aria-live="polite"></p>
-      <p class="caption">One knob traces a curve: intrinsic dimension 1. The curve bends, so a flat plane (PCA) keeps only part of it.</p>
     </section>
   </div>
   <p class="footer">Each family's images are 96 × 96 grayscale; PCA is fit separately per object and change. Escape exits when embedded.</p>
