@@ -18,20 +18,14 @@
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="48" aria-labelledby="heading-3"><p class="page">Slide 3</p>
 <h2 id="heading-3">Every low-dimensional picture is an approximation</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L03/21_eigenbasis_plane.svg" alt="A three-dimensional cloud of points lying close to, but not on, a plane spanned by two principal directions; one point and its projection onto the plane, joined by the leftover residual" aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>A three-dimensional cloud of points lying close to, but not on, a plane spanned by two principal directions; one point and its projection onto the plane, joined by the leftover residual</p><a href="../images/L03/21_eigenbasis_plane.svg">Open full-size figure</a></figcaption></figure>
+<div>
+<figure><img src="../images/L03/21_eigenbasis_plane.svg" alt="A three-dimensional cloud of points lying close to, but not on, a plane spanned by two principal directions v1 and v2, with axes x-tilde 1, 2 and 3; one point off the plane, its projection onto the plane, and the dashed residual joining them" aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>A three-dimensional cloud of points lying close to, but not on, a plane spanned by two principal directions v1 and v2, with axes x-tilde 1, 2 and 3; one point off the plane, its projection onto the plane, and the dashed residual joining them</p><a href="../images/L03/21_eigenbasis_plane.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/21b_eigenbasis_scores.svg" alt="The same 100 points drawn in two dimensions at their scores z1 and z2 along v1 and v2; the projected point is marked in green" aria-describedby="figure-3-2"><figcaption id="figure-3-2"><p>The same 100 points drawn in two dimensions at their scores z1 and z2 along v1 and v2; the projected point is marked in green</p><a href="../images/L03/21b_eigenbasis_scores.svg">Open full-size figure</a></figcaption></figure>
 </div>
-<div class="col">
 <ul>
-<li><strong>PCA:</strong> the points lie <em>close to</em> the plane, not on it. What is left over is the <strong>residual</strong>.</li>
-<li>Dropping it assumes the residual is <strong>noise</strong>. It may be, or it may hold the small differences a task needs.</li>
-<li><strong>MDS:</strong> a 2-D map approximates the dissimilarities; its <strong>stress</strong> is what does not fit.</li>
-<li>We draw in 2-D because a page is 2-D. The underlying space need not be.</li>
+<li><strong>Left, 3-D:</strong> the points lie <em>close to</em> the plane, not on it. <strong>Right, 2-D:</strong> the PCA map keeps only each point's position <em>on</em> the plane. The dashed red <span><b>residual</b></span> is dropped, on the assumption that it is noise.</li>
+<li><strong>MDS</strong> makes the same kind of approximation (its <strong>stress</strong> is what does not fit). We draw in 2-D because a page is 2-D; the data need not be.</li>
 </ul>
-</div>
-</div>
-<p><mark>Two axes on a slide are a choice of display, not a finding about dimension.</mark></p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="48" aria-labelledby="heading-4"><p class="page">Slide 4</p>
 <h2 id="heading-4">One knob, one curve: turning</h2>
 <div class="capfig">
@@ -136,7 +130,7 @@
 <tr>
 <td><strong>Embedding</strong>: flat subspace PCA needs</td>
 <td>3</td>
-<td>23 PCs for 90%</td>
+<td>24 PCs for 90%</td>
 </tr>
 <tr>
 <td><strong>Intrinsic</strong>: coordinates <em>on</em> the manifold</td>
