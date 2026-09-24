@@ -16,6 +16,7 @@
 <li><em>"If there are 50 principle components, why is it/how can it be represented by just 2 axes as on the ppt slides?"</em>: it cannot. A PCA plot keeps the two directions along which the points <strong>vary most</strong> over the whole data set and drops the other 48. Points that differ only along the dropped directions <strong>land on top of each other</strong>. That is where today's <strong>nonlinear</strong> methods come in: instead of keeping a few directions, they keep <strong>relationships</strong> between points, above all who is whose <strong>neighbor</strong>.</li>
 <li><em>"Does this mean neural signals are operating in 2 dimensional space"</em>: no. For the Bao et al. objects in AlexNet fc6 (Assignment 1 Part 3), the first two components hold only <strong>22%</strong> of the variance, and 85% takes <strong>87</strong> (Bao et al. report about 50). Counting components to a threshold measures the <strong>linear</strong> dimension and treats the rest as noise. If the data lie on a curved surface, the <strong>intrinsic</strong> dimension, the number of dimensions needed to locate a point on it, can be far smaller.</li>
 </ul>
+<p>Next: what every 2-D picture of the data gives up.</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="57" aria-labelledby="heading-4"><p class="page">Slide 4</p>
 <h2 id="heading-4">Every low-dimensional picture is an approximation</h2>
 <div>
@@ -52,7 +53,7 @@
 <figure><img src="../images/L04/11_knob_enlarge.svg" alt="The same photograph enlarged from half size to 1.45 times: eight frames and, on the first two principal components, another arch-shaped curve with four of the frames drawn next to their points" aria-describedby="figure-7-1"><figcaption id="figure-7-1"><p>The same photograph enlarged from half size to 1.45 times: eight frames and, on the first two principal components, another arch-shaped curve with four of the frames drawn next to their points</p><a href="../images/L04/11_knob_enlarge.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>Each knob gives a <strong>one-dimensional</strong> curve. Turn all three at once and the images fill a <strong>three-dimensional curved surface</strong> inside the 9,216-dimensional pixel space.</li>
+<li>Each knob gives a <strong>one-dimensional</strong> curve. Turn all three at once and the images fill a <strong>three-dimensional curved surface</strong>. Next: all three in one PCA.</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="57" aria-labelledby="heading-8"><p class="page">Slide 8</p>
 <h2 id="heading-8">All three changes in one PCA</h2>
@@ -91,6 +92,7 @@
 </ul>
 </div>
 </div>
+<p>Next: many objects, each with its own manifold, in a trained network.</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="57" aria-labelledby="heading-11"><p class="page">Slide 11</p>
 <h2 id="heading-11">Objects seen from many viewpoints</h2>
 <div class="row">
@@ -166,6 +168,7 @@
 </ul>
 </div>
 </div>
+<p>Next: to see whether a representation untangles them, we need to draw manifolds.</p>
 <div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <i>Trends Cogn. Sci.</i> 2007</a> · Fig. 1d</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-class="lead" data-marpit-pagination="16" data-marpit-pagination-total="57" aria-labelledby="heading-16"><p class="page">Slide 16</p>
 <h2 id="heading-16">How do we see a manifold?</h2>
@@ -187,7 +190,7 @@
 </div>
 <ul>
 <li><strong>PCA</strong> keeps the directions of largest variance; <strong>MDS</strong> keeps the straight-line distances. Both see the data through a <strong>flat</strong> lens.</li>
-<li>Points on neighboring turns are close <strong>through the air</strong>, so both methods put them close. Neither recovers position along the sheet.</li>
+<li>Points on neighboring turns are close <strong>through the air</strong>, so both methods put them close. Neither recovers position along the sheet. The fix: <strong>better distances</strong>, not a better projection.</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="57" aria-labelledby="heading-19"><p class="page">Slide 19</p>
 <h2 id="heading-19">Perich's origami crane</h2>
@@ -205,6 +208,7 @@
 </ul>
 </div>
 </div>
+<p>Next: why no flat view is enough.</p>
 <div class="ref">Photo: Andreas Bauer · CC BY-SA 2.5 · Wikimedia Commons · analogy from <a href="https://doi.org/10.53053/FTEU9810" rel="noopener">Perich <b>2026</b></a>, <i>The Transmitter</i></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="57" aria-labelledby="heading-20"><p class="page">Slide 20</p>
 <h2 id="heading-20">Squashing is not unfolding</h2>
@@ -222,7 +226,7 @@
 <th scope="col"></th>
 <th scope="col">Swiss&nbsp;roll</th>
 <th scope="col">Turned&nbsp;photo</th>
-<th scope="col">Grid&nbsp;cells</th>
+<th scope="col">Bao&nbsp;objects&nbsp;(fc6)</th>
 </tr>
 </thead>
 <tbody>
@@ -230,19 +234,19 @@
 <td><strong>Ambient</strong>: coordinates per point</td>
 <td>3</td>
 <td>9,216&nbsp;pixels</td>
-<td>100+&nbsp;neurons</td>
+<td>4,096&nbsp;units</td>
 </tr>
 <tr>
 <td><strong>Embedding</strong>: flat subspace PCA needs</td>
 <td>3</td>
 <td>24&nbsp;PCs&nbsp;(90%)</td>
-<td>about&nbsp;6</td>
+<td>149&nbsp;PCs&nbsp;(90%)</td>
 </tr>
 <tr>
 <td><strong>Intrinsic</strong>: dimensions to locate a point <em>on</em> it</td>
 <td>2</td>
 <td>1&nbsp;(angle)</td>
-<td>2&nbsp;(torus)</td>
+<td>unknown</td>
 </tr>
 </tbody>
 </table></div>
@@ -250,9 +254,9 @@
 <ul>
 <li>The three numbers answer different questions; none is <em>the</em> dimension.</li>
 <li>PCA measures the <strong>embedding</strong> dimension. It overestimates the intrinsic one whenever the manifold curves.</li>
-<li><strong>Grid cells</strong>: neurons in the rat brain that fire at the corners of a triangular grid over the floor. Recorded together, their activity fills a <strong>torus</strong>, a 2-D surface.</li>
+<li>For real data such as the network's responses to the Bao objects, the intrinsic dimension is <strong>unknown</strong>: that is what the <strong>nonlinear</strong> methods coming next try to reveal.</li>
 </ul>
-<div class="ref"><a href="https://doi.org/10.53053/FTEU9810" rel="noopener">Perich <b>2026</b></a> · <i>The Transmitter</i> · grid cells: <a href="https://doi.org/10.1038/s41586-021-04268-7" rel="noopener">Gardner et al. <b>2022</b></a> · <i>Nature</i></div>
+<div class="ref"><a href="https://doi.org/10.53053/FTEU9810" rel="noopener">Perich <b>2026</b></a> · <i>The Transmitter</i></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-class="lead" data-marpit-pagination="22" data-marpit-pagination-total="57" aria-labelledby="heading-22"><p class="page">Slide 22</p>
 <h2 id="heading-22">How could we fix this?</h2>
 <p>Keep the MDS idea, but change the distances. Instead of measuring <strong>straight through the air</strong>, measure <strong>along the data</strong>: only step from a point to its nearest neighbors, and add up the steps.</p>
@@ -385,6 +389,7 @@
 </ul>
 </div>
 </div>
+<p>Next: UMAP, the same idea built differently.</p>
 <div class="ref"><a href="https://www.jmlr.org/papers/v9/vandermaaten08a.html" rel="noopener">van der Maaten &amp; Hinton <b>JMLR 2008</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="57" aria-labelledby="heading-35"><p class="page">Slide 35</p>
 <h2 id="heading-35">UMAP: a related way to build a neighborhood map</h2>
@@ -416,6 +421,7 @@
 </ul>
 </div>
 </div>
+<p>Next: five methods side by side.</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="57" aria-labelledby="heading-37"><p class="page">Slide 37</p>
 <h2 id="heading-37">Match the method to the relationship</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Match the method to the relationship — table"><table><caption>Match the method to the relationship — table</caption>
@@ -463,6 +469,7 @@
 <li>Whichever you use: <strong>PCA initialization</strong>, <strong>sweep</strong> perplexity or <code>n_neighbors</code> and the random seed, and keep <strong>what holds across the sweep</strong>.</li>
 <li><strong>Never pick the prettiest run.</strong> A map suggests a claim; test it in the original space.</li>
 </ul>
+<p>Next: each method at work in published neuroscience and AI.</p>
 <div class="ref"><a href="https://doi.org/10.1038/s41587-020-00809-z" rel="noopener">Kobak &amp; Linderman <b>2021</b></a> · <i>Nature Biotechnology</i></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="57" aria-labelledby="heading-39"><p class="page">Slide 39</p>
 <h2 id="heading-39">In the wild: PCA</h2>
@@ -498,6 +505,7 @@
 <figure><figure><img src="../images/2026-illustrations/gallery/umap-lee2021-wavemap-spike-waveforms_clean.png" alt="UMAP of 625 spike waveforms from monkey premotor cortex, in eight clusters with their average waveforms" aria-describedby="figure-43-1"><figcaption id="figure-43-1"><p>UMAP of 625 spike waveforms from monkey premotor cortex, in eight clusters with their average waveforms</p><a href="../images/2026-illustrations/gallery/umap-lee2021-wavemap-spike-waveforms_clean.png">Open full-size figure</a></figcaption></figure><figcaption>625 spike shapes: eight clusters of neuron types</figcaption></figure>
 <figure><figure><img src="../images/2026-illustrations/gallery/umap-carter2019-activation-atlas_clean.png" alt="Activation Atlas: a grid of feature visualizations placed by UMAP of an image network layer, with animals, landscapes and objects in separate regions" aria-describedby="figure-43-2"><figcaption id="figure-43-2"><p>Activation Atlas: a grid of feature visualizations placed by UMAP of an image network layer, with animals, landscapes and objects in separate regions</p><a href="../images/2026-illustrations/gallery/umap-carter2019-activation-atlas_clean.png">Open full-size figure</a></figcaption></figure><figcaption>What one layer of an image network responds to</figcaption></figure>
 </div>
+<p>Next: which features of such a map can you believe?</p>
 <div class="ref">Lee et al. 2021 · <i>eLife</i> · Carter et al. 2019 · <i>Distill</i> · CC BY 4.0</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="57" aria-labelledby="heading-44"><p class="page">Slide 44</p>
 <h2 id="heading-44">Back to our data: same responses, two maps</h2>
@@ -508,6 +516,7 @@
 <li>Or did t-SNE exaggerate the groups to make them easier to see?</li>
 </ul>
 <p><mark>A map that looks cleaner does not mean the responses carry more information.</mark></p>
+<p>Next: watch it happen, live.</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-marpit-pagination="45" data-marpit-pagination-total="57" aria-labelledby="heading-45"><p class="page">Slide 45</p>
 <h2 id="heading-45">The same 120 animals, three ways — live</h2>
 <div class="interactive-figure interactive-wide">
@@ -559,6 +568,7 @@
 </tbody>
 </table></div>
 <p><mark>Repeatability, fidelity and object grouping are different questions.</mark> Assignment 1 Part 4 has you compute each one.</p>
+<p>Next: if a map cannot settle a question, what can?</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-49" data-paginate="true" data-marpit-pagination="49" data-marpit-pagination-total="57" aria-labelledby="heading-49"><p class="page">Slide 49</p>
 <h2 id="heading-49">From a map to a test of the representation</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="From a map to a test of the representation — table"><table><caption>From a map to a test of the representation — table</caption>
