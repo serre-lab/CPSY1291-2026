@@ -432,32 +432,32 @@
 <tbody>
 <tr>
 <td><strong>PCA</strong></td>
-<td>Retain variance in a linear projection</td>
-<td>Variance kept; whether the dropped directions mattered for your question</td>
+<td>Keep as much variance as a flat projection can</td>
+<td>Variance kept; did the dropped directions matter?</td>
 </tr>
 <tr>
 <td><strong>MDS</strong></td>
-<td>Approximate supplied dissimilarities</td>
-<td>Fit errors; dependence on the metric</td>
+<td>Reproduce the dissimilarities you give it as map distances</td>
+<td>Stress (fit error); which dissimilarity you chose</td>
 </tr>
 <tr>
 <td><strong>Isomap</strong></td>
-<td>MDS on "along-the-sheet" distances</td>
-<td>Neighbor graph; shortcut edges</td>
+<td>MDS on distances measured along the data</td>
+<td>Shortcut edges in the neighbor graph</td>
 </tr>
 <tr>
 <td><strong>t-SNE</strong></td>
-<td>Match local pairwise similarities</td>
-<td>Neighborhood fidelity; settings and seeds</td>
+<td>Keep each point's nearest neighbors close</td>
+<td>Are neighbors kept? Stable across settings and seeds?</td>
 </tr>
 <tr>
 <td><strong>UMAP</strong></td>
-<td>Lay out a weighted neighborhood graph</td>
-<td>Neighborhood fidelity; settings and seeds</td>
+<td>Keep a graph of nearest neighbors</td>
+<td>Are neighbors kept? Stable across settings and seeds?</td>
 </tr>
 </tbody>
 </table></div>
-<p>A measurement of a map describes <strong>the map</strong>. A claim about the representation needs evidence that the relevant relationship was preserved.</p>
+<p>Each map keeps only what its method keeps. Before trusting a pattern, check that the method keeps that kind of relationship.</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="58" aria-labelledby="heading-38"><p class="page">Slide 38</p>
 <h2 id="heading-38">Which one should I use?</h2>
 <ul>
