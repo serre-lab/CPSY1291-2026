@@ -26,7 +26,7 @@
 <p>Four questions came up often enough to answer here:</p>
 <ul>
 <li><em>"Where did the 4,096 numbers go when a row became one square of the RDM?"</em>: one number per <strong>pair</strong>, computed from both rows: the first slides today</li>
-<li><em>"How different channels can provide different features"</em>: in a <strong>convolutional network</strong>, yes: a channel is a whole sheet of units that share one set of weights, one feature detector applied at every position; the sheet shows <strong>where</strong> in the image that feature is present. Each unit is one entry of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math>. A recording <em>channel</em> is one electrode, another word</li>
+<li><em>"How different channels can provide different features"</em>: in a <strong>convolutional network</strong>, a channel is a whole sheet of units that share one set of weights, one feature detector applied at every position; the sheet shows <strong>where</strong> in the image that feature is present. Each unit is one entry of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math>. A recording <em>channel</em> is one electrode, an unrelated use of the word</li>
 <li><em>"Are the neural vectors per neuron, averaged over trials?"</em>: yes: one mean rate per neuron per image; Assignment 1 gives you those means</li>
 <li><em>"Why 0–1 rather than 0–255?"</em>: the same 256 levels divided by 255, nothing added or lost. Networks train and run in <strong>floating point</strong>: weights, activations and gradients are real numbers, far finer than 8-bit integers, so inputs are scaled to what the weights were trained on</li>
 </ul>
@@ -86,7 +86,7 @@
 </ul>
 </div>
 <div class="col fig">
-<figure><img src="../images/L01-feature-space-2026-09-13/geom_euclid.png" alt="The same plot with the segment between the tiger's and the elephant's points labelled with its Euclidean length, 59.5" aria-describedby="figure-8-1"><figcaption id="figure-8-1"><p>The same plot with the segment between the tiger's and the elephant's points labelled with its Euclidean length, 59.5</p><a href="../images/L01-feature-space-2026-09-13/geom_euclid.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L01-feature-space-2026-09-13/geom_euclid.png" alt="The two-feature plot, mean intensity against contrast, with the tiger's and the elephant's points; the segment between them is labelled with its Euclidean length, 59.5" aria-describedby="figure-8-1"><figcaption id="figure-8-1"><p>The two-feature plot, mean intensity against contrast, with the tiger's and the elephant's points; the segment between them is labelled with its Euclidean length, 59.5</p><a href="../images/L01-feature-space-2026-09-13/geom_euclid.png">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="67" aria-labelledby="heading-9"><p class="page">Slide 9</p>
@@ -154,7 +154,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <li><strong>Euclidean</strong> distance keeps gain and offset · <strong>cosine</strong> discards the gain · <strong>correlation</strong> discards both. Choose by what should not count</li>
 </ul>
 <div class="ref">Assignment 1 §1b: the three functions, then all three matrices</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-marpit-scope-2dxdnw6r="" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="67" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-marpit-scope-uh26okp8="" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="67" aria-labelledby="heading-14"><p class="page">Slide 14</p>
 <h2 id="heading-14">Which is closer to the tiger? It depends on the measure</h2>
 <div class="row">
 <div class="col">
@@ -258,7 +258,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <figure><img src="../images/L01-opening-2026-09/tigers_monkey.svg" alt="Two tiger photographs A and B and a monkey photograph C, from the Assignment 1 image set" aria-describedby="figure-19-1"><figcaption id="figure-19-1"><p>Two tiger photographs A and B and a monkey photograph C, from the Assignment 1 image set</p><a href="../images/L01-opening-2026-09/tigers_monkey.svg">Open full-size figure</a></figcaption></figure>
 <p>Mean rating &nbsp; A–B: <b>10.0</b> &nbsp;·&nbsp; A–C: <b>2.9</b> &nbsp;·&nbsp; B–C: <b>2.2</b> &nbsp;·&nbsp; one number per pair: a dissimilarity matrix, from which the space is to be recovered</p>
 <div class="ref">Ratings: <a href="https://doi.org/10.1111/cogs.12670" rel="noopener">Peterson, Abbott &amp; Griffiths <i>Cognitive Science</i> 2018</a>, the data used in Assignment 1</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-marpit-scope-wxgg9qcz="" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="67" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-marpit-scope-tym8bvow="" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="67" aria-labelledby="heading-20"><p class="page">Slide 20</p>
 <h2 id="heading-20">Which measures are distances in the full sense?</h2>
 
 <p><strong>Will it work?</strong> Yes, if the matrix is, or is well approximated by, a table of <strong>distances between points</strong> in that space. What a table of distances must satisfy, and which of our measures satisfy it:</p>
@@ -380,7 +380,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <ul>
 <li><strong>Start anywhere</strong>: six random points. The stress, the total squared mismatch over the fifteen pairs, is <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>217</mn></mrow><annotation encoding="application/x-tex">217</annotation></semantics></math></li>
 <li>One round: every point moves a little toward where its distances to the other five would match the ratings</li>
-<li>The rounds that follow are the next two slides</li>
+<li>Repeat until the stress stops falling</li>
 </ul>
 </div>
 </div>
@@ -403,11 +403,11 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <h2 id="heading-27">Watch it move</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L02-mds-problem-2026-09-17/mds_iter_final.svg" alt="The converged configuration: the map of the earlier slide, stress 22" aria-describedby="figure-27-1"><figcaption id="figure-27-1"><p>The converged configuration: the map of the earlier slide, stress 22</p><a href="../images/L02-mds-problem-2026-09-17/mds_iter_final.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L02-mds-problem-2026-09-17/mds_iter_final.svg" alt="The six animals at convergence, the map MDS returns for the six-animal ratings: gorilla and monkey close together, eagle and penguin close together; stress 22" aria-describedby="figure-27-1"><figcaption id="figure-27-1"><p>The six animals at convergence, the map MDS returns for the six-animal ratings: gorilla and monkey close together, eagle and penguin close together; stress 22</p><a href="../images/L02-mds-problem-2026-09-17/mds_iter_final.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
-<li><strong>Converged</strong>: stress <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>22</mn></mrow><annotation encoding="application/x-tex">22</annotation></semantics></math>, and no move lowers it further. This is the map shown before the stress equation</li>
+<li><strong>Converged</strong>: stress <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>22</mn></mrow><annotation encoding="application/x-tex">22</annotation></semantics></math>, and no move lowers it further. This is the six-animal map from the start of this section</li>
 <li>A different random start ends in the same map, possibly rotated or mirrored, or in a slightly worse one: run several starts, keep the lowest stress</li>
 </ul>
 </div>
@@ -437,7 +437,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 </div>
 <ul>
 <li><strong>Metric MDS</strong> demands <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover accent="true"><mi>d</mi><mo>^</mo></mover><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>≈</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\hat d_{ik} \approx d_{ik}</annotation></semantics></math>, with <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>=</mo><mn>10</mn><mo>−</mo></mrow><annotation encoding="application/x-tex">d_{ik} = 10 -</annotation></semantics></math> rating: a pair rated 2 must sit twice as far as a pair rated 6. People do not rate that way; most pairs pile up at 0–1</li>
-<li><strong>Non-metric MDS</strong> demands only the <strong>order</strong>: if <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>&lt;</mo><msub><mi>d</mi><mrow><msup><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><msup><mi>k</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ik} &lt; d_{i'k'}</annotation></semantics></math>, put <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo separator="true">,</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">i,k</annotation></semantics></math> closer than $i',k'. Any falling curve through the cloud is allowed, fitted along with the map</li>
+<li><strong>Non-metric MDS</strong> demands only the <strong>order</strong>: if <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>&lt;</mo><msub><mi>d</mi><mrow><msup><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><msup><mi>k</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ik} &lt; d_{i'k'}</annotation></semantics></math>, put <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo separator="true">,</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">i,k</annotation></semantics></math> closer than <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>k</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">i',k'</annotation></semantics></math>. Any falling curve through the cloud is allowed, fitted along with the map</li>
 <li>Same data: stress-1 <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.31</mn><mo>→</mo><mn>0.23</mn></mrow><annotation encoding="application/x-tex">0.31 \to 0.23</annotation></semantics></math>. A 0–10 rating is an ordering, not a measurement</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="67" aria-labelledby="heading-31"><p class="page">Slide 31</p>
@@ -477,7 +477,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <li>The <strong>line</strong> is the baseline: constant-rate decay, no law to state</li>
 <li>Any bend beats a line, so the fair rival is the <strong>Gaussian</strong>: same two parameters, but <strong>flat at <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">d=0</annotation></semantics></math></strong> where the exponential is steepest</li>
 <li><mark>The test is at the origin: which shape do the pairs follow there?</mark></li>
-<li>Preview: in the space recovered from people the exponential wins; against a <strong>network's</strong> distances the picture changes, and the reason is the ruler, not the mind</li>
+<li>Preview: in the space recovered from people the exponential wins; against a <strong>network's</strong> distances the picture changes, because a network's distance is a different ruler from psychological distance</li>
 </ul>
 </div>
 <div class="col fig">
@@ -500,7 +500,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <h2 id="heading-36">An RDM is itself a vector</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L02-rdm-pair-2026-09-17/rdm_pair.svg" alt="The same two 120 by 120 matrices, human judgments and the ResNet-18 late layer, side by side" aria-describedby="figure-36-1"><figcaption id="figure-36-1"><p>The same two 120 by 120 matrices, human judgments and the ResNet-18 late layer, side by side</p><a href="../images/L02-rdm-pair-2026-09-17/rdm_pair.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L02-rdm-pair-2026-09-17/rdm_pair.svg" alt="Two 120 by 120 dissimilarity matrices of the same animals side by side, human judgments and the ResNet-18 late layer, both with light blocks along the diagonal, weaker for the network" aria-describedby="figure-36-1"><figcaption id="figure-36-1"><p>Two 120 by 120 dissimilarity matrices of the same animals side by side, human judgments and the ResNet-18 late layer, both with light blocks along the diagonal, weaker for the network</p><a href="../images/L02-rdm-pair-2026-09-17/rdm_pair.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -544,7 +544,6 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <h2 id="heading-39">What that number does and does not say</h2>
 <ul>
 <li>The two systems <strong>order the pairs alike</strong>: what one treats as close, the other tends to treat as close. A claim about <strong>geometry</strong>, and only that</li>
-<li>It does <strong>not</strong> say they get there the same way: two systems can agree on every pair while measuring different things about the images</li>
 <li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math> alone means little. It needs how well people agree with each other (the <strong>noise ceiling</strong>, two slides on) and a second model: something to be large <em>relative to</em></li>
 <li>Assignment 1 reports Spearman <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math> between the human matrix and <strong>ResNet-18</strong>'s correlation distances: expect about <strong>0.4</strong>. Whether that is good: two slides on</li>
 <li><mark>Matching geometry is evidence about a representation, not a demonstration of shared mechanism.</mark></li>
@@ -579,7 +578,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 </ul>
 </div>
 </div>
-<div class="ref">Assignment 1 §2i numbers · pixels added for the lecture · ratings <a href="https://doi.org/10.1111/cogs.12670" rel="noopener">Peterson, Abbott &amp; Griffiths <i>Cognitive Science</i> 2018</a></div>
+<div class="ref">Assignment 1 §2i numbers · pixels not in the assignment · ratings <a href="https://doi.org/10.1111/cogs.12670" rel="noopener">Peterson, Abbott &amp; Griffiths <i>Cognitive Science</i> 2018</a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="67" aria-labelledby="heading-42"><p class="page">Slide 42</p>
 <h2 id="heading-42">Do bigger models get closer? Some do</h2>
 <div class="row">
@@ -601,7 +600,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 <ul>
 <li><strong>It is long.</strong> Start now if you have not; it is due <strong>Tuesday, September 29</strong></li>
 <li>After today you have everything for <strong>Parts 1 and 2</strong> (distances, RDMs, MDS, Shepard's law, the RDM comparison). Part 3 is Tuesday's lecture (PCA); the bonus has no lecture of its own</li>
-<li>The assignment is written to be <strong>self-sufficient</strong>: every part explains what it needs. That is by design. Starting a part before its lecture is allowed and often useful; the lecture then lands on something you have already tried</li>
+<li>The assignment is written to be <strong>self-sufficient</strong>: every part explains what it needs. Starting a part before its lecture is allowed and often useful; the lecture then lands on something you have already tried</li>
 <li><strong>Bonus B2 (hierarchical clustering)</strong> is not taught in class: the clustering slides in the appendix are what you need</li>
 <li>Research-trail entry 1: Friday, September 18</li>
 </ul>
@@ -648,7 +647,7 @@ r\bigl(\mathbf{x}^{(i)},\mathbf{x}^{(k)}\bigr)=\frac{\mathbf{x}_c^{(i)\top}\math
 </annotation></semantics></math></div></span></p><p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup><mo>−</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{x}^{(2)}-\mathbf{x}^{(1)}</annotation></semantics></math> is itself a vector: from the tiger's point to the elephant's.</p>
 </div>
 <div class="col fig">
-<figure><img src="../images/L01-feature-space-2026-09-13/geom_diff.png" alt="The same plot with three arrows: x superscript 1 to the tiger's point, x superscript 2 to the elephant's point, and their difference drawn from the tiger's point to the elephant's" aria-describedby="figure-47-1"><figcaption id="figure-47-1"><p>The same plot with three arrows: x superscript 1 to the tiger's point, x superscript 2 to the elephant's point, and their difference drawn from the tiger's point to the elephant's</p><a href="../images/L01-feature-space-2026-09-13/geom_diff.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L01-feature-space-2026-09-13/geom_diff.png" alt="The two-feature plot, mean intensity against contrast, with three arrows: x superscript 1 to the tiger's point, x superscript 2 to the elephant's point, and their difference drawn from the tiger's point to the elephant's" aria-describedby="figure-47-1"><figcaption id="figure-47-1"><p>The two-feature plot, mean intensity against contrast, with three arrows: x superscript 1 to the tiger's point, x superscript 2 to the elephant's point, and their difference drawn from the tiger's point to the elephant's</p><a href="../images/L01-feature-space-2026-09-13/geom_diff.png">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-48" data-paginate="true" data-class="codeslide" data-marpit-pagination="48" data-marpit-pagination-total="67" aria-labelledby="heading-48"><p class="page">Slide 48</p>
@@ -679,7 +678,7 @@ D     = squareform(d_vec)                <span class="hljs-comment"># (N, N): sy
 <div class="ref"><a href="https://docs.pytorch.org/vision/stable/_modules/torchvision/models/resnet.html">Torchvision · ResNet</a> · <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.ReLU.html">PyTorch · ReLU</a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-50" data-paginate="true" data-marpit-pagination="50" data-marpit-pagination-total="67" aria-labelledby="heading-50"><p class="page">Slide 50</p>
 <h2 id="heading-50">Appendix · Shared zeros can change correlation</h2>
-<figure><img src="../images/L01-shared-zeros-2026-09-13/shared_zeros.svg" alt="The same tiger and gorilla photographs beside their full measured ResNet-18 activation vectors, with 879 shared-zero entries marked at matching positions" aria-describedby="figure-50-1"><figcaption id="figure-50-1"><p>The same tiger and gorilla photographs beside their full measured ResNet-18 activation vectors, with 879 shared-zero entries marked at matching positions</p><a href="../images/L01-shared-zeros-2026-09-13/shared_zeros.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L01-shared-zeros-2026-09-13/shared_zeros.svg" alt="The tiger and gorilla photographs beside their full measured ResNet-18 activation vectors, with 879 shared-zero entries marked at matching positions" aria-describedby="figure-50-1"><figcaption id="figure-50-1"><p>The tiger and gorilla photographs beside their full measured ResNet-18 activation vectors, with 879 shared-zero entries marked at matching positions</p><a href="../images/L01-shared-zeros-2026-09-13/shared_zeros.svg">Open full-size figure</a></figcaption></figure>
 <ul>
 <li>All 4,096 units: correlation dissimilarity <strong>0.897</strong>. Without the 879 units silent for both: <strong>1.011</strong>. Euclidean, cosine: unchanged</li>
 <li>Issue: shared zeros pull both means down and manufacture agreement (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math> = 0.10 with, −0.01 without)</li>
@@ -710,7 +709,7 @@ D     = squareform(d_vec)                <span class="hljs-comment"># (N, N): sy
 <figure><img src="../images/L01-training-2026-09-13/training_loop.svg" alt="Supervised training: four labelled training photographs (frog, eagle, elephant, penguin) pass one at a time through a network to produce class predictions; comparing the prediction with the true label gives a loss, which guides weight updates and changes internal representations" aria-describedby="figure-52-1"><figcaption id="figure-52-1"><p>Supervised training: four labelled training photographs (frog, eagle, elephant, penguin) pass one at a time through a network to produce class predictions; comparing the prediction with the true label gives a loss, which guides weight updates and changes internal representations</p><a href="../images/L01-training-2026-09-13/training_loop.svg">Open full-size figure</a></figcaption></figure>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-53" data-paginate="true" data-marpit-pagination="53" data-marpit-pagination-total="67" aria-labelledby="heading-53"><p class="page">Slide 53</p>
 <h2 id="heading-53">Appendix · What should a dissimilarity satisfy?</h2>
-<p>The ratings you just saw come from <strong>people</strong>, not from a formula. A network's RDM inherits its properties from the measure <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math>; a rater is free to answer anything. Before we recover a space from such numbers, what must they satisfy? For tiger, penguin, gorilla (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo separator="true">,</mo><mi>k</mi><mo separator="true">,</mo><mi>l</mi></mrow><annotation encoding="application/x-tex">i, k, l</annotation></semantics></math>):</p>
+<p>Similarity ratings come from <strong>people</strong>, not from a formula. A network's RDM inherits its properties from the measure <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math>; a rater is free to answer anything. Before we recover a space from such numbers, what must they satisfy? For tiger, penguin, gorilla (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo separator="true">,</mo><mi>k</mi><mo separator="true">,</mo><mi>l</mi></mrow><annotation encoding="application/x-tex">i, k, l</annotation></semantics></math>):</p>
 <ul>
 <li>The tiger against itself: no difference. <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">d_{ii}=0</annotation></semantics></math> (<strong>zero diagonal</strong>)</li>
 <li>Tiger against penguin, penguin against tiger: the same number. <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>=</mo><msub><mi>d</mi><mrow><mi>k</mi><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ik}=d_{ki}</annotation></semantics></math> (<strong>symmetric</strong>). A rater need not agree (Tversky 1977: a camel is judged more like a horse than a horse like a camel)</li>
@@ -814,10 +813,10 @@ Y_nm = mds_nm.fit_transform(D)
 <div class="col">
 <p>Step 3 is the whole design decision:</p>
 <ul>
-<li><strong>Single</strong>, distance to the <em>closest</em> member. Chains.</li>
-<li><strong>Complete</strong>, distance to the <em>farthest</em> member. Compact, equal-size clusters.</li>
-<li><strong>Average</strong>, mean over all cross-pairs. The usual compromise.</li>
-<li><strong>Ward</strong>, merge the pair that increases within-cluster variance least. Needs coordinates, not just <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi></mrow><annotation encoding="application/x-tex">\mathbf{D}</annotation></semantics></math>.</li>
+<li><strong>Single</strong>: distance to the <em>closest</em> member. Chains.</li>
+<li><strong>Complete</strong>: distance to the <em>farthest</em> member. Compact, equal-size clusters.</li>
+<li><strong>Average</strong>: mean over all cross-pairs. The usual compromise.</li>
+<li><strong>Ward</strong>: merge the pair that increases within-cluster variance least. Needs coordinates, not just <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi></mrow><annotation encoding="application/x-tex">\mathbf{D}</annotation></semantics></math>.</li>
 </ul>
 </div>
 </div>
@@ -826,7 +825,7 @@ Y_nm = mds_nm.fit_transform(D)
 <figure><img src="../images/L02-clustering-2026-09-17/cluster_linkage.svg" alt="Three dendrograms of the same 120 animals from the human dissimilarity matrix, single, complete and average linkage, each leaf marked with its taxon colour: single linkage grows one long chain, complete linkage makes compact groups, average linkage sits between" aria-describedby="figure-59-1"><figcaption id="figure-59-1"><p>Three dendrograms of the same 120 animals from the human dissimilarity matrix, single, complete and average linkage, each leaf marked with its taxon colour: single linkage grows one long chain, complete linkage makes compact groups, average linkage sits between</p><a href="../images/L02-clustering-2026-09-17/cluster_linkage.svg">Open full-size figure</a></figcaption></figure>
 <ul>
 <li><strong>Same 120 animals, same human ratings</strong>, three linkage rules: three different trees. The colours under the leaves are the eight taxa</li>
-<li>Single linkage <strong>chains</strong>: one long thin cluster forms by hopping neighbor to neighbor. Complete linkage forces <strong>compact</strong> groups, which can split a elongated one.</li>
+<li>Single linkage <strong>chains</strong>: one long thin cluster forms by hopping neighbor to neighbor. Complete linkage forces <strong>compact</strong> groups, which can split an elongated one.</li>
 </ul>
 <div class="ref">All 120 Assignment 1 animals, human ratings · <a href="https://doi.org/10.1111/cogs.12670" rel="noopener">Peterson, Abbott &amp; Griffiths <i>Cognitive Science</i> 2018</a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-60" data-paginate="true" data-marpit-pagination="60" data-marpit-pagination-total="67" aria-labelledby="heading-60"><p class="page">Slide 60</p>
@@ -914,7 +913,7 @@ Y_nm = mds_nm.fit_transform(D)
 <p><strong>Minimality</strong>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>≥</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">d_{ik} \ge d_{ii} = 0</annotation></semantics></math></p>
 <ul>
 <li>Rothkopf's Morse-code study: participants judged some <em>different</em> pairs "same" more reliably than they judged an identical pair "same".</li>
-<li>Self-similarity is <strong>not constant</strong> across items, familiar signals are recognized as themselves more reliably than unfamiliar ones.</li>
+<li>Self-similarity is <strong>not constant</strong> across items: familiar signals are recognized as themselves more reliably than unfamiliar ones.</li>
 </ul>
 </div>
 <div class="col">
@@ -937,7 +936,7 @@ Y_nm = mds_nm.fit_transform(D)
 <div class="col">
 <ul>
 <li><strong>Triangle inequality:</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>+</mo><msub><mi>d</mi><mrow><mi>k</mi><mi>l</mi></mrow></msub><mo>≥</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ik} + d_{kl} \ge d_{il}</annotation></semantics></math>. Two items can each be similar to a third <em>on different features</em>, and not at all similar to each other.</li>
-<li><strong>Nearest-neighbor restriction:</strong> in an <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math>-dimensional Euclidean space, a point can be the nearest neighbor of only a bounded number of others. Conceptual hierarchies break that bound, <em>fruit</em> is the nearest neighbor of many fruits at once, but an MDS map can only put it near two or three.</li>
+<li><strong>Nearest-neighbor restriction:</strong> in an <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math>-dimensional Euclidean space, a point can be the nearest neighbor of only a bounded number of others. Conceptual hierarchies break that bound: <em>fruit</em> is the nearest neighbor of many fruits at once, but an MDS map can only put it near two or three.</li>
 </ul>
 </div>
 </div>
