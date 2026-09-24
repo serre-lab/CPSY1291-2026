@@ -46,7 +46,7 @@
 <figure><img src="../images/L04/09_knob_turn.svg" alt="Left, eight frames of one photograph of a marlin turned from 0 to 310 degrees, each drawn whole on a padded square. Right, all 36 turned images treated as pixel vectors and projected onto their first two principal components: the points trace a closed loop, with five of the frames drawn next to their points" aria-describedby="figure-5-1"><figcaption id="figure-5-1"><p>Left, eight frames of one photograph of a marlin turned from 0 to 310 degrees, each drawn whole on a padded square. Right, all 36 turned images treated as pixel vectors and projected onto their first two principal components: the points trace a closed loop, with five of the frames drawn next to their points</p><a href="../images/L04/09_knob_turn.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li><strong>One knob</strong>: as the angle changes, the image moves along a <strong>loop</strong> in pixel space. This 2-D view keeps only <strong>34%</strong> of the variance (24 PCs for 90%): the loop winds through many more directions.</li>
+<li>The image moves along a <strong>loop</strong>. PCA needs <strong>24 components</strong> for 90% of the variance (this view: 34%), yet <strong>one dimension</strong>, the angle, locates every image: the <strong>linear vs intrinsic</strong> gap from the questions slide.</li>
 </ul>
 <div class="ref">36 images, 9,216 pixels each: fewer samples than dimensions, so PCA is computed with the SVD of the centered data (Assignment 2)</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="57" aria-labelledby="heading-6"><p class="page">Slide 6</p>
