@@ -35,7 +35,7 @@
 <figure><img src="../images/L04/09_knob_turn.svg" alt="Left, eight frames of one photograph of a marlin turned from 0 to 310 degrees, each drawn whole on a padded square. Right, all 36 turned images treated as pixel vectors and projected onto their first two principal components: the points trace a closed loop, with five of the frames drawn next to their points" aria-describedby="figure-5-1"><figcaption id="figure-5-1"><p>Left, eight frames of one photograph of a marlin turned from 0 to 310 degrees, each drawn whole on a padded square. Right, all 36 turned images treated as pixel vectors and projected onto their first two principal components: the points trace a closed loop, with five of the frames drawn next to their points</p><a href="../images/L04/09_knob_turn.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>The image moves along a <strong>loop</strong>. PCA needs <strong>24 components</strong> for 90% of the variance (this view: 34%), yet <strong>one dimension</strong>, the angle, locates every image: the <strong>linear vs intrinsic</strong> gap from the questions slide.</li>
+<li><strong>Why look?</strong> Recognition needs one object's images to stay <strong>together</strong>. In <strong>pixels</strong>, turning alone sends the fish on a <strong>loop</strong> that needs <strong>24 PCs</strong> for 90%, yet <strong>one dimension</strong>, the angle, locates every image.</li>
 </ul>
 <div class="ref">36 images, 9,216 pixels each: fewer samples than dimensions, so PCA is computed with the SVD of the centered data (Assignment 2)</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="57" aria-labelledby="heading-6"><p class="page">Slide 6</p>
@@ -66,7 +66,7 @@
 <li>Each image is set by <strong>one knob value</strong>, yet PCA needs <strong>36 components</strong> to keep 90% of the variance.</li>
 </ul>
 </div>
-<p><mark>PCA counts flat directions, not knobs: a curved manifold looks far higher-dimensional than it is.</mark></p>
+<p><mark>In pixels, one fish's images spread over many curved directions. Does a trained network pull them together?</mark></p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="57" aria-labelledby="heading-9"><p class="page">Slide 9</p>
 <h2 id="heading-9">Turn the knobs yourself</h2>
 <div class="interactive-figure interactive-wide">
@@ -105,6 +105,7 @@
 <li>Bao, She, McGill &amp; Tsao showed these images to monkeys while recording from <strong>IT cortex</strong>, the late stage of the visual system where neurons respond to whole objects. You also use them in Assignment 1.</li>
 <li>Here each image is a point in <strong>fc6</strong>, a late layer of the image network AlexNet: 4,096 numbers per image.</li>
 <li>Two levels of grouping: views of the <strong>same object</strong>, and objects of the <strong>same category</strong>.</li>
+<li><strong>The question:</strong> pixels scatter an object's views. Does the network keep them <strong>together</strong>, and keep different objects <strong>apart</strong>?</li>
 </ul>
 </div>
 </div>
@@ -119,6 +120,7 @@
 <ul>
 <li>Each <strong>dot</strong> is one photograph of the same excavator, placed by the network's response to it. The axes are the two principal directions of those <strong>24 responses</strong>.</li>
 <li>Very different images, one <strong>patch</strong>: all the ways this object can look.</li>
+<li>Compare the pixels, where turning alone traced a long loop: the network <strong>gathers</strong> the views.</li>
 </ul>
 </div>
 </div>
@@ -132,6 +134,7 @@
 <ul>
 <li>Now one PCA of all <strong>72 responses</strong> together. Each object keeps to its own small patch, and the patches are <strong>far apart</strong>.</li>
 <li>Viewpoint moves a response <strong>within</strong> a patch; identity moves it <strong>between</strong> patches.</li>
+<li><strong>And the brain?</strong> Bao et al. recorded monkey IT cortex with these same images: do its neurons also keep each object together? That question drives the recognition lectures.</li>
 </ul>
 </div>
 </div>
