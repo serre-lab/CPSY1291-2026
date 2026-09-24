@@ -373,7 +373,7 @@
 <ul>
 <li><strong>As in MDS:</strong> drop the points on the line at random, measure how badly <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi></mrow><annotation encoding="application/x-tex">Q</annotation></semantics></math> matches <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math>, <strong>nudge every point a little</strong> to reduce the mismatch, repeat.</li>
 <li>The mismatch is the <strong>KL divergence</strong>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mrow><mi>i</mi><mo mathvariant="normal">≠</mo><mi>j</mi></mrow></msub><msub><mi>p</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mi>log</mi><mo>⁡</mo><mfrac><msub><mi>p</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mfrac></mrow><annotation encoding="application/x-tex">\sum_{i\neq j} p_{ij}\log\frac{p_{ij}}{q_{ij}}</annotation></semantics></math>; the nudging is <strong>gradient descent</strong>. Both return when we train neural networks.</li>
-<li>A fixed number of steps does not guarantee the map has settled.</li>
+<li>The random start is set by a <strong>random seed</strong>: another seed gives <strong>another map</strong>. Starting from the PCA map (<strong>PCA initialization</strong>) is more repeatable.</li>
 </ul>
 </div>
 </div>
@@ -469,7 +469,7 @@
 <li><strong>Start with PCA:</strong> linear, fast, applies to new data, and tells you how much variance the 2-D view keeps.</li>
 <li>To look at <strong>neighborhoods and clusters</strong>, use <strong>t-SNE or UMAP</strong>. They are close cousins; Assignment 1 uses t-SNE only to keep it short, and UMAP would teach the same lessons.</li>
 <li>Whichever you use: <strong>PCA initialization</strong>, <strong>sweep</strong> <code>perplexity</code> (t-SNE) or <code>n_neighbors</code> (UMAP) and the random seed, and keep <strong>what holds across the sweep</strong>.</li>
-<li><strong>Never pick the prettiest run.</strong> A map suggests a claim; test it in the original space.</li>
+<li><strong>Never pick the prettiest run.</strong> If a map shows two groups, check that the images really group that way in the network's own responses, not just in the picture.</li>
 </ul>
 <p>Next: each method at work in published neuroscience and AI.</p>
 <div class="ref"><a href="https://doi.org/10.1038/s41587-020-00809-z" rel="noopener">Kobak &amp; Linderman <b>2021</b></a> · <i>Nature Biotechnology</i></div>
