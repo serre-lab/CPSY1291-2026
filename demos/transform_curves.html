@@ -41,7 +41,7 @@ button.knob[data-knob=enlarge][aria-pressed=true]{background:var(--green);border
 input[type=range]{width:260px;accent-color:var(--knob)}
 output{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink);min-width:5ch;display:inline-block}
 #play{min-width:5.5em}
-.stage{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:stretch}
+.stage{display:grid;grid-template-columns:auto minmax(0,1fr);gap:56px;align-items:stretch}
 .panel{min-width:0;min-height:0;display:flex;flex-direction:column}
 .panel h2{margin:0 0 4px;font-size:20px;color:var(--ink);flex-shrink:0}
 .panel h2 .sub{font-weight:400;font-size:.85em;color:var(--slate)}
@@ -85,6 +85,8 @@ body.static .canvas-frame canvas{cursor:default}
 .plottext .caption{font-size:17px;margin:0}
 body.embed .plotrow .canvas-frame,html.embed .plotrow .canvas-frame{aspect-ratio:1.15/1;flex:0 0 auto;height:100%}
 @media(max-width:900px){.plotrow{flex-direction:column}.plotrow .canvas-frame{width:100%;height:auto}}
+.stage > .panel:first-child{justify-content:center}   /* image centred against the plot */
+.stage > .panel:first-child h2{margin-bottom:8px}
 </style>
 <script>
 (function(){
