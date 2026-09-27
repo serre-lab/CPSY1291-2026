@@ -14,7 +14,7 @@
 <h2 id="heading-2">Your questions from Tuesday</h2>
 <ul>
 <li><em>"If there are 50 principle components, why is it/how can it be represented by just 2 axes as on the ppt slides?"</em>: it cannot. A PCA plot keeps the two directions along which the points <strong>vary most</strong> over the whole data set and drops the other 48. Points that differ only along the dropped directions <strong>land on top of each other</strong>. That is where today's <strong>nonlinear</strong> methods come in: instead of keeping a few directions, they keep <strong>relationships</strong> between points, above all who is whose <strong>neighbor</strong>.</li>
-<li><em>"Does this mean neural signals are operating in 2 dimensional space"</em>: no. For the Bao et al. objects in AlexNet fc6 (Assignment 1 Part 3), the first two components hold only <strong>22%</strong> of the variance, and 85% takes <strong>87</strong> (Bao et al. report about 50). Counting components to a threshold measures the <strong>linear</strong> dimension and treats the rest as noise. If the data lie on a curved surface, the <strong>intrinsic</strong> dimension, the number of dimensions needed to locate a point on it, can be far smaller.</li>
+<li><em>"Does this mean neural signals are operating in 2 dimensional space"</em>: no. For the Bao et al. objects in AlexNet fc6 (Assignment 1), the first two components hold only <strong>22%</strong> of the variance, and 85% takes <strong>87</strong> (Bao et al. report about 50). Counting components to a threshold measures the <strong>linear</strong> dimension and treats the rest as noise. If the data lie on a curved surface, the <strong>intrinsic</strong> dimension, the number of dimensions needed to locate a point on it, can be far smaller.</li>
 </ul>
 <p>Next: what every 2-D picture of the data gives up.</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="58" aria-labelledby="heading-4"><p class="page">Slide 4</p>
@@ -497,7 +497,7 @@
 <figure><figure><img src="../images/2026-10-01/s152_plots.png" alt="Random noise at low perplexity comes out as clumps" aria-describedby="figure-42-3"><figcaption id="figure-42-3"><p>Random noise at low perplexity comes out as clumps</p><a href="../images/2026-10-01/s152_plots.png">Open full-size figure</a></figcaption></figure><figcaption><b>Clumps from noise</b> at low perplexity (2 → 100, left to right)</figcaption></figure>
 <figure><figure><img src="../images/2026-10-01/s149_plots.png" alt="Early in a run, shapes are pinched and change as optimization proceeds" aria-describedby="figure-42-4"><figcaption id="figure-42-4"><p>Early in a run, shapes are pinched and change as optimization proceeds</p><a href="../images/2026-10-01/s149_plots.png">Open full-size figure</a></figcaption></figure><figcaption><b>Too few steps:</b> shapes still changing (10 → 1,000 steps)</figcaption></figure>
 </div>
-<p><b>Assignment 1 Part 4</b> has you test each of these on real network responses: perplexity sweeps, seeds, and what two dimensions lose.</p>
+<p><b>Assignment 1</b> has you test each of these on real network responses: perplexity sweeps, seeds, and what two dimensions lose.</p>
 <div class="ref"><a href="https://doi.org/10.23915/distill.00002" rel="noopener">Wattenberg, Viégas &amp; Johnson <b>2016</b></a> · <i>Distill</i> · CC BY 4.0</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-marpit-pagination="43" data-marpit-pagination-total="58" aria-labelledby="heading-43"><p class="page">Slide 43</p>
 <h2 id="heading-43">A map can be stable and still distort the data</h2>
@@ -528,7 +528,7 @@
 </tr>
 </tbody>
 </table></div>
-<p><mark>Repeatability, fidelity and object grouping are different questions.</mark> Assignment 1 Part 4 has you compute each one.</p>
+<p><mark>Repeatability, fidelity and object grouping are different questions.</mark> Assignment 1 has you compute each one.</p>
 <p>Next: if a map cannot settle a question, what can?</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="58" aria-labelledby="heading-44"><p class="page">Slide 44</p>
 <h2 id="heading-44">From a map to a test of the representation</h2>
