@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Spin the axis — CPSY 1291</title>
+<title>Spin the direction — CPSY 1291</title>
 <!--
   axis_spinner.html — L03 PCA geometrically: rotate a unit direction w and watch
   projected variance vs reconstruction error trade off at constant total variance.
@@ -106,12 +106,12 @@ body.static .frame canvas{cursor:default}
 </head>
 <body>
 <div class="wrap">
-  <h1>Spin the axis</h1>
-  <p class="lede">A centred cloud of 120 animal photographs in two coordinates. Drag the left panel (or use
+  <h1>Spin the direction</h1>
+  <p class="lede">120 animal photographs as centered points in two coordinates. Drag the left panel (or use
     ← →) to rotate a unit direction <b>w</b>. What the direction keeps and what it leaves over trade off;
     their sum never moves. One angle leaves the least.</p>
 
-  <div class="toolbar" role="group" aria-label="Axis spinner controls">
+  <div class="toolbar" role="group" aria-label="Direction spinner controls">
     <span class="ctl"><label for="dataset">Data</label>
       <select id="dataset" aria-describedby="status"></select></span>
     <span class="ctl"><label for="angle">Angle of <b>w</b></label>
@@ -126,10 +126,10 @@ body.static .frame canvas{cursor:default}
 
   <div class="stage">
     <section class="panel" aria-labelledby="h-cloud">
-      <h2 id="h-cloud"><span>Centred cloud</span><span class="sub" id="axes-line"></span></h2>
+      <h2 id="h-cloud"><span>Centered points</span><span class="sub" id="axes-line"></span></h2>
       <div class="frame" id="cloud-frame">
         <canvas id="cloud" role="img" aria-labelledby="h-cloud" aria-describedby="status"
-          tabindex="0" aria-label="Centred scatter. Drag to rotate w. Click a point to select it. Arrow keys rotate w."></canvas>
+          tabindex="0" aria-label="Centered scatter. Drag to rotate w. Click a point to select it. Arrow keys rotate w."></canvas>
       </div>
     </section>
     <section class="panel" aria-labelledby="h-meters">
@@ -158,7 +158,7 @@ body.static .frame canvas{cursor:default}
   <div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
 
   <p class="footer">Data: 120 A1 animal photographs (left/right half means; mean intensity vs RMS contrast;
-    two neighbouring 64×64 pixels). Numbers computed in the browser from the centred cloud — Escape exits when embedded.</p>
+    two neighboring 64×64 pixels). Numbers computed in the browser from the centered points — Escape exits when embedded.</p>
 </div>
 
 <script src="axis_spinner_data.js"></script>
@@ -258,8 +258,8 @@ function loadSet(idx){
     angles.push(a); proj.push(mz2); err.push(total-mz2);
   }
   state.sweep={angles,proj,err};
-  // "centred" stated once here; axis ticks use the raw names only
-  $('axes-line').textContent='centred · '+set.axes[0]+' × '+set.axes[1];
+  // "centered" stated once here; axis ticks use the raw names only
+  $('axes-line').textContent='centered · '+set.axes[0]+' × '+set.axes[1];
 }
 
 function metricsAt(ang){
@@ -274,7 +274,7 @@ function metricsAt(ang){
   return {wx,wy,proj:mz2, err:state.cov.total-mz2, total:state.cov.total};
 }
 
-/** Half-extent of the centred cloud in data units (max |x| or |y|). */
+/** Half-extent of the centered points in data units (max |x| or |y|). */
 function fitCloud(){
   const pts=state.pts;
   let m=0;
@@ -350,7 +350,7 @@ function drawCloud(){
   drawArrow(ctx, ox, yTop+14, ox, yTop, COL.body, 1.5);
 
   const set=DATA.sets[state.setIdx];
-  // Axis names at the tips, outside the cloud (muted slate; "centred" is in the subtitle)
+  // Axis names at the tips, outside the cloud (muted slate; "centered" is in the subtitle)
   ctx.fillStyle=COL.slate; ctx.font='16px Poppins,system-ui,sans-serif';
   ctx.textAlign='right'; ctx.textBaseline='top';
   ctx.fillText(set.axes[0], w-12, oy+8);           // +x tip, below the axis
@@ -558,7 +558,7 @@ function updateStatus(m){
   const chip=$('best-chip');
   if(chip){ chip.textContent = onBest ? 'you are at the best direction' : ''; }
   if(cov.round){
-    msg+=' In this cloud no direction is much better than another.';
+    msg+=' For these points no direction is much better than another.';
   }
   if(state.selected>=0){
     msg+=` Selected ${DATA.names[state.selected]} (${DATA.category[state.selected]}).`;

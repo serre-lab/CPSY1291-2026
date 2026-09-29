@@ -99,7 +99,7 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="60" aria-labelledby="heading-12"><p class="page">Slide 12</p>
 <h2 id="heading-12">Centering, in code</h2>
 <marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">mean = features.mean(axis=<span class="hljs-number">0</span>)     <span class="hljs-comment"># (D,) mean response across stimuli, for each coordinate</span>
-centred = features - mean        <span class="hljs-comment"># (N, D) each stimulus response minus the mean response</span>
+centered = features - mean        <span class="hljs-comment"># (N, D) each stimulus response minus the mean response</span>
 </code></marp-pre>
 <div></div>
 <ul>
@@ -135,7 +135,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <h2 id="heading-17">Projection onto a unit direction</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L03/22_projection_3.svg" alt="The two neighbouring pixels, centred, with one point marked as the centered vector x tilde, a magenta line through the origin along the unit direction w, and the construction of the projection" aria-describedby="figure-17-1"><figcaption id="figure-17-1"><p>The two neighbouring pixels, centred, with one point marked as the centered vector x tilde, a magenta line through the origin along the unit direction w, and the construction of the projection</p><a href="../images/L03/22_projection_3.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/22_projection_3.svg" alt="The two neighboring pixels, centered, with one point marked as the centered vector x tilde, a magenta line through the origin along the unit direction w, and the construction of the projection" aria-describedby="figure-17-1"><figcaption id="figure-17-1"><p>The two neighboring pixels, centered, with one point marked as the centered vector x tilde, a magenta line through the origin along the unit direction w, and the construction of the projection</p><a href="../images/L03/22_projection_3.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -149,7 +149,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <h2 id="heading-18">A direction keeps part of the spread</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L03/25_kept_and_left_1.svg" alt="The two neighbouring pixels again, a direction drawn at 110 degrees, and a short red segment from every point to the line showing what that direction does not capture" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>The two neighbouring pixels again, a direction drawn at 110 degrees, and a short red segment from every point to the line showing what that direction does not capture</p><a href="../images/L03/25_kept_and_left_1.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/25_kept_and_left_1.svg" alt="The two neighboring pixels again, a direction drawn at 110 degrees, and a short red segment from every point to the line showing what that direction does not capture" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>The two neighboring pixels again, a direction drawn at 110 degrees, and a short red segment from every point to the line showing what that direction does not capture</p><a href="../images/L03/25_kept_and_left_1.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -176,14 +176,14 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <div class="interactive-figure narrow">
 
 <div class="print-figure">
-<figure><img src="../images/L03/demo_axis_spinner.png" alt="The axis-spinner demo with the direction at its best angle of 44 degrees: the centred points with the leftover segments drawn from each point, a bar showing 90 per cent kept against 10 per cent left over, and a sweep of both quantities against the angle with the smallest-error angle marked in gold" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>The axis-spinner demo with the direction at its best angle of 44 degrees: the centred points with the leftover segments drawn from each point, a bar showing 90 per cent kept against 10 per cent left over, and a sweep of both quantities against the angle with the smallest-error angle marked in gold</p><a href="../images/L03/demo_axis_spinner.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/demo_axis_spinner.png" alt="The direction-spinner demo with the direction at its best angle of 44 degrees: the centered points with the leftover segments drawn from each point, a bar showing 90 per cent kept against 10 per cent left over, and a sweep of both quantities against the angle with the smallest-error angle marked in gold" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>The direction-spinner demo with the direction at its best angle of 44 degrees: the centered points with the leftover segments drawn from each point, a bar showing 90 per cent kept against 10 per cent left over, and a sweep of both quantities against the angle with the smallest-error angle marked in gold</p><a href="../images/L03/demo_axis_spinner.png">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <ul>
 <li>Before turning the direction, predict which direction leaves the smallest error.</li>
 <li>Projected variance and squared reconstruction error add to a fixed total. <mark>Maximizing one minimizes the other.</mark></li>
 </ul>
-<p class="explorer-links"><a href="../demos/axis_spinner.html">Drag a unit direction through the centred points of the 120 animal photographs and watch the projected variance and the reconstruction error trade off; their sum is fixed — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="60" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<p class="explorer-links"><a href="../demos/axis_spinner.html">Drag a unit direction through the centered points of the 120 animal photographs and watch the projected variance and the reconstruction error trade off; their sum is fixed — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="60" aria-labelledby="heading-21"><p class="page">Slide 21</p>
 <h2 id="heading-21">From turning the line to a calculation</h2>
 <div class="row">
 <div class="col fig">
@@ -247,7 +247,7 @@ centred = features - mean        <span class="hljs-comment"># (N, D) each stimul
 <div class="row">
 <div class="col fig">
 <div class="capfig">
-<figure><img src="../images/L03/26_best_direction_eigenvector.svg" alt="The same centred pixel points and the same 44-degree line as the best-direction slide, now with the eigenvector v1 drawn along it as an arrow and the variance along it given as 90 percent of the total" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>The same centred pixel points and the same 44-degree line as the best-direction slide, now with the eigenvector v1 drawn along it as an arrow and the variance along it given as 90 percent of the total</p><a href="../images/L03/26_best_direction_eigenvector.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/26_best_direction_eigenvector.svg" alt="The same centered pixel points and the same 44-degree line as the best-direction slide, now with the eigenvector v1 drawn along it as an arrow and the variance along it given as 90 percent of the total" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>The same centered pixel points and the same 44-degree line as the best-direction slide, now with the eigenvector v1 drawn along it as an arrow and the variance along it given as 90 percent of the total</p><a href="../images/L03/26_best_direction_eigenvector.svg">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <div class="col">
@@ -485,7 +485,7 @@ directions = pca.components_  <span class="hljs-comment"># one principal directi
 <div class="row">
 <div class="col fig">
 <div class="capfig">
-<figure><img src="../images/L03/04_two_measurements_one_direction_2.svg" alt="The two neighbouring pixels again, with the direction that retains about 90 percent of their variance" aria-describedby="figure-43-1"><figcaption id="figure-43-1"><p>The two neighbouring pixels again, with the direction that retains about 90 percent of their variance</p><a href="../images/L03/04_two_measurements_one_direction_2.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/04_two_measurements_one_direction_2.svg" alt="The two neighboring pixels again, with the direction that retains about 90 percent of their variance" aria-describedby="figure-43-1"><figcaption id="figure-43-1"><p>The two neighboring pixels again, with the direction that retains about 90 percent of their variance</p><a href="../images/L03/04_two_measurements_one_direction_2.svg">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <div class="col">
@@ -552,18 +552,18 @@ directions = pca.components_  <span class="hljs-comment"># one principal directi
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-50" data-paginate="true" data-class="codeslide" data-marpit-pagination="50" data-marpit-pagination-total="60" aria-labelledby="heading-50"><p class="page">Slide 50</p>
 <h2 id="heading-50">PCA in code: two routes to the same answer</h2>
-<marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">centred = features - features.mean(axis=<span class="hljs-number">0</span>)
+<marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">centered = features - features.mean(axis=<span class="hljs-number">0</span>)
 
 <span class="hljs-comment"># Route 1: eigendecomposition of sample covariance</span>
-C = np.cov(centred.T)
+C = np.cov(centered.T)
 lam, V = np.linalg.eigh(C)                 <span class="hljs-comment"># ascending order</span>
 lam, V = lam[::-<span class="hljs-number">1</span>], V[:, ::-<span class="hljs-number">1</span>]             <span class="hljs-comment"># descending order</span>
 
 <span class="hljs-comment"># Route 2: SVD, without forming C</span>
-_, s, Vt = np.linalg.svd(centred, full_matrices=<span class="hljs-literal">False</span>)
-lam2 = s**<span class="hljs-number">2</span> / (<span class="hljs-built_in">len</span>(centred) - <span class="hljs-number">1</span>)
+_, s, Vt = np.linalg.svd(centered, full_matrices=<span class="hljs-literal">False</span>)
+lam2 = s**<span class="hljs-number">2</span> / (<span class="hljs-built_in">len</span>(centered) - <span class="hljs-number">1</span>)
 V2 = Vt.T                                <span class="hljs-comment"># directions as columns</span>
-Z = centred @ V2[:, :K]                   <span class="hljs-comment"># (N, K) scores</span>
+Z = centered @ V2[:, :K]                   <span class="hljs-comment"># (N, K) scores</span>
 </code></marp-pre>
 <ul>
 <li>Use <code>eigh</code>, not <code>eig</code>: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐂</mi></mrow><annotation encoding="application/x-tex">\mathbf{C}</annotation></semantics></math> is <strong>symmetric</strong>, so the eigenvalues are real and <code>eigh</code> is faster and stabler. It returns them <strong>ascending</strong>, so the reversal is not optional.</li>
@@ -585,7 +585,7 @@ Z = centred @ V2[:, :K]                   <span class="hljs-comment"># (N, K) sc
 </div>
 <div class="col">
 <ul>
-<li>400 face images (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>64</mn><mo>×</mo><mn>64</mn></mrow><annotation encoding="application/x-tex">64\times64</annotation></semantics></math> pixels, so <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>=</mo><mn>4096</mn></mrow><annotation encoding="application/x-tex">D = 4096</annotation></semantics></math>), PCA on the centred pixels, and twelve of the faces drawn at their coordinates <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mi>z</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>z</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(z_1, z_2)</annotation></semantics></math> on the first two eigenvectors.</li>
+<li>400 face images (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>64</mn><mo>×</mo><mn>64</mn></mrow><annotation encoding="application/x-tex">64\times64</annotation></semantics></math> pixels, so <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>=</mo><mn>4096</mn></mrow><annotation encoding="application/x-tex">D = 4096</annotation></semantics></math>), PCA on the centered pixels, and twelve of the faces drawn at their coordinates <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mi>z</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>z</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(z_1, z_2)</annotation></semantics></math> on the first two eigenvectors.</li>
 <li>Two numbers per face instead of 4,096. They carry <strong>24%</strong> and <strong>14%</strong> of the variance: a coarse, lossy summary, but already one in which lighting and head pose vary smoothly across the plane.</li>
 <li>This is a <strong>face space</strong>: every face is a point, and nearby points are faces that look alike to the two leading eigenfaces. The preceding slide shows those eigenfaces as images.</li>
 </ul>
