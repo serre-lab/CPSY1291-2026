@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Geometry of neural representations · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Geometry of neural representations</h1><p>Reader-friendly version of the 48 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L05_geometry-neural-representations.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Geometry of neural representations</a></li><li><a href="#slide-2">Where we are</a></li><li><a href="#slide-4">Today: two questions</a></li><li><a href="#slide-5">How many dimensions does a population of neurons use?</a></li><li><a href="#slide-6">Why count dimensions?</a></li><li><a href="#slide-7">Three measures of dimension: GPT-2</a></li><li><a href="#slide-9">Rank: how many directions the points span</a></li><li><a href="#slide-10">From the PCA lecture: the scree plot</a></li><li><a href="#slide-11">Mouse V1: variance fraction per component</a></li><li><a href="#slide-12">On log-log axes, a straight line</a></li><li><a href="#slide-13">No elbow: what it means</a></li><li><a href="#slide-14">One number: the participation ratio</a></li><li><a href="#slide-15">Participation ratio, four populations</a></li><li><a href="#slide-16">Scale matters: z-score or not</a></li><li><a href="#slide-17">What can another neuron read from the responses?</a></li><li><a href="#slide-18">What could another neuron use?</a></li><li><a href="#slide-20">A linear readout draws a hyperplane</a></li><li><a href="#slide-21">Monkey IT: reading animacy</a></li><li><a href="#slide-24">Measuring with a readout</a></li><li><a href="#slide-25">Draw the boundary yourself</a></li><li><a href="#slide-28">Linearly separable, or not</a></li><li><a href="#slide-30">Shattering: tasks one boundary can solve</a></li><li><a href="#slide-33">One boundary for objects never seen: CCGP</a></li><li><a href="#slide-34">Bernardi et al. (2020): what the monkeys did</a></li><li><a href="#slide-35">Recap</a></li><li><a href="#slide-36">Going further: what does the power law mean?</a></li><li><a href="#slide-37">Monkey V1 falls the same way</a></li><li><a href="#slide-38">Pixels fall the same way</a></li><li><a href="#slide-39">Neurons are not pixels</a></li><li><a href="#slide-40">A power law across species and methods</a></li><li><a href="#slide-41">Why a slope near 1? A smooth code</a></li><li><a href="#slide-42">Deep networks are fooled by invisible changes</a></li><li><a href="#slide-43">Could a V1-like spectrum make networks robust?</a></li><li><a href="#slide-44">Further reading</a></li><li><a href="#slide-45">Minute paper</a></li><li><a href="#slide-46">Appendix: derivations and extra examples</a></li><li><a href="#slide-47">Effective dimensionality from an eigenspectrum</a></li><li><a href="#slide-48">More features than units</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Geometry of neural representations · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Geometry of neural representations</h1><p>Reader-friendly version of the 49 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L05_geometry-neural-representations.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Geometry of neural representations</a></li><li><a href="#slide-2">Where we are</a></li><li><a href="#slide-4">Today: two questions</a></li><li><a href="#slide-5">How many dimensions does a population of neurons use?</a></li><li><a href="#slide-6">Why count dimensions?</a></li><li><a href="#slide-7">Three measures of dimension: GPT-2</a></li><li><a href="#slide-9">Rank: how many directions the points span</a></li><li><a href="#slide-10">From the PCA lecture: the scree plot</a></li><li><a href="#slide-11">Mouse V1: variance fraction per component</a></li><li><a href="#slide-12">On log-log axes, a straight line</a></li><li><a href="#slide-13">No elbow: what it means</a></li><li><a href="#slide-14">One number: the participation ratio</a></li><li><a href="#slide-15">Participation ratio, four populations</a></li><li><a href="#slide-16">Back to mouse V1</a></li><li><a href="#slide-17">Scale matters: z-score or not</a></li><li><a href="#slide-18">What can another neuron read from the responses?</a></li><li><a href="#slide-19">What could another neuron use?</a></li><li><a href="#slide-21">A linear readout draws a hyperplane</a></li><li><a href="#slide-22">Monkey IT: reading animacy</a></li><li><a href="#slide-25">Measuring with a readout</a></li><li><a href="#slide-26">Draw the boundary yourself</a></li><li><a href="#slide-29">Linearly separable, or not</a></li><li><a href="#slide-31">Shattering: tasks one boundary can solve</a></li><li><a href="#slide-34">One boundary for objects never seen: CCGP</a></li><li><a href="#slide-35">Bernardi et al. (2020): what the monkeys did</a></li><li><a href="#slide-36">Recap</a></li><li><a href="#slide-37">Going further: what does the power law mean?</a></li><li><a href="#slide-38">Monkey V1 falls the same way</a></li><li><a href="#slide-39">Pixels fall the same way</a></li><li><a href="#slide-40">Neurons are not pixels</a></li><li><a href="#slide-41">A power law across species and methods</a></li><li><a href="#slide-42">Why a slope near 1? A smooth code</a></li><li><a href="#slide-43">Deep networks are fooled by invisible changes</a></li><li><a href="#slide-44">Could a V1-like spectrum make networks robust?</a></li><li><a href="#slide-45">Further reading</a></li><li><a href="#slide-46">Minute paper</a></li><li><a href="#slide-47">Appendix: derivations and extra examples</a></li><li><a href="#slide-48">Effective dimensionality from an eigenspectrum</a></li><li><a href="#slide-49">More features than units</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
   <img src="../images/brown-crest-color.png" alt="Brown University crest">
   <div class="vrule"></div>
   <div>
@@ -10,7 +10,7 @@
 <h2 id="heading-1">Geometry of neural representations</h2>
 <p class="meta">Tuesday, September 29 · Fall 2026</p>
 
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-marpit-scope-w0tuuzmj="" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="48" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-marpit-scope-yzydakzp="" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="49" aria-labelledby="heading-2"><p class="page">Slide 2</p>
 <h2 id="heading-2">Where we are</h2>
 
 <div class="table-scroll" tabindex="0" role="region" aria-label="Where we are — table"><table><caption>Where we are — table</caption>
@@ -44,7 +44,7 @@
 </tbody>
 </table></div>
 <p><mark>Two inputs: an RDM (one number per pair of images) or a response matrix (one per image and neuron).</mark></p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="48" aria-labelledby="heading-4"><p class="page">Slide 4</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="49" aria-labelledby="heading-4"><p class="page">Slide 4</p>
 <h2 id="heading-4">Today: two questions</h2>
 <ul>
 <li>The data: the <strong>response matrix</strong> (images × neurons) of a <strong>population of neurons</strong></li>
@@ -58,9 +58,9 @@
 <li>Next lecture: do two representations agree, and when does a score mean anything?</li>
 </ul>
 <p><mark>Claims such as "V1 is high-dimensional" or "IT encodes animacy" rest on these computations.</mark></p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-class="lead" data-marpit-pagination="5" data-marpit-pagination-total="48" aria-labelledby="heading-5"><p class="page">Slide 5</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-class="lead" data-marpit-pagination="5" data-marpit-pagination-total="49" aria-labelledby="heading-5"><p class="page">Slide 5</p>
 <h2 id="heading-5">How many dimensions does a population of neurons use?</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="48" aria-labelledby="heading-6"><p class="page">Slide 6</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="49" aria-labelledby="heading-6"><p class="page">Slide 6</p>
 <h2 id="heading-6">Why count dimensions?</h2>
 <ul>
 <li>Each image's response is one point in the <strong>neural state space</strong>: one axis per recorded neuron</li>
@@ -69,7 +69,7 @@
 <li><strong>GPT-2</strong>, 768 units of layer 7: how many directions do the days of the week use?</li>
 </ul>
 <p><mark>With heavy redundancy, the population uses far fewer dimensions than neurons recorded.</mark></p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-marpit-pagination="7" data-marpit-pagination-total="48" aria-labelledby="heading-7"><p class="page">Slide 7</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-marpit-pagination="7" data-marpit-pagination-total="49" aria-labelledby="heading-7"><p class="page">Slide 7</p>
 <h2 id="heading-7">Three measures of dimension: GPT-2</h2>
 <div class="capfig">
 <figure><img src="../images/L05/40_engels2025_fig1_daysmonths.png" alt="Two panels from GPT-2-small, layer 7, projected on principal components 2 and 3, with a wide gap between them. Left, the representations of the seven days of the week form a ring of colored clusters in calendar order, Monday to Sunday. Right, the twelve months form a ring in calendar order, January to December" aria-describedby="figure-7-1"><figcaption id="figure-7-1"><p>Two panels from GPT-2-small, layer 7, projected on principal components 2 and 3, with a wide gap between them. Left, the representations of the seven days of the week form a ring of colored clusters in calendar order, Monday to Sunday. Right, the twelve months form a ring in calendar order, January to December</p><a href="../images/L05/40_engels2025_fig1_daysmonths.png">Open full-size figure</a></figcaption></figure>
@@ -81,7 +81,7 @@
 <li><mark>Each measure answers a different question, so none is <em>the</em> dimensionality (Perich 2026)</mark></li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/2405.14860" rel="noopener">Engels et al. <b>ICLR 2025</b></a> · <a href="https://doi.org/10.53053/FTEU9810" rel="noopener">Perich <b>The Transmitter 2026</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="48" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="49" aria-labelledby="heading-9"><p class="page">Slide 9</p>
 <h2 id="heading-9">Rank: how many directions the points span</h2>
 <div class="capfig">
 <figure><img src="../images/L05/50_rank_noisy.svg" alt="The same three panels with one stimulus moved off the plane: its value for neuron 3 no longer equals the sum of neurons 1 and 2, the point sits off the gold plane in the 3-D view, and the third principal component now has a small nonzero bar" aria-describedby="figure-9-1"><figcaption id="figure-9-1"><p>The same three panels with one stimulus moved off the plane: its value for neuron 3 no longer equals the sum of neurons 1 and 2, the point sits off the gold plane in the 3-D view, and the third principal component now has a small nonzero bar</p><a href="../images/L05/50_rank_noisy.svg">Open full-size figure</a></figcaption></figure>
@@ -91,7 +91,7 @@
 <li><strong>Rank</strong> = number of directions with nonzero variance = number of principal components (PCA) with nonzero variance. Neuron 3 = neuron 1 + neuron 2, so here rank 2: a plane</li>
 <li>One stimulus off the plane: rank 3. Noise does this to every real recording (480 IT neurons: rank 480). <mark>So we look at how the variance spreads</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="48" aria-labelledby="heading-10"><p class="page">Slide 10</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="49" aria-labelledby="heading-10"><p class="page">Slide 10</p>
 <h2 id="heading-10">From the PCA lecture: the scree plot</h2>
 <div class="capfig">
 <figure><img src="../images/L03/45_olivetti_scree.svg" alt="The scree plot from the PCA lecture for the 400 Olivetti faces: the variance fraction of the first 30 principal components falls steeply over the first few and then flattens, an elbow" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>The scree plot from the PCA lecture for the 400 Olivetti faces: the variance fraction of the first 30 principal components falls steeply over the first few and then flattens, an elbow</p><a href="../images/L03/45_olivetti_scree.svg">Open full-size figure</a></figcaption></figure>
@@ -100,18 +100,18 @@
 <ul>
 <li><strong>Variance fraction</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>k</mi></msub><mo>=</mo><msub><mi>λ</mi><mi>k</mi></msub><mi mathvariant="normal">/</mi><msub><mo>∑</mo><mi>j</mi></msub><msub><mi>λ</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">f_k = \lambda_k / \sum_j \lambda_j</annotation></semantics></math>, largest first. An <strong>elbow</strong> = a natural place to stop</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="48" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="49" aria-labelledby="heading-11"><p class="page">Slide 11</p>
 <h2 id="heading-11">Mouse V1: variance fraction per component</h2>
 <div class="capfig">
 <figure><img src="../images/L05/46_spectrum_pca_flash.svg" alt="Two panels for mouse V1 responses to 2,800 natural images, averaged over seven sessions. Left: bars of the variance fraction of the first 30 principal components, falling slowly from about 0.035 to about 0.006 with no elbow. Right: cumulative variance fraction against components retained, on a log axis out to 2,366; a dashed line at 0.9 is crossed at K = 744" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>Two panels for mouse V1 responses to 2,800 natural images, averaged over seven sessions. Left: bars of the variance fraction of the first 30 principal components, falling slowly from about 0.035 to about 0.006 with no elbow. Right: cumulative variance fraction against components retained, on a log axis out to 2,366; a dashed line at 0.9 is crossed at K = 744</p><a href="../images/L05/46_spectrum_pca_flash.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <p class="provenance">Computed from Stringer et al.'s data (7 sessions)</p>
 <ul>
-<li>Two-photon imaging, ~10,000 neurons, each image shown twice. <strong>Cross-validated PCA</strong>: principal components from the first showing; each one's variance = how much the two showings co-vary along it, so noise cancels</li>
+<li>Two-photon imaging, ~10,000 neurons, each image shown twice. <strong>Cross-validated PCA</strong>: principal components from the first showing; each one's variance = how much the two showings co-vary along it, so trial noise cancels</li>
 <li><mark>No elbow: 90% of the variance needs 744 components</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="48" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="49" aria-labelledby="heading-12"><p class="page">Slide 12</p>
 <h2 id="heading-12">On log-log axes, a straight line</h2>
 <div class="row">
 <div class="col fig">
@@ -126,7 +126,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="48" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="49" aria-labelledby="heading-13"><p class="page">Slide 13</p>
 <h2 id="heading-13">No elbow: what it means</h2>
 <div class="row">
 <div class="col fig">
@@ -138,12 +138,12 @@
 <li><strong>With an elbow</strong>, a few directions carry most of the variance: the embedding dimension is clear</li>
 <li><strong>Without one</strong>, the embedding dimension depends on the threshold (90%? 95%?)</li>
 <li><mark>V1 uses many dimensions, but unequally</mark>: each further component carries a little less. We want one number with no threshold</li>
-<li>Why V1 has no elbow, and what it may mean for fooling deep networks, is in the Going further block at the end</li>
+<li>Why V1 has no elbow, and what it may mean for fooling deep networks, comes at the end (Going further)</li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-marpit-scope-dbvcj9m2="" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="48" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-marpit-scope-xudru7a1="" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="49" aria-labelledby="heading-14"><p class="page">Slide 14</p>
 <h2 id="heading-14">One number: the participation ratio</h2>
 
 <ul>
@@ -155,7 +155,7 @@
 <li>PR = 1 when one direction carries all the variance; PR = <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> when all <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> share it equally. No threshold; report <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mi mathvariant="normal">/</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">\mathrm{PR}/D</annotation></semantics></math></li>
 </ul>
 <p><mark>The participation ratio counts how many directions the responses use: if k directions share the variance equally, PR = k.</mark> <span>(minute paper)</span></p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="48" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="49" aria-labelledby="heading-15"><p class="page">Slide 15</p>
 <h2 id="heading-15">Participation ratio, four populations</h2>
 <div class="row">
 <div class="col fig">
@@ -171,20 +171,37 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="48" aria-labelledby="heading-16"><p class="page">Slide 16</p>
-<h2 id="heading-16">Scale matters: z-score or not</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="49" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<h2 id="heading-16">Back to mouse V1</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L05/47_spectra_mouse.svg" alt="The log-log plot of variance fraction against principal component k for mouse V1 (2,800 images, alpha 1.06), a nearly straight line with no bend, beside a dotted guide of slope minus 1" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>The log-log plot of variance fraction against principal component k for mouse V1 (2,800 images, alpha 1.06), a nearly straight line with no bend, beside a dotted guide of slope minus 1</p><a href="../images/L05/47_spectra_mouse.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Computed from Stringer et al.'s data</p>
+</div>
+<div class="col">
+<ul>
+<li>~10,000 neurons recorded; 90% of the variance needs 744 components</li>
+<li>Participation ratio: about <strong>110</strong> (75 to 145 per session)</li>
+<li><mark>One number for a spectrum with no elbow: many dimensions, used unequally</mark></li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="49" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<h2 id="heading-17">Scale matters: z-score or not</h2>
 <ul>
 <li>The eigenvalues are variances, so a unit measured on a large scale dominates them, and the participation ratio with them</li>
 <li><strong>z-score</strong> each unit (subtract its mean, divide by its standard deviation) when scales are arbitrary: fMRI voxels, calcium fluorescence. Keep the <strong>raw</strong> scale when sizes matter: spikes/s</li>
+<li>z-scoring gives every unit variance 1: PR then counts patterns of co-activation, not loud units. Independent units of unequal size: PR 32 raw, 402 z-scored</li>
 <li>ResNet-18 on THINGS: PR 99 raw, 107 z-scored. <mark>Report which you used</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-class="lead" data-marpit-pagination="17" data-marpit-pagination-total="48" aria-labelledby="heading-17"><p class="page">Slide 17</p>
-<h2 id="heading-17">What can another neuron read from the responses?</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="48" aria-labelledby="heading-18"><p class="page">Slide 18</p>
-<h2 id="heading-18">What could another neuron use?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-class="lead" data-marpit-pagination="18" data-marpit-pagination-total="49" aria-labelledby="heading-18"><p class="page">Slide 18</p>
+<h2 id="heading-18">What can another neuron read from the responses?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="49" aria-labelledby="heading-19"><p class="page">Slide 19</p>
+<h2 id="heading-19">What could another neuron use?</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L03/dicarlo2007_d.png" alt="In pixel space the sheets of face images of two different people are interleaved, and a flat separating plane drawn through them fails to split them" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>In pixel space the sheets of face images of two different people are interleaved, and a flat separating plane drawn through them fails to split them</p><a href="../images/L03/dicarlo2007_d.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/dicarlo2007_d.png" alt="In pixel space the sheets of face images of two different people are interleaved, and a flat separating plane drawn through them fails to split them" aria-describedby="figure-19-1"><figcaption id="figure-19-1"><p>In pixel space the sheets of face images of two different people are interleaved, and a flat separating plane drawn through them fails to split them</p><a href="../images/L03/dicarlo2007_d.png">Open full-size figure</a></figcaption></figure>
 <p class="provenance">Redrawn in the last lecture from DiCarlo &amp; Cox (2007)</p>
 </div>
 <div class="col">
@@ -196,11 +213,11 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <b>Trends Cogn Sci 2007</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-marpit-scope-hv1uqwyq="" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="48" aria-labelledby="heading-20"><p class="page">Slide 20</p>
-<h2 id="heading-20">A linear readout draws a hyperplane</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-marpit-scope-n0abbu6t="" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="49" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<h2 id="heading-21">A linear readout draws a hyperplane</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/24_readout_geometry.svg" alt="A 2-D plane with axes x1 and x2 holding two groups of dots, green &quot;yes&quot; points upper right and blue &quot;no&quot; points lower left. A fitted straight line runs between them and the two sides are lightly shaded. A magenta arrow labelled w starts on the line at a right angle and points into the green side. A dotted segment from a far point to the line is labelled distance" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>A 2-D plane with axes x1 and x2 holding two groups of dots, green "yes" points upper right and blue "no" points lower left. A fitted straight line runs between them and the two sides are lightly shaded. A magenta arrow labelled w starts on the line at a right angle and points into the green side. A dotted segment from a far point to the line is labelled distance</p><a href="../images/L05/24_readout_geometry.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/24_readout_geometry.svg" alt="A 2-D plane with axes x1 and x2 holding two groups of dots, green &quot;yes&quot; points upper right and blue &quot;no&quot; points lower left. A fitted straight line runs between them and the two sides are lightly shaded. A magenta arrow labelled w starts on the line at a right angle and points into the green side. A dotted segment from a far point to the line is labelled distance" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>A 2-D plane with axes x1 and x2 holding two groups of dots, green "yes" points upper right and blue "no" points lower left. A fitted straight line runs between them and the two sides are lightly shaded. A magenta arrow labelled w starts on the line at a right angle and points into the green side. A dotted segment from a far point to the line is labelled distance</p><a href="../images/L05/24_readout_geometry.svg">Open full-size figure</a></figcaption></figure>
 <p class="provenance">Toy data, computed</p>
 </div>
 <div class="col">
@@ -212,11 +229,11 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="48" aria-labelledby="heading-21"><p class="page">Slide 21</p>
-<h2 id="heading-21">Monkey IT: reading animacy</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-marpit-pagination="22" data-marpit-pagination-total="49" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<h2 id="heading-22">Monkey IT: reading animacy</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/26_readout_real_data_f1.svg" alt="Monkey IT responses to the 1,224 Bao object images on their first two principal components. Green dots are animate images (animals and faces), blue dots inanimate ones. A straight tilted line fitted to the points separates most animate images from inanimate ones" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>Monkey IT responses to the 1,224 Bao object images on their first two principal components. Green dots are animate images (animals and faces), blue dots inanimate ones. A straight tilted line fitted to the points separates most animate images from inanimate ones</p><a href="../images/L05/26_readout_real_data_f1.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/26_readout_real_data_f1.svg" alt="Monkey IT responses to the 1,224 Bao object images on their first two principal components. Green dots are animate images (animals and faces), blue dots inanimate ones. A straight tilted line fitted to the points separates most animate images from inanimate ones" aria-describedby="figure-22-1"><figcaption id="figure-22-1"><p>Monkey IT responses to the 1,224 Bao object images on their first two principal components. Green dots are animate images (animals and faces), blue dots inanimate ones. A straight tilted line fitted to the points separates most animate images from inanimate ones</p><a href="../images/L05/26_readout_real_data_f1.svg">Open full-size figure</a></figcaption></figure>
 <p class="provenance">Computed: monkey IT, 480 neurons, 2 principal components</p>
 </div>
 <div class="col">
@@ -229,11 +246,11 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. <b>Nature 2020</b></a> · <a href="https://doi.org/10.1016/j.neuron.2008.10.043" rel="noopener">Kriegeskorte et al. <b>Neuron 2008</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="48" aria-labelledby="heading-24"><p class="page">Slide 24</p>
-<h2 id="heading-24">Measuring with a readout</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="49" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<h2 id="heading-25">Measuring with a readout</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/26_readout_real_data_f3.svg" alt="Monkey IT responses to the 1,224 Bao object images on their first two principal components. Faint dots are the 18 training views per object used to fit the line; solid dots are the 6 test views per object, held out, on which the line is scored" aria-describedby="figure-24-1"><figcaption id="figure-24-1"><p>Monkey IT responses to the 1,224 Bao object images on their first two principal components. Faint dots are the 18 training views per object used to fit the line; solid dots are the 6 test views per object, held out, on which the line is scored</p><a href="../images/L05/26_readout_real_data_f3.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/26_readout_real_data_f3.svg" alt="Monkey IT responses to the 1,224 Bao object images on their first two principal components. Faint dots are the 18 training views per object used to fit the line; solid dots are the 6 test views per object, held out, on which the line is scored" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>Monkey IT responses to the 1,224 Bao object images on their first two principal components. Faint dots are the 18 training views per object used to fit the line; solid dots are the 6 test views per object, held out, on which the line is scored</p><a href="../images/L05/26_readout_real_data_f3.svg">Open full-size figure</a></figcaption></figure>
 <p class="provenance">Computed: monkey IT, 480 neurons, 2 principal components</p>
 </div>
 <div class="col">
@@ -245,21 +262,21 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. <b>Nature 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="48" aria-labelledby="heading-25"><p class="page">Slide 25</p>
-<h2 id="heading-25">Draw the boundary yourself</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="49" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<h2 id="heading-26">Draw the boundary yourself</h2>
 <div class="interactive-figure interactive-wide">
 
 <div class="print-figure">
-<figure><img src="../images/L05/demo_readout_line.png" alt="The readout demo with the fitted line: the share of training views and of test views classified correctly, against the majority-class baseline" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>The readout demo with the fitted line: the share of training views and of test views classified correctly, against the majority-class baseline</p><a href="../images/L05/demo_readout_line.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/demo_readout_line.png" alt="The readout demo with the fitted line: the share of training views and of test views classified correctly, against the majority-class baseline" aria-describedby="figure-26-1"><figcaption id="figure-26-1"><p>The readout demo with the fitted line: the share of training views and of test views classified correctly, against the majority-class baseline</p><a href="../images/L05/demo_readout_line.png">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <ul>
 <li>Each point has a <strong>distance to the boundary</strong>; points near it flip when the boundary moves</li>
 </ul>
-<p class="explorer-links"><a href="../demos/readout_line.html">Monkey IT responses to the 1,224 Bao object images on their first two principal components, animate views in green and inanimate in blue. Drag a straight line with two handles; meters give the share of training views it classifies correctly and, once revealed, the share of test views, against the majority-class baseline. A button fits a readout — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="48" aria-labelledby="heading-28"><p class="page">Slide 28</p>
-<h2 id="heading-28">Linearly separable, or not</h2>
+<p class="explorer-links"><a href="../demos/readout_line.html">Monkey IT responses to the 1,224 Bao object images on their first two principal components, animate views in green and inanimate in blue. Drag a straight line with two handles; meters give the share of training views it classifies correctly and, once revealed, the share of test views, against the majority-class baseline. A button fits a readout — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="49" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<h2 id="heading-29">Linearly separable, or not</h2>
 <div class="capfig">
-<figure><img src="../images/L05/25_xor_pair_3.svg" alt="Toy data, two panels side by side at the same size. Left, the XOR clusters in the plane of x1 and x2. Right, the same clusters lifted by a third unit x1 times x2: the green clusters rise above a translucent plane and the blue ones drop below it, so one plane separates them" aria-describedby="figure-28-1"><figcaption id="figure-28-1"><p>Toy data, two panels side by side at the same size. Left, the XOR clusters in the plane of x1 and x2. Right, the same clusters lifted by a third unit x1 times x2: the green clusters rise above a translucent plane and the blue ones drop below it, so one plane separates them</p><a href="../images/L05/25_xor_pair_3.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/25_xor_pair_3.svg" alt="Toy data, two panels side by side at the same size. Left, the XOR clusters in the plane of x1 and x2. Right, the same clusters lifted by a third unit x1 times x2: the green clusters rise above a translucent plane and the blue ones drop below it, so one plane separates them" aria-describedby="figure-29-1"><figcaption id="figure-29-1"><p>Toy data, two panels side by side at the same size. Left, the XOR clusters in the plane of x1 and x2. Right, the same clusters lifted by a third unit x1 times x2: the green clusters rise above a translucent plane and the blue ones drop below it, so one plane separates them</p><a href="../images/L05/25_xor_pair_3.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <p class="provenance">Toy data, computed: inputs coded −1 and +1</p>
 <ul>
@@ -267,10 +284,10 @@
 <li><strong>XOR</strong>: green when both inputs have the same sign. No boundary works: 75% at best</li>
 <li>A third unit <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1 x_2</annotation></semantics></math> lifts the points into 3-D: <mark>one plane separates them</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="48" aria-labelledby="heading-30"><p class="page">Slide 30</p>
-<h2 id="heading-30">Shattering: tasks one boundary can solve</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="49" aria-labelledby="heading-31"><p class="page">Slide 31</p>
+<h2 id="heading-31">Shattering: tasks one boundary can solve</h2>
 <div class="capfig">
-<figure><img src="../images/L05/53_shattering_grid.svg" alt="Sixteen small panels, one for each way to color four points at the corners of a square green or blue. In fourteen panels a straight boundary separates the green points from the blue ones and is drawn; the two panels in which opposite corners share a color are outlined in red" aria-describedby="figure-30-1"><figcaption id="figure-30-1"><p>Sixteen small panels, one for each way to color four points at the corners of a square green or blue. In fourteen panels a straight boundary separates the green points from the blue ones and is drawn; the two panels in which opposite corners share a color are outlined in red</p><a href="../images/L05/53_shattering_grid.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/53_shattering_grid.svg" alt="Sixteen small panels, one for each way to color four points at the corners of a square green or blue. In fourteen panels a straight boundary separates the green points from the blue ones and is drawn; the two panels in which opposite corners share a color are outlined in red" aria-describedby="figure-31-1"><figcaption id="figure-31-1"><p>Sixteen small panels, one for each way to color four points at the corners of a square green or blue. In fourteen panels a straight boundary separates the green points from the blue ones and is drawn; the two panels in which opposite corners share a color are outlined in red</p><a href="../images/L05/53_shattering_grid.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <p class="provenance">Toy data, computed: all 16 labelings</p>
 <ul>
@@ -279,11 +296,11 @@
 <li><strong>Shattering accuracy</strong>, a property of a population's responses to a stimulus set: split the stimuli at random (cat, car, cup vs dog, tree, shoe), fit a readout per split, average its test accuracy</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1109/PGEC.1965.264137" rel="noopener">Cover <b>IEEE Trans Electron Comput 1965</b></a> · <a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="48" aria-labelledby="heading-33"><p class="page">Slide 33</p>
-<h2 id="heading-33">One boundary for objects never seen: CCGP</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="49" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<h2 id="heading-34">One boundary for objects never seen: CCGP</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/58_ccgp_intuition_3.svg" alt="Left, schematic: eight conditions near the corners of a cube with one variable's coding direction drawn as parallel edges, and beside it a compromise geometry, a cube whose corners are pushed slightly apart in extra dimensions. Right, redrawn from Bernardi et al.: for monkey hippocampus, prefrontal cortex and anterior cingulate cortex, shattering accuracy of 0.70 to 0.75 as bars above a random-guessing band near 0.5, and CCGP for context, value and previous action as dots, above baseline except action in the hippocampus" aria-describedby="figure-33-1"><figcaption id="figure-33-1"><p>Left, schematic: eight conditions near the corners of a cube with one variable's coding direction drawn as parallel edges, and beside it a compromise geometry, a cube whose corners are pushed slightly apart in extra dimensions. Right, redrawn from Bernardi et al.: for monkey hippocampus, prefrontal cortex and anterior cingulate cortex, shattering accuracy of 0.70 to 0.75 as bars above a random-guessing band near 0.5, and CCGP for context, value and previous action as dots, above baseline except action in the hippocampus</p><a href="../images/L05/58_ccgp_intuition_3.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/58_ccgp_intuition_3.svg" alt="Left, schematic: eight conditions near the corners of a cube with one variable's coding direction drawn as parallel edges, and beside it a compromise geometry, a cube whose corners are pushed slightly apart in extra dimensions. Right, redrawn from Bernardi et al.: for monkey hippocampus, prefrontal cortex and anterior cingulate cortex, shattering accuracy of 0.70 to 0.75 as bars above a random-guessing band near 0.5, and CCGP for context, value and previous action as dots, above baseline except action in the hippocampus" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Left, schematic: eight conditions near the corners of a cube with one variable's coding direction drawn as parallel edges, and beside it a compromise geometry, a cube whose corners are pushed slightly apart in extra dimensions. Right, redrawn from Bernardi et al.: for monkey hippocampus, prefrontal cortex and anterior cingulate cortex, shattering accuracy of 0.70 to 0.75 as bars above a random-guessing band near 0.5, and CCGP for context, value and previous action as dots, above baseline except action in the hippocampus</p><a href="../images/L05/58_ccgp_intuition_3.svg">Open full-size figure</a></figcaption></figure>
 <p class="provenance">Right: Bernardi et al. (2020), CCGP approximate</p>
 </div>
 <div class="col">
@@ -295,25 +312,25 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="48" aria-labelledby="heading-34"><p class="page">Slide 34</p>
-<h2 id="heading-34">Bernardi et al. (2020): what the monkeys did</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="49" aria-labelledby="heading-35"><p class="page">Slide 35</p>
+<h2 id="heading-35">Bernardi et al. (2020): what the monkeys did</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/58_ccgp_intuition_3.svg" alt="Left, schematic: eight conditions near the corners of a cube with one variable's coding direction drawn as parallel edges, and beside it a compromise geometry, a cube whose corners are pushed slightly apart in extra dimensions. Right, redrawn from Bernardi et al.: for monkey hippocampus, prefrontal cortex and anterior cingulate cortex, shattering accuracy of 0.70 to 0.75 as bars above a random-guessing band near 0.5, and CCGP for context, value and previous action as dots, above baseline except action in the hippocampus" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Left, schematic: eight conditions near the corners of a cube with one variable's coding direction drawn as parallel edges, and beside it a compromise geometry, a cube whose corners are pushed slightly apart in extra dimensions. Right, redrawn from Bernardi et al.: for monkey hippocampus, prefrontal cortex and anterior cingulate cortex, shattering accuracy of 0.70 to 0.75 as bars above a random-guessing band near 0.5, and CCGP for context, value and previous action as dots, above baseline except action in the hippocampus</p><a href="../images/L05/58_ccgp_intuition_3.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/58_ccgp_intuition_3.svg" alt="Left, schematic: eight conditions near the corners of a cube with one variable's coding direction drawn as parallel edges, and beside it a compromise geometry, a cube whose corners are pushed slightly apart in extra dimensions. Right, redrawn from Bernardi et al.: for monkey hippocampus, prefrontal cortex and anterior cingulate cortex, shattering accuracy of 0.70 to 0.75 as bars above a random-guessing band near 0.5, and CCGP for context, value and previous action as dots, above baseline except action in the hippocampus" aria-describedby="figure-35-1"><figcaption id="figure-35-1"><p>Left, schematic: eight conditions near the corners of a cube with one variable's coding direction drawn as parallel edges, and beside it a compromise geometry, a cube whose corners are pushed slightly apart in extra dimensions. Right, redrawn from Bernardi et al.: for monkey hippocampus, prefrontal cortex and anterior cingulate cortex, shattering accuracy of 0.70 to 0.75 as bars above a random-guessing band near 0.5, and CCGP for context, value and previous action as dots, above baseline except action in the hippocampus</p><a href="../images/L05/58_ccgp_intuition_3.svg">Open full-size figure</a></figcaption></figure>
 <p class="provenance">Right: Bernardi et al. (2020), CCGP approximate</p>
 </div>
 <div class="col">
 <ul>
 <li>Four images; which earn reward flips between two hidden <strong>contexts</strong>. 8 conditions: context × value × action</li>
-<li>A perfect <strong>cube</strong>: every variable transfers (high CCGP) but odd groupings fail (low shattering)</li>
-<li>Measured: near the cube. <mark>Both high: abstract and flexible</mark></li>
-<li>Hippocampus: context transfers; last action does not</li>
+<li>Left: dots = conditions, red/blue = context, gold = context direction</li>
+<li>Near a cube: a context readout transfers (high CCGP), and odd groupings still work (high shattering)</li>
+<li><mark>Flexible and abstract at once</mark>: hippocampus holds a hidden, inferred context</li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="48" aria-labelledby="heading-35"><p class="page">Slide 35</p>
-<h2 id="heading-35">Recap</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="49" aria-labelledby="heading-36"><p class="page">Slide 36</p>
+<h2 id="heading-36">Recap</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Recap — table"><table><caption>Recap — table</caption>
 <thead>
 <tr>
@@ -346,29 +363,29 @@
 </tbody>
 </table></div>
 <p><mark>Next lecture: comparing two representations.</mark></p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-class="lead" data-marpit-pagination="36" data-marpit-pagination-total="48" aria-labelledby="heading-36"><p class="page">Slide 36</p>
-<h2 id="heading-36">Going further: what does the power law mean?</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="48" aria-labelledby="heading-37"><p class="page">Slide 37</p>
-<h2 id="heading-37">Monkey V1 falls the same way</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-class="lead" data-marpit-pagination="37" data-marpit-pagination-total="49" aria-labelledby="heading-37"><p class="page">Slide 37</p>
+<h2 id="heading-37">Going further: what does the power law mean?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="49" aria-labelledby="heading-38"><p class="page">Slide 38</p>
+<h2 id="heading-38">Monkey V1 falls the same way</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/47_spectra_monkey.svg" alt="The same log-log plot with monkey V1 added: two green lines, one per monkey, for principal components 1 to 60, starting higher and falling a little more steeply than the mouse line, with alpha 1.32 and 1.39" aria-describedby="figure-37-1"><figcaption id="figure-37-1"><p>The same log-log plot with monkey V1 added: two green lines, one per monkey, for principal components 1 to 60, starting higher and falling a little more steeply than the mouse line, with alpha 1.32 and 1.39</p><a href="../images/L05/47_spectra_monkey.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/47_spectra_monkey.svg" alt="The same log-log plot with monkey V1 added: two green lines, one per monkey, for principal components 1 to 60, starting higher and falling a little more steeply than the mouse line, with alpha 1.32 and 1.39" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>The same log-log plot with monkey V1 added: two green lines, one per monkey, for principal components 1 to 60, starting higher and falling a little more steeply than the mouse line, with alpha 1.32 and 1.39</p><a href="../images/L05/47_spectra_monkey.svg">Open full-size figure</a></figcaption></figure>
 <p class="provenance">Computed from Stringer et al.'s and Papale et al.'s data</p>
 </div>
 <div class="col">
 <ul>
 <li><strong>Log-log axes</strong>: each tick is ×10, so a power law <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>k</mi></msub><mo>∝</mo><msup><mi>k</mi><mrow><mo>−</mo><mi>α</mi></mrow></msup></mrow><annotation encoding="application/x-tex">f_k \propto k^{-\alpha}</annotation></semantics></math> is a line of slope <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>α</mi></mrow><annotation encoding="application/x-tex">-\alpha</annotation></semantics></math></li>
 <li><strong>Mouse V1</strong>: straight over the measured range, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>1.06</mn></mrow><annotation encoding="application/x-tex">\alpha = 1.06</annotation></semantics></math> (dotted: slope <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math>)</li>
-<li><strong>Monkey V1</strong>, electrode arrays, 100 THINGS images: a little steeper, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>1.32</mn></mrow><annotation encoding="application/x-tex">\alpha = 1.32</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.39</mn></mrow><annotation encoding="application/x-tex">1.39</annotation></semantics></math></li>
+<li><strong>Monkey V1</strong>: electrode arrays; 100 THINGS images (photos of everyday objects). A little steeper, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>1.32</mn></mrow><annotation encoding="application/x-tex">\alpha = 1.32</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.39</mn></mrow><annotation encoding="application/x-tex">1.39</annotation></semantics></math></li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a> · <a href="https://doi.org/10.1016/j.neuron.2024.12.003" rel="noopener">Papale et al. <b>Neuron 2025</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="48" aria-labelledby="heading-38"><p class="page">Slide 38</p>
-<h2 id="heading-38">Pixels fall the same way</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="49" aria-labelledby="heading-39"><p class="page">Slide 39</p>
+<h2 id="heading-39">Pixels fall the same way</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/47_spectra_pixels.svg" alt="The same log-log plot with a red line added for the pixels of the 2,800 images the mice saw: it falls almost exactly on top of the mouse V1 line, alpha 1.09" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>The same log-log plot with a red line added for the pixels of the 2,800 images the mice saw: it falls almost exactly on top of the mouse V1 line, alpha 1.09</p><a href="../images/L05/47_spectra_pixels.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/47_spectra_pixels.svg" alt="The same log-log plot with a red line added for the pixels of the 2,800 images the mice saw: it falls almost exactly on top of the mouse V1 line, alpha 1.09" aria-describedby="figure-39-1"><figcaption id="figure-39-1"><p>The same log-log plot with a red line added for the pixels of the 2,800 images the mice saw: it falls almost exactly on top of the mouse V1 line, alpha 1.09</p><a href="../images/L05/47_spectra_pixels.svg">Open full-size figure</a></figcaption></figure>
 <p class="provenance">Computed from Stringer et al.'s and Papale et al.'s data</p>
 </div>
 <div class="col">
@@ -381,11 +398,11 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a> · <a href="https://doi.org/10.1016/j.neuron.2024.12.003" rel="noopener">Papale et al. <b>Neuron 2025</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="48" aria-labelledby="heading-39"><p class="page">Slide 39</p>
-<h2 id="heading-39">Neurons are not pixels</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="49" aria-labelledby="heading-40"><p class="page">Slide 40</p>
+<h2 id="heading-40">Neurons are not pixels</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/48_spectra_whitened.svg" alt="Log-log plot of variance fraction against principal component k for natural and whitened images. For natural images the pixel spectrum, alpha 1.09, and the mouse V1 spectrum, alpha 1.06, lie almost on top of each other. For whitened images the pixel spectrum is much flatter, alpha 0.41, while the mouse V1 spectrum still follows the dotted line of slope minus 1, alpha 1.09" aria-describedby="figure-39-1"><figcaption id="figure-39-1"><p>Log-log plot of variance fraction against principal component k for natural and whitened images. For natural images the pixel spectrum, alpha 1.09, and the mouse V1 spectrum, alpha 1.06, lie almost on top of each other. For whitened images the pixel spectrum is much flatter, alpha 0.41, while the mouse V1 spectrum still follows the dotted line of slope minus 1, alpha 1.09</p><a href="../images/L05/48_spectra_whitened.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/48_spectra_whitened.svg" alt="Log-log plot of variance fraction against principal component k for natural and whitened images. For natural images the pixel spectrum, alpha 1.09, and the mouse V1 spectrum, alpha 1.06, lie almost on top of each other. For whitened images the pixel spectrum is much flatter, alpha 0.41, while the mouse V1 spectrum still follows the dotted line of slope minus 1, alpha 1.09" aria-describedby="figure-40-1"><figcaption id="figure-40-1"><p>Log-log plot of variance fraction against principal component k for natural and whitened images. For natural images the pixel spectrum, alpha 1.09, and the mouse V1 spectrum, alpha 1.06, lie almost on top of each other. For whitened images the pixel spectrum is much flatter, alpha 0.41, while the mouse V1 spectrum still follows the dotted line of slope minus 1, alpha 1.09</p><a href="../images/L05/48_spectra_whitened.svg">Open full-size figure</a></figcaption></figure>
 <p class="provenance">Stringer et al.'s data: 7 natural, 4 whitened sessions</p>
 </div>
 <div class="col">
@@ -398,11 +415,11 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="48" aria-labelledby="heading-40"><p class="page">Slide 40</p>
-<h2 id="heading-40">A power law across species and methods</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="49" aria-labelledby="heading-41"><p class="page">Slide 41</p>
+<h2 id="heading-41">A power law across species and methods</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/49_spectra_datasets.svg" alt="Log-log plot of variance fraction against principal component k from 1 to 60 for the same 100 THINGS images in monkey V1, V4 and IT (electrodes) and human visual cortex (fMRI), all with the same cross-validated estimator. All four fall along nearly parallel straight lines, with alpha 1.35, 1.25, 1.24 and 1.49" aria-describedby="figure-40-1"><figcaption id="figure-40-1"><p>Log-log plot of variance fraction against principal component k from 1 to 60 for the same 100 THINGS images in monkey V1, V4 and IT (electrodes) and human visual cortex (fMRI), all with the same cross-validated estimator. All four fall along nearly parallel straight lines, with alpha 1.35, 1.25, 1.24 and 1.49</p><a href="../images/L05/49_spectra_datasets.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/49_spectra_datasets.svg" alt="Log-log plot of variance fraction against principal component k from 1 to 60 for the same 100 THINGS images in monkey V1, V4 and IT (electrodes) and human visual cortex (fMRI), all with the same cross-validated estimator. All four fall along nearly parallel straight lines, with alpha 1.35, 1.25, 1.24 and 1.49" aria-describedby="figure-41-1"><figcaption id="figure-41-1"><p>Log-log plot of variance fraction against principal component k from 1 to 60 for the same 100 THINGS images in monkey V1, V4 and IT (electrodes) and human visual cortex (fMRI), all with the same cross-validated estimator. All four fall along nearly parallel straight lines, with alpha 1.35, 1.25, 1.24 and 1.49</p><a href="../images/L05/49_spectra_datasets.svg">Open full-size figure</a></figcaption></figure>
 <p class="provenance">Computed here: one estimator, 100 THINGS images</p>
 </div>
 <div class="col">
@@ -415,11 +432,11 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1371/journal.pcbi.1013714" rel="noopener">Gauthaman et al. <b>PLoS Comput Biol 2025</b></a> · <a href="https://doi.org/10.1126/science.3629243" rel="noopener">Shepard <b>Science 1987</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="48" aria-labelledby="heading-41"><p class="page">Slide 41</p>
-<h2 id="heading-41">Why a slope near 1? A smooth code</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="49" aria-labelledby="heading-42"><p class="page">Slide 42</p>
+<h2 id="heading-42">Why a slope near 1? A smooth code</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/47_spectra_mouse.svg" alt="Log-log plot of variance fraction against principal component k from 1 to 1,000 for mouse V1 responses to 2,800 natural images: seven thin lines for the recording sessions and one thick line for their mean, falling along a nearly straight line close to a dotted guide of slope minus 1; alpha 1.06" aria-describedby="figure-41-1"><figcaption id="figure-41-1"><p>Log-log plot of variance fraction against principal component k from 1 to 1,000 for mouse V1 responses to 2,800 natural images: seven thin lines for the recording sessions and one thick line for their mean, falling along a nearly straight line close to a dotted guide of slope minus 1; alpha 1.06</p><a href="../images/L05/47_spectra_mouse.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/47_spectra_mouse.svg" alt="Log-log plot of variance fraction against principal component k from 1 to 1,000 for mouse V1 responses to 2,800 natural images: seven thin lines for the recording sessions and one thick line for their mean, falling along a nearly straight line close to a dotted guide of slope minus 1; alpha 1.06" aria-describedby="figure-42-1"><figcaption id="figure-42-1"><p>Log-log plot of variance fraction against principal component k from 1 to 1,000 for mouse V1 responses to 2,800 natural images: seven thin lines for the recording sessions and one thick line for their mean, falling along a nearly straight line close to a dotted guide of slope minus 1; alpha 1.06</p><a href="../images/L05/47_spectra_mouse.svg">Open full-size figure</a></figcaption></figure>
 <p class="provenance">Computed from Stringer et al.'s data</p>
 </div>
 <div class="col">
@@ -432,10 +449,10 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="48" aria-labelledby="heading-42"><p class="page">Slide 42</p>
-<h2 id="heading-42">Deep networks are fooled by invisible changes</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-marpit-pagination="43" data-marpit-pagination-total="49" aria-labelledby="heading-43"><p class="page">Slide 43</p>
+<h2 id="heading-43">Deep networks are fooled by invisible changes</h2>
 <div class="capfig">
-<figure><img src="../images/L05/52_adversarial_example.svg" alt="Three images in a row. Left, a public-domain photograph of an alligator lying on grass, which ImageNet-trained ResNet-18 labels alligator with 99 percent probability. Middle, the change added to it, magnified 50 times: colored noise; no pixel moves by more than 2 of 255 intensity levels. Right, the photograph plus the change, which looks identical to the original, labeled ostrich with 100 percent probability" aria-describedby="figure-42-1"><figcaption id="figure-42-1"><p>Three images in a row. Left, a public-domain photograph of an alligator lying on grass, which ImageNet-trained ResNet-18 labels alligator with 99 percent probability. Middle, the change added to it, magnified 50 times: colored noise; no pixel moves by more than 2 of 255 intensity levels. Right, the photograph plus the change, which looks identical to the original, labeled ostrich with 100 percent probability</p><a href="../images/L05/52_adversarial_example.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/52_adversarial_example.svg" alt="Three images in a row. Left, a public-domain photograph of an alligator lying on grass, which ImageNet-trained ResNet-18 labels alligator with 99 percent probability. Middle, the change added to it, magnified 50 times: colored noise; no pixel moves by more than 2 of 255 intensity levels. Right, the photograph plus the change, which looks identical to the original, labeled ostrich with 100 percent probability" aria-describedby="figure-43-1"><figcaption id="figure-43-1"><p>Three images in a row. Left, a public-domain photograph of an alligator lying on grass, which ImageNet-trained ResNet-18 labels alligator with 99 percent probability. Middle, the change added to it, magnified 50 times: colored noise; no pixel moves by more than 2 of 255 intensity levels. Right, the photograph plus the change, which looks identical to the original, labeled ostrich with 100 percent probability</p><a href="../images/L05/52_adversarial_example.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <p class="provenance">Computed here: ResNet-18 trained on ImageNet, a public-domain THINGS photograph</p>
 <ul>
@@ -443,11 +460,11 @@
 <li>It matters for cars, medical imaging and face recognition, and no defense removes the problem</li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/1312.6199" rel="noopener">Szegedy et al. <b>ICLR 2014</b></a> · <a href="https://arxiv.org/abs/1706.06083" rel="noopener">Madry et al. <b>ICLR 2018</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-marpit-pagination="43" data-marpit-pagination-total="48" aria-labelledby="heading-43"><p class="page">Slide 43</p>
-<h2 id="heading-43">Could a V1-like spectrum make networks robust?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="49" aria-labelledby="heading-44"><p class="page">Slide 44</p>
+<h2 id="heading-44">Could a V1-like spectrum make networks robust?</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/22_network_eigenspectra.svg" alt="Log-log plot of the variance fraction of each principal component against its number k, for six networks' last layers on 1,854 THINGS images, with a dotted line of slope minus 1. Five trained networks fall more gently than the dotted line, with exponents between 0.67 and 0.96; the untrained ResNet-18, dashed, falls more steeply, exponent 1.43" aria-describedby="figure-43-1"><figcaption id="figure-43-1"><p>Log-log plot of the variance fraction of each principal component against its number k, for six networks' last layers on 1,854 THINGS images, with a dotted line of slope minus 1. Five trained networks fall more gently than the dotted line, with exponents between 0.67 and 0.96; the untrained ResNet-18, dashed, falls more steeply, exponent 1.43</p><a href="../images/L05/22_network_eigenspectra.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/22_network_eigenspectra.svg" alt="Log-log plot of the variance fraction of each principal component against its number k, for six networks' last layers on 1,854 THINGS images, with a dotted line of slope minus 1. Five trained networks fall more gently than the dotted line, with exponents between 0.67 and 0.96; the untrained ResNet-18, dashed, falls more steeply, exponent 1.43" aria-describedby="figure-44-1"><figcaption id="figure-44-1"><p>Log-log plot of the variance fraction of each principal component against its number k, for six networks' last layers on 1,854 THINGS images, with a dotted line of slope minus 1. Five trained networks fall more gently than the dotted line, with exponents between 0.67 and 0.96; the untrained ResNet-18, dashed, falls more steeply, exponent 1.43</p><a href="../images/L05/22_network_eigenspectra.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -459,8 +476,8 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1371/journal.pcbi.1009739" rel="noopener">Kong et al. <b>PLoS Comput Biol 2022</b></a> · <a href="https://arxiv.org/abs/2012.04729" rel="noopener">Nassar et al. <b>NeurIPS 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="48" aria-labelledby="heading-44"><p class="page">Slide 44</p>
-<h2 id="heading-44">Further reading</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-marpit-pagination="45" data-marpit-pagination-total="49" aria-labelledby="heading-45"><p class="page">Slide 45</p>
+<h2 id="heading-45">Further reading</h2>
 <p>Optional: a few research-trail entries over the semester. Any paper mentioned in any lecture qualifies, but papers from this block are preferred.</p>
 <ul>
 <li><a href="https://doi.org/10.1371/journal.pcbi.1013714" rel="noopener">Gauthaman et al. <b>PLoS Comput Biol 2025</b></a>: the same power law in human visual cortex (fMRI)</li>
@@ -468,8 +485,8 @@
 <li><a href="https://doi.org/10.1016/j.isci.2026.116780" rel="noopener">Pavuluri &amp; Kohn <b>iScience 2026</b></a>: from V1 to V2, texture responses use fewer dimensions</li>
 <li><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a>: hippocampus and prefrontal cortex score high on both measures</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-marpit-pagination="45" data-marpit-pagination-total="48" aria-labelledby="heading-45"><p class="page">Slide 45</p>
-<h2 id="heading-45">Minute paper</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-marpit-pagination="46" data-marpit-pagination-total="49" aria-labelledby="heading-46"><p class="page">Slide 46</p>
+<h2 id="heading-46">Minute paper</h2>
 <p>Submit on <strong>Canvas → Minute papers → Minute Paper 6</strong> (access code read out in class).</p>
 <p>Write three brief points in your own words:</p>
 <ol>
@@ -478,11 +495,11 @@
 <li>Another idea you found interesting, and why it matters for brains, behavior or AI</li>
 </ol>
 <p>Credit for a thoughtful attempt, not for being correct.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-class="lead" data-marpit-pagination="46" data-marpit-pagination-total="48" aria-labelledby="heading-46"><p class="page">Slide 46</p>
-<h2 id="heading-46">Appendix: derivations and extra examples</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-paginate="true" data-class="lead" data-marpit-pagination="47" data-marpit-pagination-total="49" aria-labelledby="heading-47"><p class="page">Slide 47</p>
+<h2 id="heading-47">Appendix: derivations and extra examples</h2>
 <h2 id="material-not-covered-in-class-for-reference">Material not covered in class, for reference</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-paginate="true" data-class="codeslide" data-marpit-pagination="47" data-marpit-pagination-total="48" aria-labelledby="heading-47"><p class="page">Slide 47</p>
-<h2 id="heading-47">Effective dimensionality from an eigenspectrum</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-48" data-paginate="true" data-class="codeslide" data-marpit-pagination="48" data-marpit-pagination-total="49" aria-labelledby="heading-48"><p class="page">Slide 48</p>
+<h2 id="heading-48">Effective dimensionality from an eigenspectrum</h2>
 <marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
 <span class="hljs-comment"># X: (N stimuli, D units) response matrix -- neurons, voxels or model units</span>
 Xc = X - X.mean(axis=<span class="hljs-number">0</span>, keepdims=<span class="hljs-literal">True</span>)          <span class="hljs-comment"># center: PCA needs it (the PCA lecture)</span>
@@ -499,10 +516,10 @@ k = np.arange(<span class="hljs-number">1</span>, <span class="hljs-built_in">le
 alpha = -np.polyfit(np.log(k[<span class="hljs-number">10</span>:<span class="hljs-number">500</span>]), np.log(f[<span class="hljs-number">10</span>:<span class="hljs-number">500</span>]), <span class="hljs-number">1</span>)[<span class="hljs-number">0</span>]
 <span class="hljs-built_in">print</span>(<span class="hljs-string">f"variance fraction decays as k^-<span class="hljs-subst">{alpha:<span class="hljs-number">.2</span>f}</span>"</span>)
 </code></marp-pre>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-48" data-paginate="true" data-marpit-pagination="48" data-marpit-pagination-total="48" aria-labelledby="heading-48"><p class="page">Slide 48</p>
-<h2 id="heading-48">More features than units</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-49" data-paginate="true" data-marpit-pagination="49" data-marpit-pagination-total="49" aria-labelledby="heading-49"><p class="page">Slide 49</p>
+<h2 id="heading-49">More features than units</h2>
 <div class="capfig">
-<figure><img src="../images/L05/13_more_features_than_dims.svg" alt="Two circles of directions: two perpendicular feature directions where each unit means one thing, versus seven directions packed into the same plane, forced to overlap" aria-describedby="figure-48-1"><figcaption id="figure-48-1"><p>Two circles of directions: two perpendicular feature directions where each unit means one thing, versus seven directions packed into the same plane, forced to overlap</p><a href="../images/L05/13_more_features_than_dims.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L05/13_more_features_than_dims.svg" alt="Two circles of directions: two perpendicular feature directions where each unit means one thing, versus seven directions packed into the same plane, forced to overlap" aria-describedby="figure-49-1"><figcaption id="figure-49-1"><p>Two circles of directions: two perpendicular feature directions where each unit means one thing, versus seven directions packed into the same plane, forced to overlap</p><a href="../images/L05/13_more_features_than_dims.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> perpendicular directions hold at most <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> features. Nearly perpendicular directions, plentiful in high dimensions, hold far more, and each unit sits on several</li>
