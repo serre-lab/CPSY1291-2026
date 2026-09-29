@@ -14,13 +14,13 @@
 <h2 id="heading-2">Your questions from Tuesday</h2>
 <ul>
 <li><em>"If there are 50 principle components, why is it/how can it be represented by just 2 axes as on the ppt slides?"</em>: it cannot. A PCA plot keeps the two directions along which the points <strong>vary most</strong> over the whole data set and drops the other 48. Points that differ only along the dropped directions <strong>land on top of each other</strong>. That is where today's <strong>nonlinear</strong> methods come in: instead of keeping a few directions, they keep <strong>relationships</strong> between points, above all who is whose <strong>neighbor</strong>.</li>
-<li><em>"Does this mean neural signals are operating in 2 dimensional space"</em>: no. For the Bao et al. objects in AlexNet fc6 (Assignment 1), the first two components hold only <strong>22%</strong> of the variance, and 85% takes <strong>87</strong> (Bao et al. report about 50). Counting components to a threshold measures the <strong>linear</strong> dimension and treats the rest as noise. If the data lie on a curved surface, the <strong>intrinsic</strong> dimension, the number of dimensions needed to locate a point on it, can be far smaller.</li>
+<li><em>"Does this mean neural signals are operating in 2 dimensional space"</em>: no. For the Bao et al. objects in AlexNet fc6 (Assignment 1), the first two components hold only <strong>22%</strong> of the variance, and 85% takes <strong>87</strong> (Bao et al. report about 50). Counting components to a threshold measures the <strong>embedding</strong> dimension, a linear count, and treats the rest as noise. If the data lie on a curved surface, the <strong>intrinsic</strong> dimension, the number of dimensions needed to locate a point on it, can be far smaller.</li>
 </ul>
 <p>Next: what every 2-D picture of the data gives up.</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="59" aria-labelledby="heading-4"><p class="page">Slide 4</p>
 <h2 id="heading-4">Every low-dimensional picture is an approximation</h2>
 <div>
-<figure><img src="../images/L03/21_eigenbasis_plane.svg" alt="A three-dimensional cloud of points lying close to, but not on, a plane spanned by two principal directions v1 and v2, with axes x-tilde 1, 2 and 3. Dashed red residuals join several points to the plane; one point, x-tilde, is joined to its projection on the plane" aria-describedby="figure-4-1"><figcaption id="figure-4-1"><p>A three-dimensional cloud of points lying close to, but not on, a plane spanned by two principal directions v1 and v2, with axes x-tilde 1, 2 and 3. Dashed red residuals join several points to the plane; one point, x-tilde, is joined to its projection on the plane</p><a href="../images/L03/21_eigenbasis_plane.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L03/21_eigenbasis_plane.svg" alt="A three-dimensional set of points lying close to, but not on, a plane spanned by two principal directions v1 and v2, with axes x-tilde 1, 2 and 3. Dashed red residuals join several points to the plane; one point, x-tilde, is joined to its projection on the plane" aria-describedby="figure-4-1"><figcaption id="figure-4-1"><p>A three-dimensional set of points lying close to, but not on, a plane spanned by two principal directions v1 and v2, with axes x-tilde 1, 2 and 3. Dashed red residuals join several points to the plane; one point, x-tilde, is joined to its projection on the plane</p><a href="../images/L03/21_eigenbasis_plane.svg">Open full-size figure</a></figcaption></figure>
 <figure><img src="../images/L03/21b_eigenbasis_scores.svg" alt="PCA: the same 100 points drawn in two dimensions, each at its coordinates z1 and z2 along v1 and v2; the projected point is marked in green, with dotted lines to z1 and z2 on the axes" aria-describedby="figure-4-2"><figcaption id="figure-4-2"><p>PCA: the same 100 points drawn in two dimensions, each at its coordinates z1 and z2 along v1 and v2; the projected point is marked in green, with dotted lines to z1 and z2 on the axes</p><a href="../images/L03/21b_eigenbasis_scores.svg">Open full-size figure</a></figcaption></figure>
 <figure><img src="../images/L03/21c_eigenbasis_mds.svg" alt="MDS on the Euclidean distances between the same points: a two-dimensional map that looks the same as the PCA map, with the same point in green" aria-describedby="figure-4-3"><figcaption id="figure-4-3"><p>MDS on the Euclidean distances between the same points: a two-dimensional map that looks the same as the PCA map, with the same point in green</p><a href="../images/L03/21c_eigenbasis_mds.svg">Open full-size figure</a></figcaption></figure>
 </div>
@@ -163,8 +163,8 @@
 <div class="col">
 <ul>
 <li>In <strong>pixel</strong> coordinates the sheets of two people <strong>interleave</strong>.</li>
-<li><strong>Recognizing</strong> who it is means finding a flat boundary, a <strong>hyperplane</strong>, with one person's sheet on each side. Here none exists.</li>
-<li>That boundary is what a <strong>linear classifier</strong> learns. A good representation <strong>untangles</strong> the sheets; testing that with a <strong>linear probe</strong> is a later lecture.</li>
+<li><strong>Recognizing</strong> who it is means finding a flat (linear) boundary, a <strong>hyperplane</strong>, with one person's sheet on each side. Here none exists.</li>
+<li>That boundary is what a <strong>linear classifier</strong> learns. A good representation <strong>untangles</strong> the sheets; testing that with a <strong>linear readout</strong> is a later lecture.</li>
 </ul>
 </div>
 </div>
@@ -182,7 +182,7 @@
 <div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <b>Trends Cogn. Sci. 2007</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-class="lead" data-marpit-pagination="17" data-marpit-pagination-total="59" aria-labelledby="heading-17"><p class="page">Slide 17</p>
 <h2 id="heading-17">How do we see a manifold?</h2>
-<p>To ask whether object manifolds are tangled or untangled, we have to look at them, but they live in thousands of dimensions. We need a 2-D map that keeps their shape. First, test the maps on a manifold whose true shape we <strong>know</strong>.</p>
+<p>To ask whether object manifolds (the responses to one object across all its views) are tangled or untangled, we have to look at them, but they live in thousands of dimensions. We need a 2-D map that keeps their shape. First, test the maps on a manifold whose true shape we <strong>know</strong>.</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="59" aria-labelledby="heading-18"><p class="page">Slide 18</p>
 <h2 id="heading-18">Test case: can PCA unroll a known manifold?</h2>
 <figure><img src="../images/2026-illustrations/swiss-roll-cake-cream.jpg" alt="A chocolate Swiss roll cake with the cream spiral visible at its cut end" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>A chocolate Swiss roll cake with the cream spiral visible at its cut end</p><a href="../images/2026-illustrations/swiss-roll-cake-cream.jpg">Open full-size figure</a></figcaption></figure>
@@ -246,7 +246,7 @@
 <td>4,096&nbsp;units</td>
 </tr>
 <tr>
-<td><strong>Embedding</strong>: flat subspace PCA needs</td>
+<td><strong>Embedding</strong>: flat (linear) subspace PCA needs</td>
 <td>3</td>
 <td>24&nbsp;PCs&nbsp;(90%)</td>
 <td>149&nbsp;PCs&nbsp;(90%)</td>
@@ -262,7 +262,7 @@
 <div></div>
 <ul>
 <li>The three numbers answer different questions; none is <em>the</em> dimension.</li>
-<li>PCA measures the <strong>embedding</strong> dimension. It overestimates the intrinsic one whenever the manifold curves.</li>
+<li>PCA measures the <strong>embedding</strong> dimension, a linear count that needs a variance threshold (90% here). It overestimates the intrinsic one whenever the manifold curves.</li>
 <li>For real data such as the network's responses to the Bao objects, the intrinsic dimension is <strong>unknown</strong>: that is what the <strong>nonlinear</strong> methods coming next try to reveal.</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.53053/FTEU9810" rel="noopener">Perich <b>2026</b></a> · <i>The Transmitter</i></div>
@@ -556,7 +556,7 @@
 </tr>
 <tr>
 <td>Can object identity be read out?</td>
-<td>Accuracy on held-out images of a <strong>readout</strong>: a simple classifier trained on the responses</td>
+<td>Accuracy on held-out images of a <strong>readout</strong>: a weighted sum of the responses, then a threshold, trained on other images</td>
 </tr>
 <tr>
 <td>Does a model resemble human judgments or brain responses?</td>
@@ -644,7 +644,7 @@
 <div class="col">
 <ul>
 <li>Head-direction cells in the mouse <strong>anterodorsal thalamus</strong>: one point per time bin, one dimension per neuron.</li>
-<li><strong>Isomap</strong> closes that cloud into a <strong>ring</strong>: one curved dimension, the shape a circular variable <em>should</em> have. A topological test (persistent homology) confirms the loop without trusting the picture.</li>
+<li><strong>Isomap</strong> closes those points into a <strong>ring</strong>: one curved dimension, the shape a circular variable <em>should</em> have. A topological test (persistent homology) confirms the loop without trusting the picture.</li>
 <li>Position around the ring tracks the animal's <strong>head direction</strong>, and the ring persists in <strong>REM sleep</strong>: a circuit that maintains an internal direction.</li>
 <li>Language models do it too: days of the week and months sit on <strong>circles</strong> inside GPT-2 and Mistral.</li>
 </ul>
