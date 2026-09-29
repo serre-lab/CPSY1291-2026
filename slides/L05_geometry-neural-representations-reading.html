@@ -10,7 +10,7 @@
 <h2 id="heading-1">Geometry of neural representations</h2>
 <p class="meta">Tuesday, September 29 · Fall 2026</p>
 
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-marpit-scope-cfnqky6q="" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="48" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-marpit-scope-w0tuuzmj="" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="48" aria-labelledby="heading-2"><p class="page">Slide 2</p>
 <h2 id="heading-2">Where we are</h2>
 
 <div class="table-scroll" tabindex="0" role="region" aria-label="Where we are — table"><table><caption>Where we are — table</caption>
@@ -105,9 +105,9 @@
 <div class="capfig">
 <figure><img src="../images/L05/46_spectrum_pca_flash.svg" alt="Two panels for mouse V1 responses to 2,800 natural images, averaged over seven sessions. Left: bars of the variance fraction of the first 30 principal components, falling slowly from about 0.035 to about 0.006 with no elbow. Right: cumulative variance fraction against components retained, on a log axis out to 2,366; a dashed line at 0.9 is crossed at K = 744" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>Two panels for mouse V1 responses to 2,800 natural images, averaged over seven sessions. Left: bars of the variance fraction of the first 30 principal components, falling slowly from about 0.035 to about 0.006 with no elbow. Right: cumulative variance fraction against components retained, on a log axis out to 2,366; a dashed line at 0.9 is crossed at K = 744</p><a href="../images/L05/46_spectrum_pca_flash.svg">Open full-size figure</a></figcaption></figure>
 </div>
-<p class="provenance">Computed from Stringer et al.'s data: two-photon calcium imaging, ~10,000 neurons, 2,800 natural images, 7 sessions</p>
+<p class="provenance">Computed from Stringer et al.'s data (7 sessions)</p>
 <ul>
-<li><strong>Cross-validated PCA</strong>: each image was shown twice; directions come from the first showing, variance from agreement with the second, so noise averages out</li>
+<li>Two-photon imaging, ~10,000 neurons, each image shown twice. <strong>Cross-validated PCA</strong>: principal components from the first showing; each one's variance = how much the two showings co-vary along it, so noise cancels</li>
 <li><mark>No elbow: 90% of the variance needs 744 components</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a></div>
@@ -137,13 +137,13 @@
 <ul>
 <li><strong>With an elbow</strong>, a few directions carry most of the variance: the embedding dimension is clear</li>
 <li><strong>Without one</strong>, the embedding dimension depends on the threshold (90%? 95%?)</li>
-<li><mark>V1 is high-dimensional, but not uniformly</mark>. We want one number with no threshold</li>
+<li><mark>V1 uses many dimensions, but unequally</mark>: each further component carries a little less. We want one number with no threshold</li>
 <li>Why V1 has no elbow, and what it may mean for fooling deep networks, is in the Going further block at the end</li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-marpit-scope-iwypejcf="" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="48" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-marpit-scope-dbvcj9m2="" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="48" aria-labelledby="heading-14"><p class="page">Slide 14</p>
 <h2 id="heading-14">One number: the participation ratio</h2>
 
 <ul>
@@ -151,8 +151,8 @@
 </ul>
 <p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mo>=</mo><mfrac><msup><mrow><mo fence="true">(</mo><munder><mo>∑</mo><mi>j</mi></munder><msub><mi>λ</mi><mi>j</mi></msub><mo fence="true">)</mo></mrow><mn>2</mn></msup><mrow><munder><mo>∑</mo><mi>j</mi></munder><msubsup><mi>λ</mi><mi>j</mi><mn>2</mn></msubsup></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"></mspace><mn>1</mn><mo>≤</mo><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mo>≤</mo><mi>D</mi></mrow><annotation encoding="application/x-tex">\mathrm{PR} = \frac{\left(\sum_j \lambda_j\right)^2}{\sum_j \lambda_j^2}, \qquad 1 \le \mathrm{PR} \le D
 </annotation></semantics></math></div></span></p><ul>
-<li>PR = 1 when one direction carries all the variance; PR = <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> when all <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> share it equally</li>
-<li>It needs no threshold. Report <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mi mathvariant="normal">/</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">\mathrm{PR}/D</annotation></semantics></math> to compare populations of different sizes</li>
+<li>With the variance fractions <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">f_j</annotation></semantics></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mo>=</mo><mn>1</mn><mi mathvariant="normal">/</mi><msub><mo>∑</mo><mi>j</mi></msub><msubsup><mi>f</mi><mi>j</mi><mn>2</mn></msubsup></mrow><annotation encoding="application/x-tex">\mathrm{PR} = 1/\sum_j f_j^2</annotation></semantics></math>. Not to be confused with <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">f_k</annotation></semantics></math>: one number per component; PR is one number for the whole spectrum</li>
+<li>PR = 1 when one direction carries all the variance; PR = <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> when all <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> share it equally. No threshold; report <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mi mathvariant="normal">/</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">\mathrm{PR}/D</annotation></semantics></math></li>
 </ul>
 <p><mark>The participation ratio counts how many directions the responses use: if k directions share the variance equally, PR = k.</mark> <span>(minute paper)</span></p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="48" aria-labelledby="heading-15"><p class="page">Slide 15</p>
@@ -196,7 +196,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <b>Trends Cogn Sci 2007</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-marpit-scope-hliz3lax="" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="48" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-marpit-scope-hv1uqwyq="" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="48" aria-labelledby="heading-20"><p class="page">Slide 20</p>
 <h2 id="heading-20">A linear readout draws a hyperplane</h2>
 <div class="row">
 <div class="col fig">
