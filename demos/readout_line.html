@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Draw the readout line · L05 · CPSY 1291</title>
+<!--
+  Drag a straight line over monkey IT responses to the Bao et al. (2020) objects, shown on their
+  first two principal components, and read off how many animate / inanimate images it classifies
+  correctly: first on the training views, then on the held-out views.
+  Query: ?embed=1  ?static=1 (fitted line, held-out views shown; used for the print figure)
+  Data: readout_line_data.js, written by 2026/figures/make_L05_readout_demo_data.py (same points
+  as the slide figure L05/26_readout_real_data). No network calls.
+-->
+<style>
+:root{
+  --paper:#FAF9F5;--ink:#1E293B;--body:#334155;--slate:#64748B;
+  --blue:#3E6D8E;--magenta:#B5396B;--green:#3F7A6B;--pop:#B23A2E;--gold:#FFC72C;
+  --rule:#E7E3DA;--focus:#0969da;color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--body);
+  font:20px/1.35 "Poppins",system-ui,-apple-system,sans-serif}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1680px;margin:0 auto;padding:12px 14px 16px}
+h1{margin:0 0 4px;font-size:28px;line-height:1.2;color:var(--ink)}
+.lede{margin:0 0 10px;font-size:17px;color:var(--slate)}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:32px;align-items:stretch}
+.canvas-frame{border:1px solid var(--rule);background:var(--paper);position:relative;
+  aspect-ratio:4/3;max-height:640px;overflow:hidden}
+.canvas-frame canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.meter{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:4px 12px;
+  font-variant-numeric:tabular-nums}
+.meter .lab{font-size:20px;color:var(--ink)}
+.meter .val{font-size:34px;font-weight:600;color:var(--ink);min-width:4ch;text-align:right}
+.meter .bar{grid-column:1/3;height:12px;background:var(--rule);border-radius:6px;position:relative;overflow:hidden}
+.meter .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--magenta);border-radius:6px}
+.meter .bar b{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--ink)}
+.meter.dim{opacity:.35}
+.base{font-size:18px;color:var(--slate)}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+button{font:inherit;font-size:18px;color:var(--ink);background:var(--paper);
+  border:1px solid var(--slate);border-radius:4px;padding:6px 14px;min-height:40px;cursor:pointer}
+button[aria-pressed=true]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:17px;color:var(--body)}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;
+  margin-right:6px;vertical-align:-1px;background:var(--c)}
+.hint{font-size:16px;color:var(--slate);margin:0}
+body.embed .wrap{max-width:none;padding:6px 10px}
+body.embed h1,body.embed .lede{display:none}
+body.embed .canvas-frame{max-height:none;height:calc(100vh - 16px);aspect-ratio:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Draw the readout line</h1>
+  <p class="lede">Monkey IT, 1,224 object images on two principal components. Drag the line, then check it on views it has not seen.</p>
+  <div class="stage">
+    <div class="canvas-frame"><canvas id="cv" aria-label="Scatter of IT responses with a draggable line"></canvas></div>
+    <div class="side">
+      <div class="legend">
+        <span style="--c:#3F7A6B">animate (animals, faces)</span>
+        <span style="--c:#3E6D8E">inanimate</span>
+      </div>
+      <div class="meter" id="mTrain">
+        <span class="lab">Training views correct</span><span class="val" id="vTrain">–</span>
+        <div class="bar"><i id="bTrain"></i><b id="kTrain"></b></div>
+      </div>
+      <div class="meter dim" id="mTest">
+        <span class="lab">Held-out views correct</span><span class="val" id="vTest">?</span>
+        <div class="bar"><i id="bTest"></i><b id="kTest"></b></div>
+      </div>
+      <p class="base">Black tick: always answering "inanimate", <span id="vBase"></span></p>
+      <div class="btns">
+        <button id="bShow" aria-pressed="false">Show held-out views</button>
+        <button id="bFit">Fit a readout</button>
+        <button id="bReset">Reset</button>
+      </div>
+      <p class="hint">Drag either magenta handle, or the line itself. The side with more animate training views is read as "animate" (shaded green).</p>
+    </div>
+  </div>
+</div>
+<script src="readout_line_data.js"></script>
+<script>
+(function(){
+const q=new URLSearchParams(location.search);
+if(q.has('embed')) document.body.classList.add('embed');
+const STATIC=q.has('static');
+const D=window.READOUT_DATA, N=D.x.length;
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+const col={a:'#3F7A6B',i:'#3E6D8E',mag:'#B5396B',ink:'#1E293B',shade:'rgba(63,122,107,0.09)'};
+// data bounds with margin
+let xmin=Math.min(...D.x),xmax=Math.max(...D.x),ymin=Math.min(...D.y),ymax=Math.max(...D.y);
+const px=(xmax-xmin)*0.06,py=(ymax-ymin)*0.06; xmin-=px;xmax+=px;ymin-=py;ymax+=py;
+let W=0,H=0,dpr=1;
+const X=v=>(v-xmin)/(xmax-xmin)*W, Y=v=>H-(v-ymin)/(ymax-ymin)*H;
+const iX=p=>xmin+p/W*(xmax-xmin), iY=p=>ymin+(H-p)/H*(ymax-ymin);
+// the line: two handles in data coordinates
+const init=()=>[[xmin+(xmax-xmin)*0.25,ymin+(ymax-ymin)*0.5],[xmin+(xmax-xmin)*0.75,ymin+(ymax-ymin)*0.5]];
+let h=init(), showTest=false, drag=null, last=null;
+function fitLine(){ // w.x + b = 0 -> two points spanning the view
+  const [w0,w1]=D.fit.w,b=D.fit.b, pts=[];
+  if(Math.abs(w1)>Math.abs(w0)){for(const x of [xmin+(xmax-xmin)*0.15,xmax-(xmax-xmin)*0.15]) pts.push([x,-(w0*x+b)/w1]);}
+  else{for(const y of [ymin+(ymax-ymin)*0.15,ymax-(ymax-ymin)*0.15]) pts.push([-(w1*y+b)/w0,y]);}
+  return pts;
+}
+function side(i){const [a,b]=h;return (b[0]-a[0])*(D.y[i]-a[1])-(b[1]-a[1])*(D.x[i]-a[0]);}
+function score(){
+  // orientation: the side holding more animate training views is "animate"
+  let pos=0,neg=0; for(let i=0;i<N;i++) if(D.train[i]&&D.animate[i]) (side(i)>0?pos++:neg++);
+  const sgn=pos>=neg?1:-1; let ct=0,nt=0,cs=0,ns=0;
+  for(let i=0;i<N;i++){const pred=(sgn*side(i)>0)?1:0, ok=pred===D.animate[i];
+    if(D.train[i]){nt++;ct+=ok;}else{ns++;cs+=ok;}}
+  return {sgn,train:ct/nt,test:cs/ns};
+}
+function resize(){const r=cv.getBoundingClientRect();dpr=window.devicePixelRatio||1;
+  W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);draw();}
+function draw(){
+  if(!W) return; ctx.clearRect(0,0,W,H);
+  const s=score(), [a,b]=h;
+  // shade the animate half-plane: polygon of the view clipped by the line
+  const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,big=(xmax-xmin+ymax-ymin)*4;
+  const nx=-uy*s.sgn,ny=ux*s.sgn;
+  ctx.beginPath();
+  const P=[[a[0]-ux*big,a[1]-uy*big],[a[0]+ux*big,a[1]+uy*big],[a[0]+ux*big+nx*big,a[1]+uy*big+ny*big],[a[0]-ux*big+nx*big,a[1]-uy*big+ny*big]];
+  P.forEach((p,k)=>k?ctx.lineTo(X(p[0]),Y(p[1])):ctx.moveTo(X(p[0]),Y(p[1])));ctx.closePath();
+  ctx.fillStyle=col.shade;ctx.fill();
+  // points: training faint, held-out solid (only when shown)
+  for(let pass=0;pass<2;pass++) for(let i=0;i<N;i++){
+    const tr=D.train[i]; if(pass===0&&!tr) continue; if(pass===1&&(tr||!showTest)) continue;
+    ctx.beginPath();ctx.arc(X(D.x[i]),Y(D.y[i]),tr?3.2:5.2,0,2*Math.PI);
+    ctx.fillStyle=D.animate[i]?col.a:col.i; ctx.globalAlpha=tr?(showTest?0.25:0.7):1; ctx.fill();
+    if(!tr){ctx.globalAlpha=1;ctx.lineWidth=1;ctx.strokeStyle='#fff';ctx.stroke();}
+  }
+  ctx.globalAlpha=1;
+  // the line
+  ctx.beginPath();ctx.moveTo(X(a[0]-ux*big),Y(a[1]-uy*big));ctx.lineTo(X(a[0]+ux*big),Y(a[1]+uy*big));
+  ctx.lineWidth=3;ctx.strokeStyle=col.ink;ctx.stroke();
+  for(const p of h){ctx.beginPath();ctx.arc(X(p[0]),Y(p[1]),11,0,2*Math.PI);ctx.fillStyle=col.mag;ctx.fill();
+    ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();}
+  // axes labels
+  ctx.fillStyle='#64748B';ctx.font='19px Poppins,system-ui,sans-serif';
+  ctx.fillText('PC 1 of IT responses',W-215,H-12);ctx.save();ctx.translate(22,120);ctx.rotate(-Math.PI/2);ctx.fillText('PC 2',0,0);ctx.restore();
+  // meters
+  const pct=v=>Math.round(v*100)+'%', base=D.baseline_test;
+  document.getElementById('vTrain').textContent=pct(s.train);
+  document.getElementById('bTrain').style.width=(s.train*100)+'%';
+  document.getElementById('kTrain').style.left=(base*100)+'%';
+  document.getElementById('kTest').style.left=(base*100)+'%';
+  document.getElementById('vBase').textContent=pct(base);
+  const mt=document.getElementById('mTest');
+  if(showTest){mt.classList.remove('dim');document.getElementById('vTest').textContent=pct(s.test);
+    document.getElementById('bTest').style.width=(s.test*100)+'%';}
+  else{mt.classList.add('dim');document.getElementById('vTest').textContent='?';document.getElementById('bTest').style.width='0';}
+}
+function evPt(e){const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];}
+cv.addEventListener('pointerdown',e=>{const [mx,my]=evPt(e);
+  for(let k=0;k<2;k++) if(Math.hypot(X(h[k][0])-mx,Y(h[k][1])-my)<18){drag=k;break;}
+  if(drag===null){ // grab the whole line if near it
+    const [a,b]=h,ax=X(a[0]),ay=Y(a[1]),bx=X(b[0]),by=Y(b[1]);
+    const d=Math.abs((bx-ax)*(ay-my)-(ax-mx)*(by-ay))/Math.hypot(bx-ax,by-ay); if(d<14) drag='line';}
+  if(drag!==null){last=[iX(mx),iY(my)];cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing';}
+});
+cv.addEventListener('pointermove',e=>{if(drag===null) return; const [mx,my]=evPt(e), p=[iX(mx),iY(my)];
+  if(drag==='line'){const d=[p[0]-last[0],p[1]-last[1]];h=h.map(q=>[q[0]+d[0],q[1]+d[1]]);last=p;}
+  else h[drag]=p; draw();});
+const up=()=>{drag=null;cv.style.cursor='grab';};
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+const bShow=document.getElementById('bShow');
+bShow.onclick=()=>{showTest=!showTest;bShow.setAttribute('aria-pressed',showTest);draw();};
+document.getElementById('bFit').onclick=()=>{h=fitLine();draw();};
+document.getElementById('bReset').onclick=()=>{h=init();showTest=false;bShow.setAttribute('aria-pressed','false');draw();};
+if(STATIC){h=fitLine();showTest=true;bShow.setAttribute('aria-pressed','true');}
+new ResizeObserver(resize).observe(cv.parentElement);
+})();
+</script>
+</body>
+</html>

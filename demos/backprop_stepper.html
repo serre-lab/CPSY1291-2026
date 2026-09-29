@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backprop, one step at a time — CPSY 1291</title>
+<!--
+  CPSY 1291, Lecture 8. A 2-2-1 network (ReLU hidden layer, sigmoid output, cross-entropy
+  loss) with the starting weights of the lecture's worked example
+  (figures/make_L08_backprop_figures.py): W1 = [[0.5,-0.4],[0.3,0.8]], W2 = [0.7,-0.6],
+  biases 0, input (1,0), target 1. Every number is computed here, in the page; no network calls.
+  Check: at the start, y-hat = 0.54, loss = 0.61, delta_out = -0.46, delta_hidden = (-0.32, 0.27);
+  one update with eta = 1 gives y-hat = 0.82, loss = 0.20.
+-->
+<style>
+  :root { --bg:#FAF9F5; --ink:#1E293B; --body:#334155; --muted:#A89B8C; --mag:#B5396B;
+          --act:#3E6D8E; --err:#3F7A6B; --pop:#B23A2E; --grid:#E7E3DA; --gold:#FFC72C; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; background:var(--bg); color:var(--body);
+               font-family:Poppins, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+  .wrap { display:flex; gap:18px; padding:10px 14px; align-items:flex-start; }
+  svg { flex:1 1 auto; min-width:0; height:auto; }
+  .panel { flex:0 0 330px; font-size:18px; }
+  .row { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 10px; }
+  button { font:inherit; font-size:17px; padding:7px 12px; border:0; border-radius:8px;
+           background:#EDE7DE; color:var(--ink); cursor:pointer; }
+  button.on { background:var(--gold); }
+  button:focus-visible, select:focus-visible, input:focus-visible { outline:3px solid var(--act); outline-offset:2px; }
+  label { display:block; margin:10px 0 2px; color:#6B6258; font-size:16px; }
+  select, input[type=range] { width:100%; font:inherit; font-size:16px; }
+  .stat { background:#fff; border-radius:8px; padding:8px 12px; margin-top:8px;
+          box-shadow:0 1px 4px rgba(0,0,0,.08); font-size:17px; line-height:1.5; }
+  .stat b { font-size:20px; color:var(--ink); }
+  #say { min-height:3.2em; }
+  .m { color:var(--mag); } .a { color:var(--act); } .e { color:var(--err); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <svg id="net" viewBox="0 0 1000 560" role="img" aria-label="A 2-2-1 network with its weights, activations, errors and gradients"></svg>
+  <div class="panel">
+    <div class="row" role="group" aria-label="steps">
+      <button id="b0">1 forward</button><button id="b1">2 output error</button>
+      <button id="b2">3 backward</button><button id="b3">4 gradients</button>
+    </div>
+    <div class="row">
+      <button id="upd">apply update</button><button id="reset">reset</button>
+    </div>
+    <label for="inp">input (target)</label>
+    <select id="inp">
+      <option value="1,0,1" selected>x = (1, 0), target 1</option>
+      <option value="0,1,1">x = (0, 1), target 1</option>
+      <option value="1,1,0">x = (1, 1), target 0</option>
+      <option value="0,0,0">x = (0, 0), target 0</option>
+    </select>
+    <label for="w11">weight x₁ → h₁: <span id="w11v" class="m"></span></label>
+    <input type="range" id="w11" min="-1.5" max="1.5" step="0.05">
+    <label for="v1">weight h₁ → ŷ: <span id="v1v" class="m"></span></label>
+    <input type="range" id="v1" min="-1.5" max="1.5" step="0.05">
+    <label for="eta">learning rate η: <span id="etav"></span></label>
+    <input type="range" id="eta" min="0.1" max="3" step="0.1" value="1">
+    <div class="stat">ŷ <b id="yh" class="a"></b> &nbsp; loss <b id="L"></b><br>
+      <span style="color:#6B6258">updates</span> <b id="n">0</b></div>
+    <div class="stat" id="say"></div>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const NS = 'http://www.w3.org/2000/svg';
+const START = { W1: [[0.5, -0.4], [0.3, 0.8]], b1: [0, 0], W2: [0.7, -0.6], b2: 0 };
+let P, phase = -1, nUpd = 0, X = [1, 0], Y = 1;
+
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function sig(z) { return 1 / (1 + Math.exp(-z)); }
+function fmt(v) { if (Math.abs(v) < 0.005) return '0'; return (v < 0 ? '−' : '') + Math.abs(v).toFixed(2); }
+
+function compute() {
+  const z1 = [0, 1].map(j => P.W1[j][0] * X[0] + P.W1[j][1] * X[1] + P.b1[j]);
+  const a1 = z1.map(z => Math.max(0, z));
+  const z2 = P.W2[0] * a1[0] + P.W2[1] * a1[1] + P.b2;
+  const yh = sig(z2);
+  const eps = 1e-12;
+  const L = -(Y * Math.log(yh + eps) + (1 - Y) * Math.log(1 - yh + eps));
+  const d2 = yh - Y;
+  const d1 = [0, 1].map(j => P.W2[j] * d2 * (z1[j] > 0 ? 1 : 0));
+  const gW2 = a1.map(a => d2 * a);
+  const gW1 = d1.map(d => [d * X[0], d * X[1]]);
+  return { z1, a1, z2, yh, L, d2, d1, gW2, gW1 };
+}
+
+// ---- drawing -------------------------------------------------------------------
+const POS = { x1: [90, 150], x2: [90, 410], h1: [430, 150], h2: [430, 410], o: [740, 280] };
+const R = 52;
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  $('net').appendChild(e); return e;
+}
+function txt(x, y, s, color, size, weight, anchor) {
+  return el('text', { x, y, fill: color, 'font-size': size || 30, 'font-weight': weight || 400,
+    'text-anchor': anchor || 'middle', 'dominant-baseline': 'central',
+    'font-family': 'Poppins, system-ui, sans-serif' }, s);
+}
+function tag(x, y, s) {
+  const w = 22 * s.length + 20;
+  el('rect', { x: x - w / 2, y: y - 24, width: w, height: 48, rx: 10, fill: '#E4EFEA', stroke: '#3F7A6B', 'stroke-width': 2 });
+  txt(x, y, s, '#3F7A6B', 28, 700);
+}
+function arrow(x0, y0, x1, y1, color, width) {
+  el('line', { x1: x0, y1: y0, x2: x1, y2: y1, stroke: color, 'stroke-width': width || 4, 'marker-end': 'url(#hd)' });
+}
+
+function draw() {
+  const svg = $('net'); svg.innerHTML = '';
+  const defs = el('defs', {});
+  const m = document.createElementNS(NS, 'marker');
+  for (const [k, v] of Object.entries({ id: 'hd', markerWidth: 22, markerHeight: 22, refX: 18, refY: 10, orient: 'auto', markerUnits: 'userSpaceOnUse' })) m.setAttribute(k, v);
+  const p = document.createElementNS(NS, 'path'); p.setAttribute('d', 'M0,0 L20,10 L0,20 z'); p.setAttribute('fill', '#3F7A6B');
+  m.appendChild(p); defs.appendChild(m);
+  const c = compute();
+  const showF = phase >= 0, showO = phase >= 1, showH = phase >= 2, showG = phase >= 3;
+  // edges, with weights (or gradients in phase 3)
+  const edges = [['x1', 'h1', P.W1[0][0], c.gW1[0][0], 0.28, -22], ['x2', 'h1', P.W1[0][1], c.gW1[0][1], 0.22, -24],
+                 ['x1', 'h2', P.W1[1][0], c.gW1[1][0], 0.22, 24], ['x2', 'h2', P.W1[1][1], c.gW1[1][1], 0.28, 22],
+                 ['h1', 'o', P.W2[0], c.gW2[0], 0.30, 30], ['h2', 'o', P.W2[1], c.gW2[1], 0.30, -30]];
+  for (const [s, t, w, g, f, dy] of edges) {
+    const [xs, ys] = POS[s], [xt, yt] = POS[t];
+    el('line', { x1: xs, y1: ys, x2: xt, y2: yt, stroke: '#A89B8C', 'stroke-width': 3 });
+    const lx = xs + f * (xt - xs), ly = ys + f * (yt - ys) + dy;
+    const s2 = showG ? fmt(g) : fmt(w);
+    el('rect', { x: lx - 42, y: ly - 20, width: 84, height: 40, rx: 6, fill: '#FAF9F5' });
+    txt(lx, ly, s2, showG ? '#3F7A6B' : '#B5396B', 28, showG ? 700 : 400);
+  }
+  el('line', { x1: POS.o[0], y1: 280, x2: 865, y2: 280, stroke: '#A89B8C', 'stroke-width': 3 });
+  // loss box
+  el('rect', { x: 865, y: 205, width: 130, height: 150, rx: 12, fill: '#FAF9F5', stroke: '#1E293B', 'stroke-width': 2.5 });
+  txt(930, 240, 'target ' + Y, '#1E293B', 24);
+  txt(930, 300, showF ? 'loss' : '', '#1E293B', 24);
+  txt(930, 330, showF ? c.L.toFixed(2) : '', '#1E293B', 28, 700);
+  // backward arrows
+  if (showO) arrow(865, 312, POS.o[0] + R + 6, 312, '#3F7A6B', 5);
+  if (showH) {
+    ['h1', 'h2'].forEach((h, j) => {
+      const [ox, oy] = POS.o, [hx, hy] = POS[h];
+      const L0 = Math.hypot(hx - ox, hy - oy), ux = (hx - ox) / L0, uy = (hy - oy) / L0;
+      let px = -uy, py = ux; if (py * (hy - oy) < 0) { px = -px; py = -py; }   // away from the middle
+      const off = 42, x0 = ox + 70 * ux + off * px, y0 = oy + 70 * uy + off * py;
+      const x1 = hx - 70 * ux + off * px, y1 = hy - 70 * uy + off * py;
+      arrow(x0, y0, x1, y1, '#3F7A6B', 5);
+      txt((x0 + x1) / 2 + 34 * px, (y0 + y1) / 2 + 34 * py, '× ' + fmt(P.W2[j]), '#3F7A6B', 24, 400);
+      // a unit that is off gets slope 0: say so on a second line, clear of the arrowhead
+      if (!(c.z1[j] > 0)) txt((x0 + x1) / 2 + 68 * px, (y0 + y1) / 2 + 68 * py, '× 0 (unit off)', '#B23A2E', 24, 700);
+    });
+  }
+  // nodes
+  const names = { x1: 'x₁', x2: 'x₂', h1: 'h₁', h2: 'h₂', o: 'ŷ' };
+  const vals = { x1: X[0], x2: X[1], h1: c.a1[0], h2: c.a1[1], o: c.yh };
+  for (const k in POS) {
+    const [x, y] = POS[k];
+    el('circle', { cx: x, cy: y, r: R, fill: '#FAF9F5', stroke: '#1E293B', 'stroke-width': 3 });
+    const up = y < 280 || k === 'o';
+    txt(x, up ? y - R - 26 : y + R + 26, names[k], '#1E293B', 30);
+    if (k[0] === 'x') txt(x, y, String(vals[k]), '#3E6D8E', 32, 700);
+    else if (showF) txt(x, y, fmt(vals[k]), '#3E6D8E', 30, 700);
+  }
+  if (showO) tag(850, 402, 'δ = ' + fmt(c.d2));
+  if (showH) { tag(POS.h1[0] - 150, 60, 'δ₁ = ' + fmt(c.d1[0])); tag(POS.h2[0] - 150, 500, 'δ₂ = ' + fmt(c.d1[1])); }
+  // stats and explanation
+  $('yh').textContent = showF ? fmt(c.yh) : '?';
+  $('L').textContent = showF ? c.L.toFixed(2) : '?';
+  $('n').textContent = nUpd;
+  const say = [
+    'Forward: each hidden unit is ReLU of its weighted sum; the output is a sigmoid. The loss is −log of the probability given to the target.',
+    'Output error δ = ŷ − y = ' + fmt(c.d2) + (c.d2 < 0 ? ': the output was too low.' : ': the output was too high.'),
+    'Each hidden unit’s error = output error × its weight to the output × its ReLU slope (1 if on, 0 if off).',
+    'Each gradient = error of the unit it feeds × activity of the unit it comes from. Apply the update to subtract η × gradient.'
+  ];
+  $('say').textContent = phase < 0 ? 'Press 1 to run the forward pass.' : say[phase];
+  ['b0', 'b1', 'b2', 'b3'].forEach((id, i) => $(id).classList.toggle('on', i === phase));
+  $('w11').value = P.W1[0][0]; $('w11v').textContent = fmt(P.W1[0][0]);
+  $('v1').value = P.W2[0]; $('v1v').textContent = fmt(P.W2[0]);
+  $('etav').textContent = (+$('eta').value).toFixed(1);
+}
+
+function update() {
+  const c = compute(), eta = +$('eta').value;
+  for (let j = 0; j < 2; j++) {
+    for (let i = 0; i < 2; i++) P.W1[j][i] -= eta * c.gW1[j][i];
+    P.b1[j] -= eta * c.d1[j];
+    P.W2[j] -= eta * c.gW2[j];
+  }
+  P.b2 -= eta * c.d2;
+  nUpd += 1; phase = 0; draw();
+}
+function reset() { P = clone(START); nUpd = 0; phase = -1; draw(); }
+
+['b0', 'b1', 'b2', 'b3'].forEach((id, i) => $(id).addEventListener('click', () => { phase = i; draw(); }));
+$('upd').addEventListener('click', update);
+$('reset').addEventListener('click', reset);
+$('inp').addEventListener('change', e => { const v = e.target.value.split(',').map(Number); X = [v[0], v[1]]; Y = v[2]; if (phase < 0) phase = 0; draw(); });
+$('w11').addEventListener('input', e => { P.W1[0][0] = +e.target.value; if (phase < 0) phase = 0; draw(); });
+$('v1').addEventListener('input', e => { P.W2[0] = +e.target.value; if (phase < 0) phase = 0; draw(); });
+$('eta').addEventListener('input', draw);
+reset();
+</script>
+</body>
+</html>

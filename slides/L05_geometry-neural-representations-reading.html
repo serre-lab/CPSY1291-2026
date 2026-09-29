@@ -1,0 +1,812 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Geometry of neural representations · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Geometry of neural representations</h1><p>Reader-friendly version of the 58 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L05_geometry-neural-representations.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Geometry of neural representations</a></li><li><a href="#slide-2">Where we are</a></li><li><a href="#slide-3">How many dimensions does a population use?</a></li><li><a href="#slide-4">The raw material, one more time</a></li><li><a href="#slide-5">Two dual views of the same matrix</a></li><li><a href="#slide-6">"Dimension" means more than one thing</a></li><li><a href="#slide-7">How big is the cloud? The eigenspectrum of V1</a></li><li><a href="#slide-8">Do two people use the same dimensions?</a></li><li><a href="#slide-9">Does a deep network do the same?</a></li><li><a href="#slide-10">Putting a number on it: effective dimensionality</a></li><li><a href="#slide-11">What can a linear readout do with the cloud?</a></li><li><a href="#slide-12">A linear readout draws a hyperplane</a></li><li><a href="#slide-13">A readout as a measurement</a></li><li><a href="#slide-14">Draw the line yourself</a></li><li><a href="#slide-15">When no line works, add a unit that mixes</a></li><li><a href="#slide-16">One neuron, many variables</a></li><li><a href="#slide-17">Mixing makes the population high-dimensional</a></li><li><a href="#slide-18">A condition is a cloud with a size and a shape</a></li><li><a href="#slide-19">How big are the clouds? Identity and viewpoint</a></li><li><a href="#slide-20">A readout must also generalize: CCGP</a></li><li><a href="#slide-21">The same populations do both</a></li><li><a href="#slide-22">Abstraction appears with inference, in humans</a></li><li><a href="#slide-23">Does a deep network see objects the way IT does?</a></li><li><a href="#slide-24">Why not just compare behavior?</a></li><li><a href="#slide-25">Put a number on the match: RSA</a></li><li><a href="#slide-26">An alternative to RSA: CKA</a></li><li><a href="#slide-27">RSA or CKA?</a></li><li><a href="#slide-28">Other comparisons you will meet in papers</a></li><li><a href="#slide-29">Is a score above chance? Shuffle the stimuli</a></li><li><a href="#slide-30">With few stimuli, any two representations look alike</a></li><li><a href="#slide-31">Brains are noisy, networks are not</a></li><li><a href="#slide-32">How high could a score go? The noise ceiling</a></li><li><a href="#slide-33">Would the result hold for other stimuli? Resample</a></li><li><a href="#slide-34">Different measures, different winners</a></li><li><a href="#slide-35">Tied on natural images, split on designed ones</a></li><li><a href="#slide-36">Recap</a></li><li><a href="#slide-37">Geometry is a description.</a></li><li><a href="#slide-38">Further reading for the research trail</a></li><li><a href="#slide-39">Minute paper</a></li><li><a href="#slide-40">Appendix: derivations and extra examples</a></li><li><a href="#slide-41">Localist and distributed population codes</a></li><li><a href="#slide-42">Shared dimensions need a functional alignment</a></li><li><a href="#slide-43">Effective dimensionality from an eigenspectrum</a></li><li><a href="#slide-44">Careful: dimensionality is estimated, not observed</a></li><li><a href="#slide-45">Between and within variance, worked by hand</a></li><li><a href="#slide-46">Abstraction fails on error trials</a></li><li><a href="#slide-47">Reading one variable without reading the others</a></li><li><a href="#slide-48">The price of abstraction: the binding problem</a></li><li><a href="#slide-49">Geometry predicts behavior</a></li><li><a href="#slide-50">Same images, two representations</a></li><li><a href="#slide-51">CKA between two response matrices</a></li><li><a href="#slide-52">CCA and its variants</a></li><li><a href="#slide-53">Shape metrics</a></li><li><a href="#slide-54">Comparison measures and what each ignores</a></li><li><a href="#slide-55">Random directions become nearly perpendicular</a></li><li><a href="#slide-56">More features than units</a></li><li><a href="#slide-57">Limits of similarity measures</a></li><li><a href="#slide-58">Beyond geometry: computation happens in time</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+  <img src="../images/brown-crest-color.png" alt="Brown University crest">
+  <div class="vrule"></div>
+  <div>
+    <span class="code">CPSY 1291</span>
+    <span class="name">Computational Methods for Mind, Brain &amp; Behavior</span>
+  </div>
+</div>
+<div class="eyebrow">Lecture 5 · Theme 1: Representational spaces</div>
+<h2 id="heading-1">Geometry of neural representations</h2>
+<p class="meta">Tuesday, September 29 · Fall 2026</p>
+
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="58" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<h2 id="heading-2">Where we are</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Where we are — table"><table><caption>Where we are — table</caption>
+<thead>
+<tr>
+<th scope="col"></th>
+<th scope="col">Question it answered</th>
+<th scope="col">The object it built</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Metrics</strong></td>
+<td><em>What is a data point?</em></td>
+<td>coordinates, dot products, distances</td>
+</tr>
+<tr>
+<td><strong>MDS</strong></td>
+<td><em>How similar are these stimuli?</em></td>
+<td>a dissimilarity matrix, and a map from it</td>
+</tr>
+<tr>
+<td><strong>PCA</strong></td>
+<td><em>What are the dominant axes?</em></td>
+<td>the covariance's eigenvectors: a flat subspace</td>
+</tr>
+<tr>
+<td><strong>Isomap, t-SNE, UMAP</strong></td>
+<td><em>What if the surface is curved?</em></td>
+<td>intrinsic vs embedding dimension, object manifolds</td>
+</tr>
+<tr>
+<td><strong>Today</strong></td>
+<td><em>What shape is the cloud? What can a readout do with it? Does it match another cloud?</em></td>
+<td><strong>the same objects, no new data</strong>: the population itself, not a picture of it</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>Given only a response matrix, what can we say about a representation? And how would we know that two representations match?</mark></p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-class="lead" data-marpit-pagination="3" data-marpit-pagination-total="58" aria-labelledby="heading-3"><p class="page">Slide 3</p>
+<h2 id="heading-3">How many dimensions does a population use?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="58" aria-labelledby="heading-4"><p class="page">Slide 4</p>
+<h2 id="heading-4">The raw material, one more time</h2>
+<ul>
+<li>Record <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> <strong>stimuli</strong> from <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> <strong>units</strong> (neurons, voxels or model units): a <strong>response matrix</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi><mo>∈</mo><msup><mi mathvariant="normal" data-original-mathvariant="double-struck">ℝ</mi><mrow><mi>N</mi><mo>×</mo><mi>D</mi></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{X}\in\mathbb{R}^{N\times D}</annotation></semantics></math>. It is all we ever get</li>
+<li>Each row is the population's response to one stimulus: a <strong>point</strong> in a space with one axis per unit. Today we study the <strong>shape of the cloud</strong> of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> points</li>
+</ul>
+<div class="capfig">
+<figure><img src="../images/L05/01_response_matrix.svg" alt="Heatmap of the N-by-D response matrix with one row outlined, next to a 3-D scatter of points in which that row is one highlighted point of the population's cloud" aria-describedby="figure-4-1"><figcaption id="figure-4-1"><p>Heatmap of the N-by-D response matrix with one row outlined, next to a 3-D scatter of points in which that row is one highlighted point of the population's cloud</p><a href="../images/L05/01_response_matrix.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-marpit-pagination="5" data-marpit-pagination-total="58" aria-labelledby="heading-5"><p class="page">Slide 5</p>
+<h2 id="heading-5">Two dual views of the same matrix</h2>
+<div class="capfig">
+<figure><img src="../images/L05/19_dual_views.svg" alt="Three panels computed from a toy response matrix of 12 stimuli from three categories and 5 neurons. Left, the matrix as a heatmap with stimulus A1's row and neuron 1's column outlined. Middle, stimulus space: each stimulus is a point placed by its responses in neurons 1 and 2, and the three categories form three separate clusters, with A1 circled. Right, neuron space: each neuron is a point placed by its responses to stimuli A1 and B1; neuron 1 sits high on A1 and low on B1, neuron 2 the reverse, and neuron 4, which responds to both categories, sits high on both" aria-describedby="figure-5-1"><figcaption id="figure-5-1"><p>Three panels computed from a toy response matrix of 12 stimuli from three categories and 5 neurons. Left, the matrix as a heatmap with stimulus A1's row and neuron 1's column outlined. Middle, stimulus space: each stimulus is a point placed by its responses in neurons 1 and 2, and the three categories form three separate clusters, with A1 circled. Right, neuron space: each neuron is a point placed by its responses to stimuli A1 and B1; neuron 1 sits high on A1 and low on B1, neuron 2 the reverse, and neuron 4, which responds to both categories, sits high on both</p><a href="../images/L05/19_dual_views.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>Stimulus space</strong>: rows as points, one axis per neuron, the <em>representational geometry</em>. <strong>Neuron space</strong>: columns as points, one axis per stimulus. A neuron's position is its <em>tuning curve</em></li>
+<li>Same matrix, transposed: one SVD gives both. <mark>Tuning and geometry are two descriptions of one thing</mark></li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1038/s41583-021-00502-3" rel="noopener">Kriegeskorte &amp; Wei <b>Nat Rev Neurosci 2021</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="58" aria-labelledby="heading-6"><p class="page">Slide 6</p>
+<h2 id="heading-6">"Dimension" means more than one thing</h2>
+<ul>
+<li><strong>Ambient</strong> (units recorded), <strong>embedding</strong> (the flat subspace PCA needs), <strong>intrinsic</strong> (dimensions needed to locate a point on the manifold). In GPT-2, days and months lie on circles. A circle: intrinsic 1, embedding 2. GPT-2: ambient 768</li>
+</ul>
+<div class="capfig">
+<figure><img src="../images/L05/40_engels2025_fig1_daysmonths.png" alt="Two panels from the language model GPT-2-small, layer 7, projected on principal axes 2 and 3. Left, the representations of the seven days of the week form a ring of colored clusters in calendar order, Monday to Sunday. Right, the twelve months form a ring in calendar order, January to December" aria-describedby="figure-6-1"><figcaption id="figure-6-1"><p>Two panels from the language model GPT-2-small, layer 7, projected on principal axes 2 and 3. Left, the representations of the seven days of the week form a ring of colored clusters in calendar order, Monday to Sunday. Right, the twelve months form a ring in calendar order, January to December</p><a href="../images/L05/40_engels2025_fig1_daysmonths.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>Rank</strong>: the number of independent directions the points span (3 points always lie in a plane)</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2405.14860" rel="noopener">Engels, Michaud, Liao, Gurnee &amp; Tegmark <b>ICLR 2025</b></a> · <a href="https://www.thetransmitter.org/neural-dynamics/dimensionality-neurosciences-red-herring/" rel="noopener">Perich <b>The Transmitter 2026</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-marpit-pagination="7" data-marpit-pagination-total="58" aria-labelledby="heading-7"><p class="page">Slide 7</p>
+<h2 id="heading-7">How big is the cloud? The eigenspectrum of V1</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L05/41_v1_spectrum_real.svg" alt="Log-log plot of share of variance against principal component number, 1 to 60, for V1 in two macaque monkeys viewing 100 natural images. Both spectra fall along nearly straight lines with power-law exponents of about 1.32 and 1.39, a little steeper than a dotted line of slope minus 1 labeled mouse V1. Thin dashed lines without cross-validation lie almost on top of the solid ones" aria-describedby="figure-7-1"><figcaption id="figure-7-1"><p>Log-log plot of share of variance against principal component number, 1 to 60, for V1 in two macaque monkeys viewing 100 natural images. Both spectra fall along nearly straight lines with power-law exponents of about 1.32 and 1.39, a little steeper than a dotted line of slope minus 1 labeled mouse V1. Thin dashed lines without cross-validation lie almost on top of the solid ones</p><a href="../images/L05/41_v1_spectrum_real.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>The PCA lecture's scree plot, on log-log axes. Stringer et al. imaged ~<strong>10,000 neurons</strong> in mouse V1 (early visual cortex) viewing ~2,800 natural images</li>
+<li>No elbow. A straight line: a <strong>power law</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>n</mi></msub><mo>∝</mo><msup><mi>n</mi><mrow><mo>−</mo><mi>α</mi></mrow></msup></mrow><annotation encoding="application/x-tex">\lambda_n \propto n^{-\alpha}</annotation></semantics></math>, with <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math> just above 1</li>
+<li>Monkey V1 on 100 images (left): again a straight line, a little steeper</li>
+<li>A slower decay than <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">1/n</annotation></semantics></math> would spread variance over more dimensions, but then small changes to an image could cause large jumps in the response</li>
+</ul>
+</div>
+</div>
+<p><mark>V1 spreads its variance over many dimensions, but no more than a smooth code allows.</mark></p>
+<div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer, Pachitariu, Steinmetz, Carandini &amp; Harris <b>Nature 2019</b></a> · <a href="https://doi.org/10.1016/j.neuron.2024.12.003" rel="noopener">Papale, Wang, Self et al. <b>Neuron 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="58" aria-labelledby="heading-8"><p class="page">Slide 8</p>
+<h2 id="heading-8">Do two people use the same dimensions?</h2>
+<div class="capfig">
+<figure><img src="../images/L05/37_gauthaman2025_fig2.png" alt="Two log-log plots from human fMRI. Left, within-subject: for eight people, covariance falls along the same straight line against component number, from 1 to about 5,000, with no elbow. Right, between-subject relative to subject 1: after each other person's responses are rotated to line up with subject 1's, their cross-covariance along subject 1's dimensions falls along the same power law up to a few hundred components, the number of images all subjects saw" aria-describedby="figure-8-1"><figcaption id="figure-8-1"><p>Two log-log plots from human fMRI. Left, within-subject: for eight people, covariance falls along the same straight line against component number, from 1 to about 5,000, with no elbow. Right, between-subject relative to subject 1: after each other person's responses are rotated to line up with subject 1's, their cross-covariance along subject 1's dimensions falls along the same power law up to a few hundred components, the number of images all subjects saw</p><a href="../images/L05/37_gauthaman2025_fig2.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Human visual cortex (fMRI): again a power law, no elbow, over thousands of components</li>
+<li><mark>Aligned by a rotation, two brains share the same power law, hundreds of dimensions deep</mark></li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1371/journal.pcbi.1013714" rel="noopener">Gauthaman, Ménard &amp; Bonner <b>PLoS Comput Biol 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="58" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<h2 id="heading-9">Does a deep network do the same?</h2>
+<div class="capfig">
+<figure><img src="../images/L05/22_network_eigenspectra.svg" alt="Log-log plot of the share of variance carried by each principal component against its number n, for six networks' responses to 1,854 THINGS images, with a dotted reference line of slope minus 1, the power law found in mouse V1. Five trained networks have gently falling curves with fitted exponents between about 0.67 and 0.96, at or a little flatter than the reference; the untrained ResNet-18, dashed, starts with one component holding most of the variance and then falls much more steeply, exponent 1.43" aria-describedby="figure-9-1"><figcaption id="figure-9-1"><p>Log-log plot of the share of variance carried by each principal component against its number n, for six networks' responses to 1,854 THINGS images, with a dotted reference line of slope minus 1, the power law found in mouse V1. Five trained networks have gently falling curves with fitted exponents between about 0.67 and 0.96, at or a little flatter than the reference; the untrained ResNet-18, dashed, starts with one component holding most of the variance and then falls much more steeply, exponent 1.43</p><a href="../images/L05/22_network_eigenspectra.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><mark>Why care: in published tests, networks with spectra flatter than V1's are easier to fool with tiny image changes</mark></li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a> · <a href="https://arxiv.org/abs/2012.04729" rel="noopener">Nassar et al. <b>arXiv 2020</b></a> · <a href="https://doi.org/10.1371/journal.pcbi.1009739" rel="noopener">Kong, Margalit, Gardner &amp; Norcia <b>PLoS Comput Biol 2022</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="58" aria-labelledby="heading-10"><p class="page">Slide 10</p>
+<h2 id="heading-10">Putting a number on it: effective dimensionality</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li>Noise gives every direction <em>some</em> variance. We need a soft count: <strong>effective dimensionality</strong></li>
+<li>100 neurons that all echo one signal fill <strong>one</strong> direction. 100 that each have their own signal fill <strong>100</strong>. A trained network's 512 units fill about 99</li>
+<li>The <strong>participation ratio</strong> turns an eigenspectrum into that count:</li>
+</ul>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mfrac><msup><mrow><mo fence="true">(</mo><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>λ</mi><mi>i</mi></msub><mo fence="true">)</mo></mrow><mn>2</mn></msup><mrow><munder><mo>∑</mo><mi>i</mi></munder><msubsup><mi>λ</mi><mi>i</mi><mn>2</mn></msubsup></mrow></mfrac></mrow><annotation encoding="application/x-tex">\mathrm{PR} \;=\; \frac{\left(\sum_{i}\lambda_i\right)^{2}}{\sum_{i}\lambda_i^{2}}
+</annotation></semantics></math></div></span></p><ul>
+<li>One eigenvalue: PR = 1. <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math> equal eigenvalues: PR = <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math>. No threshold, no elbow</li>
+<li>It depends on each unit's scale. <strong>z-scoring</strong> units first is <mark>a choice, not a default</mark></li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/L05/36_pr_examples.svg" alt="Three eigenspectra, first 40 principal components each. Top, 100 model neurons that echo one signal: a single bar, participation ratio 1. Middle, 100 neurons that each carry their own signal: 40 bars of almost equal height, participation ratio 98. Bottom, a trained ResNet-18's 512-unit last layer on 1,854 THINGS images: bars that fall smoothly, participation ratio 99" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>Three eigenspectra, first 40 principal components each. Top, 100 model neurons that echo one signal: a single bar, participation ratio 1. Middle, 100 neurons that each carry their own signal: 40 bars of almost equal height, participation ratio 98. Bottom, a trained ResNet-18's 512-unit last layer on 1,854 THINGS images: bars that fall smoothly, participation ratio 99</p><a href="../images/L05/36_pr_examples.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-class="lead" data-marpit-pagination="11" data-marpit-pagination-total="58" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<h2 id="heading-11">What can a linear readout do with the cloud?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="58" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<h2 id="heading-12">A linear readout draws a hyperplane</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L05/24_readout_geometry.svg" alt="A 2-D plane with axes x1 and x2 holding two clouds of dots, green &quot;yes&quot; points upper right and blue &quot;no&quot; points lower left. A fitted straight line runs between them and the two sides are lightly shaded. A magenta arrow labelled w starts on the line at a right angle and points into the green side. A dotted segment from one green point to the line is labelled distance = confidence" aria-describedby="figure-12-1"><figcaption id="figure-12-1"><p>A 2-D plane with axes x1 and x2 holding two clouds of dots, green "yes" points upper right and blue "no" points lower left. A fitted straight line runs between them and the two sides are lightly shaded. A magenta arrow labelled w starts on the line at a right angle and points into the green side. A dotted segment from one green point to the line is labelled distance = confidence</p><a href="../images/L05/24_readout_geometry.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>A downstream neuron computes a weighted sum <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>+</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">\mathbf{w}^{\top}\mathbf{x} + b</annotation></semantics></math> (weights <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mrow><annotation encoding="application/x-tex">\mathbf{w}</annotation></semantics></math>, bias <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math>) and answers "yes" when it is positive: a <strong>linear readout</strong></li>
+<li>Where <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>+</mo><mi>b</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\mathbf{w}^{\top}\mathbf{x} + b = 0</annotation></semantics></math> the answer flips: a line in 2-D, a plane in 3-D, a <strong>hyperplane</strong> in <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> dimensions</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mrow><annotation encoding="application/x-tex">\mathbf{w}</annotation></semantics></math> is perpendicular to the hyperplane and points to the "yes" side. The farther a point lies from it, the more confident the answer</li>
+<li>Fit on some stimuli, a readout becomes a measurement of the others</li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="58" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<h2 id="heading-13">A readout as a measurement</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L05/26_readout_real_data.svg" alt="Monkey IT responses to the 1,224 object images on their first two principal components. Green dots are animate images (animals and faces), blue dots inanimate ones; faint dots are training views and solid dots held-out views. A straight line fitted on the training views separates most held-out animate images from inanimate ones" aria-describedby="figure-13-1"><figcaption id="figure-13-1"><p>Monkey IT responses to the 1,224 object images on their first two principal components. Green dots are animate images (animals and faces), blue dots inanimate ones; faint dots are training views and solid dots held-out views. A straight line fitted on the training views separates most held-out animate images from inanimate ones</p><a href="../images/L05/26_readout_real_data.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Fit the weights on <strong>training</strong> stimuli, then score the readout on <strong>held-out</strong> stimuli (the <strong>test set</strong>). Even the z-scoring uses the training stimuli's mean and SD</li>
+<li>Monkey IT, two principal components only: a line fitted on 18 views per object classifies <strong>94%</strong> of new views as animate or inanimate. Always guessing "inanimate" gives 63%, the <strong>majority-class baseline</strong></li>
+<li>A readout used to test what a representation makes available is a <strong>probe</strong></li>
+<li>Animate or not is one way to split the objects in two. For some splits, no line works</li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="58" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<h2 id="heading-14">Draw the line yourself</h2>
+<div class="interactive-figure interactive-wide">
+
+<div class="print-figure">
+<figure><img src="../images/L05/demo_readout_line.png" alt="The readout demo with the fitted line: training views 92 percent correct, held-out views 94 percent, against a majority-class baseline of 63 percent" aria-describedby="figure-14-1"><figcaption id="figure-14-1"><p>The readout demo with the fitted line: training views 92 percent correct, held-out views 94 percent, against a majority-class baseline of 63 percent</p><a href="../images/L05/demo_readout_line.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<p class="explorer-links"><a href="../demos/readout_line.html">Monkey IT responses to the 1,224 object images on their first two principal components, animate views in green and inanimate in blue. Drag a straight line with two handles; meters give the share of training views it classifies correctly and, once revealed, the share of held-out views, against the 63 percent of always answering inanimate. A button fits a readout — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="58" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<h2 id="heading-15">When no line works, add a unit that mixes</h2>
+<div class="capfig">
+<figure><img src="../images/L05/25_separable_or_not.svg" alt="Left, titled XOR: no line works: four clusters at the corners of a square, green upper right and lower left, blue upper left and lower right; the best line gets 75 percent. Right, titled add a mixed unit: a plane works: the same points in 3-D with a third axis x1 times x2; the green clusters rise above a translucent gold plane and the blue ones drop below it" aria-describedby="figure-15-1"><figcaption id="figure-15-1"><p>Left, titled XOR: no line works: four clusters at the corners of a square, green upper right and lower left, blue upper left and lower right; the best line gets 75 percent. Right, titled add a mixed unit: a plane works: the same points in 3-D with a third axis x1 times x2; the green clusters rise above a translucent gold plane and the blue ones drop below it</p><a href="../images/L05/25_separable_or_not.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>Linearly separable</strong>: one hyperplane puts the two classes on opposite sides. XOR is not</li>
+<li>A unit that responds to the <strong>combination</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math> lifts the points into 3-D, where one plane works</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="58" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<h2 id="heading-16">One neuron, many variables</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L05/30_mixed_neuron_rigotti.svg" alt="Firing rate of one monkey prefrontal neuron for four objects shown first, in two tasks. The two lines are not parallel: object C drives about 6 spikes per second in the recognition task but about 3.4 in the recall task, while object A drives more firing in recall than in recognition" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>Firing rate of one monkey prefrontal neuron for four objects shown first, in two tasks. The two lines are not parallel: object C drives about 6 spikes per second in the recognition task but about 3.4 in the recall task, while object A drives more firing in recall than in recognition</p><a href="../images/L05/30_mixed_neuron_rigotti.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>A neuron in monkey prefrontal cortex, recorded while the monkey remembered a sequence of objects in two tasks</li>
+<li>It prefers object C, but how much depends on the task: the lines are not parallel. Its response is a <strong>nonlinear combination</strong> of object and task: <mark>nonlinear mixed selectivity</mark></li>
+<li>Most prefrontal neurons are like this</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti, Barak, Warden, Wang, Daw, Miller &amp; Fusi <b>Nature 2013</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="58" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<h2 id="heading-17">Mixing makes the population high-dimensional</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L05/31_rigotti_error_dimensionality.svg" alt="Dimensionality of monkey prefrontal activity against the number of neurons read out: it rises and levels off near the maximum of 12 on correct trials and near 7 on error trials" aria-describedby="figure-17-1"><figcaption id="figure-17-1"><p>Dimensionality of monkey prefrontal activity against the number of neurons read out: it rises and levels off near the maximum of 12 on correct trials and near 7 on error trials</p><a href="../images/L05/31_rigotti_error_dimensionality.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>With <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> conditions there are <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>N</mi></msup></mrow><annotation encoding="application/x-tex">2^N</annotation></semantics></math> ways to assign them to two classes. <strong>Shattering dimensionality</strong>: how many of these two-class tasks a linear readout can solve, counted in dimensions (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">\log_2</annotation></semantics></math> of the count, at most <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math>)</li>
+<li>On correct trials, monkey prefrontal cortex comes close to the maximum. A population of pure neurons could not</li>
+<li>On <strong>error trials</strong> it collapses, although the objects can still be decoded</li>
+<li>Each condition here is one point. Real conditions are clouds of trials or views</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="58" aria-labelledby="heading-18"><p class="page">Slide 18</p>
+<h2 id="heading-18">A condition is a cloud with a size and a shape</h2>
+<div class="capfig">
+<figure><img src="../images/L05/20_manifold_geometry.svg" alt="Two panels. Left, one manifold: a blue cloud of sampled points longer in one direction than the other, with its center marked, a dashed arrow from the origin to the center, a dotted circle and arrow for its radius, the mean distance of the points from the center, and two arrows along its spread directions, dimension 2. Right, a line plot of the share of two-class tasks a linear readout solves against manifolds per unit: single points stay separable up to about 2 per unit, small manifolds fall through one half near 0.75, large manifolds near 0.33" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>Two panels. Left, one manifold: a blue cloud of sampled points longer in one direction than the other, with its center marked, a dashed arrow from the origin to the center, a dotted circle and arrow for its radius, the mean distance of the points from the center, and two arrows along its spread directions, dimension 2. Right, a line plot of the share of two-class tasks a linear readout solves against manifolds per unit: single points stay separable up to about 2 per unit, small manifolds fall through one half near 0.75, large manifolds near 0.33</p><a href="../images/L05/20_manifold_geometry.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Last lecture: tangled or untangled. Now we measure it. One object's views form a cloud with a <strong>radius</strong> (mean distance from its center) and a <strong>dimension</strong></li>
+<li><mark>The bigger the clouds, the fewer of them a linear readout can separate</mark></li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1103/PhysRevX.8.031003" rel="noopener">Chung, Lee &amp; Sompolinsky <b>Phys Rev X 2018</b></a> · <a href="https://doi.org/10.1038/s41467-020-14578-5" rel="noopener">Cohen, Chung, Lee &amp; Sompolinsky <b>Nat Commun 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="58" aria-labelledby="heading-19"><p class="page">Slide 19</p>
+<h2 id="heading-19">How big are the clouds? Identity and viewpoint</h2>
+<div class="capfig">
+<figure><img src="../images/L05/21_between_within_variance.svg" alt="Horizontal stacked bars, one per representation of the 1,224 object images. Each bar splits a unit's variance into a between-objects part (identity, dark) and a within-object part (viewpoint, light). Pixels 0.16 between; trained ResNet-18 early 0.66, middle 0.54, late 0.51; untrained ResNet-18 late 0.60; monkey IT 0.37" aria-describedby="figure-19-1"><figcaption id="figure-19-1"><p>Horizontal stacked bars, one per representation of the 1,224 object images. Each bar splits a unit's variance into a between-objects part (identity, dark) and a within-object part (viewpoint, light). Pixels 0.16 between; trained ResNet-18 early 0.66, middle 0.54, late 0.51; untrained ResNet-18 late 0.60; monkey IT 0.37</p><a href="../images/L05/21_between_within_variance.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Pixels: mostly <strong>within an object</strong> (viewpoint). Networks: mostly <strong>between objects</strong> (identity). IT keeps much of the viewpoint. Small clouds do not prove invariance: the untrained network's are smaller than the trained one's</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao, She, McGill &amp; Tsao <b>Nature 2020</b></a> · <a href="https://doi.org/10.1038/nn.4247" rel="noopener">Hong, Yamins, Majaj &amp; DiCarlo <b>Nat Neurosci 2016</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="58" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<h2 id="heading-20">A readout must also generalize: CCGP</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li>Train a readout for "animal or not" on dogs and chairs. Test it on cats and tables. If it still works, the variable is coded the same way across conditions: <strong>abstract</strong></li>
+<li><strong>Cross-condition generalization performance (CCGP)</strong>: accuracy of a readout trained on some conditions and tested on conditions it never saw</li>
+<li>The simplest geometry that does this: each variable is <strong>one consistent direction</strong>, so the conditions sit near the corners of a low-dimensional cube</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/L05/07_abstraction_cube.svg" alt="Eight conditions sitting near the vertices of a cube, with one variable's coding direction drawn as parallel red edges, parallel everywhere, so a readout trained on one face generalizes to the other" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>Eight conditions sitting near the vertices of a cube, with one variable's coding direction drawn as parallel red edges, parallel everywhere, so a readout trained on one face generalizes to the other</p><a href="../images/L05/07_abstraction_cube.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi, Benna, Rigotti, Munuera, Fusi &amp; Salzman <b>Cell 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="58" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<h2 id="heading-21">The same populations do both</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L05/32_bernardi_sd_ccgp.svg" alt="For monkey hippocampus, DLPFC and ACC: shattering dimensionality of about 0.70 to 0.75 as bars, well above a chance band near 0.5; CCGP for context, value and previous action as dots, well above chance except action in the hippocampus" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>For monkey hippocampus, DLPFC and ACC: shattering dimensionality of about 0.70 to 0.75 as bars, well above a chance band near 0.5; CCGP for context, value and previous action as dots, well above chance except action in the hippocampus</p><a href="../images/L05/32_bernardi_sd_ccgp.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Shattering and CCGP pull in opposite directions: separating everything, or generalizing along a few consistent directions</li>
+<li>Yet in monkey hippocampus and prefrontal cortex, the same neurons score high on <strong>both</strong></li>
+<li>Shattering as an accuracy: fit a readout for each two-class split, average its held-out accuracy (chance 0.5). Too many splits? Draw some at random</li>
+<li>The geometry is neither a random cloud nor a clean cube. It is a compromise</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-marpit-pagination="22" data-marpit-pagination-total="58" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<h2 id="heading-22">Abstraction appears with inference, in humans</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L05/34_courellis_ccgp_inference.svg" alt="In human hippocampal neurons, cross-condition generalization for context and for stimulus pair sits at chance in sessions where patients could not infer the hidden context, and rises above chance in sessions where they could; shattering dimensionality rises slightly, from 0.57 to 0.62" aria-describedby="figure-22-1"><figcaption id="figure-22-1"><p>In human hippocampal neurons, cross-condition generalization for context and for stimulus pair sits at chance in sessions where patients could not infer the hidden context, and rises above chance in sessions where they could; shattering dimensionality rises slightly, from 0.57 to 0.62</p><a href="../images/L05/34_courellis_ccgp_inference.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Single neurons recorded in epilepsy patients doing a task with a hidden context</li>
+<li>In sessions where patients could not infer the context, CCGP for context sat at chance. Where they could, it rose</li>
+<li>Shattering rose only slightly. What came with understanding was the <strong>abstract</strong> format</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1038/s41586-024-07799-x" rel="noopener">Courellis, Minxha, Cardenas et al. <b>Nature 2024</b></a> · <a href="https://doi.org/10.1038/s41593-026-02315-y" rel="noopener">O'Neill et al. <b>Nat Neurosci 2026</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-marpit-pagination="23" data-marpit-pagination-total="58" aria-labelledby="heading-23"><p class="page">Slide 23</p>
+<h2 id="heading-23">Does a deep network see objects the way IT does?</h2>
+<div class="capfig">
+<figure><img src="../images/L05/28_it_vs_network_maps.svg" alt="Two maps of the same 51 objects made by multidimensional scaling, one from monkey IT recordings (481 sites) and one from a trained ResNet-18's late layer (512 units). Dots are colored by category, and six objects are shown as small pictures in both maps: two human heads, a cat, a car, a house and bananas. The maps are rotated relative to each other, but the grouping is the same: the two heads sit together, animals cluster apart from vehicles, and the house lies near the vehicles in both" aria-describedby="figure-23-1"><figcaption id="figure-23-1"><p>Two maps of the same 51 objects made by multidimensional scaling, one from monkey IT recordings (481 sites) and one from a trained ResNet-18's late layer (512 units). Dots are colored by category, and six objects are shown as small pictures in both maps: two human heads, a cat, a car, a house and bananas. The maps are rotated relative to each other, but the grouping is the same: the two heads sit together, animals cluster apart from vehicles, and the house lies near the vehicles in both</p><a href="../images/L05/28_it_vs_network_maps.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>We cannot match IT site 17 to network unit 17. <mark>But we can ask whether both put the same objects close together</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="58" aria-labelledby="heading-24"><p class="page">Slide 24</p>
+<h2 id="heading-24">Why not just compare behavior?</h2>
+<div class="row">
+<div class="col">
+<p>The smallest possible network: one input, one <strong>hidden unit</strong> (a unit between input and output), one output:</p>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>h</mi><mo>=</mo><msub><mi>w</mi><mn>1</mn></msub><mi>x</mi><mo separator="true">,</mo><mspace width="2em"></mspace><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><msub><mi>w</mi><mn>2</mn></msub><mi>h</mi><mo>=</mo><munder><munder><mrow><msub><mi>w</mi><mn>2</mn></msub><msub><mi>w</mi><mn>1</mn></msub></mrow><mo stretchy="true">⏟</mo></munder><mtext>the&nbsp;function</mtext></munder><mi>x</mi></mrow><annotation encoding="application/x-tex">h = w_1 x, \qquad \hat{y} = w_2 h = \underbrace{w_2 w_1}_{\text{the function}} x
+</annotation></semantics></math></div></span></p><p>The <strong>function</strong> depends only on the <strong>product</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mn>2</mn></msub><msub><mi>w</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">w_2w_1</annotation></semantics></math>.<br>
+The <strong>representation</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>=</mo><msub><mi>w</mi><mn>1</mn></msub><mi>x</mi></mrow><annotation encoding="application/x-tex">h = w_1x</annotation></semantics></math> depends on <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">w_1</annotation></semantics></math> <strong>only</strong>.</p>
+</div>
+<div class="col">
+<div class="table-scroll" tabindex="0" role="region" aria-label="Why not just compare behavior? — table"><table><caption>Why not just compare behavior? — table</caption>
+<thead>
+<tr>
+<th scope="col"></th>
+<th scope="col"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">w_1</annotation></semantics></math></th>
+<th scope="col"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">w_2</annotation></semantics></math></th>
+<th scope="col"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\hat y</annotation></semantics></math> for <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">x{=}1</annotation></semantics></math></th>
+<th scope="col"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi></mrow><annotation encoding="application/x-tex">h</annotation></semantics></math> for <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">x{=}1</annotation></semantics></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>net A</strong></td>
+<td>1</td>
+<td>2</td>
+<td><strong>2</strong></td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>net B</strong></td>
+<td>2</td>
+<td>1</td>
+<td><strong>2</strong></td>
+<td><strong>2</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Identical behavior on every input. Hidden activity differs by a factor of two, and we could make it a factor of a thousand.</p>
+</div>
+</div>
+<p><mark>Same function, different representation.</mark> It follows from the algebra, so no amount of behavioral data could tell these two networks apart. We have to compare the representations themselves.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="58" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<h2 id="heading-25">Put a number on the match: RSA</h2>
+<div class="capfig">
+<figure><img src="../images/L05/29_it_vs_network_rdms.svg" alt="Two 51 by 51 dissimilarity matrices for the same objects in the same category order, from monkey IT (left) and ResNet-18's late layer (right). Both show a light block for faces and lighter blocks within animals and within vehicles, and faces are strongly different from vehicles in both. An arrow between the matrices reads correlate the upper triangles" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>Two 51 by 51 dissimilarity matrices for the same objects in the same category order, from monkey IT (left) and ResNet-18's late layer (right). Both show a light block for faces and lighter blocks within animals and within vehicles, and faces are strongly different from vehicles in both. An arrow between the matrices reads correlate the upper triangles</p><a href="../images/L05/29_it_vs_network_rdms.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>For each representation, the <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>51</mn><mo>×</mo><mn>51</mn></mrow><annotation encoding="application/x-tex">51\times51</annotation></semantics></math> <strong>RDM</strong>: the dissimilarity between every pair of objects. The units are gone, so 481 sites and 512 units become comparable</li>
+<li><strong>RSA</strong> scores the match as the Spearman correlation between the two RDMs' upper triangles. It only sees distances</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="58" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<h2 id="heading-26">An alternative to RSA: CKA</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li>Instead of distances, compare <strong>dot products</strong> between stimuli, magnitudes included</li>
+<li><strong>Centered kernel alignment (CKA)</strong> for centered <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi></mrow><annotation encoding="application/x-tex">\mathbf{X}</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐘</mi></mrow><annotation encoding="application/x-tex">\mathbf{Y}</annotation></semantics></math> (same <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> stimuli in the same order, any numbers of units):</li>
+</ul>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">K</mi><mi mathvariant="normal">A</mi></mrow><mo>=</mo><mfrac><mrow><mo stretchy="false">∥</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐘</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi><msubsup><mo stretchy="false">∥</mo><mi>F</mi><mn>2</mn></msubsup></mrow><mrow><mo stretchy="false">∥</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi><msub><mo stretchy="false">∥</mo><mi>F</mi></msub><mtext> </mtext><mo stretchy="false">∥</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐘</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐘</mi><msub><mo stretchy="false">∥</mo><mi>F</mi></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">\mathrm{CKA} = \frac{\lVert \mathbf{Y}^{\top}\mathbf{X}\rVert_{F}^{2}}{\lVert \mathbf{X}^{\top}\mathbf{X}\rVert_{F}\,\lVert \mathbf{Y}^{\top}\mathbf{Y}\rVert_{F}}
+</annotation></semantics></math></div></span></p><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">∥</mo><mo>⋅</mo><msub><mo stretchy="false">∥</mo><mi>F</mi></msub></mrow><annotation encoding="application/x-tex">\lVert\cdot\rVert_F</annotation></semantics></math>: square root of the sum of squared entries. CKA is 1 when the two differ only by a rotation and an overall rescaling</li>
+<li>Sanity check: two networks of different depths match best at the same relative depth</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/L05/42_cka_resnet18_vs_resnet50.svg" alt="Heatmap of linear CKA between every block of an ImageNet-trained ResNet-18 (x axis, stem and blocks 1 to 8) and ResNet-50 (y axis, stem and blocks 1 to 16), measured on 1,854 THINGS images. A dark band runs from bottom-left to top-right: each ResNet-18 block is most similar to the ResNet-50 block at the same relative depth, marked by gold rings (CKA 0.74 to 0.99), and early-versus-late pairs are least similar (down to 0.16)" aria-describedby="figure-26-1"><figcaption id="figure-26-1"><p>Heatmap of linear CKA between every block of an ImageNet-trained ResNet-18 (x axis, stem and blocks 1 to 8) and ResNet-50 (y axis, stem and blocks 1 to 16), measured on 1,854 THINGS images. A dark band runs from bottom-left to top-right: each ResNet-18 block is most similar to the ResNet-50 block at the same relative depth, marked by gold rings (CKA 0.74 to 0.99), and early-versus-late pairs are least similar (down to 0.16)</p><a href="../images/L05/42_cka_resnet18_vs_resnet50.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/1905.00414" rel="noopener">Kornblith, Norouzi, Lee &amp; Hinton <b>ICML 2019</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-marpit-pagination="27" data-marpit-pagination-total="58" aria-labelledby="heading-27"><p class="page">Slide 27</p>
+<h2 id="heading-27">RSA or CKA?</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="RSA or CKA? — table"><table><caption>RSA or CKA? — table</caption>
+<thead>
+<tr>
+<th scope="col"></th>
+<th scope="col"><strong>RSA</strong></th>
+<th scope="col"><strong>CKA</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compares</td>
+<td>the order of the distances between stimuli</td>
+<td>dot products between stimuli, magnitudes included</td>
+</tr>
+<tr>
+<td>Assumes, ignores</td>
+<td>a distance you choose, and only its ranks</td>
+<td>linear, and ignores rotation and overall scale</td>
+</tr>
+<tr>
+<td>Better at</td>
+<td>any data: neurons, fMRI, behavior</td>
+<td>using magnitudes, matching network layers</td>
+</tr>
+<tr>
+<td>Worse at</td>
+<td>depends on the distance, noisy with few stimuli</td>
+<td>a few big directions dominate, can be high for unrelated data</td>
+</tr>
+<tr>
+<td>IT vs network</td>
+<td>0.73</td>
+<td>0.82</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Neither score is a percentage of shared information. Is 0.82 high? We need something to compare it to</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/1905.00414" rel="noopener">Kornblith et al. <b>ICML 2019</b></a> · <a href="https://arxiv.org/abs/2210.16156" rel="noopener">Davari et al. <b>ICLR 2023</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="58" aria-labelledby="heading-28"><p class="page">Slide 28</p>
+<h2 id="heading-28">Other comparisons you will meet in papers</h2>
+<ul>
+<li><strong>Linear predictivity</strong> (encoding models, Brain-Score): fit a linear map from the network's units to each neuron and score its predictions on held-out images. <em>Can each neuron be rebuilt from the network?</em></li>
+<li><strong>CCA and SVCCA</strong>: find the directions in the two representations that are most correlated with each other. <em>Do they share some directions?</em></li>
+<li><strong>Procrustes and shape metrics</strong>: rotate one representation to line it up with the other as well as possible, and measure what is left. <em>How far apart are the two shapes?</em> A true distance</li>
+<li><strong>Decoding transfer</strong>: train a readout on one representation and test it on the other. <em>Do the same readouts work in both?</em></li>
+<li>Whatever the measure, a score needs a reference. What would it give for two representations that share nothing?</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1016/j.neuron.2020.07.040" rel="noopener">Schrimpf et al. <b>Neuron 2020</b></a> · <a href="https://arxiv.org/abs/1706.05806" rel="noopener">Raghu et al. <b>NeurIPS 2017</b></a> · <a href="https://arxiv.org/abs/2110.14739" rel="noopener">Williams, Kunz, Kornblith &amp; Linderman <b>NeurIPS 2021</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="58" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<h2 id="heading-29">Is a score above chance? Shuffle the stimuli</h2>
+<ul>
+<li>Two people rate the same 100 movies. Shuffle which movie each of one person's ratings belongs to. Any agreement left cannot come from the movies</li>
+<li><strong>Shuffle baseline:</strong> shuffle the stimulus order of one representation, so that row <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math> no longer describes the same image in both, and recompute the score. Repeat many times, e.g. 1,000</li>
+<li>The real score counts only if it lies above nearly all the shuffled scores, e.g. above their 95th percentile. This is a <strong>permutation test</strong></li>
+<li>IT vs the network: RSA 0.73 against a shuffled 95th percentile of 0.05. CKA 0.82 against 0.25</li>
+<li><mark>If the shuffled scores are far from zero, the measure responds to something other than the match between stimuli</mark></li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1371/journal.pcbi.1003553" rel="noopener">Nili, Wingfield, Walther et al. <b>PLoS Comput Biol 2014</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="58" aria-labelledby="heading-30"><p class="page">Slide 30</p>
+<h2 id="heading-30">With few stimuli, any two representations look alike</h2>
+<div class="capfig">
+<figure><img src="../images/L05/35_cka_few_stimuli.svg" alt="Two line plots of the similarity between CLIP and DINOv2 on random subsets of 10 to 1,000 THINGS images, number of stimuli on a log axis. Left, linear CKA: with 10 stimuli the real pairing is 0.96, shuffled stimuli 0.93 and random data of the same size 0.98; as stimuli are added, shuffled CKA falls to 0.11 and random-data CKA to 0.38, while the real pairing falls more slowly to 0.55. Right, RSA on the same subsets: the real pairing stays near 0.35 at every size, while shuffled RSA stays at 0" aria-describedby="figure-30-1"><figcaption id="figure-30-1"><p>Two line plots of the similarity between CLIP and DINOv2 on random subsets of 10 to 1,000 THINGS images, number of stimuli on a log axis. Left, linear CKA: with 10 stimuli the real pairing is 0.96, shuffled stimuli 0.93 and random data of the same size 0.98; as stimuli are added, shuffled CKA falls to 0.11 and random-data CKA to 0.38, while the real pairing falls more slowly to 0.55. Right, RSA on the same subsets: the real pairing stays near 0.35 at every size, while shuffled RSA stays at 0</p><a href="../images/L05/35_cka_few_stimuli.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>With far more units than stimuli, every stimulus can be nearly perpendicular to every other, as random vectors are. <mark>Then the pairing hardly matters, and shuffled CKA stays high</mark></li>
+<li>Do all large networks converge on one representation? Huh et al. said yes. With a shuffle baseline, much of that convergence disappears (Gröger et al.)</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2405.07987" rel="noopener">Huh, Cheung, Wang &amp; Isola <b>ICML 2024</b></a> · <a href="https://arxiv.org/abs/2602.14486" rel="noopener">Gröger, Wen &amp; Brbić <b>arXiv 2026</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="58" aria-labelledby="heading-31"><p class="page">Slide 31</p>
+<h2 id="heading-31">Brains are noisy, networks are not</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L05/27_trial_noise.svg" alt="Line plot of how well two separate halves of a monkey's IT recordings agree, measured by CKA from 0 to 1, as more repeats are averaged in each half, 1, 2, 4, 8 and 15. With one repeat per half, agreement is about 0.5 for monkey F and about 0.7 for monkey N, with a wide spread across random splits; both curves rise steadily toward 1 and the spread narrows. A dashed line at exactly 1 shows ResNet-18, which gives identical activations every time an image is shown" aria-describedby="figure-31-1"><figcaption id="figure-31-1"><p>Line plot of how well two separate halves of a monkey's IT recordings agree, measured by CKA from 0 to 1, as more repeats are averaged in each half, 1, 2, 4, 8 and 15. With one repeat per half, agreement is about 0.5 for monkey F and about 0.7 for monkey N, with a wide spread across random splits; both curves rise steadily toward 1 and the spread narrows. A dashed line at exactly 1 shows ResNet-18, which gives identical activations every time an image is shown</p><a href="../images/L05/27_trial_noise.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>The same 100 images, shown 30 times to two monkeys: IT responds differently on every presentation</li>
+<li>Average more repeats in each of two halves, and the two averages agree better</li>
+<li>A network gives the same response every time. Noise limits how high any model can score against a recording</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1016/j.neuron.2024.12.003" rel="noopener">Papale, Wang, Self et al. <b>Neuron 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="58" aria-labelledby="heading-32"><p class="page">Slide 32</p>
+<h2 id="heading-32">How high could a score go? The noise ceiling</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li>Split the repeats at random into two halves, average each half, and score one half against the other with the same measure. Average over several random splits: the <strong>split-half reliability</strong></li>
+<li>Used as a reference for models, it is the <strong>noise ceiling</strong>. <mark>A reference, not a hard bound</mark></li>
+<li>Report a model between references: the shuffle floor below, the noise ceiling above, and the same area in another brain</li>
+<li>Human IT (fMRI): every network sits between floor and ceiling. Another person's IT reaches the ceiling</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/L05/43_fmri_floor_ceiling.svg" alt="Horizontal bars of RSA between six networks and one person's IT measured with fMRI, 100 THINGS images: ResNet-50 0.19, DINOv2 0.18, CLIP 0.17, ResNet-18 0.17, ResNet-50 DINO 0.16, untrained ResNet-18 0.06. A grey shuffle floor near 0.02 sits behind the bars; a dashed line for another person at 0.24 and a dotted split-half noise ceiling at 0.24 lie to the right of all bars" aria-describedby="figure-32-1"><figcaption id="figure-32-1"><p>Horizontal bars of RSA between six networks and one person's IT measured with fMRI, 100 THINGS images: ResNet-50 0.19, DINOv2 0.18, CLIP 0.17, ResNet-18 0.17, ResNet-50 DINO 0.16, untrained ResNet-18 0.06. A grey shuffle floor near 0.02 sits behind the bars; a dashed line for another person at 0.24 and a dotted split-half noise ceiling at 0.24 lie to the right of all bars</p><a href="../images/L05/43_fmri_floor_ceiling.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1371/journal.pcbi.1003553" rel="noopener">Nili, Wingfield, Walther et al. <b>PLoS Comput Biol 2014</b></a> · <a href="https://doi.org/10.7554/eLife.82580" rel="noopener">Hebart, Contier, Teichmann et al. <b>eLife 2023</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="58" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<h2 id="heading-33">Would the result hold for other stimuli? Resample</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li>A score is measured on one set of stimuli. Another set from the same pool gives a different score</li>
+<li><strong>Bootstrap over stimuli:</strong> draw <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> stimuli with replacement, drop the pairs of a stimulus with its own copy, recompute every model's score, repeat many times</li>
+<li>Count how often each model comes first. On the same fMRI data, the top network wins only about half the time</li>
+<li><mark>An unstable ranking calls for different stimuli, chosen so that the models disagree</mark></li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/L05/44_fmri_bootstrap_winners.svg" alt="Top: overlapping bootstrap distributions of RSA with human IT for six networks, the trained ones all spanning roughly 0.11 to 0.25 and the untrained one near 0.06. Bottom: across 1,000 resamples of the 100 images, ResNet-50 ranks first in 55 percent, DINOv2 in 16 percent, CLIP in 18 percent, ResNet-18 in 8 percent, ResNet-50 DINO in 4 percent and the untrained network in 0 percent" aria-describedby="figure-33-1"><figcaption id="figure-33-1"><p>Top: overlapping bootstrap distributions of RSA with human IT for six networks, the trained ones all spanning roughly 0.11 to 0.25 and the untrained one near 0.06. Bottom: across 1,000 resamples of the 100 images, ResNet-50 ranks first in 55 percent, DINOv2 in 16 percent, CLIP in 18 percent, ResNet-18 in 8 percent, ResNet-50 DINO in 4 percent and the untrained network in 0 percent</p><a href="../images/L05/44_fmri_bootstrap_winners.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.7554/eLife.82566" rel="noopener">Schütt, Kipnis, Diedrichsen &amp; Kriegeskorte <b>eLife 2023</b></a> · <a href="https://doi.org/10.1073/pnas.1912334117" rel="noopener">Golan, Raju &amp; Kriegeskorte <b>PNAS 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="58" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<h2 id="heading-34">Different measures, different winners</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li>Rank seven networks by how much they look like monkey IT, on the same 51 objects</li>
+<li><mark>Change only the measure, and the winner changes</mark>. RSA puts CLIP first. CKA and a Procrustes distance agree on the whole order, with ResNet-18 first</li>
+<li>The top places are near-ties, so small differences in what each measure ignores reorder them</li>
+<li>Soni et al. find the same across measures, datasets and model families</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/L05/45_metrics_disagree_bao.svg" alt="Slope plot ranking seven networks by similarity to monkey IT under three measures. CKA and Procrustes give the same order, led by ResNet-18, ResNet-50 and CLIP, but RSA puts CLIP first and ResNet-50 fourth. The untrained ResNet-18 is last under all three" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Slope plot ranking seven networks by similarity to monkey IT under three measures. CKA and Procrustes give the same order, led by ResNet-18, ResNet-50 and CLIP, but RSA puts CLIP first and ResNet-50 fourth. The untrained ResNet-18 is last under all three</p><a href="../images/L05/45_metrics_disagree_bao.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1101/2024.08.07.607035" rel="noopener">Soni, Srivastava, Maechler et al. <b>bioRxiv 2024</b></a> · <a href="https://arxiv.org/abs/2110.14739" rel="noopener">Williams, Kunz, Kornblith &amp; Linderman <b>NeurIPS 2021</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="58" aria-labelledby="heading-35"><p class="page">Slide 35</p>
+<h2 id="heading-35">Tied on natural images, split on designed ones</h2>
+<div class="capfig">
+<figure><img src="../images/L05/39_prince2026_fig4.png" alt="Two bar charts for ten neural-network models of macaque visual cortex. Left, a, encoding score on natural test images: every trained model predicts the neurons almost equally well, Pearson r about 0.67 to 0.71, the untrained model 0.47. Right, b, parametric control on images each model synthesized to drive the neurons: the same models spread apart, about 0.38 to 0.47 for most, 0.66 to 0.68 for the two adversarially trained models, 0.14 for the untrained one" aria-describedby="figure-35-1"><figcaption id="figure-35-1"><p>Two bar charts for ten neural-network models of macaque visual cortex. Left, a, encoding score on natural test images: every trained model predicts the neurons almost equally well, Pearson r about 0.67 to 0.71, the untrained model 0.47. Right, b, parametric control on images each model synthesized to drive the neurons: the same models spread apart, about 0.38 to 0.47 for most, 0.66 to 0.68 for the two adversarially trained models, 0.14 for the untrained one</p><a href="../images/L05/39_prince2026_fig4.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Nine trained models: equal on natural images, split on images each designed to drive neurons</li>
+<li><mark>To tell models apart, choose stimuli on which they disagree</mark></li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.64898/2026.08.16.745063" rel="noopener">Prince, Wang, Fel et al. <b>bioRxiv 2026</b></a> · <a href="https://doi.org/10.1073/pnas.1912334117" rel="noopener">Golan, Raju &amp; Kriegeskorte <b>PNAS 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="58" aria-labelledby="heading-36"><p class="page">Slide 36</p>
+<h2 id="heading-36">Recap</h2>
+<ul>
+<li>A population response is a <strong>cloud of points</strong>. Its eigenspectrum and <strong>participation ratio</strong> say how many directions it fills. V1 fills many, but no more than a smooth code allows. Trained networks spread theirs a little further</li>
+<li>A <strong>linear readout</strong> is a hyperplane. <strong>Shattering</strong> counts the two-class tasks it can solve. <strong>CCGP</strong> asks whether it generalizes to new conditions. Mixed selectivity raises the first, abstraction the second, and cortex does both</li>
+<li>To compare a network with IT, compare how each <strong>arranges the objects</strong>: <strong>RSA</strong> with distances, <strong>CKA</strong> with dot products</li>
+<li>A score needs references: a <strong>shuffle</strong> floor, a <strong>noise ceiling</strong>, <strong>resampled</strong> stimuli, and <strong>more than one measure</strong></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-class="lead" data-marpit-pagination="37" data-marpit-pagination-total="58" aria-labelledby="heading-37"><p class="page">Slide 37</p>
+<h2 id="heading-37">Geometry is a <strong>description</strong>.</h2>
+<h2 id="what-computes-it">What <em>computes</em> it?</h2>
+<h3 id="everything-so-far--everything-after">Everything so far · Everything after</h3>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="58" aria-labelledby="heading-38"><p class="page">Slide 38</p>
+<h2 id="heading-38">Further reading for the research trail</h2>
+<ul>
+<li><strong>Reviews:</strong> Chung &amp; Abbott, <a href="https://doi.org/10.1016/j.conb.2021.10.010">Neural population geometry</a> (2021) · Kriegeskorte &amp; Wei, <a href="https://doi.org/10.1038/s41583-021-00502-3">Neural tuning and representational geometry</a> (2021)</li>
+<li><strong>Research-trail options:</strong> Rigotti et al., <a href="https://doi.org/10.1038/nature12160">mixed selectivity</a> (2013) · Bernardi et al., <a href="https://doi.org/10.1016/j.cell.2020.09.031">the geometry of abstraction</a> (2020) · Kornblith et al., <a href="https://arxiv.org/abs/1905.00414">CKA</a> (2019) · Golan, Raju &amp; Kriegeskorte, <a href="https://doi.org/10.1073/pnas.1912334117">controversial stimuli</a> (2020) · Chen &amp; Bonner, <a href="https://doi.org/10.1126/sciadv.adw7697">universal dimensions of visual representation</a> (2025) · O'Neill et al., <a href="https://doi.org/10.1038/s41593-026-02315-y">amygdala geometry</a> (2026) · Huh et al., <a href="https://arxiv.org/abs/2405.07987">the platonic representation hypothesis</a> (2024)</li>
+<li><strong>Optional:</strong> Soni et al., <a href="https://doi.org/10.1101/2024.08.07.607035">metrics disagree</a> (2024) · Cohen et al., <a href="https://doi.org/10.1038/s41467-020-14578-5">object manifolds in deep networks</a> (2020) · Gröger et al., <a href="https://arxiv.org/abs/2602.14486">an Aristotelian view</a> (2026)</li>
+</ul>
+<p>The paper you select for your research trail is required. The other papers are optional.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="58" aria-labelledby="heading-39"><p class="page">Slide 39</p>
+<h2 id="heading-39">Minute paper</h2>
+<p>Submit on <strong>Canvas → Minute papers → Minute Paper 6</strong> (access code read out in class).</p>
+<p>Write three brief points in your own words:</p>
+<ol>
+<li>Two representations have a CKA of 0.8. Name one check you would run before calling them alike, and what it would tell you.</li>
+<li>Something you do not yet understand, or a question still open</li>
+<li>Another idea you found interesting, and why it matters for brains, behavior or AI</li>
+</ol>
+<p>Credit for a thoughtful attempt, not for being correct.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-class="lead" data-marpit-pagination="40" data-marpit-pagination-total="58" aria-labelledby="heading-40"><p class="page">Slide 40</p>
+<h2 id="heading-40">Appendix: derivations and extra examples</h2>
+<h2 id="material-not-covered-in-class-for-reference">Material not covered in class, for reference</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="58" aria-labelledby="heading-41"><p class="page">Slide 41</p>
+<h2 id="heading-41">Localist and distributed population codes</h2>
+<figure><img src="../images/L01-geometry-review-2026-09/codes.svg" alt="Illustrative matrices for six stimuli and eight units: localist has one active unit per item; dense uses all units; sparse uses two units per item" aria-describedby="figure-41-1"><figcaption id="figure-41-1"><p>Illustrative matrices for six stimuli and eight units: localist has one active unit per item; dense uses all units; sparse uses two units per item</p><a href="../images/L01-geometry-review-2026-09/codes.svg">Open full-size figure</a></figcaption></figure>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Localist and distributed population codes — table"><table><caption>Localist and distributed population codes — table</caption>
+<thead>
+<tr>
+<th scope="col">Localist</th>
+<th scope="col">Dense distributed</th>
+<th scope="col">Sparse distributed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One unit identifies an item</td>
+<td>Many units contribute to each item</td>
+<td>A small subset contributes to each item</td>
+</tr>
+</tbody>
+</table></div>
+<div class="ref"><a href="https://doi.org/10.1068/p010371" rel="noopener">Barlow <b>Perception 1972</b></a> · <a href="https://doi.org/10.7551/mitpress/5236.003.0005" rel="noopener">Hinton, McClelland &amp; Rumelhart <b>MIT Press 1986</b></a> · <a href="https://drive.google.com/file/d/0BzC4pqiFnDxcRXdTNmRJdkxJckE/view" rel="noopener">Földiák &amp; Young <b>MIT Press 1995</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="58" aria-labelledby="heading-42"><p class="page">Slide 42</p>
+<h2 id="heading-42">Shared dimensions need a functional alignment</h2>
+<div class="capfig">
+<figure><img src="../images/L05/38_gauthaman2025_fig4.png" alt="Between-subject similarity relative to subject 4, in three panels for components 1 to 10, 11 to 50 and 51 to 100: with functional alignment the cross-correlation with each other subject stays high, near 0.9 for the first ten and 0.6 to 0.85 for components 11 to 50; with anatomical alignment it is near 0.2 for the first ten and near 0 beyond" aria-describedby="figure-42-1"><figcaption id="figure-42-1"><p>Between-subject similarity relative to subject 4, in three panels for components 1 to 10, 11 to 50 and 51 to 100: with functional alignment the cross-correlation with each other subject stays high, near 0.9 for the first ten and 0.6 to 0.85 for components 11 to 50; with anatomical alignment it is near 0.2 for the first ten and near 0 beyond</p><a href="../images/L05/38_gauthaman2025_fig4.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Align two brains by anatomy and only the first ten dimensions are shared; align them by function and far more are</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1371/journal.pcbi.1013714" rel="noopener">Gauthaman, Ménard &amp; Bonner <b>PLoS Comput Biol 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-class="codeslide" data-marpit-pagination="43" data-marpit-pagination-total="58" aria-labelledby="heading-43"><p class="page">Slide 43</p>
+<h2 id="heading-43">Effective dimensionality from an eigenspectrum</h2>
+<marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-comment"># X: (N stimuli, D units) response matrix -- neurons, voxels, or model units</span>
+Xc = X - X.mean(axis=<span class="hljs-number">0</span>, keepdims=<span class="hljs-literal">True</span>)          <span class="hljs-comment"># center: PCA needs it (the PCA lecture)</span>
+
+<span class="hljs-comment"># eigenvalues of the covariance = squared singular values of the centered data</span>
+s = np.linalg.svd(Xc, compute_uv=<span class="hljs-literal">False</span>)
+lam = s**<span class="hljs-number">2</span> / (Xc.shape[<span class="hljs-number">0</span>] - <span class="hljs-number">1</span>)                  <span class="hljs-comment"># the PCA eigenspectrum</span>
+
+pr = lam.<span class="hljs-built_in">sum</span>()**<span class="hljs-number">2</span> / (lam**<span class="hljs-number">2</span>).<span class="hljs-built_in">sum</span>()              <span class="hljs-comment"># participation ratio</span>
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f"ambient D = <span class="hljs-subst">{X.shape[<span class="hljs-number">1</span>]}</span>,  effective dimensionality = <span class="hljs-subst">{pr:<span class="hljs-number">.1</span>f}</span>"</span>)
+<span class="hljs-comment"># the power-law exponent Stringer et al. report: slope of log(lam) vs log(n)</span>
+n = np.arange(<span class="hljs-number">1</span>, <span class="hljs-built_in">len</span>(lam) + <span class="hljs-number">1</span>)                  <span class="hljs-comment"># component number</span>
+alpha = -np.polyfit(np.log(n[<span class="hljs-number">1</span>:<span class="hljs-number">500</span>]), np.log(lam[<span class="hljs-number">1</span>:<span class="hljs-number">500</span>]), <span class="hljs-number">1</span>)[<span class="hljs-number">0</span>]
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f"spectrum decays as n^-<span class="hljs-subst">{alpha:<span class="hljs-number">.2</span>f}</span>"</span>)
+</code></marp-pre>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="58" aria-labelledby="heading-44"><p class="page">Slide 44</p>
+<h2 id="heading-44">Careful: dimensionality is <em>estimated</em>, not observed</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li>You never see the true spectrum, you see it through finite trials, finite neurons, and measurement noise</li>
+<li>Noise inflates small eigenvalues and shrinks large ones: the measured spectrum is <strong>flatter than the truth</strong>, which biases dimensionality <strong>upward</strong></li>
+<li>Pospisil &amp; Pillow revisit exactly the Stringer analysis with bias-corrected estimators and reach different quantitative conclusions about the exponent</li>
+<li>The qualitative story (high-dimensional, no elbow) survives; the <strong>number</strong> is fragile</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/L05/05_noisy_spectrum.svg" alt="A true eigenspectrum falling as a straight line on log-log axes while the measured, noisy spectrum bends upward in the tail, inflating the participation ratio" aria-describedby="figure-44-1"><figcaption id="figure-44-1"><p>A true eigenspectrum falling as a straight line on log-log axes while the measured, noisy spectrum bends upward in the tail, inflating the participation ratio</p><a href="../images/L05/05_noisy_spectrum.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1101/2024.02.16.580726" rel="noopener">Pospisil &amp; Pillow <b>bioRxiv 2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-marpit-pagination="45" data-marpit-pagination-total="58" aria-labelledby="heading-45"><p class="page">Slide 45</p>
+<h2 id="heading-45">Between and within variance, worked by hand</h2>
+<div class="row">
+<div class="col">
+<p>For equal numbers of views per object:</p>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>V</mi><mrow><mi mathvariant="normal">t</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">l</mi></mrow></msub><mo>=</mo><msub><mi>V</mi><mrow><mi mathvariant="normal">w</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">h</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">n</mi></mrow></msub><mo>+</mo><msub><mi>V</mi><mrow><mi mathvariant="normal">b</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">w</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">n</mi></mrow></msub><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">V_{\mathrm{total}}=V_{\mathrm{within}}+V_{\mathrm{between}}.
+</annotation></semantics></math></div></span></p><ul>
+<li><strong>Within:</strong> average variation around each object's mean.</li>
+<li><strong>Between:</strong> variation of object means around the overall mean.</li>
+<li>Example: total <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5</mn><mo>=</mo><mn>1</mn><mo>+</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">5=1+4</annotation></semantics></math>. Within <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>20</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">20\%</annotation></semantics></math>; between <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>80</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">80\%</annotation></semantics></math>.</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/A1-coverage-2026-09/within_between.svg" alt="Two objects with feature values zero and two versus four and six, object means one and five, and overall mean three" aria-describedby="figure-45-1"><figcaption id="figure-45-1"><p>Two objects with feature values zero and two versus four and six, object means one and five, and overall mean three</p><a href="../images/A1-coverage-2026-09/within_between.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-marpit-pagination="46" data-marpit-pagination-total="58" aria-labelledby="heading-46"><p class="page">Slide 46</p>
+<h2 id="heading-46">Abstraction fails on error trials</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L05/33_bernardi_ccgp_errors.svg" alt="Paired dots for correct and error trials in monkey hippocampus, DLPFC and ACC: cross-condition generalization for context drops on error trials in all three areas, by about 0.07 to 0.11" aria-describedby="figure-46-1"><figcaption id="figure-46-1"><p>Paired dots for correct and error trials in monkey hippocampus, DLPFC and ACC: cross-condition generalization for context drops on error trials in all three areas, by about 0.07 to 0.11</p><a href="../images/L05/33_bernardi_ccgp_errors.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>CCGP for context drops on error trials in all three areas</li>
+<li>Ordinary decoding of context does not drop</li>
+<li>What tracks behavior is the abstract format, not the information</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-paginate="true" data-marpit-pagination="47" data-marpit-pagination-total="58" aria-labelledby="heading-47"><p class="page">Slide 47</p>
+<h2 id="heading-47">Reading one variable without reading the others</h2>
+<div class="capfig">
+<figure><img src="../images/L05/12_coding_directions.svg" alt="CCGP protocol drawn out: a boundary fitted on the circle conditions still separates the held-out triangles when the two coding directions are orthogonal, but fails when they are correlated" aria-describedby="figure-47-1"><figcaption id="figure-47-1"><p>CCGP protocol drawn out: a boundary fitted on the circle conditions still separates the held-out triangles when the two coding directions are orthogonal, but fails when they are correlated</p><a href="../images/L05/12_coding_directions.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>Orthogonal</strong> directions → no <strong>cross-variable interference</strong>. <strong>Correlated</strong> directions → the boundary learned in one context is wrong in the next</li>
+</ul>
+<p><mark>Neurons that are individually mixed can still give a population that reads out one variable at a time.</mark></p>
+<div class="ref"><a href="https://doi.org/10.1038/s41593-026-02315-y" rel="noopener">O'Neill, Posani, Meszaros, Warren, Schoonover, Fink, Fusi &amp; Salzman <b>Nat Neurosci 2026</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-48" data-paginate="true" data-marpit-pagination="48" data-marpit-pagination-total="58" aria-labelledby="heading-48"><p class="page">Slide 48</p>
+<h2 id="heading-48">The price of abstraction: the binding problem</h2>
+<div class="capfig">
+<figure><img src="../images/L05/17_binding_ambiguity.svg" alt="Two displays, a red circle with a blue triangle and a blue circle with a red triangle, activate exactly the same color units and the same shape units" aria-describedby="figure-48-1"><figcaption id="figure-48-1"><p>Two displays, a red circle with a blue triangle and a blue circle with a red triangle, activate exactly the same color units and the same shape units</p><a href="../images/L05/17_binding_ambiguity.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>A factorized code gives color and shape their <strong>own directions</strong>, which is what lets it generalize to new combinations</li>
+<li>With <strong>two objects</strong> present, both displays turn on the same units: the code no longer says which color goes with which shape</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1016/j.tics.2025.12.002" rel="noopener">Aldegheri &amp; Fleming <b>Trends Cogn Sci 2026</b></a> · <a href="https://doi.org/10.1016/0010-0285(80)90005-5" rel="noopener">Treisman &amp; Gelade <b>Cogn Psychol 1980</b></a> · <a href="https://doi.org/10.1152/jn.90650.2008" rel="noopener">McMahon &amp; Olson <b>J Neurophysiol 2009</b></a> · <a href="https://doi.org/10.1016/j.neuroimage.2022.118941" rel="noopener">Taylor &amp; Xu <b>NeuroImage 2022</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-49" data-paginate="true" data-marpit-pagination="49" data-marpit-pagination-total="58" aria-labelledby="heading-49"><p class="page">Slide 49</p>
+<h2 id="heading-49">Geometry predicts behavior</h2>
+<ul>
+<li><strong>Episodic memory.</strong> Sheng et al. find that higher-dimensional neural representations during encoding predict <strong>better subsequent memory</strong>: the geometry is measured in the brain, the outcome is measured in behavior</li>
+<li>Few-shot concept learning. Sorscher, Ganguli &amp; Sompolinsky derive how many examples a learner needs from the <strong>geometry</strong> of the underlying manifolds, and the theory tracks human few-shot performance</li>
+<li>Model quality. Elmoznino &amp; Bonner report that models with <strong>higher latent dimensionality</strong> tend to predict visual cortex better</li>
+</ul>
+<p><mark>The shape of a representation is tied to what the system can do.</mark></p>
+<div class="ref"><a href="https://doi.org/10.1126/sciadv.abm3829" rel="noopener">Sheng et al. <b>Sci Adv 2022</b></a> · <a href="https://doi.org/10.1073/pnas.2200800119" rel="noopener">Sorscher, Ganguli &amp; Sompolinsky <b>PNAS 2022</b></a> · <a href="https://doi.org/10.1371/journal.pcbi.1011792" rel="noopener">Elmoznino &amp; Bonner <b>PLoS Comput Biol 2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-50" data-paginate="true" data-marpit-pagination="50" data-marpit-pagination-total="58" aria-labelledby="heading-50"><p class="page">Slide 50</p>
+<h2 id="heading-50">Same images, two representations</h2>
+<div class="capfig">
+<figure><img src="../images/L03/11_alignment_pixels_vs_network.svg" alt="Two scatter plots. Left, in pixel coordinates, the distance between two photographs plotted against how dissimilar people judged them: a formless cloud with a flat median line and a rank correlation of 0.01. Right, in the late layer of a trained network, the same plot rises clearly, rank correlation 0.42" aria-describedby="figure-50-1"><figcaption id="figure-50-1"><p>Two scatter plots. Left, in pixel coordinates, the distance between two photographs plotted against how dissimilar people judged them: a formless cloud with a flat median line and a rank correlation of 0.01. Right, in the late layer of a trained network, the same plot rises clearly, rank correlation 0.42</p><a href="../images/L03/11_alignment_pixels_vs_network.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Every pair: how far apart the two images are, against how dissimilar people judged them.</li>
+<li>In <strong>pixel</strong> coordinates there is almost no monotonic association, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>s</mi></msub><mo>=</mo><mn>0.01</mn></mrow><annotation encoding="application/x-tex">r_s = 0.01</annotation></semantics></math>. In a trained network's late layer, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>s</mi></msub><mo>=</mo><mn>0.42</mn></mrow><annotation encoding="application/x-tex">r_s = 0.42</annotation></semantics></math>.</li>
+<li>Same images, same measure. <mark>What changed is the representation.</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-51" data-paginate="true" data-class="codeslide" data-marpit-pagination="51" data-marpit-pagination-total="58" aria-labelledby="heading-51"><p class="page">Slide 51</p>
+<h2 id="heading-51">CKA between two response matrices</h2>
+<marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">linear_cka</span>(<span class="hljs-params">X, Y</span>):
+    <span class="hljs-string">"""X: (N, d1), Y: (N, d2) -- same N stimuli, in the SAME ORDER.
+       d1 and d2 need not match: that is the whole point."""</span>
+    X = X - X.mean(axis=<span class="hljs-number">0</span>, keepdims=<span class="hljs-literal">True</span>)        <span class="hljs-comment"># center the units</span>
+    Y = Y - Y.mean(axis=<span class="hljs-number">0</span>, keepdims=<span class="hljs-literal">True</span>)
+
+    num = np.linalg.norm(Y.T @ X, <span class="hljs-built_in">ord</span>=<span class="hljs-string">"fro"</span>) ** <span class="hljs-number">2</span>
+    den = (np.linalg.norm(X.T @ X, <span class="hljs-built_in">ord</span>=<span class="hljs-string">"fro"</span>)
+           * np.linalg.norm(Y.T @ Y, <span class="hljs-built_in">ord</span>=<span class="hljs-string">"fro"</span>))
+    <span class="hljs-keyword">return</span> num / den
+
+cka = linear_cka(it_neurons, net_layer)          <span class="hljs-comment"># monkey IT vs. a network layer</span>
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f"CKA = <span class="hljs-subst">{cka:<span class="hljs-number">.3</span>f}</span>"</span>)                        <span class="hljs-comment"># 1.0 = identical up to rotation+scale</span>
+</code></marp-pre>
+<ul>
+<li><strong>Centering is not optional</strong>, uncentered CKA is dominated by the mean response and reports ~1 for almost anything</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-52" data-paginate="true" data-marpit-pagination="52" data-marpit-pagination-total="58" aria-labelledby="heading-52"><p class="page">Slide 52</p>
+<h2 id="heading-52">CCA and its variants</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li><strong>CCA</strong> finds the pair of directions <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐮</mi><mo separator="true">,</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi></mrow><annotation encoding="application/x-tex">\mathbf{u},\mathbf{v}</annotation></semantics></math> maximizing <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">r</mi></mrow><mo stretchy="false">(</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi><mi mathvariant="normal" data-original-mathvariant="bold">𝐮</mi><mo separator="true">,</mo><mtext> </mtext><mi mathvariant="normal" data-original-mathvariant="bold">𝐘</mi><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathrm{corr}(\mathbf{X}\mathbf{u},\, \mathbf{Y}\mathbf{v})</annotation></semantics></math>, then the next pair whose <strong>canonical variates</strong> are uncorrelated with earlier pairs, and so on. The canonical correlations summarize the shared structure</li>
+<li><strong>Invariance:</strong> any <strong>invertible linear</strong> transformation of either representation</li>
+<li><strong>SVCCA</strong> (Raghu et al.) first projects onto the top singular directions to drop the noise-dominated tail, then runs CCA, enough to track how layers evolve over training</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/L05/12_cca_schematic.svg" alt="Two point clouds with an arrow marking the best-correlated direction found in each, next to the bar chart of declining canonical correlations" aria-describedby="figure-52-1"><figcaption id="figure-52-1"><p>Two point clouds with an arrow marking the best-correlated direction found in each, next to the bar chart of declining canonical correlations</p><a href="../images/L05/12_cca_schematic.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/1706.05806" rel="noopener">Raghu, Gilmer, Yosinski &amp; Sohl-Dickstein <b>NeurIPS 2017</b></a> · <a href="https://arxiv.org/abs/1806.05759" rel="noopener">Morcos, Raghu &amp; Bengio <b>NeurIPS 2018</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-53" data-paginate="true" data-marpit-pagination="53" data-marpit-pagination-total="58" aria-labelledby="heading-53"><p class="page">Slide 53</p>
+<h2 id="heading-53">Shape metrics</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li>RSA and CKA give a <strong>score</strong>, not a <strong>distance</strong>, they can violate the triangle inequality, so "A is closer to B than to C" need not mean anything</li>
+<li>Williams et al. fix this: declare your invariance group <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">G</mi></mrow><annotation encoding="application/x-tex">\mathcal{G}</annotation></semantics></math>, then define</li>
+</ul>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>d</mi><mo stretchy="false">(</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi><mo separator="true">,</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐘</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>=</mo><mtext>  </mtext><munder><mrow><mi>min</mi><mo>⁡</mo></mrow><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐓</mi><mo>∈</mo><mi mathvariant="script">G</mi></mrow></munder><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">∥</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi><mo>−</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐘</mi><mi mathvariant="normal" data-original-mathvariant="bold">𝐓</mi><msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">∥</mo><mi>F</mi></msub></mrow><annotation encoding="application/x-tex">d(\mathbf{X},\mathbf{Y}) \;=\; \min_{\mathbf{T}\in\mathcal{G}} \big\lVert \mathbf{X} - \mathbf{Y}\mathbf{T} \big\rVert_{F}
+</annotation></semantics></math></div></span></p><ul>
+<li>With <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">G</mi></mrow><annotation encoding="application/x-tex">\mathcal{G}</annotation></semantics></math> orthogonal this is <strong>Procrustes</strong> distance: rotations and reflections preserve every distance (the metric lecture's isometries), so what is left is what <strong>no change of coordinates</strong> can explain</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/L05/14_procrustes.svg" alt="Two point clouds joined by long residual lines before alignment, and the same clouds after the best rotation with most of the residual gone" aria-describedby="figure-53-1"><figcaption id="figure-53-1"><p>Two point clouds joined by long residual lines before alignment, and the same clouds after the best rotation with most of the residual gone</p><a href="../images/L05/14_procrustes.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/2110.14739" rel="noopener">Williams, Kunz, Kornblith &amp; Linderman <b>NeurIPS 2021</b></a> · <a href="https://arxiv.org/abs/2211.11665" rel="noopener">Duong et al. <b>ICLR 2023</b></a> · <a href="https://doi.org/10.1101/2025.01.10.632411" rel="noopener">Barbosa, Nejatbakhsh, Duong et al. <b>bioRxiv 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-54" data-paginate="true" data-marpit-pagination="54" data-marpit-pagination-total="58" aria-labelledby="heading-54"><p class="page">Slide 54</p>
+<h2 id="heading-54">Comparison measures and what each ignores</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Comparison measures and what each ignores — table"><table><caption>Comparison measures and what each ignores — table</caption>
+<thead>
+<tr>
+<th scope="col">Measure</th>
+<th scope="col">Invariant to</th>
+<th scope="col">Needs <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mn>1</mn></msub><mo>=</mo><msub><mi>d</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">d_1 = d_2</annotation></semantics></math>?</th>
+<th scope="col">A proper metric?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RSA</strong> (RDM correlation)</td>
+<td>isometries; scale (rank-based: monotone maps)</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td><strong>CCA</strong></td>
+<td>any invertible linear map</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td><strong>SVCCA / PWCCA</strong></td>
+<td>invertible linear, after truncation / reweighting</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td><strong>CKA</strong> (linear)</td>
+<td>orthogonal + isotropic scale</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td><strong>Procrustes / shape metrics</strong></td>
+<td>whatever group <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">G</mi></mrow><annotation encoding="application/x-tex">\mathcal{G}</annotation></semantics></math> you declare</td>
+<td>no</td>
+<td><strong>yes</strong></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>The measures differ mainly in how much they agree to ignore</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2305.06329" rel="noopener">Klabunde, Schumacher, Strohmaier &amp; Lemmerich <b>ACM Comput Surv 2023</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-55" data-paginate="true" data-marpit-pagination="55" data-marpit-pagination-total="58" aria-labelledby="heading-55"><p class="page">Slide 55</p>
+<h2 id="heading-55">Random directions become nearly perpendicular</h2>
+<div class="capfig">
+<figure><img src="../images/L05/18_random_directions_orthogonal.svg" alt="Four histograms of the cosine between two random vectors, for 2, 10, 100 and 1,000 dimensions. In 2 dimensions the cosines spread from -1 to 1; as the dimension grows they pile up ever more tightly around 0, so almost every pair is close to perpendicular" aria-describedby="figure-55-1"><figcaption id="figure-55-1"><p>Four histograms of the cosine between two random vectors, for 2, 10, 100 and 1,000 dimensions. In 2 dimensions the cosines spread from -1 to 1; as the dimension grows they pile up ever more tightly around 0, so almost every pair is close to perpendicular</p><a href="../images/L05/18_random_directions_orthogonal.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Draw two random directions. In 2-D they can point anywhere. In 1,000-D they are almost always nearly perpendicular: the average |cosine| falls from 0.65 to 0.025, roughly as <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><msqrt><mi>D</mi></msqrt></mrow><annotation encoding="application/x-tex">1/\sqrt{D}</annotation></semantics></math></li>
+<li>This is one face of the <strong>curse of dimensionality</strong>: with many dimensions and few samples, every sample looks about equally far from every other</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-56" data-paginate="true" data-marpit-pagination="56" data-marpit-pagination-total="58" aria-labelledby="heading-56"><p class="page">Slide 56</p>
+<h2 id="heading-56">More features than units</h2>
+<div class="capfig">
+<figure><img src="../images/L05/13_more_features_than_dims.svg" alt="Two circles of directions: two perpendicular feature directions where each unit means one thing, versus seven directions packed into the same plane, forced to overlap" aria-describedby="figure-56-1"><figcaption id="figure-56-1"><p>Two circles of directions: two perpendicular feature directions where each unit means one thing, versus seven directions packed into the same plane, forced to overlap</p><a href="../images/L05/13_more_features_than_dims.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Give every feature its <strong>own perpendicular direction</strong> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> units hold <strong>at most <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math></strong> features</li>
+<li>Accept <em>roughly</em> perpendicular directions and far more fit, in high dimensions, <strong>very many more</strong>. Each unit then sits on <strong>several</strong> of them</li>
+</ul>
+<p><mark>A population can code more features than it has units, and then no single unit stands for one thing.</mark></p>
+<div class="ref"><a href="https://transformer-circuits.pub/2022/toy_model/index.html" rel="noopener">Elhage et al. <b>Transformer Circuits Thread 2022</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-57" data-paginate="true" data-marpit-pagination="57" data-marpit-pagination-total="58" aria-labelledby="heading-57"><p class="page">Slide 57</p>
+<h2 id="heading-57">Limits of similarity measures</h2>
+<ul>
+<li><strong>CKA is not always reliable.</strong> Davari et al. show CKA scores can be driven by a small number of high-variance directions, and manipulated without changing what the representation actually encodes</li>
+<li><strong>Benchmark it.</strong> ReSi evaluates similarity measures against ground-truth tests, do they detect the differences we <em>know</em> are there?</li>
+<li><strong>Tie the metric to a claim.</strong> Harvey, Lipshutz &amp; Williams ask what each measure implies about <strong>decodable information</strong>, which is the property we usually care about</li>
+<li><strong>Are individual units special?</strong> Khosla et al. ask whether the coordinate axes of a representation are privileged, or whether only the geometry matters, if axes matter, rotation-invariant measures are throwing away signal</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2210.16156" rel="noopener">Davari et al. <b>ICLR 2023</b></a> · <a href="https://arxiv.org/abs/2408.00531" rel="noopener">Klabunde et al. <b>ICLR 2024</b></a> · <a href="https://arxiv.org/abs/2411.08197" rel="noopener">Harvey, Lipshutz &amp; Williams <b>arXiv 2024</b></a> · <a href="https://doi.org/10.1101/2024.06.20.599957" rel="noopener">Khosla et al. <b>bioRxiv 2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-58" data-paginate="true" data-marpit-pagination="58" data-marpit-pagination-total="58" aria-labelledby="heading-58"><p class="page">Slide 58</p>
+<h2 id="heading-58">Beyond geometry: computation happens in <em>time</em></h2>
+<ul>
+<li>Everything in this lecture was about a <strong>static</strong> cloud of points. But a brain is a dynamical system: the same geometry can be traversed by very different dynamics</li>
+<li>Two circuits with near-identical representational geometry can implement different computations</li>
+<li><strong>Dynamical Similarity Analysis (DSA)</strong> compares the <em>temporal structure</em> of the trajectories rather than the shape of the cloud, and separates systems that geometry alone conflates</li>
+<li>Manifolds and circuit dynamics are two views of one system</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2306.10168" rel="noopener">Ostrow, Eisen, Kozachkov &amp; Fiete <b>NeurIPS 2023</b></a> · <a href="https://doi.org/10.1038/s41583-023-00693-x" rel="noopener">Langdon, Genkin &amp; Engel <b>Nat Rev Neurosci 2023</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section></main></body></html>
