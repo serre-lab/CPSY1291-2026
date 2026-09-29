@@ -10,7 +10,7 @@
 <h2 id="heading-1">Geometry of neural representations</h2>
 <p class="meta">Tuesday, September 29 · Fall 2026</p>
 
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-marpit-scope-t4m4bfxl="" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="47" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-marpit-scope-xih6vai2="" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="47" aria-labelledby="heading-2"><p class="page">Slide 2</p>
 <h2 id="heading-2">Where we are</h2>
 
 <div class="table-scroll" tabindex="0" role="region" aria-label="Where we are — table"><table><caption>Where we are — table</caption>
@@ -137,12 +137,12 @@
 <li><strong>With an elbow</strong>, a few directions carry most of the variance: the embedding dimension is clear</li>
 <li><strong>Without one</strong>, the embedding dimension depends on the threshold (90%? 95%?)</li>
 <li><mark>V1 is high-dimensional, but not uniformly</mark>. We want one number with no threshold</li>
-<li>Why V1 has no elbow, and why that may matter for fooling deep networks: after the readout section</li>
+<li>Why V1 has no elbow, and what it may mean for fooling deep networks, comes after the readouts</li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-marpit-scope-kj5zgyfm="" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="47" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-marpit-scope-wagdn3e9="" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="47" aria-labelledby="heading-13"><p class="page">Slide 13</p>
 <h2 id="heading-13">One number: the participation ratio</h2>
 
 <ul>
@@ -195,7 +195,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <b>Trends Cogn Sci 2007</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-marpit-scope-vsz3kbsv="" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="47" aria-labelledby="heading-19"><p class="page">Slide 19</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-marpit-scope-rn6zpkt8="" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="47" aria-labelledby="heading-19"><p class="page">Slide 19</p>
 <h2 id="heading-19">A linear readout draws a hyperplane</h2>
 <div class="row">
 <div class="col fig">
@@ -275,7 +275,7 @@
 <ul>
 <li>A <strong>two-class task</strong> splits <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> stimuli in two: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>N</mi></msup></mrow><annotation encoding="application/x-tex">2^N</annotation></semantics></math> tasks. Four points: 16, and a boundary solves 14</li>
 <li>Outlined: no boundary works. <mark>In <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">N - 1</annotation></semantics></math> dimensions, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> spread-out points split every way</mark></li>
-<li><strong>Shattering accuracy</strong> (Bernardi et al. 2020): the mean test accuracy over sampled tasks</li>
+<li><strong>Shattering accuracy</strong>, a property of a population's responses to a stimulus set: split the stimuli at random (cat, car, cup vs dog, tree, shoe), fit a readout per split, average its test accuracy</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1109/PGEC.1965.264137" rel="noopener">Cover <b>IEEE Trans Electron Comput 1965</b></a> · <a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="47" aria-labelledby="heading-32"><p class="page">Slide 32</p>
@@ -287,8 +287,8 @@
 </div>
 <div class="col">
 <ul>
-<li>Train "animate or not" on dogs and chairs; test on cats and tables</li>
-<li><strong>CCGP</strong> (Bernardi et al. 2020): fit once, keep the weights, score on objects held out entirely</li>
+<li><strong>Shattering</strong>: any grouping of the same stimuli. <strong>CCGP</strong>: does "animate or not" learned on dogs and chairs work on cats and tables?</li>
+<li>Weights fixed, tested on new objects: high = general, low = specific</li>
 <li><strong>Random scatter</strong> gives CCGP near baseline; <strong>one consistent direction</strong> gives high CCGP</li>
 <li>Hippocampus and prefrontal cortex: <mark>high shattering, high CCGP</mark></li>
 </ul>
@@ -504,7 +504,6 @@ alpha = -np.polyfit(np.log(k[<span class="hljs-number">10</span>:<span class="hl
 <div class="capfig">
 <figure><img src="../images/L05/13_more_features_than_dims.svg" alt="Two circles of directions: two perpendicular feature directions where each unit means one thing, versus seven directions packed into the same plane, forced to overlap" aria-describedby="figure-47-1"><figcaption id="figure-47-1"><p>Two circles of directions: two perpendicular feature directions where each unit means one thing, versus seven directions packed into the same plane, forced to overlap</p><a href="../images/L05/13_more_features_than_dims.svg">Open full-size figure</a></figcaption></figure>
 </div>
-<p class="provenance">Schematic</p>
 <ul>
 <li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> perpendicular directions hold at most <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> features. Nearly perpendicular directions, plentiful in high dimensions, hold far more, and each unit sits on several</li>
 <li><mark>A population can code more features than it has units: no unit stands for one thing</mark></li>
