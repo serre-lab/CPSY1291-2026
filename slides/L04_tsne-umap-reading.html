@@ -81,7 +81,7 @@
 <figure><img src="../images/2026-illustrations/earth-blue-marble.png" alt="The Earth photographed from space: a curved surface that looks flat to someone standing on it" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>The Earth photographed from space: a curved surface that looks flat to someone standing on it</p><a href="../images/2026-illustrations/earth-blue-marble.png">Open full-size figure</a></figcaption></figure>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L04/18_turn_enlarge_surface.svg" alt="A curved surface drawn as a mesh shaped like a dome: red rings and green spokes. It is made of 216 images of the marlin, turned in 15-degree steps at nine sizes, placed on their first three principal components. Each red ring is one size turned all the way round; each green spoke is one angle enlarged. One small mesh cell is shaded gold. Thumbnails show the smallest marlin at the top of the dome and two large ones at the base" aria-describedby="figure-10-2"><figcaption id="figure-10-2"><p>A curved surface drawn as a mesh shaped like a dome: red rings and green spokes. It is made of 216 images of the marlin, turned in 15-degree steps at nine sizes, placed on their first three principal components. Each red ring is one size turned all the way round; each green spoke is one angle enlarged. One small mesh cell is shaded gold. Thumbnails show the smallest marlin at the top of the dome and two large ones at the base</p><a href="../images/L04/18_turn_enlarge_surface.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L04/18_turn_enlarge_surface.svg" alt="A curved surface drawn as a mesh shaped like a bowl: red rings and green spokes. It is made of 216 images of the marlin, turned in 15-degree steps at nine sizes, placed on their first three principal components. Each red ring is one size turned all the way round; each green spoke is one angle enlarged. One small mesh cell is shaded gold. Thumbnails show the smallest marlin at the bottom of the bowl and two large ones at the rim" aria-describedby="figure-10-2"><figcaption id="figure-10-2"><p>A curved surface drawn as a mesh shaped like a bowl: red rings and green spokes. It is made of 216 images of the marlin, turned in 15-degree steps at nine sizes, placed on their first three principal components. Each red ring is one size turned all the way round; each green spoke is one angle enlarged. One small mesh cell is shaded gold. Thumbnails show the smallest marlin at the bottom of the bowl and two large ones at the rim</p><a href="../images/L04/18_turn_enlarge_surface.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -105,7 +105,7 @@
 <ul>
 <li><strong>1,224 images</strong>: 51 objects, each rendered from <strong>24 views</strong>, in 6 categories.</li>
 <li>Bao, She, McGill &amp; Tsao showed these images to monkeys while recording from <strong>IT cortex</strong>, the late stage of the visual system where neurons respond to whole objects. You also use them in Assignment 1.</li>
-<li>Here each image is a point in <strong>fc6</strong>, a late layer of the image network AlexNet: 4,096 numbers per image.</li>
+<li>Here each image is a point in the <strong>late layer</strong> of ResNet-18, the trained image network of Assignment 1: 4,096 numbers per image.</li>
 <li>Two levels of grouping: views of the <strong>same object</strong>, and objects of the <strong>same category</strong>.</li>
 <li><strong>The question:</strong> pixels scatter an object's views. Does the network keep them <strong>together</strong>, and keep different objects <strong>apart</strong>?</li>
 </ul>
@@ -275,7 +275,7 @@
 <figure><img src="../images/L04/06_isomap.svg" alt="Left, the Swiss roll with two probe points one turn apart: a short dashed red segment joins them straight through the roll, and a long black path joins them by hopping between nearest neighbors around the spiral. Right, the Isomap layout: a flat strip ordered blue to gold, with the two probes at opposite ends" aria-describedby="figure-24-1"><figcaption id="figure-24-1"><p>Left, the Swiss roll with two probe points one turn apart: a short dashed red segment joins them straight through the roll, and a long black path joins them by hopping between nearest neighbors around the spiral. Right, the Isomap layout: a flat strip ordered blue to gold, with the two probes at opposite ends</p><a href="../images/L04/06_isomap.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>Connect each point to its <strong>10 nearest neighbors</strong>. The shortest path through that graph <strong>approximates the "along-the-sheet" distance</strong>: 71.3 for the two probes, 6.1 in a straight line.</li>
+<li>Connect each point to its <strong>10 nearest neighbors</strong>. The shortest path through that graph <strong>approximates the "along-the-sheet" distance</strong>: 71.2 for the two probes, 6.1 in a straight line.</li>
 <li>Run <strong>MDS</strong>, from the second lecture, on those path lengths. The roll unrolls <strong>if</strong> the points cover the sheet densely and no edge jumps between turns.</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1126/science.290.5500.2319" rel="noopener">Tenenbaum, de Silva &amp; Langford <b>2000</b></a> · <i>Science</i></div>
