@@ -10,7 +10,7 @@
 <h2 id="heading-1">Geometry of neural representations</h2>
 <p class="meta">Tuesday, September 29 · Fall 2026</p>
 
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-marpit-scope-sk4ur992="" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="48" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-marpit-scope-cfnqky6q="" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="48" aria-labelledby="heading-2"><p class="page">Slide 2</p>
 <h2 id="heading-2">Where we are</h2>
 
 <div class="table-scroll" tabindex="0" role="region" aria-label="Where we are — table"><table><caption>Where we are — table</caption>
@@ -89,7 +89,7 @@
 <p class="provenance">Toy data, computed</p>
 <ul>
 <li><strong>Rank</strong> = number of directions with nonzero variance = number of principal components (PCA) with nonzero variance. Neuron 3 = neuron 1 + neuron 2, so here rank 2: a plane</li>
-<li>One stimulus leaves the plane: rank 3. <mark>Rank counts directions, not their variance</mark></li>
+<li>One stimulus off the plane: rank 3. Noise does this to every real recording (480 IT neurons: rank 480). <mark>So we look at how the variance spreads</mark></li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="48" aria-labelledby="heading-10"><p class="page">Slide 10</p>
 <h2 id="heading-10">From the PCA lecture: the scree plot</h2>
@@ -138,18 +138,18 @@
 <li><strong>With an elbow</strong>, a few directions carry most of the variance: the embedding dimension is clear</li>
 <li><strong>Without one</strong>, the embedding dimension depends on the threshold (90%? 95%?)</li>
 <li><mark>V1 is high-dimensional, but not uniformly</mark>. We want one number with no threshold</li>
-<li>Why V1 has no elbow, and what it may mean for fooling deep networks, comes after the readouts</li>
+<li>Why V1 has no elbow, and what it may mean for fooling deep networks, is in the Going further block at the end</li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-019-1346-5" rel="noopener">Stringer et al. <b>Nature 2019</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-marpit-scope-ivuihn0c="" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="48" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-marpit-scope-iwypejcf="" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="48" aria-labelledby="heading-14"><p class="page">Slide 14</p>
 <h2 id="heading-14">One number: the participation ratio</h2>
 
 <ul>
 <li>The <strong>participation ratio</strong> of the eigenvalues <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">\lambda_k</annotation></semantics></math> (variances along the principal components):</li>
 </ul>
-<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mo>=</mo><mfrac><msup><mrow><mo fence="true">(</mo><munder><mo>∑</mo><mi>k</mi></munder><msub><mi>λ</mi><mi>k</mi></msub><mo fence="true">)</mo></mrow><mn>2</mn></msup><mrow><munder><mo>∑</mo><mi>k</mi></munder><msubsup><mi>λ</mi><mi>k</mi><mn>2</mn></msubsup></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"></mspace><mn>1</mn><mo>≤</mo><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mo>≤</mo><mi>D</mi></mrow><annotation encoding="application/x-tex">\mathrm{PR} = \frac{\left(\sum_k \lambda_k\right)^2}{\sum_k \lambda_k^2}, \qquad 1 \le \mathrm{PR} \le D
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mo>=</mo><mfrac><msup><mrow><mo fence="true">(</mo><munder><mo>∑</mo><mi>j</mi></munder><msub><mi>λ</mi><mi>j</mi></msub><mo fence="true">)</mo></mrow><mn>2</mn></msup><mrow><munder><mo>∑</mo><mi>j</mi></munder><msubsup><mi>λ</mi><mi>j</mi><mn>2</mn></msubsup></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"></mspace><mn>1</mn><mo>≤</mo><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mo>≤</mo><mi>D</mi></mrow><annotation encoding="application/x-tex">\mathrm{PR} = \frac{\left(\sum_j \lambda_j\right)^2}{\sum_j \lambda_j^2}, \qquad 1 \le \mathrm{PR} \le D
 </annotation></semantics></math></div></span></p><ul>
 <li>PR = 1 when one direction carries all the variance; PR = <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> when all <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> share it equally</li>
 <li>It needs no threshold. Report <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mi mathvariant="normal">/</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">\mathrm{PR}/D</annotation></semantics></math> to compare populations of different sizes</li>
@@ -185,7 +185,7 @@
 <div class="row">
 <div class="col fig">
 <figure><img src="../images/L03/dicarlo2007_d.png" alt="In pixel space the sheets of face images of two different people are interleaved, and a flat separating plane drawn through them fails to split them" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>In pixel space the sheets of face images of two different people are interleaved, and a flat separating plane drawn through them fails to split them</p><a href="../images/L03/dicarlo2007_d.png">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Redrawn in the PCA lecture from DiCarlo &amp; Cox (2007)</p>
+<p class="provenance">Redrawn in the last lecture from DiCarlo &amp; Cox (2007)</p>
 </div>
 <div class="col">
 <ul>
@@ -196,7 +196,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.tics.2007.06.010" rel="noopener">DiCarlo &amp; Cox <b>Trends Cogn Sci 2007</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-marpit-scope-b3585fsp="" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="48" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-marpit-scope-hliz3lax="" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="48" aria-labelledby="heading-20"><p class="page">Slide 20</p>
 <h2 id="heading-20">A linear readout draws a hyperplane</h2>
 <div class="row">
 <div class="col fig">
@@ -291,7 +291,6 @@
 <li><strong>Shattering</strong>: any grouping of the same stimuli. <strong>CCGP</strong>: does "animate or not" learned on dogs and chairs work on cats and tables?</li>
 <li>Weights fixed, tested on new objects: high = general, low = specific</li>
 <li><strong>Random scatter</strong> gives CCGP near baseline; <strong>one consistent direction</strong> gives high CCGP</li>
-<li>Hippocampus and prefrontal cortex: <mark>high shattering, high CCGP</mark></li>
 </ul>
 </div>
 </div>
@@ -307,7 +306,7 @@
 <ul>
 <li>Four images; which earn reward flips between two hidden <strong>contexts</strong>. 8 conditions: context × value × action</li>
 <li>A perfect <strong>cube</strong>: every variable transfers (high CCGP) but odd groupings fail (low shattering)</li>
-<li>Measured: corners slightly off the cube. <mark>Both high: abstract and flexible</mark></li>
+<li>Measured: near the cube. <mark>Both high: abstract and flexible</mark></li>
 <li>Hippocampus: context transfers; last action does not</li>
 </ul>
 </div>
@@ -336,7 +335,7 @@
 </tr>
 <tr>
 <td><strong>Shattering accuracy</strong></td>
-<td>How many two-class tasks can one boundary solve?</td>
+<td>How well does one boundary solve an arbitrary two-class task, on average?</td>
 <td>guessing, 0.5</td>
 </tr>
 <tr>
@@ -358,7 +357,7 @@
 </div>
 <div class="col">
 <ul>
-<li><strong>Log-log axes</strong>: each tick is ×10, so a power law <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>k</mi></msub><mo>∝</mo><msup><mi>k</mi><mrow><mo>−</mo><mi>α</mi></mrow></msup></mrow><annotation encoding="application/x-tex">\lambda_k \propto k^{-\alpha}</annotation></semantics></math> is a line of slope <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>α</mi></mrow><annotation encoding="application/x-tex">-\alpha</annotation></semantics></math></li>
+<li><strong>Log-log axes</strong>: each tick is ×10, so a power law <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>k</mi></msub><mo>∝</mo><msup><mi>k</mi><mrow><mo>−</mo><mi>α</mi></mrow></msup></mrow><annotation encoding="application/x-tex">f_k \propto k^{-\alpha}</annotation></semantics></math> is a line of slope <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>α</mi></mrow><annotation encoding="application/x-tex">-\alpha</annotation></semantics></math></li>
 <li><strong>Mouse V1</strong>: straight over the measured range, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>1.06</mn></mrow><annotation encoding="application/x-tex">\alpha = 1.06</annotation></semantics></math> (dotted: slope <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math>)</li>
 <li><strong>Monkey V1</strong>, electrode arrays, 100 THINGS images: a little steeper, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>1.32</mn></mrow><annotation encoding="application/x-tex">\alpha = 1.32</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.39</mn></mrow><annotation encoding="application/x-tex">1.39</annotation></semantics></math></li>
 </ul>
@@ -374,7 +373,7 @@
 </div>
 <div class="col">
 <ul>
-<li><strong>Log-log axes</strong>: each tick is ×10, so a power law <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>k</mi></msub><mo>∝</mo><msup><mi>k</mi><mrow><mo>−</mo><mi>α</mi></mrow></msup></mrow><annotation encoding="application/x-tex">\lambda_k \propto k^{-\alpha}</annotation></semantics></math> is a line of slope <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>α</mi></mrow><annotation encoding="application/x-tex">-\alpha</annotation></semantics></math></li>
+<li><strong>Log-log axes</strong>: each tick is ×10, so a power law <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>k</mi></msub><mo>∝</mo><msup><mi>k</mi><mrow><mo>−</mo><mi>α</mi></mrow></msup></mrow><annotation encoding="application/x-tex">f_k \propto k^{-\alpha}</annotation></semantics></math> is a line of slope <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>α</mi></mrow><annotation encoding="application/x-tex">-\alpha</annotation></semantics></math></li>
 <li><strong>Mouse V1</strong>: straight over the measured range, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>1.06</mn></mrow><annotation encoding="application/x-tex">\alpha = 1.06</annotation></semantics></math> (dotted: slope <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">-1</annotation></semantics></math>)</li>
 <li><strong>Monkey V1</strong>, electrode arrays, 100 THINGS images: a little steeper, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>1.32</mn></mrow><annotation encoding="application/x-tex">\alpha = 1.32</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.39</mn></mrow><annotation encoding="application/x-tex">1.39</annotation></semantics></math></li>
 <li><strong>Pixels</strong> of the 2,800 images: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>1.09</mn></mrow><annotation encoding="application/x-tex">\alpha = 1.09</annotation></semantics></math>, the same slope. <mark>Is V1 just copying the images?</mark></li>
@@ -387,7 +386,7 @@
 <div class="row">
 <div class="col fig">
 <figure><img src="../images/L05/48_spectra_whitened.svg" alt="Log-log plot of variance fraction against principal component k for natural and whitened images. For natural images the pixel spectrum, alpha 1.09, and the mouse V1 spectrum, alpha 1.06, lie almost on top of each other. For whitened images the pixel spectrum is much flatter, alpha 0.41, while the mouse V1 spectrum still follows the dotted line of slope minus 1, alpha 1.09" aria-describedby="figure-39-1"><figcaption id="figure-39-1"><p>Log-log plot of variance fraction against principal component k for natural and whitened images. For natural images the pixel spectrum, alpha 1.09, and the mouse V1 spectrum, alpha 1.06, lie almost on top of each other. For whitened images the pixel spectrum is much flatter, alpha 0.41, while the mouse V1 spectrum still follows the dotted line of slope minus 1, alpha 1.09</p><a href="../images/L05/48_spectra_whitened.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">4 recording sessions, whitened images</p>
+<p class="provenance">Stringer et al.'s data: 7 natural, 4 whitened sessions</p>
 </div>
 <div class="col">
 <ul>
