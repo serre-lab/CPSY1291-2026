@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flexible or abstract? · L06 · CPSY 1291</title>
+<!--
+  Shattering versus CCGP (Bernardi et al. 2020). Eight conditions of three binary variables
+  sit on a cube, in a random cloud, or on a mix of the two. A slider sets the mix.
+  Query: ?embed=1  ?static=1 (seed 1, λ = 0.25; used for the print figure). No network calls.
+  The pure functions live in the script#model block so 2026/figures/check_L06_flexible_abstract.cjs
+  can run the same computation.
+-->
+<style>
+:root{
+  --paper:#FAF9F5;--ink:#1E293B;--body:#334155;--slate:#64748B;
+  --blue:#3E6D8E;--magenta:#B5396B;--green:#3F7A6B;--pop:#B23A2E;--gold:#FFC72C;
+  --rule:#E7E3DA;--focus:#0969da;color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--paper);color:var(--body);
+  font:20px/1.35 "Poppins",system-ui,-apple-system,sans-serif}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1680px;margin:0 auto;padding:12px 14px 16px;min-height:100%;
+  display:flex;flex-direction:column}
+h1{margin:0 0 4px;font-size:28px;line-height:1.2;color:var(--ink)}
+h2{margin:0 0 6px;font-size:18px;font-weight:600;color:var(--ink)}
+.lede{margin:0 0 10px;font-size:17px;color:var(--slate)}
+.stage{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:18px;
+  align-items:stretch;flex:1;min-height:420px}
+.panel{display:flex;flex-direction:column;min-width:0;min-height:0}
+.canvas-frame{border:1px solid var(--rule);background:var(--paper);position:relative;flex:1;min-height:0}
+.canvas-frame canvas{display:block;width:100%;height:100%}
+.meter{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:4px 12px;
+  font-variant-numeric:tabular-nums}
+.meter .lab{font-size:20px;color:var(--ink)}
+.meter .val{font-size:34px;font-weight:600;color:var(--ink);min-width:4ch;text-align:right}
+.meter .bar{grid-column:1/3;height:12px;background:var(--rule);border-radius:6px;position:relative;overflow:hidden}
+.meter .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--magenta);border-radius:6px}
+.meter .bar b{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--ink)}
+.meter.dim{opacity:.35}
+.base{font-size:18px;color:var(--slate)}
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;margin-top:12px}
+.slider{display:flex;flex-direction:column;gap:2px;flex:1 1 240px;max-width:380px;
+  font-size:18px;color:var(--ink)}
+.slider .row{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.slider .row b{font-weight:600}
+input[type=range]{width:100%;accent-color:var(--blue);height:28px;margin:0}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+button{font:inherit;font-size:18px;color:var(--ink);background:var(--paper);
+  border:1px solid var(--slate);border-radius:4px;padding:6px 14px;min-height:40px;cursor:pointer}
+button[aria-pressed=true]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:17px;color:var(--body);margin-top:8px}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;
+  margin-right:6px;vertical-align:-1px;background:var(--c)}
+.live{font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums;margin:8px 0 0}
+.hint{font-size:16px;color:var(--slate);margin:4px 0 0}
+body.embed .wrap{max-width:none;padding:8px 12px 10px;height:100%}
+body.embed h1,body.embed .lede{display:none}
+body.embed .stage{min-height:0}
+body.embed h2{font-size:16px}
+body.embed button{font-size:16px}
+body.embed .slider{font-size:16px}
+body.embed .legend{font-size:15px;margin-top:6px}
+body.embed .live{font-size:16px}
+body.embed .hint{font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Flexible or abstract?</h1>
+  <p class="lede">Eight conditions, three binary variables. A cube keeps one readout valid on conditions it never saw. A random cloud lets a readout solve almost every split, and that readout does not transfer.</p>
+  <div class="stage">
+    <section class="panel">
+      <h2>Shattering and generalization</h2>
+      <div class="canvas-frame"><canvas id="chart" tabindex="0" aria-label="Bar chart of shattering accuracy and cross-condition generalization for context, action, and reward"></canvas></div>
+    </section>
+    <section class="panel">
+      <h2>Eight condition means</h2>
+      <div class="canvas-frame"><canvas id="map" tabindex="0" aria-label="Two-dimensional view of the eight condition means. Color is context. Gold segments join conditions that differ only in context."></canvas></div>
+    </section>
+  </div>
+  <div class="legend">
+    <span style="--c:#B23A2E">CCGP context</span>
+    <span style="--c:#3E6D8E">CCGP action</span>
+    <span style="--c:#3F7A6B">CCGP reward</span>
+  </div>
+  <div class="controls">
+    <label class="slider">Random mixing λ
+      <span class="row"><span>cube</span><b id="lamOut">0.25</b><span>random</span></span>
+      <input id="lam" type="range" min="0" max="1" step="0.01" value="0.25"
+        aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.25" aria-valuetext="0.25">
+    </label>
+    <label class="slider">Trial noise σ
+      <span class="row"><span>quiet</span><b id="sigOut">0.75</b><span>noisy</span></span>
+      <input id="sig" type="range" min="0" max="2" step="0.01" value="0.75"
+        aria-valuemin="0" aria-valuemax="2" aria-valuenow="0.75" aria-valuetext="0.75">
+    </label>
+    <div class="btns">
+      <button type="button" id="bCube" aria-pressed="false">Cube (abstract)</button>
+      <button type="button" id="bMix" aria-pressed="true">Compromise</button>
+      <button type="button" id="bRand" aria-pressed="false">Random (flexible)</button>
+      <button type="button" id="bNew">New draw</button>
+    </div>
+  </div>
+  <p class="live" id="live" aria-live="polite">Shattering – · CCGP context – · decoding context –</p>
+  <p class="hint">Filled bars and the colored numbers are CCGP. Outline bars and the grey numbers are ordinary decoding. The black line is shattering. The dashed line is chance. On the map, letters A–H name the conditions, red is context +, blue is context −, and gold joins a pair that differs only in context.</p>
+</div>
+<script id="model">
+'use strict';
+/*
+  Eight conditions, three binary variables (context, action, reward) in {±1}.
+  D = 30. Directions u are random Gaussian vectors, orthonormalised by Gram–Schmidt.
+  Cube corner: √3 · (s_ctx u_ctx + s_act u_act + s_rew u_rew), so each corner has norm 3.
+  r_c starts as an independent Gaussian, with the cube subspace removed, then the eight
+  vectors are orthonormalised and scaled to RANDOM_SCALE times the cube-corner norm.
+  (Equal-norm raw Gaussians did not separate shattering from CCGP on seed 1: see RANDOM_SCALE.)
+  Mean: m = (1 − λ) · cube + λ · r.
+  Trials: m + σ ε, ε ~ N(0, I), 20 train and 20 test per condition, fixed for a seed.
+  Readout: ridge regression onto ±1 labels, with a bias. The penalty is 1e-2 · trace(XᵀX) / D
+  on the weights, not on the bias. The prediction is the sign of the output.
+  Shattering: the 35 distinct 4-vs-4 splits, fit on training trials, scored on test trials.
+  CCGP: for each variable, hold out one of the four conditions on each side (16 ways),
+  fit on the other six, score the held-out conditions' test trials.
+*/
+(function () {
+  var D = 30, N_TRAIN = 20, N_TEST = 20, P = D + 1;
+  // σ so the pure cube has CCGP ≈ 0.95. RANDOM_SCALE multiplies the cube-corner norm to set
+  // the length of each orthonormal random vector. Equal lengths (scale 1) left λ = 0.25 with
+  // almost the cube's shattering; scale 2 makes that mix high on both measures.
+  var DEFAULT_SIGMA = 0.75;
+  var RANDOM_SCALE = 2;
+  var LETTERS = 'ABCDEFGH';
+  var ALL = [0, 1, 2, 3, 4, 5, 6, 7];
+
+  function mulberry32(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function gauss(rng) {
+    var u = 0, v = 0;
+    while (u === 0) u = rng();
+    while (v === 0) v = rng();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+  function randGaussian(rng) {
+    var v = new Float64Array(D), n2 = 0, i, g;
+    for (i = 0; i < D; i++) { g = gauss(rng); v[i] = g; n2 += g * g; }
+    return v;
+  }
+  function normOf(v) {
+    var s = 0, i;
+    for (i = 0; i < v.length; i++) s += v[i] * v[i];
+    return Math.sqrt(s);
+  }
+
+  function buildSplits() {
+    var splits = [], choose = [];
+    function rec(start) {
+      if (choose.length === 4) {
+        var mask = 0, i, y;
+        for (i = 0; i < 4; i++) mask |= 1 << choose[i];
+        if (mask < ((~mask) & 255)) {
+          y = new Int8Array(8);
+          for (i = 0; i < 8; i++) y[i] = (mask & (1 << i)) ? 1 : -1;
+          splits.push(y);
+        }
+        return;
+      }
+      for (var i = start; i < 8; i++) { choose.push(i); rec(i + 1); choose.pop(); }
+    }
+    rec(0);
+    if (splits.length !== 35) throw new Error('expected 35 splits, got ' + splits.length);
+    return splits;
+  }
+  function buildJobs(bit) {
+    var pos = [], neg = [], i, a, b, train, jobs = [];
+    for (i = 0; i < 8; i++) (i & bit ? pos : neg).push(i);
+    var y = new Int8Array(8);
+    for (i = 0; i < 8; i++) y[i] = (i & bit) ? 1 : -1;
+    for (a = 0; a < 4; a++) for (b = 0; b < 4; b++) {
+      train = [];
+      for (i = 0; i < 8; i++) if (i !== pos[a] && i !== neg[b]) train.push(i);
+      jobs.push({train: train, test: [pos[a], neg[b]]});
+    }
+    if (jobs.length !== 16) throw new Error('expected 16 CCGP splits');
+    return {y: y, jobs: jobs};
+  }
+  var SPLITS = buildSplits();
+  var VARS = [buildJobs(4), buildJobs(2), buildJobs(1)];
+
+  var Gbuf = new Float64Array(P * P);
+  var xtBuf = new Float64Array(P);
+  var wBuf = new Float64Array(P);
+  var yTmp = new Float64Array(P);
+  var Lbuf = new Float64Array(P * P);
+
+  function cholesky(A, L, n) {
+    var i, j, k, s;
+    L.fill(0);
+    for (i = 0; i < n; i++) {
+      for (j = 0; j <= i; j++) {
+        s = A[i * n + j];
+        for (k = 0; k < j; k++) s -= L[i * n + k] * L[j * n + k];
+        if (i === j) L[i * n + j] = Math.sqrt(s > 1e-18 ? s : 1e-18);
+        else L[i * n + j] = s / L[j * n + j];
+      }
+    }
+  }
+  function cholSolve(L, b, w, n) {
+    var i, k, s;
+    for (i = 0; i < n; i++) {
+      s = b[i];
+      for (k = 0; k < i; k++) s -= L[i * n + k] * yTmp[k];
+      yTmp[i] = s / L[i * n + i];
+    }
+    for (i = n - 1; i >= 0; i--) {
+      s = yTmp[i];
+      for (k = i + 1; k < n; k++) s -= L[k * n + i] * w[k];
+      w[i] = s / L[i * n + i];
+    }
+  }
+  function zeroG() { Gbuf.fill(0); }
+  function addStat(stat) {
+    var sumX = stat.sumX, sumXX = stat.sumXX, nT = stat.nT, a, b, row;
+    for (a = 0; a < D; a++) {
+      row = a * P;
+      for (b = a; b < D; b++) Gbuf[row + b] += sumXX[a * D + b];
+      Gbuf[row + D] += sumX[a];
+    }
+    Gbuf[D * P + D] += nT;
+  }
+  function symmetrize() {
+    var a, b, v;
+    for (a = 0; a < P; a++) for (b = a + 1; b < P; b++) {
+      v = Gbuf[a * P + b];
+      Gbuf[b * P + a] = v;
+    }
+  }
+  function applyRidge() {
+    var tr = 0, a;
+    for (a = 0; a < D; a++) tr += Gbuf[a * P + a];
+    var ridge = 1e-2 * tr / D;
+    for (a = 0; a < D; a++) Gbuf[a * P + a] += ridge;
+    return ridge;
+  }
+  function xTy(stat, y) {
+    var sumX = stat.sumX, a;
+    for (a = 0; a < D; a++) xtBuf[a] += y * sumX[a];
+    xtBuf[D] += y * stat.nT;
+  }
+  function accuracy(w, flats, labels, conds) {
+    var correct = 0, total = 0, ci, c, flat, y, nT, t, o, a, s;
+    var bias = w[D];
+    for (ci = 0; ci < conds.length; ci++) {
+      c = conds[ci];
+      flat = flats[c];
+      y = labels[c];
+      nT = (flat.length / D) | 0;
+      for (t = 0; t < nT; t++) {
+        s = bias;
+        o = t * D;
+        for (a = 0; a < D; a++) s += w[a] * flat[o + a];
+        if ((s >= 0 ? 1 : -1) === y) correct++;
+        total++;
+      }
+    }
+    return correct / total;
+  }
+  function statsOf(flat) {
+    var nT = (flat.length / D) | 0;
+    var sumX = new Float64Array(D);
+    var sumXX = new Float64Array(D * D);
+    var t, o, a, b, xa;
+    for (t = 0; t < nT; t++) {
+      o = t * D;
+      for (a = 0; a < D; a++) {
+        xa = flat[o + a];
+        sumX[a] += xa;
+        for (b = a; b < D; b++) sumXX[a * D + b] += xa * flat[o + b];
+      }
+    }
+    return {sumX: sumX, sumXX: sumXX, nT: nT};
+  }
+  function fillFlat(dest, mean, eps, sigma) {
+    var nT = (dest.length / D) | 0, t, o, a;
+    for (t = 0; t < nT; t++) {
+      o = t * D;
+      for (a = 0; a < D; a++) dest[o + a] = mean[a] + sigma * eps[o + a];
+    }
+  }
+
+  function gramSchmidt(vecs) {
+    var out = [], vi, w, ui, u, d, i, n2, inv;
+    for (vi = 0; vi < vecs.length; vi++) {
+      w = Float64Array.from(vecs[vi]);
+      for (ui = 0; ui < out.length; ui++) {
+        u = out[ui]; d = 0;
+        for (i = 0; i < D; i++) d += w[i] * u[i];
+        for (i = 0; i < D; i++) w[i] -= d * u[i];
+      }
+      n2 = 0;
+      for (i = 0; i < D; i++) n2 += w[i] * w[i];
+      inv = 1 / Math.sqrt(n2);
+      for (i = 0; i < D; i++) w[i] *= inv;
+      out.push(w);
+    }
+    return out;
+  }
+  function makeWorld(seed) {
+    var rng = mulberry32(seed >>> 0);
+    // Orthonormal frame: random Gaussian vectors, then Gram–Schmidt. A cube needs orthogonal axes;
+    // normalising alone leaves them a few degrees off, and seed 1's raw cloud is not near chance.
+    var U = gramSchmidt([randGaussian(rng), randGaussian(rng), randGaussian(rng)]);
+    var root3 = Math.sqrt(3);
+    var cube = [], raw = [], c, d, s, m, i, k, proj;
+    for (c = 0; c < 8; c++) {
+      s = {ctx: (c & 4) ? 1 : -1, act: (c & 2) ? 1 : -1, rew: (c & 1) ? 1 : -1};
+      m = new Float64Array(D);
+      for (d = 0; d < D; d++) m[d] = root3 * (s.ctx * U[0][d] + s.act * U[1][d] + s.rew * U[2][d]);
+      cube.push(m);
+      raw.push(randGaussian(rng));
+    }
+    // Take the random part out of the cube's subspace, then orthonormalise the eight vectors
+    // so no variable has an accidental shared direction. One scale then matches norms.
+    for (c = 0; c < 8; c++) {
+      for (k = 0; k < 3; k++) {
+        proj = 0;
+        for (d = 0; d < D; d++) proj += raw[c][d] * U[k][d];
+        for (d = 0; d < D; d++) raw[c][d] -= proj * U[k][d];
+      }
+    }
+    var orth = gramSchmidt(raw);
+    var meanCube = 0;
+    for (c = 0; c < 8; c++) meanCube += normOf(cube[c]);
+    meanCube /= 8;
+    var rand = [];
+    for (c = 0; c < 8; c++) {
+      m = new Float64Array(D);
+      for (d = 0; d < D; d++) m[d] = orth[c][d] * meanCube * RANDOM_SCALE;
+      rand.push(m);
+    }
+    function noiseBank(nT) {
+      var bank = [];
+      for (c = 0; c < 8; c++) {
+        var e = new Float64Array(nT * D);
+        for (i = 0; i < e.length; i++) e[i] = gauss(rng);
+        bank.push(e);
+      }
+      return bank;
+    }
+    return {
+      seed: seed >>> 0,
+      cube: cube,
+      rand: rand,
+      epsTrain: noiseBank(N_TRAIN),
+      epsTest: noiseBank(N_TEST),
+      train: ALL.map(function () { return new Float64Array(N_TRAIN * D); }),
+      test: ALL.map(function () { return new Float64Array(N_TEST * D); }),
+      means: ALL.map(function () { return new Float64Array(D); })
+    };
+  }
+
+  function evaluate(world, lambda, sigma) {
+    var c, d, mean, om = 1 - lambda;
+    for (c = 0; c < 8; c++) {
+      mean = world.means[c];
+      var cu = world.cube[c], rd = world.rand[c];
+      for (d = 0; d < D; d++) mean[d] = om * cu[d] + lambda * rd[d];
+      fillFlat(world.train[c], mean, world.epsTrain[c], sigma);
+      fillFlat(world.test[c], mean, world.epsTest[c], sigma);
+    }
+    var stats = new Array(8);
+    for (c = 0; c < 8; c++) stats[c] = statsOf(world.train[c]);
+
+    zeroG();
+    for (c = 0; c < 8; c++) addStat(stats[c]);
+    symmetrize();
+    applyRidge();
+    cholesky(Gbuf, Lbuf, P);
+    var L = new Float64Array(Lbuf);
+
+    var shatterSum = 0, s;
+    for (s = 0; s < SPLITS.length; s++) {
+      var y = SPLITS[s];
+      xtBuf.fill(0);
+      for (c = 0; c < 8; c++) xTy(stats[c], y[c]);
+      cholSolve(L, xtBuf, wBuf, P);
+      shatterSum += accuracy(wBuf, world.test, y, ALL);
+    }
+
+    var ccgp = [0, 0, 0], decode = [0, 0, 0], v, j, job, k;
+    for (v = 0; v < 3; v++) {
+      xtBuf.fill(0);
+      for (c = 0; c < 8; c++) xTy(stats[c], VARS[v].y[c]);
+      cholSolve(L, xtBuf, wBuf, P);
+      decode[v] = accuracy(wBuf, world.test, VARS[v].y, ALL);
+      var accSum = 0, jobs = VARS[v].jobs;
+      for (j = 0; j < jobs.length; j++) {
+        job = jobs[j];
+        zeroG();
+        xtBuf.fill(0);
+        for (k = 0; k < job.train.length; k++) {
+          addStat(stats[job.train[k]]);
+          xTy(stats[job.train[k]], VARS[v].y[job.train[k]]);
+        }
+        symmetrize();
+        applyRidge();
+        cholesky(Gbuf, Lbuf, P);
+        cholSolve(Lbuf, xtBuf, wBuf, P);
+        accSum += accuracy(wBuf, world.test, VARS[v].y, job.test);
+      }
+      ccgp[v] = accSum / jobs.length;
+    }
+    return {
+      shatter: shatterSum / SPLITS.length,
+      ccgp: ccgp,
+      decode: decode,
+      means: world.means
+    };
+  }
+
+  function dotD(a, b) {
+    var s = 0, i;
+    for (i = 0; i < a.length; i++) s += a[i] * b[i];
+    return s;
+  }
+  function nrmD(v) { return Math.sqrt(dotD(v, v)); }
+  function unitD(v) {
+    var n = nrmD(v), o = new Float64Array(v.length), i;
+    if (n < 1e-12) return o;
+    for (i = 0; i < v.length; i++) o[i] = v[i] / n;
+    return o;
+  }
+  function goldSegs(means) {
+    var segs = [], i, s, d;
+    for (i = 0; i < 4; i++) {
+      s = new Float64Array(D);
+      for (d = 0; d < D; d++) s[d] = means[i | 4][d] - means[i][d];
+      segs.push(s);
+    }
+    return segs;
+  }
+  // Acute angle between lines: 0 means parallel. A zero-length segment counts as parallel.
+  function meanAcute(vecs) {
+    var s = 0, c = 0, i, j, na, nb, cs, deg;
+    for (i = 0; i < vecs.length; i++) for (j = i + 1; j < vecs.length; j++) {
+      na = nrmD(vecs[i]); nb = nrmD(vecs[j]);
+      c++;
+      if (na < 1e-8 || nb < 1e-8) continue;
+      cs = dotD(vecs[i], vecs[j]) / (na * nb);
+      if (cs > 1) cs = 1;
+      if (cs < -1) cs = -1;
+      deg = Math.acos(cs) * 180 / Math.PI;
+      s += deg < 180 - deg ? deg : 180 - deg;
+    }
+    return c ? s / c : 0;
+  }
+  function topDir(vecs) {
+    var n = vecs.length, G = new Float64Array(n * n), i, j, v, w, it, s, nn, dir, lam, d;
+    for (i = 0; i < n; i++) for (j = 0; j < n; j++) G[i * n + j] = dotD(vecs[i], vecs[j]);
+    v = new Float64Array(n);
+    for (i = 0; i < n; i++) v[i] = Math.sin((i + 1) * 1.3) + 0.1 * (i + 1);
+    w = new Float64Array(n);
+    for (it = 0; it < 80; it++) {
+      for (i = 0; i < n; i++) {
+        s = 0;
+        for (j = 0; j < n; j++) s += G[i * n + j] * v[j];
+        w[i] = s;
+      }
+      nn = nrmD(w) || 1;
+      for (i = 0; i < n; i++) v[i] = w[i] / nn;
+    }
+    dir = new Float64Array(D);
+    for (i = 0; i < n; i++) for (d = 0; d < D; d++) dir[d] += v[i] * vecs[i][d];
+    lam = 0;
+    for (i = 0; i < n; i++) {
+      s = 0;
+      for (j = 0; j < n; j++) s += G[i * n + j] * v[j];
+      lam += v[i] * s;
+    }
+    if (nrmD(dir) < 1e-8) return {dir: new Float64Array(D), lam: 0};
+    return {dir: unitD(dir), lam: lam};
+  }
+  // Mean of the conditions with this bit set, minus the mean of the others.
+  // The sign is part of the definition, so the axis does not flip while λ slides.
+  function codingDir(means, bit, remove) {
+    var pos = new Float64Array(D), neg = new Float64Array(D), np = 0, nn = 0, i, d, dir, u, p;
+    for (i = 0; i < 8; i++) {
+      if (i & bit) { np++; for (d = 0; d < D; d++) pos[d] += means[i][d]; }
+      else { nn++; for (d = 0; d < D; d++) neg[d] += means[i][d]; }
+    }
+    dir = new Float64Array(D);
+    for (d = 0; d < D; d++) dir[d] = pos[d] / np - neg[d] / nn;
+    for (i = 0; i < remove.length; i++) {
+      u = remove[i];
+      if (nrmD(u) < 0.5) continue;
+      p = dotD(dir, u);
+      for (d = 0; d < D; d++) dir[d] -= p * u[d];
+    }
+    if (nrmD(dir) < 1e-8) return new Float64Array(D);
+    return unitD(dir);
+  }
+  function mixMeans(world, lambda) {
+    var means = [], om = 1 - lambda, c, d, m;
+    for (c = 0; c < 8; c++) {
+      m = new Float64Array(D);
+      for (d = 0; d < D; d++) m[d] = om * world.cube[c][d] + lambda * world.rand[c][d];
+      means.push(m);
+    }
+    return means;
+  }
+  // The first two principal components of these eight means lie in the cube subspace
+  // until the random part catches up (around λ = 0.55). In that subspace the four
+  // context segments are the same vector, so the plane draws them parallel and hides
+  // the random part. The leading principal component after removing the context
+  // direction is an action/reward axis, which is orthogonal to every context segment
+  // and hides the same thing.
+  //
+  // The view therefore puts the context coding direction on x (context + toward +x).
+  // On y it puts the leading direction of the segment residuals — the largest direction
+  // orthogonal to context in which the gold segments disagree — plus a fixed mix of
+  // the action and reward coding directions. Those two are orthogonal to every context
+  // segment, so they keep the eight corners apart and do not change the segment angles.
+  // Signs are fixed by the coding contrasts, and the vertical mix does not flip as λ moves.
+  function projectMeans(means) {
+    var segs = goldSegs(means);
+    var ang30 = meanAcute(segs);
+    var ctx = codingDir(means, 4, []);
+    var res = [], i, d, s, p, dev, devDir, bi, ba, a, act, rew, mix, mu, pts, x, y, c, segs2;
+    for (i = 0; i < 4; i++) {
+      s = new Float64Array(D);
+      p = dotD(segs[i], ctx);
+      for (d = 0; d < D; d++) s[d] = segs[i][d] - p * ctx[d];
+      res.push(s);
+    }
+    dev = topDir(res);
+    devDir = dev.dir;
+    if (dev.lam < 1e-4) devDir = new Float64Array(D);
+    else {
+      bi = 0; ba = -1;
+      for (i = 0; i < 4; i++) {
+        a = Math.abs(dotD(res[i], devDir));
+        if (a > ba) { ba = a; bi = i; }
+      }
+      if (dotD(res[bi], devDir) < 0) {
+        for (d = 0; d < D; d++) devDir[d] = -devDir[d];
+      }
+    }
+    act = codingDir(means, 2, [ctx, devDir]);
+    rew = codingDir(means, 1, [ctx, devDir, act]);
+    mix = new Float64Array(D);
+    for (d = 0; d < D; d++) mix[d] = act[d] + 0.45 * rew[d];
+    mix = unitD(mix);
+    mu = new Float64Array(D);
+    for (i = 0; i < 8; i++) for (d = 0; d < D; d++) mu[d] += means[i][d];
+    for (d = 0; d < D; d++) mu[d] /= 8;
+    pts = [];
+    for (i = 0; i < 8; i++) {
+      x = 0; y = 0;
+      for (d = 0; d < D; d++) {
+        c = means[i][d] - mu[d];
+        x += c * ctx[d];
+        y += c * (devDir[d] + mix[d]);
+      }
+      pts.push({x: x, y: y, pos: (i & 4) !== 0, letter: LETTERS[i]});
+    }
+    segs2 = [];
+    for (i = 0; i < 4; i++) segs2.push([pts[i | 4].x - pts[i].x, pts[i | 4].y - pts[i].y]);
+    return {
+      pts: pts,
+      xLabel: 'context direction',
+      yLabel: 'largest other direction',
+      ang30: ang30,
+      ang2: meanAcute(segs2)
+    };
+  }
+  // Square window covering the whole λ path for this seed. Equal units on x and y,
+  // so a later frame is not rescaled and the segment angles stay honest.
+  function mapLimits(world) {
+    var xmin = Infinity, xmax = -Infinity, ymin = Infinity, ymax = -Infinity, t, p, i, cx, cy, r;
+    for (t = 0; t <= 20; t++) {
+      p = projectMeans(mixMeans(world, t / 20));
+      for (i = 0; i < p.pts.length; i++) {
+        if (p.pts[i].x < xmin) xmin = p.pts[i].x;
+        if (p.pts[i].x > xmax) xmax = p.pts[i].x;
+        if (p.pts[i].y < ymin) ymin = p.pts[i].y;
+        if (p.pts[i].y > ymax) ymax = p.pts[i].y;
+      }
+    }
+    cx = (xmin + xmax) / 2;
+    cy = (ymin + ymax) / 2;
+    r = Math.max(xmax - xmin, ymax - ymin) / 2;
+    r = (r || 1) * 1.28;
+    return {xmin: cx - r, xmax: cx + r, ymin: cy - r, ymax: cy + r};
+  }
+
+  globalThis.FLEX = {
+    D: D,
+    DEFAULT_SIGMA: DEFAULT_SIGMA,
+    makeWorld: makeWorld,
+    evaluate: evaluate,
+    projectMeans: projectMeans,
+    mapLimits: mapLimits
+  };
+})();
+</script>
+<script>
+'use strict';
+(function () {
+  var q = new URLSearchParams(location.search);
+  if (q.has('embed')) document.body.classList.add('embed');
+  var STATIC = q.has('static');
+  var F = globalThis.FLEX;
+  var COL = {ctx: '#B23A2E', act: '#3E6D8E', rew: '#3F7A6B', ink: '#1E293B', body: '#334155',
+    slate: '#64748B', rule: '#E7E3DA', paper: '#FAF9F5', gold: '#FFC72C', neg: '#3E6D8E'};
+  var chart = document.getElementById('chart'), map = document.getElementById('map');
+  var lamInput = document.getElementById('lam'), sigInput = document.getElementById('sig');
+  var live = document.getElementById('live');
+  var seed = 1, lambda = 0.25, sigma = F.DEFAULT_SIGMA;
+  var world = F.makeWorld(seed);
+  var pending = false, metrics = null;
+  var mapLim = null, mapLimSeed = -1;
+
+  function fmt(v) { return v.toFixed(2); }
+  function fit(cv) {
+    var r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    var w = Math.max(1, r.width), h = Math.max(1, r.height);
+    var W = Math.round(w * dpr), H = Math.round(h * dpr);
+    if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {ctx: ctx, w: w, h: h};
+  }
+  function halo(ctx, text, x, y) {
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = COL.paper;
+    ctx.strokeText(text, x, y);
+    ctx.fillText(text, x, y);
+  }
+  function drawChart(m) {
+    var f = fit(chart), ctx = f.ctx, w = f.w, h = f.h;
+    ctx.clearRect(0, 0, w, h);
+    var left = 54, right = 158, top = 28, bottom = 32;
+    var plotW = w - left - right, plotH = h - top - bottom;
+    if (plotW < 40 || plotH < 40) return;
+    function yOf(v) { return top + (1 - (v - 0.4) / 0.6) * plotH; }
+    ctx.font = '16px Poppins, system-ui, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = COL.rule;
+    ctx.fillStyle = COL.slate;
+    [0.4, 0.6, 0.8, 1.0].forEach(function (t) {
+      var y = yOf(t);
+      ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(left + plotW, y); ctx.stroke();
+      ctx.fillText(t.toFixed(1), left - 8, y);
+    });
+    var yc = yOf(0.5);
+    ctx.save();
+    ctx.setLineDash([5, 4]);
+    ctx.strokeStyle = COL.slate;
+    ctx.beginPath(); ctx.moveTo(left, yc); ctx.lineTo(left + plotW, yc); ctx.stroke();
+    ctx.restore();
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    ctx.fillStyle = COL.slate;
+    ctx.fillText('chance', left + plotW + 8, yc - 3);
+
+    var names = ['context', 'action', 'reward'];
+    var cols = [COL.ctx, COL.act, COL.rew];
+    var slot = plotW / 3;
+    var geos = [];
+    for (var i = 0; i < 3; i++) {
+      var cx = left + slot * (i + 0.5);
+      var hw = Math.min(28, slot * 0.16), hh = hw * 1.55;
+      var dec = m.decode[i], cc = m.ccgp[i];
+      var yDec = yOf(Math.max(0.4, Math.min(1, dec)));
+      var yCc = yOf(Math.max(0.4, Math.min(1, cc)));
+      var yBase = yOf(0.4);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = cols[i];
+      ctx.strokeRect(cx - hh, yDec, hh * 2, Math.max(0, yBase - yDec));
+      ctx.fillStyle = cols[i];
+      ctx.fillRect(cx - hw, yCc, hw * 2, Math.max(0, yBase - yCc));
+      geos.push({cx: cx, dec: dec, cc: cc, col: cols[i], name: names[i]});
+    }
+    var ys = yOf(Math.max(0.4, Math.min(1, m.shatter)));
+    ctx.strokeStyle = COL.ink;
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(left, ys); ctx.lineTo(left + plotW, ys); ctx.stroke();
+
+    ctx.font = '15px Poppins, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    geos.forEach(function (g) {
+      var yC = yOf(Math.max(0.4, Math.min(1, g.cc))) - 3;
+      var yD = yOf(Math.max(0.4, Math.min(1, g.dec))) - 3;
+      if (Math.abs(g.dec - g.cc) < 0.025) {
+        var hi = Math.min(yC, yD);
+        ctx.fillStyle = COL.body;
+        halo(ctx, fmt(Math.max(g.dec, g.cc)), g.cx, hi - 18);
+        ctx.fillStyle = g.col;
+        halo(ctx, fmt(Math.min(g.dec, g.cc)), g.cx, hi);
+      } else {
+        ctx.fillStyle = g.col;
+        halo(ctx, fmt(g.cc), g.cx, yC);
+        ctx.fillStyle = COL.body;
+        halo(ctx, fmt(g.dec), g.cx, yD);
+      }
+    });
+    ctx.fillStyle = COL.ink;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    halo(ctx, 'shattering ' + fmt(m.shatter), left + plotW + 10, ys);
+    ctx.font = '16px Poppins, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = COL.body;
+    geos.forEach(function (g) { ctx.fillText(g.name, g.cx, top + plotH + 8); });
+  }
+  function drawMap(means) {
+    var f = fit(map), ctx = f.ctx, w = f.w, h = f.h;
+    ctx.clearRect(0, 0, w, h);
+    if (!mapLim || mapLimSeed !== seed) {
+      mapLim = F.mapLimits(world);
+      mapLimSeed = seed;
+    }
+    var proj = F.projectMeans(means);
+    var pts = proj.pts;
+    var lim = mapLim;
+    var left = 28, right = 18, top = 18, bottom = 36;
+    var plotW = w - left - right, plotH = h - top - bottom;
+    if (plotW < 40 || plotH < 40) return;
+    var dataW = lim.xmax - lim.xmin, dataH = lim.ymax - lim.ymin;
+    var scale = Math.min(plotW / dataW, plotH / dataH);
+    var ox = left + (plotW - dataW * scale) / 2;
+    var oy = top + (plotH - dataH * scale) / 2;
+    function X(v) { return ox + (v - lim.xmin) * scale; }
+    function Y(v) { return oy + (lim.ymax - v) * scale; }
+    var segPx = [], i;
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = COL.gold;
+    for (i = 0; i < 4; i++) {
+      var x1 = X(pts[i].x), y1 = Y(pts[i].y), x2 = X(pts[i | 4].x), y2 = Y(pts[i | 4].y);
+      segPx.push([x1, y1, x2, y2]);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+    var dots = [];
+    for (i = 0; i < pts.length; i++) {
+      var p = pts[i], x = X(p.x), y = Y(p.y);
+      dots.push({x: x, y: y, pos: p.pos, letter: p.letter});
+      ctx.beginPath(); ctx.arc(x, y, 7, 0, 2 * Math.PI);
+      ctx.fillStyle = p.pos ? COL.ctx : COL.neg;
+      ctx.fill();
+      ctx.lineWidth = 1.5; ctx.strokeStyle = '#fff'; ctx.stroke();
+    }
+    ctx.font = '16px Poppins, system-ui, sans-serif';
+    ctx.textBaseline = 'middle';
+    function labelRect(text, ax, ay, align) {
+      var tw = ctx.measureText(text).width, hh = 15;
+      var l = align === 'right' ? ax - tw : ax;
+      return {l: l - 2, t: ay - hh / 2 - 2, r: l + tw + 2, b: ay + hh / 2 + 2};
+    }
+    function boxPointDist(b, cx, cy) {
+      var qx = Math.max(b.l, Math.min(cx, b.r));
+      var qy = Math.max(b.t, Math.min(cy, b.b));
+      return Math.hypot(qx - cx, qy - cy);
+    }
+    function orient(ax, ay, bx, by, cx, cy) {
+      return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+    }
+    function segsCross(ax, ay, bx, by, cx, cy, dx, dy) {
+      var o1 = orient(ax, ay, bx, by, cx, cy), o2 = orient(ax, ay, bx, by, dx, dy);
+      var o3 = orient(cx, cy, dx, dy, ax, ay), o4 = orient(cx, cy, dx, dy, bx, by);
+      return (o1 > 0) !== (o2 > 0) && (o3 > 0) !== (o4 > 0);
+    }
+    function boxSegDist(b, x1, y1, x2, y2) {
+      var pad = 3;
+      var bb = {l: b.l - pad, t: b.t - pad, r: b.r + pad, b: b.b + pad};
+      function inside(px, py) { return px >= bb.l && px <= bb.r && py >= bb.t && py <= bb.b; }
+      if (inside(x1, y1) || inside(x2, y2) ||
+          segsCross(x1, y1, x2, y2, bb.l, bb.t, bb.r, bb.t) ||
+          segsCross(x1, y1, x2, y2, bb.r, bb.t, bb.r, bb.b) ||
+          segsCross(x1, y1, x2, y2, bb.r, bb.b, bb.l, bb.b) ||
+          segsCross(x1, y1, x2, y2, bb.l, bb.b, bb.l, bb.t)) return 0;
+      function distPointSeg(px, py) {
+        var dx = x2 - x1, dy = y2 - y1, L2 = dx * dx + dy * dy, t;
+        if (L2 < 1e-8) return Math.hypot(px - x1, py - y1);
+        t = ((px - x1) * dx + (py - y1) * dy) / L2;
+        if (t < 0) t = 0;
+        if (t > 1) t = 1;
+        return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+      }
+      return Math.min(
+        distPointSeg(b.l, b.t), distPointSeg(b.r, b.t),
+        distPointSeg(b.r, b.b), distPointSeg(b.l, b.b),
+        boxPointDist(b, x1, y1), boxPointDist(b, x2, y2)
+      );
+    }
+    function boxBoxDist(a, b) {
+      var dx = 0, dy = 0;
+      if (a.r < b.l) dx = b.l - a.r;
+      else if (b.r < a.l) dx = a.l - b.r;
+      if (a.b < b.t) dy = b.t - a.b;
+      else if (b.b < a.t) dy = a.t - b.b;
+      if (dx === 0 && dy === 0) return 0;
+      return Math.hypot(dx, dy);
+    }
+    function clearance(rect) {
+      var c = 1e9, k;
+      if (rect.l < 2 || rect.r > w - 2 || rect.t < 2 || rect.b > h - 2) return -1e6;
+      for (k = 0; k < dots.length; k++) c = Math.min(c, boxPointDist(rect, dots[k].x, dots[k].y) - 11);
+      for (k = 0; k < segPx.length; k++) c = Math.min(c, boxSegDist(rect, segPx[k][0], segPx[k][1], segPx[k][2], segPx[k][3]) - 2);
+      for (k = 0; k < placed.length; k++) c = Math.min(c, boxBoxDist(rect, placed[k].rect) - 2);
+      return c;
+    }
+    var placed = [], order = [];
+    for (i = 0; i < dots.length; i++) order.push(i);
+    order.sort(function (a, b) { return dots[a].y - dots[b].y; });
+    for (var oi = 0; oi < order.length; oi++) {
+      var di = order[oi], dot = dots[di];
+      var side = dot.pos ? 1 : -1;
+      var align = dot.pos ? 'left' : 'right';
+      // Above-left of a blue point, above-right of a red one. Further spots stay
+      // in that quadrant and are tried nearest-first, so a letter is not sent
+      // across the figure when its first spot is taken.
+      var pref = [side * 14, -16];
+      var cands = [pref], extra = [], dy, dx;
+      for (dy = -48; dy <= -6; dy += 4) for (dx = 8; dx <= 46; dx += 4) extra.push([side * dx, dy]);
+      for (dy = 8; dy <= 28; dy += 4) extra.push([side * 16, dy]);
+      extra.sort(function (a, b) {
+        var da = (a[0] - pref[0]) * (a[0] - pref[0]) + (a[1] - pref[1]) * (a[1] - pref[1]);
+        var db = (b[0] - pref[0]) * (b[0] - pref[0]) + (b[1] - pref[1]) * (b[1] - pref[1]);
+        return da - db;
+      });
+      for (var ei = 0; ei < extra.length; ei++) cands.push(extra[ei]);
+      var best = null, bestC = -1e9, ci;
+      for (ci = 0; ci < cands.length; ci++) {
+        var ax = dot.x + cands[ci][0], ay = dot.y + cands[ci][1];
+        var rect = labelRect(dot.letter, ax, ay, align);
+        var c = clearance(rect);
+        if (c > 1) { best = {ax: ax, ay: ay, align: align, rect: rect, letter: dot.letter}; break; }
+        if (c > bestC) { bestC = c; best = {ax: ax, ay: ay, align: align, rect: rect, letter: dot.letter}; }
+      }
+      placed.push(best);
+    }
+    ctx.fillStyle = COL.ink;
+    for (i = 0; i < placed.length; i++) {
+      ctx.textAlign = placed[i].align;
+      halo(ctx, placed[i].letter, placed[i].ax, placed[i].ay);
+    }
+    ctx.fillStyle = COL.slate;
+    ctx.font = '15px Poppins, system-ui, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(proj.xLabel, ox + dataW * scale, oy + dataH * scale + 22);
+    ctx.save();
+    ctx.translate(13, oy + dataH * scale / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(proj.yLabel, 0, 0);
+    ctx.restore();
+  }
+  function syncControls() {
+    lamInput.value = String(lambda);
+    sigInput.value = String(sigma);
+    lamInput.setAttribute('aria-valuenow', fmt(lambda));
+    lamInput.setAttribute('aria-valuetext', fmt(lambda));
+    sigInput.setAttribute('aria-valuenow', fmt(sigma));
+    sigInput.setAttribute('aria-valuetext', fmt(sigma));
+    document.getElementById('lamOut').textContent = fmt(lambda);
+    document.getElementById('sigOut').textContent = fmt(sigma);
+    var cube = Math.abs(lambda - 0) < 0.005;
+    var mix = Math.abs(lambda - 0.25) < 0.005;
+    var rand = Math.abs(lambda - 1) < 0.005;
+    document.getElementById('bCube').setAttribute('aria-pressed', cube ? 'true' : 'false');
+    document.getElementById('bMix').setAttribute('aria-pressed', mix ? 'true' : 'false');
+    document.getElementById('bRand').setAttribute('aria-pressed', rand ? 'true' : 'false');
+  }
+  function render() {
+    var t0 = (typeof performance !== 'undefined') ? performance.now() : 0;
+    metrics = F.evaluate(world, lambda, sigma);
+    var ms = (typeof performance !== 'undefined') ? performance.now() - t0 : 0;
+    syncControls();
+    drawChart(metrics);
+    drawMap(metrics.means);
+    var text = 'Shattering ' + fmt(metrics.shatter) + ' · CCGP context ' + fmt(metrics.ccgp[0]) +
+      ' · decoding context ' + fmt(metrics.decode[0]);
+    live.textContent = text;
+    chart.setAttribute('aria-label',
+      'Bar chart. Shattering ' + fmt(metrics.shatter) +
+      '. CCGP context ' + fmt(metrics.ccgp[0]) + ', action ' + fmt(metrics.ccgp[1]) +
+      ', reward ' + fmt(metrics.ccgp[2]) +
+      '. Decoding context ' + fmt(metrics.decode[0]) + ', action ' + fmt(metrics.decode[1]) +
+      ', reward ' + fmt(metrics.decode[2]) + '.');
+    globalThis.__FLEX_STATE = {
+      seed: seed, lambda: lambda, sigma: sigma, ms: ms,
+      shatter: metrics.shatter, ccgp: metrics.ccgp.slice(), decode: metrics.decode.slice(),
+      live: text
+    };
+    globalThis.__FLEX_READY = true;
+  }
+  function schedule() {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(function () { pending = false; render(); });
+  }
+  lamInput.addEventListener('input', function () {
+    lambda = parseFloat(lamInput.value);
+    schedule();
+  });
+  sigInput.addEventListener('input', function () {
+    sigma = parseFloat(sigInput.value);
+    schedule();
+  });
+  document.getElementById('bCube').addEventListener('click', function () { lambda = 0; schedule(); });
+  document.getElementById('bMix').addEventListener('click', function () { lambda = 0.25; schedule(); });
+  document.getElementById('bRand').addEventListener('click', function () { lambda = 1; schedule(); });
+  document.getElementById('bNew').addEventListener('click', function () {
+    seed = (seed + 1) >>> 0;
+    world = F.makeWorld(seed);
+    schedule();
+  });
+  if (STATIC) { seed = 1; lambda = 0.25; sigma = F.DEFAULT_SIGMA; world = F.makeWorld(seed); }
+  sigInput.value = String(F.DEFAULT_SIGMA);
+  sigma = F.DEFAULT_SIGMA;
+  new ResizeObserver(function () { if (metrics) { drawChart(metrics); drawMap(metrics.means); } }).observe(chart.parentElement);
+  new ResizeObserver(function () { if (metrics) { drawChart(metrics); drawMap(metrics.means); } }).observe(map.parentElement);
+  render();
+})();
+</script>
+</body>
+</html>
