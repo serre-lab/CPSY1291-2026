@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reading and comparing representations · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Reading and comparing representations</h1><p>Reader-friendly version of the 53 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L06_reading-comparing-representations.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Reading and comparing representations</a></li><li><a href="#slide-2">Picking up: what can another neuron read from the responses?</a></li><li><a href="#slide-3">Where we left off</a></li><li><a href="#slide-4">Shattering: every yes/no question about the stimuli</a></li><li><a href="#slide-5">Shattering: four stimuli, 16 questions</a></li><li><a href="#slide-6">Shattering: the lifting unit answers the last two</a></li><li><a href="#slide-7">How many questions can NN neurons answer?</a></li><li><a href="#slide-8">Shattering accuracy: a score for recorded neurons</a></li><li><a href="#slide-9">Shattering in real brains: two monkey studies</a></li><li><a href="#slide-10">The task: remembering a sequence in prefrontal cortex</a></li><li><a href="#slide-11">Prefrontal neurons look messy</a></li><li><a href="#slide-14">Prefrontal cortex: one neuron, many variables</a></li><li><a href="#slide-15">One unit alone: pure and linear units</a></li><li><a href="#slide-16">One unit alone: nonlinear units</a></li><li><a href="#slide-17">The response matrix: linear mixing</a></li><li><a href="#slide-18">The response matrix: add the lifting unit</a></li><li><a href="#slide-19">The response matrix: add the AND unit</a></li><li><a href="#slide-20">Scaling up: pure and linear populations</a></li><li><a href="#slide-21">Scaling up: a nonlinear mixed population</a></li><li><a href="#slide-22">Mixed neurons make a high-dimensional population</a></li><li><a href="#slide-23">High dimensionality goes with correct choices</a></li><li><a href="#slide-24">One boundary for objects never seen: CCGP</a></li><li><a href="#slide-25">CCGP: when does one boundary transfer?</a></li><li><a href="#slide-26">The task: a hidden context</a></li><li><a href="#slide-27">The monkeys infer the hidden context</a></li><li><a href="#slide-28">CCGP on the task: two ways to code context</a></li><li><a href="#slide-29">CCGP on the task: a square, and a square bent</a></li><li><a href="#slide-30">Every tool on one population: the cube</a></li><li><a href="#slide-31">Every tool on one population: the compromise</a></li><li><a href="#slide-32">Every tool on one population: random</a></li><li><a href="#slide-33">Single trials in t-SNE: islands mislead</a></li><li><a href="#slide-34">Hippocampus: context transfers, action does not</a></li><li><a href="#slide-35">Why both can be high: the compromise geometry</a></li><li><a href="#slide-36">Try it: flexible or abstract?</a></li><li><a href="#slide-37">In people too: the human hippocampus</a></li><li><a href="#slide-38">Human hippocampus: context becomes abstract</a></li><li><a href="#slide-39">Where does abstraction come from?</a></li><li><a href="#slide-40">Many tasks make representations abstract</a></li><li><a href="#slide-41">Recap: measures of one population</a></li><li><a href="#slide-42">Comparing two representations</a></li><li><a href="#slide-43">What every comparison score has in common</a></li><li><a href="#slide-44">Same 51 objects, two systems: one RDM each</a></li><li><a href="#slide-45">RSA: rank-correlate the two RDMs</a></li><li><a href="#slide-46">Two ways to compare two images</a></li><li><a href="#slide-47">New today: CKA compares dot products</a></li><li><a href="#slide-48">Comparing RSA and CKA</a></li><li><a href="#slide-49">Do networks judge objects the way people do?</a></li><li><a href="#slide-50">What sets a network's agreement with people?</a></li><li><a href="#slide-51">We have scores. When does a score mean anything?</a></li><li><a href="#slide-52">Further reading for the research trail</a></li><li><a href="#slide-53">Minute paper</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reading and comparing representations · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Reading and comparing representations</h1><p>Reader-friendly version of the 61 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L06_reading-comparing-representations.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Reading and comparing representations</a></li><li><a href="#slide-2">Picking up: what does a population of neurons encode?</a></li><li><a href="#slide-3">Reminder: a linear readout</a></li><li><a href="#slide-4">Where we left off</a></li><li><a href="#slide-5">Where we left off: the readouts</a></li><li><a href="#slide-6">Two properties of a representation: flexible and abstract</a></li><li><a href="#slide-8">XOR: not linearly separable</a></li><li><a href="#slide-9">Can separability measure flexibility? Three stimuli</a></li><li><a href="#slide-10">Shattering four stimuli: 14 of 16 splits</a></li><li><a href="#slide-11">Random labels: splits that mean nothing</a></li><li><a href="#slide-12">How flexible are neurons in the brain?</a></li><li><a href="#slide-13">Shattering in real brains: two monkey studies</a></li><li><a href="#slide-16">Simple tuning: one neuron, one variable</a></li><li><a href="#slide-17">The task: remembering a sequence in prefrontal cortex</a></li><li><a href="#slide-19">What would one neuron do in this task?</a></li><li><a href="#slide-21">The recorded neurons: mixed</a></li><li><a href="#slide-22">One unit alone: pure and linear units</a></li><li><a href="#slide-23">One unit alone: nonlinear units</a></li><li><a href="#slide-24">The response matrix: linear mixing</a></li><li><a href="#slide-25">The response matrix: add the lifting unit</a></li><li><a href="#slide-26">The response matrix: add the AND unit</a></li><li><a href="#slide-27">Summary: new units must not be weighted sums</a></li><li><a href="#slide-28">Mixed neurons make a high-dimensional population</a></li><li><a href="#slide-29">High dimensionality goes with correct choices</a></li><li><a href="#slide-30">Second property: abstraction</a></li><li><a href="#slide-31">One boundary for objects never seen: CCGP</a></li><li><a href="#slide-32">CCGP: when does one boundary transfer?</a></li><li><a href="#slide-33">The task: a hidden context</a></li><li><a href="#slide-34">The monkeys infer the hidden context</a></li><li><a href="#slide-35">Recall: points in general position split every way</a></li><li><a href="#slide-36">Four toy geometries, 1 of 4: points at random</a></li><li><a href="#slide-37">Four toy geometries, 2 of 4: clustered by context</a></li><li><a href="#slide-38">Four toy geometries, 3 of 4: a square</a></li><li><a href="#slide-39">Four toy geometries, 4 of 4: a square, bent</a></li><li><a href="#slide-40">Hippocampus: context transfers, action does not</a></li><li><a href="#slide-41">Why both can be high: the compromise geometry</a></li><li><a href="#slide-42">Try it: flexible or abstract?</a></li><li><a href="#slide-43">Human hippocampus: context becomes abstract</a></li><li><a href="#slide-44">Recap: measures of one population</a></li><li><a href="#slide-45">By the way: comparing two representations</a></li><li><a href="#slide-46">Recall from the MDS lecture: RSA</a></li><li><a href="#slide-47">Another popular score: CKA</a></li><li><a href="#slide-48">CKA on two networks, block by block</a></li><li><a href="#slide-49">Do networks judge objects the way people do?</a></li><li><a href="#slide-50">Papers from today</a></li><li><a href="#slide-51">Minute paper</a></li><li><a href="#slide-52">Appendix</a></li><li><a href="#slide-53">Not linearly separable: four examples</a></li><li><a href="#slide-54">A third unit lifts each one</a></li><li><a href="#slide-55">What sets a network's agreement with people?</a></li><li><a href="#slide-56">Scaling up: pure and linear populations</a></li><li><a href="#slide-57">Scaling up: a nonlinear mixed population</a></li><li><a href="#slide-58">Can the Theme 1 tools see it? 1 of 3: the cube</a></li><li><a href="#slide-59">Can the Theme 1 tools see it? 2 of 3: the compromise</a></li><li><a href="#slide-60">Can the Theme 1 tools see it? 3 of 3: random</a></li><li><a href="#slide-61">Single trials in t-SNE: islands mislead</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
   <img src="../images/brown-crest-color.png" alt="Brown University crest">
   <div class="vrule"></div>
   <div>
@@ -6,345 +6,445 @@
     <span class="name">Computational Methods for Mind, Brain &amp; Behavior</span>
   </div>
 </div>
-<div class="eyebrow">Lecture 6 · Theme 2: Learning: from single neurons to deep networks</div>
+<div class="eyebrow">Lecture 6 · Theme 1: Representational spaces</div>
 <h2 id="heading-1">Reading and comparing representations</h2>
 <p class="meta">Thursday, October 1 · Fall 2026</p>
 
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-class="lead" data-marpit-pagination="2" data-marpit-pagination-total="53" aria-labelledby="heading-2"><p class="page">Slide 2</p>
-<h2 id="heading-2">Picking up: what can another neuron read from the responses?</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="53" aria-labelledby="heading-3"><p class="page">Slide 3</p>
-<h2 id="heading-3">Where we left off</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-class="lead" data-marpit-pagination="2" data-marpit-pagination-total="61" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<h2 id="heading-2">Picking up: what does a population of neurons encode?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="61" aria-labelledby="heading-3"><p class="page">Slide 3</p>
+<h2 id="heading-3">Reminder: a linear readout</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/25_xor_pair_3.svg" alt="Left, the XOR layout in the plane of x1 and x2: four clusters at the corners of a square, green where both inputs have the same sign, blue otherwise; no line separates them. Right, the same points lifted by a third unit x1 times x2: the green clusters rise above a flat gold plane and the blue ones fall below it" aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>Left, the XOR layout in the plane of x1 and x2: four clusters at the corners of a square, green where both inputs have the same sign, blue otherwise; no line separates them. Right, the same points lifted by a third unit x1 times x2: the green clusters rise above a flat gold plane and the blue ones fall below it</p><a href="../images/L05/25_xor_pair_3.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L06/readout_hyperplane.svg" alt="Two clouds of points in the space of three units x1, x2, x3, blue upper right and red lower left, separated by a gold plane labelled w dot x plus b equals 0; an arrow labelled w points from the plane toward the blue points" aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>Two clouds of points in the space of three units x1, x2, x3, blue upper right and red lower left, separated by a gold plane labelled w dot x plus b equals 0; an arrow labelled w points from the plane toward the blue points</p><a href="../images/L06/readout_hyperplane.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mo>⋅</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>+</mo><mi>b</mi><mtext>  </mtext><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>&gt;</mo><mn>0</mn><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>class&nbsp;1&nbsp;(positive&nbsp;side)</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>&lt;</mo><mn>0</mn><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>class&nbsp;2&nbsp;(negative&nbsp;side)</mtext></mstyle></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">\mathbf{w}\cdot\mathbf{x} + b \;\begin{cases} &gt; 0: &amp; \text{class 1 (positive side)}\\ &lt; 0: &amp; \text{class 2 (negative side)}\end{cases}
+</annotation></semantics></math></div></span></p><ul>
+<li>A <strong>linear readout</strong> weights the <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> responses, sums them (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mo>⋅</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{w}\cdot\mathbf{x}</annotation></semantics></math>), and compares the sum with a threshold, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">-b</annotation></semantics></math></li>
+<li>Its <strong>decision boundary</strong>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mo>⋅</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>+</mo><mi>b</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\mathbf{w}\cdot\mathbf{x} + b = 0</annotation></semantics></math>, is a <strong>hyperplane</strong> of dimension <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">D-1</annotation></semantics></math> (a line in 2-D, a plane in 3-D). Which side is class 1 is arbitrary</li>
+<li>Fitting the readout places that boundary: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mrow><annotation encoding="application/x-tex">\mathbf{w}</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math> are chosen from labeled responses (how: next week)</li>
+<li>It stands in for a downstream neuron: what it decodes, that neuron could learn. As a test, it is a <strong>probe</strong></li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="61" aria-labelledby="heading-4"><p class="page">Slide 4</p>
+<h2 id="heading-4">Where we left off</h2>
+<figure><img src="../images/L06/it_row_f1.svg" alt="Three panels side by side, each showing the same monkey IT responses to the 1,224 Bao object images on their first two principal components, one point per image, colored by a different split. Animate or not: animate images red, inanimate blue; the inanimate images fill the upper left, the animate ones form two groups, one at the right and one at the bottom. Face or not: only the bottom group is red. A random half of the objects: red and blue points mixed everywhere" aria-describedby="figure-4-1"><figcaption id="figure-4-1"><p>Three panels side by side, each showing the same monkey IT responses to the 1,224 Bao object images on their first two principal components, one point per image, colored by a different split. Animate or not: animate images red, inanimate blue; the inanimate images fill the upper left, the animate ones form two groups, one at the right and one at the bottom. Face or not: only the bottom group is red. A random half of the objects: red and blue points mixed everywhere</p><a href="../images/L06/it_row_f1.svg">Open full-size figure</a></figcaption></figure>
+<ul>
+<li>Each panel shows the same 1,224 images (51 objects × 24 views), each image a point in the first two principal components of 480 IT neurons' responses</li>
+<li>Each panel splits the 51 objects into two classes in a different way, red and blue. <mark>Which splits can a linear readout learn?</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-marpit-pagination="5" data-marpit-pagination-total="61" aria-labelledby="heading-5"><p class="page">Slide 5</p>
+<h2 id="heading-5">Where we left off: the readouts</h2>
+<figure><img src="../images/L06/it_row_f2.svg" alt="The same three panels with a gold readout line in each and its accuracy on new views under the panel. Animate or not: the line separates most red from blue; 93%, chance 63%. Face or not: the line cuts off the bottom group; 100%, chance 82%. A random half of the objects: red and blue stay mixed on both sides of the line; 57%, chance 51%" aria-describedby="figure-5-1"><figcaption id="figure-5-1"><p>The same three panels with a gold readout line in each and its accuracy on new views under the panel. Animate or not: the line separates most red from blue; 93%, chance 63%. Face or not: the line cuts off the bottom group; 100%, chance 82%. A random half of the objects: red and blue stay mixed on both sides of the line; 57%, chance 51%</p><a href="../images/L06/it_row_f2.svg">Open full-size figure</a></figcaption></figure>
+<ul>
+<li>Animate or not is <strong>nearly linearly separable</strong>: the readout classifies 93% of new views. Face or not is <strong>linearly separable</strong> on new views: 100%</li>
+<li>A <strong>random labeling</strong> (classes by coin flip) is <strong>not linearly separable</strong>: 57% (chance 51%). All 480 neurons: 99%, 100%, 78%</li>
+<li><mark>How the neurons respond decides which splits a readout can learn</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-marpit-scope-qhgcbmqx="" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="61" aria-labelledby="heading-6"><p class="page">Slide 6</p>
+<h2 id="heading-6">Two properties of a representation: flexible and abstract</h2>
+
+<div class="table-scroll" tabindex="0" role="region" aria-label="Two properties of a representation: flexible and abstract — table"><table><caption>Two properties of a representation: flexible and abstract — table</caption>
+<thead>
+<tr>
+<th scope="col"></th>
+<th scope="col"><strong>Flexible</strong></th>
+<th scope="col"><strong>Abstract</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What it means</td>
+<td>almost any grouping of the stimuli can be read out</td>
+<td>a readout learned on some stimuli still works on stimuli it never saw</td>
+</tr>
+<tr>
+<td>What it supports</td>
+<td>a fixed association from each input to an output</td>
+<td>an explicit variable, such as context, that switches the associations</td>
+</tr>
+<tr>
+<td>Measured by</td>
+<td><strong>shattering</strong>: how many splits a readout can learn (first half)</td>
+<td><strong>CCGP</strong>: does one readout carry over to new stimuli (second half)</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>First flexibility, then abstraction. The two pull against each other</mark></p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="61" aria-labelledby="heading-8"><p class="page">Slide 8</p>
+<h2 id="heading-8">XOR: not linearly separable</h2>
+<figure><img src="../images/L06/ns_gallery_xor_f2.svg" alt="The same, with the best linear decision boundary drawn in gold, cutting off one group; under the panel: best boundary 75%" aria-describedby="figure-8-1"><figcaption id="figure-8-1"><p>The same, with the best linear decision boundary drawn in gold, cutting off one group; under the panel: best boundary 75%</p><a href="../images/L06/ns_gallery_xor_f2.svg">Open full-size figure</a></figcaption></figure>
+<ul>
+<li>XOR, from the last lecture: two toy units respond to four stimuli, each shown many times with noise</li>
+<li>A point is blue when the two units' responses have the same sign, and red when the signs differ</li>
+<li>No linear boundary can. The best one classifies 75% of the points: three of the four groups</li>
+<li><mark>XOR is <strong>not linearly separable</strong></mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-marpit-scope-6ghnr3qs="" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="61" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<h2 id="heading-9">Can separability measure flexibility? Three stimuli</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L06/shatter_three_f1.svg" alt="Two blocks of eight small panels, one panel per way to color three stimuli blue or red. Top block, Representation A, general position, 8 of 8: the three stimuli at the corners of a triangle, and every panel has a straight line with the blue stimuli on one side and the red on the other. Bottom block, Representation B, three points on one line, 6 of 8: the same three stimuli on a diagonal line; the two panels where the middle stimulus has the other color from both ends have no line and a thick dashed outline" aria-describedby="figure-9-1"><figcaption id="figure-9-1"><p>Two blocks of eight small panels, one panel per way to color three stimuli blue or red. Top block, Representation A, general position, 8 of 8: the three stimuli at the corners of a triangle, and every panel has a straight line with the blue stimuli on one side and the red on the other. Bottom block, Representation B, three points on one line, 6 of 8: the same three stimuli on a diagonal line; the two panels where the middle stimulus has the other color from both ends have no line and a thick dashed outline</p><a href="../images/L06/shatter_three_f1.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
-<li>A <strong>linear readout</strong> (weighted sum + threshold) is a probe of a representation: what do the responses make easy to read?</li>
-<li>Monkey IT's responses make animacy readable on new views: 93%, against a 63% baseline</li>
-<li>In the plane of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1, x_2</annotation></semantics></math>, XOR is not <strong>linearly separable</strong>. Adding a unit that mixes the inputs (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math>) changes the representation, and XOR becomes readable</li>
-<li><mark>Today: how many questions can a representation answer? Does an answer carry over to new objects?</mark></li>
+<li><strong>Flexible</strong>: many tasks a downstream neuron could learn. A task = a split of the stimuli into two groups, or <strong>labeling</strong>: 3 stimuli give 2³ = 8</li>
+<li>Two hypothetical representations of the same 3 stimuli in 2 units, one point per stimulus (its mean response; noise not shown)</li>
+<li>A, points in <strong>general position</strong> (no three on one line): all 8 splits are linearly separable, so a readout <strong>shatters</strong> them. B, points on one line: 6 of 8</li>
+<li><mark>Shattering characterizes the representation: how many splits a linear readout could, in principle, learn from it</mark></li>
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="53" aria-labelledby="heading-4"><p class="page">Slide 4</p>
-<h2 id="heading-4">Shattering: every yes/no question about the stimuli</h2>
-<figure><img src="../images/L06/shatter_q_f1.svg" alt="Eight small panels, one for each way to color three points green or blue. The three points sit at the corners of a triangle in the plane of two units. Every panel has a straight line with all green points on one side and all blue points on the other; in the two panels where the three points share one color, the line runs outside them. The title reads: 3 points, a line answers 8 of 8 questions" aria-describedby="figure-4-1"><figcaption id="figure-4-1"><p>Eight small panels, one for each way to color three points green or blue. The three points sit at the corners of a triangle in the plane of two units. Every panel has a straight line with all green points on one side and all blue points on the other; in the two panels where the three points share one color, the line runs outside them. The title reads: 3 points, a line answers 8 of 8 questions</p><a href="../images/L06/shatter_q_f1.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Toy data, computed: all 8 labelings</p>
-<ul>
-<li>A <strong>two-class task</strong> is a yes/no question about the stimuli: green = yes, blue = no</li>
-<li>Three stimuli, two units: 2³ = 8 questions. A line answers every one</li>
-<li><mark>A readout <strong>shatters</strong> a set of stimuli when it can answer every yes/no question about them</mark></li>
-</ul>
 <div class="ref"><a href="https://doi.org/10.1109/PGEC.1965.264137" rel="noopener">Cover <b>IEEE Trans Electron Comput 1965</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-marpit-pagination="5" data-marpit-pagination-total="53" aria-labelledby="heading-5"><p class="page">Slide 5</p>
-<h2 id="heading-5">Shattering: four stimuli, 16 questions</h2>
-<figure><img src="../images/L06/shatter_q_f2.svg" alt="Sixteen small panels, one for each way to color four points at the corners of a square green or blue. In fourteen panels a straight line separates the green points from the blue ones and is drawn. The two panels in which opposite corners share a color are outlined in red and have no line. The title reads: 4 points, a line answers 14 of 16" aria-describedby="figure-5-1"><figcaption id="figure-5-1"><p>Sixteen small panels, one for each way to color four points at the corners of a square green or blue. In fourteen panels a straight line separates the green points from the blue ones and is drawn. The two panels in which opposite corners share a color are outlined in red and have no line. The title reads: 4 points, a line answers 14 of 16</p><a href="../images/L06/shatter_q_f2.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Toy data, computed: all 16 labelings</p>
-<ul>
-<li>Four stimuli at the corners of a square: 2⁴ = 16 questions. A line answers 14</li>
-<li>The two it misses (red) put opposite corners together. That is XOR</li>
-<li><mark>No line shatters four points in the plane</mark></li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1109/PGEC.1965.264137" rel="noopener">Cover <b>IEEE Trans Electron Comput 1965</b></a> · <a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="53" aria-labelledby="heading-6"><p class="page">Slide 6</p>
-<h2 id="heading-6">Shattering: the lifting unit answers the last two</h2>
-<figure><img src="../images/L06/shatter_q_f3.svg" alt="The same sixteen panels. The fourteen separable ones keep their lines. The two XOR panels are replaced by small three-dimensional views, outlined in green: the four points lifted by a third unit, x1 times x2, with a light gold plane between the raised and the lowered points. The title reads: add the lifting unit x1 times x2, 16 of 16" aria-describedby="figure-6-1"><figcaption id="figure-6-1"><p>The same sixteen panels. The fourteen separable ones keep their lines. The two XOR panels are replaced by small three-dimensional views, outlined in green: the four points lifted by a third unit, x1 times x2, with a light gold plane between the raised and the lowered points. The title reads: add the lifting unit x1 times x2, 16 of 16</p><a href="../images/L06/shatter_q_f3.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Toy data, computed: all 16 labelings, with and without the lifting unit</p>
-<ul>
-<li>Add the lifting unit from last lecture, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math>, as a third unit. A plane now answers all 16</li>
-<li><mark>More dimensions: more questions a readout can answer</mark></li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1109/PGEC.1965.264137" rel="noopener">Cover <b>IEEE Trans Electron Comput 1965</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-marpit-pagination="7" data-marpit-pagination-total="53" aria-labelledby="heading-7"><p class="page">Slide 7</p>
-<h2 id="heading-7">How many questions can <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> neurons answer?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-marpit-scope-djotcawp="" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="61" aria-labelledby="heading-10"><p class="page">Slide 10</p>
+<h2 id="heading-10">Shattering four stimuli: 14 of 16 splits</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L06/cover_capacity.svg" alt="Line plot of the fraction of random yes/no questions a readout answers, from 0 to 1, against points per unit, P over N, from 0 to 4. Three curves, for 2, 10 and 50 units, from Cover's formula, with simulated dots on them. All three stay at 1 up to about one point per unit, cross 0.5 near two points per unit, marked by a dashed line, and fall toward 0 after it. The curve for 50 units drops most steeply; the curve for 2 units falls slowly and crosses 0.5 at 3 points per unit" aria-describedby="figure-7-1"><figcaption id="figure-7-1"><p>Line plot of the fraction of random yes/no questions a readout answers, from 0 to 1, against points per unit, P over N, from 0 to 4. Three curves, for 2, 10 and 50 units, from Cover's formula, with simulated dots on them. All three stay at 1 up to about one point per unit, cross 0.5 near two points per unit, marked by a dashed line, and fall toward 0 after it. The curve for 50 units drops most steeply; the curve for 2 units falls slowly and crosses 0.5 at 3 points per unit</p><a href="../images/L06/cover_capacity.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Computed: Cover's formula (lines), simulation (dots)</p>
+<figure><img src="../images/L06/shatter_q_f2.svg" alt="Sixteen small panels in a four by four grid, one for each way to color four stimuli at the corners of a square blue or red, under the header Four stimuli, 14 of 16. Fourteen panels have a straight line separating blue from red. The two panels in which opposite corners share a color have no line and a thick dashed outline" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>Sixteen small panels in a four by four grid, one for each way to color four stimuli at the corners of a square blue or red, under the header Four stimuli, 14 of 16. Fourteen panels have a straight line separating blue from red. The two panels in which opposite corners share a color have no line and a thick dashed outline</p><a href="../images/L06/shatter_q_f2.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
-<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math> random stimuli in the space of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> units, each with a random yes/no answer. Can one readout get every answer right?</li>
-<li>Up to about <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> stimuli, always. At <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>N</mi></mrow><annotation encoding="application/x-tex">2N</annotation></semantics></math>, half the time</li>
-<li><mark>A readout of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> units can learn about <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>N</mi></mrow><annotation encoding="application/x-tex">2N</annotation></semantics></math> random answers</mark></li>
+<li>Four stimuli in 2 units, at the corners of a square: 2⁴ = 16 splits</li>
+<li>A linear boundary separates 14 of them. The two it cannot separate are the XOR splits, which put opposite corners together</li>
+<li>Even in <strong>general position</strong> (no three on one line), four points in a plane give 14 of 16, never more</li>
+<li><mark>With two units, no linear readout shatters four stimuli</mark></li>
 </ul>
 </div>
 </div>
-<div class="ref"><a href="https://doi.org/10.1109/PGEC.1965.264137" rel="noopener">Cover <b>IEEE Trans Electron Comput 1965</b></a> · <a href="https://arxiv.org/abs/1611.03530" rel="noopener">Zhang et al. <b>ICLR 2017</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="53" aria-labelledby="heading-8"><p class="page">Slide 8</p>
-<h2 id="heading-8">Shattering accuracy: a score for recorded neurons</h2>
+<div class="ref"><a href="https://doi.org/10.1109/PGEC.1965.264137" rel="noopener">Cover <b>IEEE Trans Electron Comput 1965</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="61" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<h2 id="heading-11">Random labels: splits that mean nothing</h2>
+<figure><img src="../images/L06/random_pixel_examples.svg" alt="Eight random 10 by 10 pixel images in a row, each pixel black or white. Each image has a colored frame and a label under it: class 2 (red) or class 1 (blue); five are class 1 and three class 2" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>Eight random 10 by 10 pixel images in a row, each pixel black or white. Each image has a colored frame and a label under it: class 2 (red) or class 1 (blue); five are class 1 and three class 2</p><a href="../images/L06/random_pixel_examples.svg">Open full-size figure</a></figcaption></figure>
+<div></div>
 <ul>
-<li>Recorded responses are noisy, so a readout answers a question well or badly, not yes or no</li>
-<li><strong>Shattering accuracy</strong>: fit a readout per random split (cat, car, cup vs dog, tree, shoe), score it on held-out trials, average over splits</li>
-<li><mark>0.5 = guessing. 1.0 = every random split solved</mark></li>
+<li>Each stimulus: a random 10 × 10 pixel image (100 units), its class set by a coin flip. Getting the training images right means <strong>memorizing</strong> them; on new images a readout is at chance</li>
+<li><strong>Capacity</strong>: how many random labels a classifier can memorize. A linear readout: about two per dimension (Cover 1965)</li>
+<li>Networks: more weights, more capacity. <strong>Zhang et al. (2017)</strong>: deep networks memorized ImageNet training photos with shuffled labels, and were at chance on new photos</li>
+<li><mark>Shattering measures capacity. Generalizing needs more than capacity: the trade-off between the two is a future lecture</mark></li>
 </ul>
-<div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="53" aria-labelledby="heading-9"><p class="page">Slide 9</p>
-<h2 id="heading-9">Shattering in real brains: two monkey studies</h2>
+<div class="ref"><a href="https://arxiv.org/abs/1611.03530" rel="noopener">Zhang et al. <b>ICLR 2017</b></a> · <a href="https://doi.org/10.1109/PGEC.1965.264137" rel="noopener">Cover <b>IEEE Trans Electron Comput 1965</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-class="lead" data-marpit-pagination="12" data-marpit-pagination-total="61" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<h2 id="heading-12">How flexible are neurons in the brain?</h2>
+<h2 id="recorded-neurons-are-noisy-and-many-how-many-splits-can-a-readout-learn-from-their-responses">Recorded neurons are noisy and many. How many splits can a readout learn from their responses?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="61" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<h2 id="heading-13">Shattering in real brains: two monkey studies</h2>
 <div class="capfig">
-<figure><img src="../images/L06/macaque_areas.svg" alt="Schematic of a macaque brain in two views. Left, the side of the left hemisphere, front to the left: lateral prefrontal cortex around the principal sulcus, in front of the arcuate sulcus, is shaded blue and labelled area 46 for Rigotti 2013 and areas 8, 9 and 46 (dorsolateral prefrontal cortex) for Bernardi 2020. Right, the inner face of the right hemisphere: anterior cingulate cortex (area 24c) is shaded green in the lower bank of the cingulate sulcus, above the corpus callosum, labelled Bernardi 2020, and the hippocampus is drawn dashed in red, deep in the temporal lobe, labelled Bernardi 2020" aria-describedby="figure-9-1"><figcaption id="figure-9-1"><p>Schematic of a macaque brain in two views. Left, the side of the left hemisphere, front to the left: lateral prefrontal cortex around the principal sulcus, in front of the arcuate sulcus, is shaded blue and labelled area 46 for Rigotti 2013 and areas 8, 9 and 46 (dorsolateral prefrontal cortex) for Bernardi 2020. Right, the inner face of the right hemisphere: anterior cingulate cortex (area 24c) is shaded green in the lower bank of the cingulate sulcus, above the corpus callosum, labelled Bernardi 2020, and the hippocampus is drawn dashed in red, deep in the temporal lobe, labelled Bernardi 2020</p><a href="../images/L06/macaque_areas.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L06/macaque_brain_retzius.png" alt="Two photographs of a rhesus monkey brain (Retzius 1906): the outer side and the inner side, front to the right. Three labelled dots mark approximate recording sites: lateral prefrontal cortex (area 46, Rigotti 2013 and Bernardi 2020), anterior cingulate (area 24, Bernardi 2020) and hippocampus (Bernardi 2020)" aria-describedby="figure-13-1"><figcaption id="figure-13-1"><p>Two photographs of a rhesus monkey brain (Retzius 1906): the outer side and the inner side, front to the right. Three labelled dots mark approximate recording sites: lateral prefrontal cortex (area 46, Rigotti 2013 and Bernardi 2020), anterior cingulate (area 24, Bernardi 2020) and hippocampus (Bernardi 2020)</p><a href="../images/L06/macaque_brain_retzius.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li><strong>Lateral prefrontal cortex</strong> (area 46): Rigotti et al. (2013), remembering a sequence</li>
-<li>Bernardi et al. (2020), inferring a hidden context: <strong>hippocampus</strong> (HPC), <strong>anterior cingulate cortex</strong> (ACC), and <strong>dorsolateral prefrontal cortex</strong> (DLPFC, areas 8, 9, 46)</li>
+<li><strong>Prefrontal cortex</strong>: rules, working memory. <strong>Hippocampus</strong>: memory, maps. <strong>Anterior cingulate</strong>: outcomes, errors</li>
+<li>Rigotti et al. (2013): lateral prefrontal cortex. Bernardi et al. (2020): all three</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="53" aria-labelledby="heading-10"><p class="page">Slide 10</p>
-<h2 id="heading-10">The task: remembering a sequence in prefrontal cortex</h2>
-<div class="capfig">
-<figure><img src="../images/L06/rigotti_task.svg" alt="Timeline of one trial of the sequence-memory task. The monkey fixates for 1000 ms, sees object A for 500 ms, waits 1000 ms, sees object C for 500 ms and waits 1000 ms more. The trial then forks. In a recognition block, a test sequence follows and the monkey releases a bar if it shows the same two objects in the same order, and keeps holding if not. In a recall block, three objects appear and the monkey looks first at A, then at C. Text below: recorded here, 24 conditions, 4 first objects times 3 second objects times 2 tasks; tasks alternate in blocks of 100 to 250 trials with no explicit cue; 237 lateral prefrontal neurons in 2 monkeys" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>Timeline of one trial of the sequence-memory task. The monkey fixates for 1000 ms, sees object A for 500 ms, waits 1000 ms, sees object C for 500 ms and waits 1000 ms more. The trial then forks. In a recognition block, a test sequence follows and the monkey releases a bar if it shows the same two objects in the same order, and keeps holding if not. In a recall block, three objects appear and the monkey looks first at A, then at C. Text below: recorded here, 24 conditions, 4 first objects times 3 second objects times 2 tasks; tasks alternate in blocks of 100 to 250 trials with no explicit cue; 237 lateral prefrontal neurons in 2 monkeys</p><a href="../images/L06/rigotti_task.svg">Open full-size figure</a></figcaption></figure>
-</div>
+<div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a> · <a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a> · Photographs: Retzius <b>1906</b></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="61" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<h2 id="heading-16">Simple tuning: one neuron, one variable</h2>
+<figure><img src="../images/L06/simple_tuning_f3.svg" alt="Three panels. Left, V1: one orientation. Original printout of one monkey V1 neuron: total spikes over 10 trials against stimulus orientation, 0 to 348 degrees, with one sharp peak near 80 degrees and a low floor elsewhere. Middle, IT: one kind of object. Bar chart of one IT neuron's mean firing rate to each of 51 objects, grouped by category; the nine face bars reach 14 to 18 spikes per second, and nearly every other bar is below 5. Right, V1: more contrast. Original plot of one V1 neuron's response, as percent of its maximum, against contrast from 0 to about 55 percent: it rises steeply up to about 15 percent contrast, then levels off near 100 percent" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>Three panels. Left, V1: one orientation. Original printout of one monkey V1 neuron: total spikes over 10 trials against stimulus orientation, 0 to 348 degrees, with one sharp peak near 80 degrees and a low floor elsewhere. Middle, IT: one kind of object. Bar chart of one IT neuron's mean firing rate to each of 51 objects, grouped by category; the nine face bars reach 14 to 18 spikes per second, and nearly every other bar is below 5. Right, V1: more contrast. Original plot of one V1 neuron's response, as percent of its maximum, against contrast from 0 to about 55 percent: it rises steeply up to about 15 percent contrast, then levels off near 100 percent</p><a href="../images/L06/simple_tuning_f3.svg">Open full-size figure</a></figcaption></figure>
 <ul>
-<li>Two objects in a row, held in memory for a second. Then <strong>recognize</strong> the sequence (release a bar on a match) or <strong>recall</strong> it (look at the objects in order)</li>
+<li><strong>V1</strong> (first lecture): fires most for a bar at one orientation</li>
+<li><strong>IT</strong> (last lecture): fires for faces, little for anything else</li>
+<li><strong>V1</strong>, contrast: the response rises, then levels off (monotonic tuning)</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1152/jn.1976.39.6.1320" rel="noopener">Schiller et al. <b>J Neurophysiol 1976</b></a> · <a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. <b>Nature 2020</b></a> · <a href="https://doi.org/10.1152/jn.1982.48.1.217" rel="noopener">Albrecht &amp; Hamilton <b>J Neurophysiol 1982</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="61" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<h2 id="heading-17">The task: remembering a sequence in prefrontal cortex</h2>
+<div class="row">
+<div class="col fig">
+<div class="capfig">
+<figure><img src="../images/L06/rigotti_task.svg" alt="Timeline of the sequence-memory task in three left-aligned rows. Sample: remember which two objects, in which order: fixate 1000 ms, object A 500 ms, delay 1000 ms, object C 500 ms, delay 1000 ms. Recognition block, in red: a test sequence A, delay, C; same two objects in the same order, release the bar; different, keep holding. Recall block, in blue: three objects B, A and C around the fixation point; arrow 1 to A, then arrow 2 to C: look at the two objects in the order seen" aria-describedby="figure-17-1"><figcaption id="figure-17-1"><p>Timeline of the sequence-memory task in three left-aligned rows. Sample: remember which two objects, in which order: fixate 1000 ms, object A 500 ms, delay 1000 ms, object C 500 ms, delay 1000 ms. Recognition block, in red: a test sequence A, delay, C; same two objects in the same order, release the bar; different, keep holding. Recall block, in blue: three objects B, A and C around the fixation point; arrow 1 to A, then arrow 2 to C: look at the two objects in the order seen</p><a href="../images/L06/rigotti_task.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="col">
+<ul>
+<li><strong>Recognition</strong>: keep the two objects in memory and compare them with a test sequence. <strong>Recall</strong>: plan two eye movements, in order, to the objects in an array</li>
+<li>One task needs a memory to compare, the other a plan of movements. You might expect two separate groups of neurons</li>
 <li>A <strong>condition</strong> is one combination of the task variables: 4 first × 3 second objects × 2 tasks = 24</li>
+<li><mark>Yet the same prefrontal neurons take part in both. How can one population encode objects and task so that the monkey can switch?</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="53" aria-labelledby="heading-11"><p class="page">Slide 11</p>
-<h2 id="heading-11">Prefrontal neurons look messy</h2>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a> · <a href="https://doi.org/10.1523/JNEUROSCI.1569-10.2010" rel="noopener">Warden &amp; Miller <b>J Neurosci 2010</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="61" aria-labelledby="heading-19"><p class="page">Slide 19</p>
+<h2 id="heading-19">What would one neuron do in this task?</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L06/pub_rigotti2013_fig3d.png" alt="Rigotti et al. (2013) Fig. 3d. Bar chart of one prefrontal neuron's firing rate, 0 to 15 spikes per second, at t = 1.8 s, in all 24 conditions. Under the bars, three rows of labels: the second object, the first object (A to D) and the task (T1 on the left, red bars; T2 on the right, blue bars). Responses vary widely across conditions. The two tallest bars, about 15 and 14 spikes per second, are labelled T2 C A and T2 C D: first object C, second object A or D, task 2. Several conditions give almost no firing. Error bars on each bar" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>Rigotti et al. (2013) Fig. 3d. Bar chart of one prefrontal neuron's firing rate, 0 to 15 spikes per second, at t = 1.8 s, in all 24 conditions. Under the bars, three rows of labels: the second object, the first object (A to D) and the task (T1 on the left, red bars; T2 on the right, blue bars). Responses vary widely across conditions. The two tallest bars, about 15 and 14 spikes per second, are labelled T2 C A and T2 C D: first object C, second object A or D, task 2. Several conditions give almost no firing. Error bars on each bar</p><a href="../images/L06/pub_rigotti2013_fig3d.png">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Reproduced from Rigotti et al. (2013), Fig. 3d</p>
+<figure><img src="../images/L06/rig_expect_f2.svg" alt="The same two panels with neuron 1 now additive. Left: the blue recall curve is the red recognition curve moved up by 1.2 spikes per second at every object. Right: every blue point moves right by 1.2, and a gold decision boundary from upper left to lower right separates red from blue" aria-describedby="figure-19-1"><figcaption id="figure-19-1"><p>The same two panels with neuron 1 now additive. Left: the blue recall curve is the red recognition curve moved up by 1.2 spikes per second at every object. Right: every blue point moves right by 1.2, and a gold decision boundary from upper left to lower right separates red from blue</p><a href="../images/L06/rig_expect_f2.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Hypothetical neurons, synthetic data</p>
 </div>
 <div class="col">
 <ul>
-<li>The first lecture: a V1 neuron fired for a bar at one orientation. The PCA lecture: each IT neuron preferred one region of object space</li>
-<li>This prefrontal neuron: spikes per second in all 24 conditions (T1: recognize, T2: recall)</li>
-<li>Its response to the second object depends on the first object and on the task</li>
+<li>Simple tuning, as in V1 or IT, predicts one tuning curve over the first object</li>
+<li><strong>Pure selectivity</strong>: the neuron's response depends on the first object only, so its tuning curves in the two tasks coincide</li>
+<li><strong>Additive mixed selectivity</strong>: the task adds the same amount to the response to every object, so the two tuning curves are parallel</li>
+<li>With such a neuron, a linear readout can tell the two tasks apart</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="61" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<h2 id="heading-21">The recorded neurons: mixed</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L06/pub_rigotti2013_fig3_neurons_d.png" alt="The same Rigotti et al. (2013) Fig. 3, with the lower-right panel outlined in gold: neuron 2 in all 24 conditions, bars per combination of first object, second object and task; in the recall task it fires most when A or D comes second, most of all after C" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>The same Rigotti et al. (2013) Fig. 3, with the lower-right panel outlined in gold: neuron 2 in all 24 conditions, bars per combination of first object, second object and task; in the recall task it fires most when A or D comes second, most of all after C</p><a href="../images/L06/pub_rigotti2013_fig3_neurons_d.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Recorded prefrontal neurons are neither pure nor additive: how a neuron responds to an object depends on the task</li>
+<li><strong>Nonlinear mixed selectivity</strong>: the neuron responds to combinations of object and task, as the <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math> unit responds to combinations of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">x_1</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_2</annotation></semantics></math></li>
+<li>Many prefrontal neurons respond this way. Described by one preferred stimulus, they would make little sense</li>
+<li>Outlined: a second neuron, in all 24 conditions. Its response to the second object depends on the first object and on the task</li>
 <li><mark>Is this mixing noise, or part of the code?</mark></li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="53" aria-labelledby="heading-14"><p class="page">Slide 14</p>
-<h2 id="heading-14">Prefrontal cortex: one neuron, many variables</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-marpit-pagination="22" data-marpit-pagination-total="61" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<h2 id="heading-22">One unit alone: pure and linear units</h2>
+<figure><img src="../images/L06/rigotti_tuning_f1.svg" alt="Three panels over the plane of x1 and x2, each coloring one unit's response from low (light) to high (dark), with the XOR stimuli as blue (same sign) and red (different signs) dots near the four corners. x1, pure: the response changes from left to right only, gold threshold vertical. x2, pure: from bottom to top only, gold threshold horizontal. x1 plus x2, linear: along the diagonal, gold threshold a diagonal line. Under the panels, how many of the four conditions each unit gets right alone: 50%, 50% and 75%. A colour bar at the right" aria-describedby="figure-22-1"><figcaption id="figure-22-1"><p>Three panels over the plane of x1 and x2, each coloring one unit's response from low (light) to high (dark), with the XOR stimuli as blue (same sign) and red (different signs) dots near the four corners. x1, pure: the response changes from left to right only, gold threshold vertical. x2, pure: from bottom to top only, gold threshold horizontal. x1 plus x2, linear: along the diagonal, gold threshold a diagonal line. Under the panels, how many of the four conditions each unit gets right alone: 50%, 50% and 75%. A colour bar at the right</p><a href="../images/L06/rigotti_tuning_f1.svg">Open full-size figure</a></figcaption></figure>
+<ul>
+<li>Now <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">x_1</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_2</annotation></semantics></math> are two <strong>task variables</strong> (like object and task), not neurons. Each panel is one neuron's response to them; gold, its best threshold</li>
+<li><mark>No pure or linear unit solves XOR alone</mark></li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-marpit-pagination="23" data-marpit-pagination-total="61" aria-labelledby="heading-23"><p class="page">Slide 23</p>
+<h2 id="heading-23">One unit alone: nonlinear units</h2>
+<figure><img src="../images/L06/rigotti_tuning_f2.svg" alt="The same layout with three nonlinear units. x1 times x2: high in the two corners where the inputs share a sign, low in the other two; its gold threshold follows both axes and gets 100%. The AND unit, max of 0 and x1 plus x2 minus 1: zero everywhere except toward the upper right corner; 75%. The absolute difference of x1 and x2: zero along the diagonal, high toward the other two corners; 100%" aria-describedby="figure-23-1"><figcaption id="figure-23-1"><p>The same layout with three nonlinear units. x1 times x2: high in the two corners where the inputs share a sign, low in the other two; its gold threshold follows both axes and gets 100%. The AND unit, max of 0 and x1 plus x2 minus 1: zero everywhere except toward the upper right corner; 75%. The absolute difference of x1 and x2: zero along the diagonal, high toward the other two corners; 100%</p><a href="../images/L06/rigotti_tuning_f2.svg">Open full-size figure</a></figcaption></figure>
+<ul>
+<li><strong>Nonlinear mixed</strong> units: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∣</mi><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mi mathvariant="normal">∣</mi></mrow><annotation encoding="application/x-tex">|x_1-x_2|</annotation></semantics></math> split XOR alone; <strong>AND</strong> (a rectified sum) fires when both inputs are high</li>
+<li><mark>AND alone: 3 of 4. Added to <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">x_1</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_2</annotation></semantics></math>, it makes all 16 splits separable</mark></li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="61" aria-labelledby="heading-24"><p class="page">Slide 24</p>
+<h2 id="heading-24">The response matrix: linear mixing</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/30_mixed_neuron_rigotti_f3.svg" alt="The recorded neuron: firing rate against four objects in two tasks; the two lines are not parallel. Object C drives about 6 spikes per second in the recognition task but about 3.4 in the recall task, while object A drives more firing in recall than in recognition" aria-describedby="figure-14-1"><figcaption id="figure-14-1"><p>The recorded neuron: firing rate against four objects in two tasks; the two lines are not parallel. Object C drives about 6 spikes per second in the recognition task but about 3.4 in the recall task, while object A drives more firing in recall than in recognition</p><a href="../images/L05/30_mixed_neuron_rigotti_f3.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L06/rigotti_matrix_f1.svg" alt="Left, a response matrix with four rows, the four XOR conditions (minus minus, minus plus, plus minus, plus plus), and three columns, the units x1, x2 and x1 plus x2, each cell colored and printed with its value. Under it: rank 2, 14 of 16 splits. Right, the four conditions as points in three dimensions with axes x1, x2 and x1 plus x2, labelled by their corner; all four lie on one tilted plane, drawn lightly" aria-describedby="figure-24-1"><figcaption id="figure-24-1"><p>Left, a response matrix with four rows, the four XOR conditions (minus minus, minus plus, plus minus, plus plus), and three columns, the units x1, x2 and x1 plus x2, each cell colored and printed with its value. Under it: rank 2, 14 of 16 splits. Right, the four conditions as points in three dimensions with axes x1, x2 and x1 plus x2, labelled by their corner; all four lie on one tilted plane, drawn lightly</p><a href="../images/L06/rigotti_matrix_f1.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
-<li>Recognize or recall: how does one neuron respond to object and task?</li>
-<li><strong>Pure selectivity</strong>: the response depends on one variable only (here the object), so the lines of the two tasks lie on top of each other</li>
-<li><strong>Additive mixed selectivity</strong>: object effect plus task effect. The lines are parallel, one shifted</li>
-<li><strong>Nonlinear mixed selectivity</strong>: the object's effect changes with the task, like the <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math> unit. <mark>Many prefrontal neurons mix this way</mark></li>
+<li>The <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1+x_2</annotation></semantics></math> column is the sum of the other two columns, so the <strong>rank</strong> stays 2. A linear readout can separate 14 of the 16 splits</li>
+<li>Rank, as last lecture: the number of principal components with nonzero variance. These responses are noiseless, so we can read it off exactly</li>
+<li><mark>A unit whose responses are a weighted sum of the other units' responses never raises the rank</mark></li>
 </ul>
 </div>
 </div>
-<div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="53" aria-labelledby="heading-15"><p class="page">Slide 15</p>
-<h2 id="heading-15">One unit alone: pure and linear units</h2>
-<figure><img src="../images/L06/rigotti_tuning_f1.svg" alt="Three panels over the plane of x1 and x2, each coloring one unit's response from low (light) to high (dark), with the XOR stimuli as green and blue dots near the four corners. x1, pure: the response changes from left to right only, gold threshold vertical. x2, pure: from bottom to top only, gold threshold horizontal. x1 plus x2, linear: along the diagonal, gold threshold a diagonal line. Under the panels, how many of the four conditions each unit gets right alone: 50%, 50% and 75%. A colour bar at the right" aria-describedby="figure-15-1"><figcaption id="figure-15-1"><p>Three panels over the plane of x1 and x2, each coloring one unit's response from low (light) to high (dark), with the XOR stimuli as green and blue dots near the four corners. x1, pure: the response changes from left to right only, gold threshold vertical. x2, pure: from bottom to top only, gold threshold horizontal. x1 plus x2, linear: along the diagonal, gold threshold a diagonal line. Under the panels, how many of the four conditions each unit gets right alone: 50%, 50% and 75%. A colour bar at the right</p><a href="../images/L06/rigotti_tuning_f1.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Toy data, computed: the XOR stimuli of the last lecture</p>
-<ul>
-<li>Each panel: one unit's response over the plane of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">x_1</annotation></semantics></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_2</annotation></semantics></math>. Gold: its best threshold</li>
-<li><mark>No pure or linear unit answers XOR alone</mark></li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="53" aria-labelledby="heading-16"><p class="page">Slide 16</p>
-<h2 id="heading-16">One unit alone: nonlinear units</h2>
-<figure><img src="../images/L06/rigotti_tuning_f2.svg" alt="The same layout with three nonlinear units. x1 times x2: high in the two corners where the inputs share a sign, low in the other two; its gold threshold follows both axes and gets 100%. The AND unit, max of 0 and x1 plus x2 minus 1: zero everywhere except toward the upper right corner; 75%. The absolute difference of x1 and x2: zero along the diagonal, high toward the other two corners; 100%" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>The same layout with three nonlinear units. x1 times x2: high in the two corners where the inputs share a sign, low in the other two; its gold threshold follows both axes and gets 100%. The AND unit, max of 0 and x1 plus x2 minus 1: zero everywhere except toward the upper right corner; 75%. The absolute difference of x1 and x2: zero along the diagonal, high toward the other two corners; 100%</p><a href="../images/L06/rigotti_tuning_f2.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Toy data, computed: the XOR stimuli of the last lecture</p>
-<ul>
-<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∣</mi><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mi mathvariant="normal">∣</mi></mrow><annotation encoding="application/x-tex">|x_1-x_2|</annotation></semantics></math> answer XOR alone. The <strong>AND unit</strong> fires only when both inputs are high</li>
-<li><mark>Nonlinear mixed units respond to combinations of the inputs</mark></li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="53" aria-labelledby="heading-17"><p class="page">Slide 17</p>
-<h2 id="heading-17">The response matrix: linear mixing</h2>
-<figure><img src="../images/L06/rigotti_matrix_f1.svg" alt="Left, a response matrix with four rows, the four XOR conditions (minus minus, minus plus, plus minus, plus plus), and three columns, the units x1, x2 and x1 plus x2, each cell colored and printed with its value. Under it: rank 2, 14 of 16 splits. Right, the four conditions as points in three dimensions with axes x1, x2 and x1 plus x2, labelled by their corner; all four lie on one tilted plane, drawn lightly" aria-describedby="figure-17-1"><figcaption id="figure-17-1"><p>Left, a response matrix with four rows, the four XOR conditions (minus minus, minus plus, plus minus, plus plus), and three columns, the units x1, x2 and x1 plus x2, each cell colored and printed with its value. Under it: rank 2, 14 of 16 splits. Right, the four conditions as points in three dimensions with axes x1, x2 and x1 plus x2, labelled by their corner; all four lie on one tilted plane, drawn lightly</p><a href="../images/L06/rigotti_matrix_f1.svg">Open full-size figure</a></figcaption></figure>
-<ul>
-<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1+x_2</annotation></semantics></math> is the sum of the other two columns: <strong>rank</strong> 2. A line answers 14 of 16</li>
-<li><mark>Linear mixing never adds a dimension</mark></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="53" aria-labelledby="heading-18"><p class="page">Slide 18</p>
-<h2 id="heading-18">The response matrix: add the lifting unit</h2>
-<figure><img src="../images/L06/rigotti_matrix_f2.svg" alt="The response matrix with a fourth column, x1 times x2: plus 1, minus 1, minus 1, plus 1. Under it: rank 3, 16 of 16 splits. Right, the points in three dimensions with axes x1, x2 and x1 times x2: the two same-sign corners are raised, the two others lowered, and a plane at x1 times x2 equal to zero separates them" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>The response matrix with a fourth column, x1 times x2: plus 1, minus 1, minus 1, plus 1. Under it: rank 3, 16 of 16 splits. Right, the points in three dimensions with axes x1, x2 and x1 times x2: the two same-sign corners are raised, the two others lowered, and a plane at x1 times x2 equal to zero separates them</p><a href="../images/L06/rigotti_matrix_f2.svg">Open full-size figure</a></figcaption></figure>
-<ul>
-<li>Add <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math>: no weighted sum of the other columns gives it. Rank 3, 16 of 16</li>
-<li><mark>A nonlinear unit adds a dimension</mark></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="53" aria-labelledby="heading-19"><p class="page">Slide 19</p>
-<h2 id="heading-19">The response matrix: add the AND unit</h2>
-<figure><img src="../images/L06/rigotti_matrix_f3.svg" alt="The response matrix with the AND unit as fourth column instead of x1 times x2: 0, 0, 0, 1. Under it: rank 3, 16 of 16 splits. Right, the points in three dimensions with axes x1, x2 and the AND unit: only the plus plus corner is raised, and a tilted plane separates the two same-sign corners from the two others" aria-describedby="figure-19-1"><figcaption id="figure-19-1"><p>The response matrix with the AND unit as fourth column instead of x1 times x2: 0, 0, 0, 1. Under it: rank 3, 16 of 16 splits. Right, the points in three dimensions with axes x1, x2 and the AND unit: only the plus plus corner is raised, and a tilted plane separates the two same-sign corners from the two others</p><a href="../images/L06/rigotti_matrix_f3.svg">Open full-size figure</a></figcaption></figure>
-<ul>
-<li>The AND unit instead of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math>: rank 3 again, 16 of 16</li>
-<li><mark>A nonlinear unit can add the dimension. The lifting unit from last lecture is one of them</mark></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="53" aria-labelledby="heading-20"><p class="page">Slide 20</p>
-<h2 id="heading-20">Scaling up: pure and linear populations</h2>
-<figure><img src="../images/L06/rig_pop_f1.svg" alt="Two columns of panels for 200 simulated neurons in the 24 conditions of the sequence task, a third column left empty. Top row, response matrices, 24 conditions by 200 neurons, recognition rows above recall rows, colored from low to high. Bottom row, scree plots of the variance fraction of components 1 to 23. Pure selectivity: seven bars, then nothing; rank 7, PR 6.2. Linear mixed: seven bars, then nothing; rank 7, PR 5.9" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>Two columns of panels for 200 simulated neurons in the 24 conditions of the sequence task, a third column left empty. Top row, response matrices, 24 conditions by 200 neurons, recognition rows above recall rows, colored from low to high. Bottom row, scree plots of the variance fraction of components 1 to 23. Pure selectivity: seven bars, then nothing; rank 7, PR 6.2. Linear mixed: seven bars, then nothing; rank 7, PR 5.9</p><a href="../images/L06/rig_pop_f1.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Simulated: 24 conditions, 200 neurons</p>
-<ul>
-<li><strong>Pure</strong>: one variable per neuron. <strong>Linear mixed</strong>: a weighted sum of all three</li>
-<li><mark>Without nonlinear mixing, 24 conditions use only 7 dimensions</mark></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="53" aria-labelledby="heading-21"><p class="page">Slide 21</p>
-<h2 id="heading-21">Scaling up: a nonlinear mixed population</h2>
-<figure><img src="../images/L06/rig_pop_f2.svg" alt="The same panels with the third column filled: nonlinear mixed selectivity. Its response matrix looks as busy as the other two. Its scree plot has 23 bars that fall slowly from 0.07 to 0.02; rank 23, PR 20.7" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>The same panels with the third column filled: nonlinear mixed selectivity. Its response matrix looks as busy as the other two. Its scree plot has 23 bars that fall slowly from 0.07 to 0.02; rank 23, PR 20.7</p><a href="../images/L06/rig_pop_f2.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Simulated: 24 conditions, 200 neurons</p>
-<ul>
-<li><strong>Nonlinear mixed</strong>: its own response to each condition. The matrices look alike</li>
-<li><mark>Only nonlinear mixing uses all 23 dimensions</mark></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-marpit-pagination="22" data-marpit-pagination-total="53" aria-labelledby="heading-22"><p class="page">Slide 22</p>
-<h2 id="heading-22">Mixed neurons make a high-dimensional population</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="61" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<h2 id="heading-25">The response matrix: add the lifting unit</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L06/pub_rigotti2013_fig4b.png" alt="Rigotti et al. (2013) Fig. 4b, second delay of the sequence task. Line plot against the number of neurons read out, 0 to 4,000. Left axis: number of two-class splits a readout solves, N sub c, on a log scale from 10 to 10 to the 7; right axis: number of dimensions, 6 to 24. Black line, recorded data: rises steadily to about 23 dimensions at 4,000 neurons, just under the dashed maximum of 24. Grey line, simulated pure-selectivity neurons: levels off near 7 dimensions from about 500 neurons on. Error bars on each point" aria-describedby="figure-22-1"><figcaption id="figure-22-1"><p>Rigotti et al. (2013) Fig. 4b, second delay of the sequence task. Line plot against the number of neurons read out, 0 to 4,000. Left axis: number of two-class splits a readout solves, N sub c, on a log scale from 10 to 10 to the 7; right axis: number of dimensions, 6 to 24. Black line, recorded data: rises steadily to about 23 dimensions at 4,000 neurons, just under the dashed maximum of 24. Grey line, simulated pure-selectivity neurons: levels off near 7 dimensions from about 500 neurons on. Error bars on each point</p><a href="../images/L06/pub_rigotti2013_fig4b.png">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Reproduced from Rigotti et al. (2013), Fig. 4b</p>
+<figure><img src="../images/L06/rigotti_matrix_f2.svg" alt="The response matrix with a fourth column, x1 times x2: plus 1, minus 1, minus 1, plus 1. Under it: rank 3, 16 of 16 splits. Right, the points in three dimensions with axes x1, x2 and x1 times x2: the two same-sign corners are raised, the two others lowered, and a plane at x1 times x2 equal to zero separates them" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>The response matrix with a fourth column, x1 times x2: plus 1, minus 1, minus 1, plus 1. Under it: rank 3, 16 of 16 splits. Right, the points in three dimensions with axes x1, x2 and x1 times x2: the two same-sign corners are raised, the two others lowered, and a plane at x1 times x2 equal to zero separates them</p><a href="../images/L06/rigotti_matrix_f2.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
-<li><strong>Shattering dimensionality</strong>: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">\log_2</annotation></semantics></math> of how many two-class splits of the conditions a readout solves</li>
-<li>24 conditions, so at most 24 (dashed line)</li>
-<li>Recorded prefrontal neurons (black): close to 24</li>
-<li><strong>Pure selectivity</strong>, simulated (grey): below 8</li>
+<li>Add <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math>: no weighted sum of the other columns gives it. The rank rises to 3, and all 16 splits are separable</li>
+<li><mark>Its responses are not a weighted sum of the others', so the points leave the plane</mark></li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="61" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<h2 id="heading-26">The response matrix: add the AND unit</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L06/rigotti_matrix_f3.svg" alt="The response matrix with the AND unit as fourth column instead of x1 times x2: 0, 0, 0, 1. Under it: rank 3, 16 of 16 splits. Right, the points in three dimensions with axes x1, x2 and the AND unit: only the plus plus corner is raised, and a tilted plane separates the two same-sign corners from the two others" aria-describedby="figure-26-1"><figcaption id="figure-26-1"><p>The response matrix with the AND unit as fourth column instead of x1 times x2: 0, 0, 0, 1. Under it: rank 3, 16 of 16 splits. Right, the points in three dimensions with axes x1, x2 and the AND unit: only the plus plus corner is raised, and a tilted plane separates the two same-sign corners from the two others</p><a href="../images/L06/rigotti_matrix_f3.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Put the AND unit in place of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math>. Its responses are not a weighted sum of the others' either: rank 3 again, and all 16 splits are separable</li>
+<li>AND alone cannot do XOR. A readout of all three can: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><mn>4</mn><mtext> </mtext><mrow><mi mathvariant="normal">A</mi><mi mathvariant="normal">N</mi><mi mathvariant="normal">D</mi></mrow></mrow><annotation encoding="application/x-tex">x_1 + x_2 - 4\,\mathrm{AND}</annotation></semantics></math> is <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">-2</annotation></semantics></math> for same signs and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math> for different signs, so one threshold splits them</li>
+<li><mark>Many nonlinear units raise the rank. The product unit from the last lecture is only one of them</mark></li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-marpit-scope-wrw3eprf="" data-paginate="true" data-marpit-pagination="27" data-marpit-pagination-total="61" aria-labelledby="heading-27"><p class="page">Slide 27</p>
+<h2 id="heading-27">Summary: new units must not be weighted sums</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L06/shatter_lift_f3.svg" alt="Three panels. The two from before, plus a third: eight stimuli whose red and blue versions share positions in the x1, x2 plane, separated by a new unit x3 that responds to a different property" aria-describedby="figure-27-1"><figcaption id="figure-27-1"><p>Three panels. The two from before, plus a third: eight stimuli whose red and blue versions share positions in the x1, x2 plane, separated by a new unit x3 that responds to a different property</p><a href="../images/L06/shatter_lift_f3.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Top: adding <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math> raises the rank to 3 (16 of 16); adding <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1+x_2</annotation></semantics></math>, a weighted sum, leaves it at 2 (14 of 16)</li>
+<li>A unit can also help by responding to something new. Bottom: a linear unit <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">x_3</annotation></semantics></math>, tuned to a new property, separates stimuli that share positions</li>
+<li><mark>A new unit helps only if its responses are not a weighted sum of the others': then the rank goes up</mark></li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="61" aria-labelledby="heading-28"><p class="page">Slide 28</p>
+<h2 id="heading-28">Mixed neurons make a high-dimensional population</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L06/pub_rigotti2013_fig4b_aligned.png" alt="Rigotti et al. (2013) Fig. 4b, second delay of the sequence task. Line plot against the number of neurons read out, 0 to 4,000. Left axis: number of two-class splits a readout solves, N sub c, on a log scale from 10 to 10 to the 7; right axis: number of dimensions, 6 to 24. Black line, recorded data: rises steadily to about 23 dimensions at 4,000 neurons, just under the dashed maximum of 24. Grey line, simulated pure-selectivity neurons: levels off near 7 dimensions from about 500 neurons on. Error bars on each point" aria-describedby="figure-28-1"><figcaption id="figure-28-1"><p>Rigotti et al. (2013) Fig. 4b, second delay of the sequence task. Line plot against the number of neurons read out, 0 to 4,000. Left axis: number of two-class splits a readout solves, N sub c, on a log scale from 10 to 10 to the 7; right axis: number of dimensions, 6 to 24. Black line, recorded data: rises steadily to about 23 dimensions at 4,000 neurons, just under the dashed maximum of 24. Grey line, simulated pure-selectivity neurons: levels off near 7 dimensions from about 500 neurons on. Error bars on each point</p><a href="../images/L06/pub_rigotti2013_fig4b_aligned.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li><strong>Shattering dimensionality</strong> counts flexibility: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">\log_2</annotation></semantics></math> of the number of splits a readout solves (solved: ≥ 75–80% on held-out trials)</li>
+<li>24 conditions, 2²⁴ splits: solving all of them gives log₂ 2²⁴ = 24, the maximum (dashed line)</li>
+<li>Recorded prefrontal neurons (black): close to 24, almost any grouping is readable</li>
+<li><strong>Pure selectivity</strong>, simulated (grey): at most 8 (3 + 3 + 1 directions for the two objects and the task, plus 1)</li>
 <li><mark>Nonlinear mixed selectivity makes the responses of the population high-dimensional</mark></li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-marpit-pagination="23" data-marpit-pagination-total="53" aria-labelledby="heading-23"><p class="page">Slide 23</p>
-<h2 id="heading-23">High dimensionality goes with correct choices</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="61" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<h2 id="heading-29">High dimensionality goes with correct choices</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L06/pub_rigotti2013_fig5a.png" alt="Rigotti et al. (2013) Fig. 5a, recall task. Line plot against the number of neurons read out, 0 to 4,000. Left axis: number of two-class splits a readout solves, N sub c, on a log scale; right axis: number of dimensions, 2 to 12. Black line, correct trials: rises to about 11 dimensions, close to the dashed maximum of 12. Grey line, error trials: levels off near 7. Error bars on each point" aria-describedby="figure-23-1"><figcaption id="figure-23-1"><p>Rigotti et al. (2013) Fig. 5a, recall task. Line plot against the number of neurons read out, 0 to 4,000. Left axis: number of two-class splits a readout solves, N sub c, on a log scale; right axis: number of dimensions, 2 to 12. Black line, correct trials: rises to about 11 dimensions, close to the dashed maximum of 12. Grey line, error trials: levels off near 7. Error bars on each point</p><a href="../images/L06/pub_rigotti2013_fig5a.png">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Reproduced from Rigotti et al. (2013), Fig. 5a</p>
+<figure><img src="../images/L06/pub_rigotti2013_fig5a_aligned.png" alt="Rigotti et al. (2013) Fig. 5a, recall task. Line plot against the number of neurons read out, 0 to 4,000. Left axis: number of two-class splits a readout solves, N sub c, on a log scale; right axis: number of dimensions, 2 to 12. Black line, correct trials: rises to about 11 dimensions, close to the dashed maximum of 12. Grey line, error trials: levels off near 7. Error bars on each point" aria-describedby="figure-29-1"><figcaption id="figure-29-1"><p>Rigotti et al. (2013) Fig. 5a, recall task. Line plot against the number of neurons read out, 0 to 4,000. Left axis: number of two-class splits a readout solves, N sub c, on a log scale; right axis: number of dimensions, 2 to 12. Black line, correct trials: rises to about 11 dimensions, close to the dashed maximum of 12. Grey line, error trials: levels off near 7. Error bars on each point</p><a href="../images/L06/pub_rigotti2013_fig5a_aligned.png">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
 <li>Recall task only: 12 conditions, so at most 12 dimensions (dashed line)</li>
 <li><strong>Correct trials</strong> (black): close to 12</li>
-<li><strong>Error trials</strong> (grey): about 7. The objects can still be decoded</li>
-<li><mark>Dimensionality drops on error trials</mark></li>
+<li><strong>Error trials</strong> (grey): about 7. The objects can still be decoded, but fewer groupings of the conditions can be read out</li>
+<li>The drop is in the nonlinear mixed part of the responses: remove it and correct and error trials look alike</li>
+<li><mark>On error trials the population is less flexible: the information is there, but not in a form a readout can use</mark></li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="53" aria-labelledby="heading-24"><p class="page">Slide 24</p>
-<h2 id="heading-24">One boundary for objects never seen: CCGP</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-class="lead" data-marpit-pagination="30" data-marpit-pagination-total="61" aria-labelledby="heading-30"><p class="page">Slide 30</p>
+<h2 id="heading-30">Second property: abstraction</h2>
+<h2 id="flexibility-counts-the-groupings-a-readout-can-learn-abstraction-asks-whether-one-readout-carries-over-to-conditions-it-never-saw">Flexibility counts the groupings a readout can learn. Abstraction asks whether one readout carries over to conditions it never saw</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="61" aria-labelledby="heading-31"><p class="page">Slide 31</p>
+<h2 id="heading-31">One boundary for objects never seen: CCGP</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/58_shattering_vs_ccgp.svg" alt="Schematic: a readout for animate against inanimate is fitted on dogs and chairs, then applied to cats and tables. Left, shattering refits a readout for every task on the same objects; right, CCGP fits once and keeps the weights fixed for objects it never saw" aria-describedby="figure-24-1"><figcaption id="figure-24-1"><p>Schematic: a readout for animate against inanimate is fitted on dogs and chairs, then applied to cats and tables. Left, shattering refits a readout for every task on the same objects; right, CCGP fits once and keeps the weights fixed for objects it never saw</p><a href="../images/L05/58_shattering_vs_ccgp.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L06/ccgp_shatter_vs_ccgp.svg" alt="A readout for animate against inanimate is fitted on dogs and chairs, then applied to cats and tables. Left, shattering refits a readout for every task on the same objects; right, CCGP fits once and keeps the weights fixed for objects it never saw" aria-describedby="figure-31-1"><figcaption id="figure-31-1"><p>A readout for animate against inanimate is fitted on dogs and chairs, then applied to cats and tables. Left, shattering refits a readout for every task on the same objects; right, CCGP fits once and keeps the weights fixed for objects it never saw</p><a href="../images/L06/ccgp_shatter_vs_ccgp.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
-<li>High shattering: a new readout solves almost any grouping. But does a readout learned on some conditions work on new conditions?</li>
 <li><strong>CCGP</strong> (cross-condition generalization performance): learn "animate or not" on dogs and chairs, test on cats and tables</li>
-<li><mark>With the weights fixed, a high CCGP means animacy is coded the same way for new objects</mark>&nbsp;<span>(minute&nbsp;paper)</span></li>
+<li><mark>A high CCGP means the code for animacy is <b>abstract</b>: not tied to the objects the readout was trained on, so it carries over to objects never seen</mark>&nbsp;<span>(minute&nbsp;paper)</span></li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="53" aria-labelledby="heading-25"><p class="page">Slide 25</p>
-<h2 id="heading-25">CCGP: when does one boundary transfer?</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L05/58_ccgp_intuition_1.svg" alt="Two toy panels in the plane of two units. Filled dogs (green) and chairs (blue) are separated by a gold boundary; hollow cats and tables, never seen, lie below them. Left, cats sit under the dogs and tables under the chairs, so the boundary classifies every new object correctly: held-out accuracy 100%. Right, cats and tables are swapped, and the same boundary gets all of them wrong:" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>Two toy panels in the plane of two units. Filled dogs (green) and chairs (blue) are separated by a gold boundary; hollow cats and tables, never seen, lie below them. Left, cats sit under the dogs and tables under the chairs, so the boundary classifies every new object correctly: held-out accuracy 100%. Right, cats and tables are swapped, and the same boundary gets all of them wrong:</p><a href="../images/L05/58_ccgp_intuition_1.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<div class="col">
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="61" aria-labelledby="heading-32"><p class="page">Slide 32</p>
+<h2 id="heading-32">CCGP: when does one boundary transfer?</h2>
+<figure><img src="../images/L06/ccgp_toy.svg" alt="Two toy panels in the plane of two units x1 and x2, with noisy clouds. Filled red dots are dogs and filled blue dots chairs; a gold boundary is fitted on them. Hollow red dots are cats and hollow blue dots tables, never used to fit. Left, cats overlap the dogs and tables overlap the chairs; the dog-to-cat shift, shown by a grey arrow, runs along the boundary; on cats and tables the boundary scores 98%. Right, the same dogs, chairs and boundary, but cats and tables are shifted across the boundary; 22%" aria-describedby="figure-32-1"><figcaption id="figure-32-1"><p>Two toy panels in the plane of two units x1 and x2, with noisy clouds. Filled red dots are dogs and filled blue dots chairs; a gold boundary is fitted on them. Hollow red dots are cats and hollow blue dots tables, never used to fit. Left, cats overlap the dogs and tables overlap the chairs; the dog-to-cat shift, shown by a grey arrow, runs along the boundary; on cats and tables the boundary scores 98%. Right, the same dogs, chairs and boundary, but cats and tables are shifted across the boundary; 22%</p><a href="../images/L06/ccgp_toy.svg">Open full-size figure</a></figcaption></figure>
 <ul>
-<li>Left: cats under dogs, tables under chairs. The boundary fitted on dogs vs chairs transfers (100%)</li>
-<li>Swapped: 0%. Random scatter lands in between, near baseline</li>
-<li><strong>Flexible</strong>: many splits solvable (high shattering). <strong>Abstract</strong>: one readout transfers (high CCGP)</li>
-<li><mark>With the weights fixed, a high CCGP means animacy is coded the same way for new objects</mark>&nbsp;<span>(minute&nbsp;paper)</span></li>
+<li>Left: cats differ from dogs only <strong>along</strong> the boundary, a direction the readout ignores: it transfers (98%). Right: <strong>across</strong> the boundary: it fails (22%)</li>
+<li><mark>Abstract: objects differ only in directions the readout ignores</mark>&nbsp;<span>(minute&nbsp;paper)</span></li>
 </ul>
-</div>
-</div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="53" aria-labelledby="heading-26"><p class="page">Slide 26</p>
-<h2 id="heading-26">The task: a hidden context</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="61" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<h2 id="heading-33">The task: a hidden context</h2>
 <div class="capfig">
-<figure><img src="../images/L06/pub_bernardi2020_fig1ab.png" alt="Bernardi et al. (2020) Fig. 1a–b. a, one trial as a staircase of grey screens: inter-trial interval 1750 ms, fixation 400 ms, a fractal image for 500 ms, response hold or release within 900 ms, then the outcome, plus or minus. b, the four fractal images in two columns, Context 1 and Context 2, each with the correct action (R release, H hold) and the reward (plus juice, minus none). Context 1, top to bottom: R plus, H plus, R minus, H minus. Context 2: H minus, R plus, H plus, R minus" aria-describedby="figure-26-1"><figcaption id="figure-26-1"><p>Bernardi et al. (2020) Fig. 1a–b. a, one trial as a staircase of grey screens: inter-trial interval 1750 ms, fixation 400 ms, a fractal image for 500 ms, response hold or release within 900 ms, then the outcome, plus or minus. b, the four fractal images in two columns, Context 1 and Context 2, each with the correct action (R release, H hold) and the reward (plus juice, minus none). Context 1, top to bottom: R plus, H plus, R minus, H minus. Context 2: H minus, R plus, H plus, R minus</p><a href="../images/L06/pub_bernardi2020_fig1ab.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L06/bernardi_task.svg" alt="Schematic of one trial: inter-trial interval 1750 ms, hold the button and fixate 400 ms, one of four images A to D for 500 ms, then hold or release within 900 ms. Below, two tables. Context 1 (red): A release, juice, labelled A plus; B hold, juice; C release, none, labelled C minus; D hold, none. Context 2 (blue): A hold, none, labelled A minus; B release, juice; C hold, juice, labelled C plus; D release, none. Between them: switch every 50 to 70 trials, no cue, inferred from outcomes" aria-describedby="figure-33-1"><figcaption id="figure-33-1"><p>Schematic of one trial: inter-trial interval 1750 ms, hold the button and fixate 400 ms, one of four images A to D for 500 ms, then hold or release within 900 ms. Below, two tables. Context 1 (red): A release, juice, labelled A plus; B hold, juice; C release, none, labelled C minus; D hold, none. Context 2 (blue): A hold, none, labelled A minus; B release, juice; C hold, juice, labelled C plus; D release, none. Between them: switch every 50 to 70 trials, no cue, inferred from outcomes</p><a href="../images/L06/bernardi_task.svg">Open full-size figure</a></figcaption></figure>
 </div>
-<p class="provenance">Reproduced from Bernardi et al. (2020), Fig. 1a–b</p>
+<p class="provenance">Schematic of the task of Bernardi et al. (2020)</p>
 <ul>
-<li><strong>R</strong>: release, <strong>H</strong>: hold. <strong>+</strong>: juice, <strong>−</strong>: none. Context 2 flips every action</li>
-<li><mark>Is context coded the same way whatever the action and reward?</mark></li>
+<li>An uncued <strong>context</strong> flips the rules. Each variable splits the 8 conditions into two <strong>classes</strong></li>
+<li><mark>Memorized associations are not enough: the monkey must hold context as a variable</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-marpit-pagination="27" data-marpit-pagination-total="53" aria-labelledby="heading-27"><p class="page">Slide 27</p>
-<h2 id="heading-27">The monkeys infer the hidden context</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="61" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<h2 id="heading-34">The monkeys infer the hidden context</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L06/pub_bernardi2020_fig1c.png" alt="Bernardi et al. (2020) Fig. 1c. Bar chart of average performance in percent, 0 to 100, against image number around a context switch, marked by a magenta line. Last image before the switch: about 95%. First image after it: about 9%. Second, third and fourth images: about 56, 74 and 87%. A dashed line marks 50%, chance for a choice between release and hold. Error bars are 95% confidence intervals" aria-describedby="figure-27-1"><figcaption id="figure-27-1"><p>Bernardi et al. (2020) Fig. 1c. Bar chart of average performance in percent, 0 to 100, against image number around a context switch, marked by a magenta line. Last image before the switch: about 95%. First image after it: about 9%. Second, third and fourth images: about 56, 74 and 87%. A dashed line marks 50%, chance for a choice between release and hold. Error bars are 95% confidence intervals</p><a href="../images/L06/pub_bernardi2020_fig1c.png">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Reproduced from Bernardi et al. (2020), Fig. 1c</p>
+<figure><img src="../images/L06/pub_bernardi2020_fig1c.png" alt="Bernardi et al. (2020) Fig. 1c. Bar chart of average performance in percent, 0 to 100, against image number around a context switch, marked by a magenta line. Last image before the switch: about 95%. First image after it: about 9%. Second, third and fourth images: about 56, 74 and 87%. A dashed line marks 50%, chance for a choice between release and hold. Error bars are 95% confidence intervals" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Bernardi et al. (2020) Fig. 1c. Bar chart of average performance in percent, 0 to 100, against image number around a context switch, marked by a magenta line. Last image before the switch: about 95%. First image after it: about 9%. Second, third and fourth images: about 56, 74 and 87%. A dashed line marks 50%, chance for a choice between release and hold. Error bars are 95% confidence intervals</p><a href="../images/L06/pub_bernardi2020_fig1c.png">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
 <li>Accuracy on the last image before a switch, then on the first showing of each image after it</li>
 <li>1st image after the switch: about 9% correct. Nothing warned the monkey</li>
 <li>2nd to 4th images, not yet seen in the new context: above chance (dashed line, 50%)</li>
+<li><strong>Bernardi et al.</strong> call this <strong>inference</strong>: it suggests a variable for context, coded separately from any one image</li>
 <li><mark>After one surprise, the monkeys switch all the rules</mark></li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="53" aria-labelledby="heading-28"><p class="page">Slide 28</p>
-<h2 id="heading-28">CCGP on the task: two ways to code context</h2>
-<div class="capfig">
-<figure><img src="../images/L06/pub_bernardi2020_fig2ab.png" alt="Bernardi et al. (2020) Fig. 2a–b. Two three-dimensional plots with axes f1, f2 and f3, each showing four conditions: images A and C, rewarded (plus) or not (minus); red is context 1 (A plus, C minus), blue is context 2 (A minus, C plus). Left, the four points sit at random, joined into a tetrahedron, with a yellow plane separating the contexts; bars beside it: shattering dimensionality 1, CCGP for context 0.5. Right, the points form two tight pairs, one per context; pink arrows labelled Train point to the rewarded conditions, blue arrows labelled Test to the unrewarded ones, and two nearly identical planes separate the pairs; bars: shattering dimensionality about 0.7, CCGP for context 1. A legend below: pink bars mark training samples, blue bars test samples" aria-describedby="figure-28-1"><figcaption id="figure-28-1"><p>Bernardi et al. (2020) Fig. 2a–b. Two three-dimensional plots with axes f1, f2 and f3, each showing four conditions: images A and C, rewarded (plus) or not (minus); red is context 1 (A plus, C minus), blue is context 2 (A minus, C plus). Left, the four points sit at random, joined into a tetrahedron, with a yellow plane separating the contexts; bars beside it: shattering dimensionality 1, CCGP for context 0.5. Right, the points form two tight pairs, one per context; pink arrows labelled Train point to the rewarded conditions, blue arrows labelled Test to the unrewarded ones, and two nearly identical planes separate the pairs; bars: shattering dimensionality about 0.7, CCGP for context 1. A legend below: pink bars mark training samples, blue bars test samples</p><a href="../images/L06/pub_bernardi2020_fig2ab.png">Open full-size figure</a></figcaption></figure>
-</div>
-<p class="provenance">Reproduced from Bernardi et al. (2020), Fig. 2a–b</p>
-<ul>
-<li>Four conditions in three neurons. Red: context 1, blue: context 2. <strong>SD</strong>: shattering</li>
-<li>Left, at random: every split decodes (SD 1). A context readout does not transfer (CCGP 0.5)</li>
-<li><mark>Right, clustered: train on rewarded, test on unrewarded, CCGP 1. Only context is coded</mark></li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="53" aria-labelledby="heading-29"><p class="page">Slide 29</p>
-<h2 id="heading-29">CCGP on the task: a square, and a square bent</h2>
-<div class="capfig">
-<figure><img src="../images/L06/pub_bernardi2020_fig2cd.png" alt="Bernardi et al. (2020) Fig. 2c–d. Left, the four conditions at the corners of a square in three dimensions: the red segment joins A plus and C minus (context 1), the blue segment joins C plus and A minus (context 2), parallel to each other; a pink plane separates them. Bars: shattering dimensionality about 0.9, CCGP for context and for value both about 0.75. Right, the same square with its corners pushed out of the plane, drawn inside the grey outline of the original square; bars: shattering dimensionality 1, CCGP for context and value about 0.75" aria-describedby="figure-29-1"><figcaption id="figure-29-1"><p>Bernardi et al. (2020) Fig. 2c–d. Left, the four conditions at the corners of a square in three dimensions: the red segment joins A plus and C minus (context 1), the blue segment joins C plus and A minus (context 2), parallel to each other; a pink plane separates them. Bars: shattering dimensionality about 0.9, CCGP for context and for value both about 0.75. Right, the same square with its corners pushed out of the plane, drawn inside the grey outline of the original square; bars: shattering dimensionality 1, CCGP for context and value about 0.75</p><a href="../images/L06/pub_bernardi2020_fig2cd.png">Open full-size figure</a></figcaption></figure>
-</div>
-<p class="provenance">Reproduced from Bernardi et al. (2020), Fig. 2c–d</p>
-<ul>
-<li>Left, a square: context and value both transfer. XOR fails, so SD &lt; 1</li>
-<li>Right, corners pushed out of the plane: every split decodes (SD 1), CCGP stays high</li>
-<li><mark>A slightly bent square is flexible and abstract at once</mark></li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="53" aria-labelledby="heading-30"><p class="page">Slide 30</p>
-<h2 id="heading-30">Every tool on one population: the cube</h2>
-<figure><img src="../images/L06/bern_tools_f1.svg" alt="One row of panels for the cube population of the demo model, eight conditions A to H. Distances (RDM): an 8 by 8 matrix of Euclidean distances between condition means, with four distinct distance levels. MDS map: blue dots A to D (context minus) and red dots E to H (context plus) around a ring, short gold segments joining conditions that differ only in context and pointing in different directions; stress 0.24. Scree: three equal bars for components 1 to 3, none after; rank 3, PR 3.0. At right: shattering 0.72, context CCGP 0.95" aria-describedby="figure-30-1"><figcaption id="figure-30-1"><p>One row of panels for the cube population of the demo model, eight conditions A to H. Distances (RDM): an 8 by 8 matrix of Euclidean distances between condition means, with four distinct distance levels. MDS map: blue dots A to D (context minus) and red dots E to H (context plus) around a ring, short gold segments joining conditions that differ only in context and pointing in different directions; stress 0.24. Scree: three equal bars for components 1 to 3, none after; rank 3, PR 3.0. At right: shattering 0.72, context CCGP 0.95</p><a href="../images/L06/bern_tools_f1.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Computed: the demo's model, seed 1</p>
-<ul>
-<li>The demo's model: context × action × reward, 30 units. <strong>Cube</strong>: one direction per variable</li>
-<li>RDM and MDS map (the MDS lecture), scree and participation ratio, PR (last lecture)</li>
-<li><mark>On a map, the cube's parallel context edges are lost (stress 0.24)</mark></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="53" aria-labelledby="heading-31"><p class="page">Slide 31</p>
-<h2 id="heading-31">Every tool on one population: the compromise</h2>
-<figure><img src="../images/L06/bern_tools_f2.svg" alt="The same row for the compromise population, lambda 0.25. RDM: distances more even. MDS map: again a ring of eight dots with short gold segments; stress 0.25. Scree: three large bars and four small ones; rank 7, PR 4.1. At right: shattering 0.80, context CCGP 0.80" aria-describedby="figure-31-1"><figcaption id="figure-31-1"><p>The same row for the compromise population, lambda 0.25. RDM: distances more even. MDS map: again a ring of eight dots with short gold segments; stress 0.25. Scree: three large bars and four small ones; rank 7, PR 4.1. At right: shattering 0.80, context CCGP 0.80</p><a href="../images/L06/bern_tools_f2.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Computed: the demo's model, seed 1</p>
-<ul>
-<li><strong>Compromise</strong>: each corner pushed a little off the cube. Rank 7, PR 4.1</li>
-<li>Shattering rises (0.72 → 0.80), context CCGP falls (0.95 → 0.80)</li>
-<li><mark>The RDM and the map barely change. The readout scores do</mark></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="53" aria-labelledby="heading-32"><p class="page">Slide 32</p>
-<h2 id="heading-32">Every tool on one population: random</h2>
-<figure><img src="../images/L06/bern_tools_f3.svg" alt="The same row for the random population, lambda 1. RDM: every off-diagonal entry the same, every condition equally far from every other. MDS map: gold segments crossing at odd angles; stress 0.31. Scree: seven equal bars; rank 7, PR 7.0. At right: shattering 0.99, context CCGP 0.51" aria-describedby="figure-32-1"><figcaption id="figure-32-1"><p>The same row for the random population, lambda 1. RDM: every off-diagonal entry the same, every condition equally far from every other. MDS map: gold segments crossing at odd angles; stress 0.31. Scree: seven equal bars; rank 7, PR 7.0. At right: shattering 0.99, context CCGP 0.51</p><a href="../images/L06/bern_tools_f3.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Computed: the demo's model, seed 1</p>
-<ul>
-<li><strong>Random</strong>: every condition equally far from every other. Rank 7, PR 7.0</li>
-<li>Shattering 0.99. Context CCGP 0.51, so nothing transfers</li>
-<li><mark>RDM, map and PR describe the geometry. Only CCGP tests transfer</mark></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="53" aria-labelledby="heading-33"><p class="page">Slide 33</p>
-<h2 id="heading-33">Single trials in t-SNE: islands mislead</h2>
-<figure><img src="../images/L06/bern_tools_tsne.svg" alt="Three t-SNE maps of single trials, 40 per condition, one dot per trial, blue for context minus and red for context plus, each condition's letter beside its group. Cube: the trials form a ring of touching groups, red and blue alternating. Compromise: groups that touch and partly mix. Random: eight tight, well-separated islands. Under the maps: cube shattering 0.72, context CCGP 0.95; compromise 0.80 and 0.80; random 0.99 and 0.51" aria-describedby="figure-33-1"><figcaption id="figure-33-1"><p>Three t-SNE maps of single trials, 40 per condition, one dot per trial, blue for context minus and red for context plus, each condition's letter beside its group. Cube: the trials form a ring of touching groups, red and blue alternating. Compromise: groups that touch and partly mix. Random: eight tight, well-separated islands. Under the maps: cube shattering 0.72, context CCGP 0.95; compromise 0.80 and 0.80; random 0.99 and 0.51</p><a href="../images/L06/bern_tools_tsne.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Computed: the demo's model, seed 1, perplexity 30 for all three</p>
-<ul>
-<li>Random: cleanest islands, nothing transfers (0.51). Cube: islands touch, context transfers best</li>
-<li><mark>A t-SNE map suggests groups. A readout on the responses tests them</mark></li>
-</ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="53" aria-labelledby="heading-34"><p class="page">Slide 34</p>
-<h2 id="heading-34">Hippocampus: context transfers, action does not</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-marpit-scope-uv8fnn5l="" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="61" aria-labelledby="heading-35"><p class="page">Slide 35</p>
+<h2 id="heading-35">Recall: points in general position split every way</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L06/pub_bernardi2020_fig3e.png" alt="Bernardi et al. (2020) Fig. 3e. For hippocampus (HPC), dorsolateral prefrontal cortex (DLPFC) and anterior cingulate cortex (ACC), a vertical axis from 0.4 to 1 labelled shattering dimensionality and CCGP, with a dashed line at 0.5. Short black lines mark the measured CCGP of three variables, each on a set of coloured dots from 100 runs of a perfect-cube model: context in red (HPC 0.96, DLPFC 0.74, ACC 0.81), value of the previous trial in purple (0.79, 0.88, 0.94) and action of the previous trial in orange (0.44, 0.75, 0.90). Short grey lines mark the measured shattering dimensionality (0.70, 0.75, 0.74). Clusters of white dots, the cube model's shattering dimensionality, sit lower, at about 0.60, 0.62 and 0.65" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Bernardi et al. (2020) Fig. 3e. For hippocampus (HPC), dorsolateral prefrontal cortex (DLPFC) and anterior cingulate cortex (ACC), a vertical axis from 0.4 to 1 labelled shattering dimensionality and CCGP, with a dashed line at 0.5. Short black lines mark the measured CCGP of three variables, each on a set of coloured dots from 100 runs of a perfect-cube model: context in red (HPC 0.96, DLPFC 0.74, ACC 0.81), value of the previous trial in purple (0.79, 0.88, 0.94) and action of the previous trial in orange (0.44, 0.75, 0.90). Short grey lines mark the measured shattering dimensionality (0.70, 0.75, 0.74). Clusters of white dots, the cube model's shattering dimensionality, sit lower, at about 0.60, 0.62 and 0.65</p><a href="../images/L06/pub_bernardi2020_fig3e.png">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Reproduced from Bernardi et al. (2020), Fig. 3e</p>
+<figure><img src="../images/L06/shatter_three_f1.svg" alt="The shattering figure from earlier in the lecture: two blocks of eight small panels, one per way to color three stimuli blue or red. Top, three stimuli in general position: every panel has a line separating blue from red, 8 of 8. Bottom, three stimuli on one line: 6 of 8" aria-describedby="figure-35-1"><figcaption id="figure-35-1"><p>The shattering figure from earlier in the lecture: two blocks of eight small panels, one per way to color three stimuli blue or red. Top, three stimuli in general position: every panel has a line separating blue from red, 8 of 8. Bottom, three stimuli on one line: 6 of 8</p><a href="../images/L06/shatter_three_f1.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Earlier: 3 stimuli in 2 units, in general position: a line separates all 8 splits</li>
+<li>One more unit, one more stimulus: 4 conditions at random in 3 neurons can be split all 16 ways by a plane</li>
+<li>Bernardi's <strong>shattering accuracy</strong>: a readout for every balanced split (3 with 4 conditions, 35 with 8), scored on held-out trials, averaged. 0.5 = guessing</li>
+<li><mark>Next slide: the context split is one of them; the other splits are separable too</mark></li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="61" aria-labelledby="heading-36"><p class="page">Slide 36</p>
+<h2 id="heading-36">Four toy geometries, 1 of 4: points at random</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L06/bern_geom_random.svg" alt="Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context" aria-describedby="figure-36-1"><figcaption id="figure-36-1"><p>Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context</p><a href="../images/L06/bern_geom_random.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Cartoon, not recordings: simulated trials, after Bernardi et al. (2020), Fig. 2</p>
+</div>
+<div class="col">
+<ul>
+<li><span>Red</span>/<span>blue</span>: context 1/2. Gold: a context readout fitted on the filled points; hollow: never seen</li>
+<li>Four conditions at random, i.e. in <strong>general position</strong>, in 3 neurons</li>
+<li><strong>Shattering</strong> 1.0: every split is separable. <strong>Generalization</strong> (CCGP) 0.52: the plane says nothing about C− and A−</li>
+<li><mark>Flexible, not abstract</mark></li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="61" aria-labelledby="heading-37"><p class="page">Slide 37</p>
+<h2 id="heading-37">Four toy geometries, 2 of 4: clustered by context</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L06/bern_geom_clustered.svg" alt="Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context" aria-describedby="figure-37-1"><figcaption id="figure-37-1"><p>Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context</p><a href="../images/L06/bern_geom_clustered.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Cartoon, not recordings: simulated trials, after Bernardi et al. (2020), Fig. 2</p>
+</div>
+<div class="col">
+<ul>
+<li><span>Red</span>/<span>blue</span>: context 1/2. Gold: a context readout fitted on the filled points; hollow: never seen</li>
+<li>Each context's two conditions sit close together</li>
+<li><strong>Generalization</strong> (CCGP) 1.0: context transfers. <strong>Shattering</strong> 0.73: conditions within a context cannot be told apart</li>
+<li><mark>Abstract, not flexible</mark></li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="61" aria-labelledby="heading-38"><p class="page">Slide 38</p>
+<h2 id="heading-38">Four toy geometries, 3 of 4: a square</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L06/bern_geom_square.svg" alt="Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context, CCGP value" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context, CCGP value</p><a href="../images/L06/bern_geom_square.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Cartoon, not recordings: simulated trials, after Bernardi et al. (2020), Fig. 2</p>
+</div>
+<div class="col">
+<ul>
+<li><span>Red</span>/<span>blue</span>: context 1/2. Gold: a context readout fitted on the filled points; hollow: never seen</li>
+<li>Corners of a square: one direction for context, one for value, so a readout for one ignores the other</li>
+<li><strong>Generalization</strong>: CCGP 0.78 (context), 0.72 (value). <strong>Shattering</strong> 0.82: the diagonal split is an XOR and fails</li>
+<li><mark>Abstract, but not fully flexible</mark></li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="61" aria-labelledby="heading-39"><p class="page">Slide 39</p>
+<h2 id="heading-39">Four toy geometries, 4 of 4: a square, bent</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L06/bern_geom_bent.svg" alt="Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context, CCGP value" aria-describedby="figure-39-1"><figcaption id="figure-39-1"><p>Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context, CCGP value</p><a href="../images/L06/bern_geom_bent.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Cartoon, not recordings: simulated trials, after Bernardi et al. (2020), Fig. 2</p>
+</div>
+<div class="col">
+<ul>
+<li><span>Red</span>/<span>blue</span>: context 1/2. Gold: a context readout fitted on the filled points; hollow: never seen</li>
+<li>The same square, corners pushed out of the plane</li>
+<li><strong>Shattering</strong> 1.0: the diagonal split separates too. <strong>Generalization</strong> still holds: CCGP 0.77, 0.73</li>
+<li><mark>Flexible and abstract at once</mark></li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="61" aria-labelledby="heading-40"><p class="page">Slide 40</p>
+<h2 id="heading-40">Hippocampus: context transfers, action does not</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L06/pub_bernardi2020_fig3e.png" alt="Bernardi et al. (2020) Fig. 3e. For hippocampus (HPC), dorsolateral prefrontal cortex (DLPFC) and anterior cingulate cortex (ACC), a vertical axis from 0.4 to 1 labelled shattering dimensionality and CCGP, with a dashed line at 0.5. Short black lines mark the measured CCGP of three variables, each on a set of coloured dots from 100 runs of a perfect-cube model: context in red (HPC 0.96, DLPFC 0.74, ACC 0.81), value of the previous trial in purple (0.79, 0.88, 0.94) and action of the previous trial in orange (0.44, 0.75, 0.90). Short grey lines mark the measured shattering dimensionality (0.70, 0.75, 0.74). Clusters of white dots, the cube model's shattering dimensionality, sit lower, at about 0.60, 0.62 and 0.65" aria-describedby="figure-40-1"><figcaption id="figure-40-1"><p>Bernardi et al. (2020) Fig. 3e. For hippocampus (HPC), dorsolateral prefrontal cortex (DLPFC) and anterior cingulate cortex (ACC), a vertical axis from 0.4 to 1 labelled shattering dimensionality and CCGP, with a dashed line at 0.5. Short black lines mark the measured CCGP of three variables, each on a set of coloured dots from 100 runs of a perfect-cube model: context in red (HPC 0.96, DLPFC 0.74, ACC 0.81), value of the previous trial in purple (0.79, 0.88, 0.94) and action of the previous trial in orange (0.44, 0.75, 0.90). Short grey lines mark the measured shattering dimensionality (0.70, 0.75, 0.74). Clusters of white dots, the cube model's shattering dimensionality, sit lower, at about 0.60, 0.62 and 0.65</p><a href="../images/L06/pub_bernardi2020_fig3e.png">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -356,231 +456,145 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="53" aria-labelledby="heading-35"><p class="page">Slide 35</p>
-<h2 id="heading-35">Why both can be high: the compromise geometry</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="61" aria-labelledby="heading-41"><p class="page">Slide 41</p>
+<h2 id="heading-41">Why both can be high: the compromise geometry</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L05/58_ccgp_intuition_3_left.svg" alt="Schematic of the compromise geometry: eight conditions as dots in the space of three units, colored by context, near the corners of a cube but each pushed off a little. Gold edges join conditions that differ only in context and stay nearly parallel; grey edges join the others. Text above: near the cube's corners, each pushed off a little, most two-class tasks solvable (shattering high) and the direction still nearly parallel (CCGP high)" aria-describedby="figure-35-1"><figcaption id="figure-35-1"><p>Schematic of the compromise geometry: eight conditions as dots in the space of three units, colored by context, near the corners of a cube but each pushed off a little. Gold edges join conditions that differ only in context and stay nearly parallel; grey edges join the others. Text above: near the cube's corners, each pushed off a little, most two-class tasks solvable (shattering high) and the direction still nearly parallel (CCGP high)</p><a href="../images/L05/58_ccgp_intuition_3_left.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L06/ccgp_intuition_3_left.svg" alt="Schematic of the compromise geometry: eight conditions as dots in the space of three units, colored by context, near the corners of a cube but each pushed off a little. Gold edges join conditions that differ only in context and stay nearly parallel; grey edges join the others. Text above: near the cube's corners, each pushed off a little, most two-class tasks solvable (shattering high) and the direction still nearly parallel (CCGP high)" aria-describedby="figure-41-1"><figcaption id="figure-41-1"><p>Schematic of the compromise geometry: eight conditions as dots in the space of three units, colored by context, near the corners of a cube but each pushed off a little. Gold edges join conditions that differ only in context and stay nearly parallel; grey edges join the others. Text above: near the cube's corners, each pushed off a little, most two-class tasks solvable (shattering high) and the direction still nearly parallel (CCGP high)</p><a href="../images/L06/ccgp_intuition_3_left.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
 <li>Dots: conditions. Color: context (schematic)</li>
-<li><strong>Cube</strong>: one direction per variable. Gold edges join conditions that differ only in context</li>
-<li>Parallel edges: high context CCGP</li>
-<li>Corners pushed off the cube make odd groupings solvable (high shattering)</li>
+<li><strong>Cube</strong> (Rigotti's linear mixing): each variable adds its own fixed step, whatever the others are. Gold edges: the context step</li>
+<li>Same step everywhere (parallel edges): one boundary per variable works for unseen combinations, high CCGP</li>
+<li>Corners pushed off the cube (nonlinear mixing) make odd groupings solvable (high shattering)</li>
 <li>A perfect cube with the measured CCGPs has lower shattering (white dots, last slide). <mark>The recordings sit near the cube, not on it</mark></li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="53" aria-labelledby="heading-36"><p class="page">Slide 36</p>
-<h2 id="heading-36">Try it: flexible or abstract?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="61" aria-labelledby="heading-42"><p class="page">Slide 42</p>
+<h2 id="heading-42">Try it: flexible or abstract?</h2>
 <div class="interactive-figure interactive-wide">
 
 <div class="print-figure">
-<figure><img src="../images/L06/demo_flexible_abstract.png" alt="The demo at the compromise setting: shattering accuracy 0.80; CCGP 0.80 for context, 0.83 for action, 0.80 for reward; ordinary decoding 0.93 to 0.96; the gold segments on the condition map are less parallel" aria-describedby="figure-36-1"><figcaption id="figure-36-1"><p>The demo at the compromise setting: shattering accuracy 0.80; CCGP 0.80 for context, 0.83 for action, 0.80 for reward; ordinary decoding 0.93 to 0.96; the gold segments on the condition map are less parallel</p><a href="../images/L06/demo_flexible_abstract.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L06/demo_flexible_abstract.png" alt="The demo at the compromise setting: shattering accuracy 0.80; CCGP 0.80 for context, 0.83 for action, 0.80 for reward; ordinary decoding 0.93 to 0.96; the gold segments on the condition map are less parallel" aria-describedby="figure-42-1"><figcaption id="figure-42-1"><p>The demo at the compromise setting: shattering accuracy 0.80; CCGP 0.80 for context, 0.83 for action, 0.80 for reward; ordinary decoding 0.93 to 0.96; the gold segments on the condition map are less parallel</p><a href="../images/L06/demo_flexible_abstract.png">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <ul>
 <li>Toward random: shattering rises, CCGP falls. <mark><strong>Decoding</strong> (all conditions in training) stays high</mark></li>
 </ul>
-<p class="explorer-links"><a href="../demos/flexible_abstract.html">Eight task conditions (context, action and reward, each two-valued) as responses of 30 model units. A slider mixes the conditions from the corners of a cube (abstract) toward random positions (flexible). A bar chart updates live: shattering accuracy as a black line, CCGP for context, action and reward as filled bars, ordinary decoding as outline bars, chance at 0.5. A map shows the eight condition means, with gold segments joining conditions that differ only in context — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="53" aria-labelledby="heading-37"><p class="page">Slide 37</p>
-<h2 id="heading-37">In people too: the human hippocampus</h2>
+<p class="explorer-links"><a href="../demos/flexible_abstract.html">Eight task conditions (context, action and reward, each two-valued) as responses of 30 model units. A slider mixes the conditions from the corners of a cube (abstract) toward random positions (flexible). A bar chart updates live: shattering accuracy as a black line, CCGP for context, action and reward as filled bars, ordinary decoding as outline bars, chance at 0.5. A map shows the eight condition means, with gold segments joining conditions that differ only in context — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-marpit-pagination="43" data-marpit-pagination-total="61" aria-labelledby="heading-43"><p class="page">Slide 43</p>
+<h2 id="heading-43">Human hippocampus: context becomes abstract</h2>
 <div class="capfig">
-<figure><img src="../images/L06/pub_courellis2024_fig1ef.png" alt="Courellis et al. (2024) Fig. 1e–f. e, a table of the four images, A a plush toy, B a lemon, C a person in a ski helmet, D a car, with the correct response and the reward in each context. Context 1: A left 25 cents, B right 25 cents, C left 5 cents, D right 5 cents. Context 2: A right 5 cents, B left 25 cents, C right 25 cents, D left 5 cents. f, accuracy from 0 to 1 on the last trial before a context switch and the first four trials after it, with the trial sequence drawn below. Black squares, 22 inference-present sessions: about 0.96, then 0.05 on the first trial after the switch, then about 0.89, 0.93 and 0.88 on images not yet seen in the new context. Grey squares, 14 inference-absent sessions: about 0.89, 0.16, then 0.47, 0.66 and 0.68. Dashed line at chance, 0.5" aria-describedby="figure-37-1"><figcaption id="figure-37-1"><p>Courellis et al. (2024) Fig. 1e–f. e, a table of the four images, A a plush toy, B a lemon, C a person in a ski helmet, D a car, with the correct response and the reward in each context. Context 1: A left 25 cents, B right 25 cents, C left 5 cents, D right 5 cents. Context 2: A right 5 cents, B left 25 cents, C right 25 cents, D left 5 cents. f, accuracy from 0 to 1 on the last trial before a context switch and the first four trials after it, with the trial sequence drawn below. Black squares, 22 inference-present sessions: about 0.96, then 0.05 on the first trial after the switch, then about 0.89, 0.93 and 0.88 on images not yet seen in the new context. Grey squares, 14 inference-absent sessions: about 0.89, 0.16, then 0.47, 0.66 and 0.68. Dashed line at chance, 0.5</p><a href="../images/L06/pub_courellis2024_fig1ef.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L06/pub_courellis2024_fig2ef.png" alt="Courellis et al. (2024) Fig. 2e–f, hippocampus while the image is on, inference-absent against inference-present sessions. e, decoding accuracy from 0.4 to 0.8 for all 35 ways to split the 8 conditions in half, grey open circles, with named splits in colour: context (red-orange) rises from about 0.57 to 0.72, stim pair (purple) from 0.62 to 0.77, parity (yellow) from 0.54 to 0.64, outcome (blue) falls from 0.62 to 0.56, response (green) rises from 0.46 to 0.50. Black lines mark shattering dimensionality, 0.57 and 0.62 in the text. f, CCGP from 0.3 to 0.7: context rises from about 0.50 to 0.63, stim pair from 0.56 to 0.70, parity from 0.46 to 0.53, outcome falls from 0.56 to 0.41, response stays near 0.36. Grey bars show the 5th to 95th percentile of a null distribution, about 0.40 to 0.60. The legend is at right" aria-describedby="figure-43-1"><figcaption id="figure-43-1"><p>Courellis et al. (2024) Fig. 2e–f, hippocampus while the image is on, inference-absent against inference-present sessions. e, decoding accuracy from 0.4 to 0.8 for all 35 ways to split the 8 conditions in half, grey open circles, with named splits in colour: context (red-orange) rises from about 0.57 to 0.72, stim pair (purple) from 0.62 to 0.77, parity (yellow) from 0.54 to 0.64, outcome (blue) falls from 0.62 to 0.56, response (green) rises from 0.46 to 0.50. Black lines mark shattering dimensionality, 0.57 and 0.62 in the text. f, CCGP from 0.3 to 0.7: context rises from about 0.50 to 0.63, stim pair from 0.56 to 0.70, parity from 0.46 to 0.53, outcome falls from 0.56 to 0.41, response stays near 0.36. Grey bars show the 5th to 95th percentile of a null distribution, about 0.40 to 0.60. The legend is at right</p><a href="../images/L06/pub_courellis2024_fig2ef.png">Open full-size figure</a></figcaption></figure>
 </div>
-<p class="provenance">Reproduced from Courellis et al. (2024), Fig. 1e–f</p>
 <ul>
-<li>Four images: press left or right, win 25¢ or 5¢. Context 2 flips every response</li>
-<li><strong>Inference present</strong> (black): the first unseen image after a switch is correct. <strong>Absent</strong> (grey): near chance</li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1038/s41586-024-07799-x" rel="noopener">Courellis et al. <b>Nature 2024</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="53" aria-labelledby="heading-38"><p class="page">Slide 38</p>
-<h2 id="heading-38">Human hippocampus: context becomes abstract</h2>
-<div class="capfig">
-<figure><img src="../images/L06/pub_courellis2024_fig2ef.png" alt="Courellis et al. (2024) Fig. 2e–f, hippocampus while the image is on, inference-absent against inference-present sessions. e, decoding accuracy from 0.4 to 0.8 for all 35 ways to split the 8 conditions in half, grey open circles, with named splits in colour: context (red-orange) rises from about 0.57 to 0.72, stim pair (purple) from 0.62 to 0.77, parity (yellow) from 0.54 to 0.64, outcome (blue) falls from 0.62 to 0.56, response (green) rises from 0.46 to 0.50. Black lines mark shattering dimensionality, 0.57 and 0.62 in the text. f, CCGP from 0.3 to 0.7: context rises from about 0.50 to 0.63, stim pair from 0.56 to 0.70, parity from 0.46 to 0.53, outcome falls from 0.56 to 0.41, response stays near 0.36. Grey bars show the 5th to 95th percentile of a null distribution, about 0.40 to 0.60. The legend is at right" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>Courellis et al. (2024) Fig. 2e–f, hippocampus while the image is on, inference-absent against inference-present sessions. e, decoding accuracy from 0.4 to 0.8 for all 35 ways to split the 8 conditions in half, grey open circles, with named splits in colour: context (red-orange) rises from about 0.57 to 0.72, stim pair (purple) from 0.62 to 0.77, parity (yellow) from 0.54 to 0.64, outcome (blue) falls from 0.62 to 0.56, response (green) rises from 0.46 to 0.50. Black lines mark shattering dimensionality, 0.57 and 0.62 in the text. f, CCGP from 0.3 to 0.7: context rises from about 0.50 to 0.63, stim pair from 0.56 to 0.70, parity from 0.46 to 0.53, outcome falls from 0.56 to 0.41, response stays near 0.36. Grey bars show the 5th to 95th percentile of a null distribution, about 0.40 to 0.60. The legend is at right</p><a href="../images/L06/pub_courellis2024_fig2ef.png">Open full-size figure</a></figcaption></figure>
-</div>
-<p class="provenance">Reproduced from Courellis et al. (2024), Fig. 2e–f</p>
-<ul>
-<li>Each dot: one of 35 ways to split the 8 conditions (4 images × 2 contexts) in half. Grey bars: chance</li>
-<li><mark>With inference, context (red) and <strong>stim pair</strong> (purple) become abstract, as in monkeys</mark></li>
+<li>Patients with implanted electrodes, the monkeys' task. Each dot: one of 35 half-splits of the 8 conditions. Grey: chance</li>
+<li><mark>When people infer the switch, context (red) and <strong>stim pair</strong> (purple) become abstract</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-024-07799-x" rel="noopener">Courellis et al. <b>Nature 2024</b></a> · <a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="53" aria-labelledby="heading-39"><p class="page">Slide 39</p>
-<h2 id="heading-39">Where does abstraction come from?</h2>
-<div class="capfig">
-<figure><img src="../images/L06/pub_johnston2023_fig3a.png" alt="Johnston and Fusi (2023) Fig. 3a, a schematic. Left, the latent variables drawn as nested squares in the plane of latent dim 1 and latent dim 2. An input model, green layers, maps them to a high-dimensional input layer, a dark bar, labelled low-d to high-d. The multi-tasking model, blue layers, maps that input to a representation layer and then to P task outputs. Each task is a two-way split of the latent space, drawn as a square cut by a red line into category 1 and category 2" aria-describedby="figure-39-1"><figcaption id="figure-39-1"><p>Johnston and Fusi (2023) Fig. 3a, a schematic. Left, the latent variables drawn as nested squares in the plane of latent dim 1 and latent dim 2. An input model, green layers, maps them to a high-dimensional input layer, a dark bar, labelled low-d to high-d. The multi-tasking model, blue layers, maps that input to a representation layer and then to P task outputs. Each task is a two-way split of the latent space, drawn as a square cut by a red line into category 1 and category 2</p><a href="../images/L06/pub_johnston2023_fig3a.png">Open full-size figure</a></figcaption></figure>
-</div>
-<p class="provenance">Reproduced from Johnston &amp; Fusi (2023), Fig. 3a (CC BY 4.0)</p>
-<ul>
-<li>A first network (green) mixes 5 hidden variables into a high-dimensional input</li>
-<li>A second network (blue) learns <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math> random two-class tasks on those variables at once</li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1038/s41467-023-36583-0" rel="noopener">Johnston &amp; Fusi <b>Nat Commun 2023</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="53" aria-labelledby="heading-40"><p class="page">Slide 40</p>
-<h2 id="heading-40">Many tasks make representations abstract</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L06/pub_johnston2023_fig3e.png" alt="Johnston and Fusi (2023) Fig. 3e, left. Classifier generalization, 0.5 to 1.0, against the number of training tasks, 0 to 50, one dot per trained network. It starts near 0.5 with one task, climbs steeply, passes 0.9 at about 8 tasks and levels off near 0.97. A grey vertical line marks 5, the number of latent variables" aria-describedby="figure-40-1"><figcaption id="figure-40-1"><p>Johnston and Fusi (2023) Fig. 3e, left. Classifier generalization, 0.5 to 1.0, against the number of training tasks, 0 to 50, one dot per trained network. It starts near 0.5 with one task, climbs steeply, passes 0.9 at about 8 tasks and levels off near 0.97. A grey vertical line marks 5, the number of latent variables</p><a href="../images/L06/pub_johnston2023_fig3e.png">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Reproduced from Johnston &amp; Fusi (2023), Fig. 3e (CC BY 4.0)</p>
-</div>
-<div class="col">
-<ul>
-<li>Test: a new readout, fit on half of the variable space, scored on the other half (like CCGP)</li>
-<li>Grey line: 5 tasks, one per hidden variable</li>
-<li><mark>With more tasks than hidden variables, the representation becomes abstract</mark></li>
-<li>A later lecture: how networks learn their weights</li>
-</ul>
-</div>
-</div>
-<div class="ref"><a href="https://doi.org/10.1038/s41467-023-36583-0" rel="noopener">Johnston &amp; Fusi <b>Nat Commun 2023</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="53" aria-labelledby="heading-41"><p class="page">Slide 41</p>
-<h2 id="heading-41">Recap: measures of one population</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="61" aria-labelledby="heading-44"><p class="page">Slide 44</p>
+<h2 id="heading-44">Recap: measures of one population</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Recap: measures of one population — table"><table><caption>Recap: measures of one population — table</caption>
 <thead>
 <tr>
 <th scope="col">Measure</th>
-<th scope="col">The question it answers</th>
+<th scope="col">What it says about the representation</th>
 <th scope="col">Compared with</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>Participation ratio</strong></td>
-<td>How many directions hold most of the variance, with no threshold?</td>
+<td>How many dimensions it uses</td>
 <td>the number of units <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math>, as <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi></mrow><mi mathvariant="normal">/</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">\mathrm{PR}/D</annotation></semantics></math></td>
 </tr>
 <tr>
 <td><strong>Readout accuracy</strong></td>
-<td>Can a weighted sum and a threshold read a variable from new views?</td>
+<td>Whether a variable is explicit: available to one weighted sum and a threshold</td>
 <td>majority-class baseline</td>
 </tr>
 <tr>
 <td><strong>Shattering accuracy</strong></td>
-<td>How well does one boundary solve an arbitrary two-class task, on average?</td>
+<td>How <strong>flexible</strong> it is: how many different groupings it makes available</td>
 <td>guessing, 0.5</td>
 </tr>
 <tr>
 <td><strong>CCGP</strong></td>
-<td>Does one boundary transfer to objects never seen?</td>
-<td>majority-class baseline</td>
+<td>How <strong>abstract</strong> it is: whether a variable keeps one format across conditions</td>
+<td>chance, 0.5</td>
 </tr>
 </tbody>
 </table></div>
 <p><mark>Each score describes one population of neurons or units. How alike are two populations?</mark></p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-class="lead" data-marpit-pagination="42" data-marpit-pagination-total="53" aria-labelledby="heading-42"><p class="page">Slide 42</p>
-<h2 id="heading-42">Comparing two representations</h2>
-<h2 id="does-a-network-layer-arrange-the-same-objects-the-way-monkey-it-does">Does a network layer arrange the same objects the way monkey IT does?</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-marpit-pagination="43" data-marpit-pagination-total="53" aria-labelledby="heading-43"><p class="page">Slide 43</p>
-<h2 id="heading-43">What every comparison score has in common</h2>
-<ul>
-<li><strong>What goes in</strong>: two <strong>response matrices</strong> for the same images in the same order (a row per image, a column per neuron or unit), or one matrix and people's judgments</li>
-<li><strong>The score</strong>: one number saying how alike the two systems arrange the images</li>
-<li><strong>What it ignores</strong>: which neuron matches which unit, and how many each system has. The scores differ in what they ignore</li>
-<li><strong>The question it answers</strong>: does a layer arrange objects like IT, or like people's judgments?</li>
-</ul>
-<p>Today: <strong>RSA</strong> (distances between images), <strong>CKA</strong> (dot products between images), and agreement with people's <strong>odd-one-out</strong> choices.</p>
-<p><mark>For each score, ask what it compares and what it ignores</mark></p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="53" aria-labelledby="heading-44"><p class="page">Slide 44</p>
-<h2 id="heading-44">Same 51 objects, two systems: one RDM each</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-class="lead" data-marpit-pagination="45" data-marpit-pagination-total="61" aria-labelledby="heading-45"><p class="page">Slide 45</p>
+<h2 id="heading-45">By the way: comparing two representations</h2>
+<h2 id="a-tool-for-assignment-2-not-part-of-todays-story-besides-rsa-a-second-way-to-compare-two-systems-cka">A tool for Assignment 2, not part of today's story: besides RSA, a second way to compare two systems, CKA</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-marpit-pagination="46" data-marpit-pagination-total="61" aria-labelledby="heading-46"><p class="page">Slide 46</p>
+<h2 id="heading-46">Recall from the MDS lecture: RSA</h2>
 <div class="capfig">
-<figure><img src="../images/L05/55_rdm_pair.svg" alt="Two 51 by 51 dissimilarity matrices for the same Bao objects in the same category order, with object thumbnails along the edges, from monkey IT (480 neurons, left) and ResNet-18's late layer (4,096 units, right). Both show a light block for faces and lighter blocks within animals and within vehicles" aria-describedby="figure-44-1"><figcaption id="figure-44-1"><p>Two 51 by 51 dissimilarity matrices for the same Bao objects in the same category order, with object thumbnails along the edges, from monkey IT (480 neurons, left) and ResNet-18's late layer (4,096 units, right). Both show a light block for faces and lighter blocks within animals and within vehicles</p><a href="../images/L05/55_rdm_pair.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L06/55_rdm_pair.svg" alt="Two 51 by 51 dissimilarity matrices for the same Bao objects in the same category order, with object thumbnails along the edges, from monkey IT (480 neurons, left) and ResNet-18's late layer (4,096 units, right). Both show a light block for faces and lighter blocks within animals and within vehicles" aria-describedby="figure-46-1"><figcaption id="figure-46-1"><p>Two 51 by 51 dissimilarity matrices for the same Bao objects in the same category order, with object thumbnails along the edges, from monkey IT (480 neurons, left) and ResNet-18's late layer (4,096 units, right). Both show a light block for faces and lighter blocks within animals and within vehicles</p><a href="../images/L06/55_rdm_pair.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <p class="provenance">Computed: correlation-distance RDMs of the 51 object means, monkey IT (480 neurons) and ResNet-18 late layer (4,096 units)</p>
 <ul>
-<li>No neuron matches a unit, so compare each system's <strong>RDM</strong>: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">1 - r</annotation></semantics></math> for every pair of objects</li>
+<li>One <strong>RDM</strong> per system: correlation distance <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">1 - r</annotation></semantics></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math>: Pearson) for each pair of objects. <strong>RSA</strong>: Spearman <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math> of the two RDMs, <strong>0.71</strong> here. <mark>Only the rank order of distances counts</mark></li>
 </ul>
-<div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. <b>Nature 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-marpit-pagination="45" data-marpit-pagination-total="53" aria-labelledby="heading-45"><p class="page">Slide 45</p>
-<h2 id="heading-45">RSA: rank-correlate the two RDMs</h2>
-<div class="capfig">
-<figure><img src="../images/L02-rank-2026-09-17/rank_correlation.svg" alt="Three scatter plots of eight pairs' dissimilarities in two systems. Left: the second system's values are a bent but rising function of the first's, Pearson 0.95, Spearman 1. Middle: the same eight pairs plotted as ranks, a perfect straight line. Right: two neighbouring pairs swapped, Pearson 0.94, Spearman 0.98" aria-describedby="figure-45-1"><figcaption id="figure-45-1"><p>Three scatter plots of eight pairs' dissimilarities in two systems. Left: the second system's values are a bent but rising function of the first's, Pearson 0.95, Spearman 1. Middle: the same eight pairs plotted as ranks, a perfect straight line. Right: two neighbouring pairs swapped, Pearson 0.94, Spearman 0.98</p><a href="../images/L02-rank-2026-09-17/rank_correlation.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<p class="provenance">From the MDS lecture: toy values</p>
+<div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. <b>Nature 2020</b></a> · <a href="https://doi.org/10.3389/neuro.06.004.2008" rel="noopener">Kriegeskorte et al. <b>Front Syst Neurosci 2008</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-paginate="true" data-marpit-pagination="47" data-marpit-pagination-total="61" aria-labelledby="heading-47"><p class="page">Slide 47</p>
+<h2 id="heading-47">Another popular score: CKA</h2>
 <ul>
-<li><strong>RSA</strong>: rank-correlate (Spearman) the upper triangles of the two RDMs, one entry per pair of objects</li>
-<li>Monkey IT vs ResNet-18's late layer, the 51 objects of the last slide: <strong>RSA = 0.71</strong></li>
-<li><mark>RSA depends only on the rank order of the dissimilarities</mark></li>
+<li>Each builds one matrix per system, then compares the two matrices. They differ at <strong>both</strong> steps:</li>
 </ul>
-<div class="ref"><a href="https://doi.org/10.3389/neuro.06.004.2008" rel="noopener">Kriegeskorte et al. <b>Front Syst Neurosci 2008</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-marpit-pagination="46" data-marpit-pagination-total="53" aria-labelledby="heading-46"><p class="page">Slide 46</p>
-<h2 id="heading-46">Two ways to compare two images</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L01-feature-space-2026-09-13/geom_angle.png" alt="The feature-space plot from the first lectures with the tiger vector x superscript 1 and the elephant vector x superscript 2, the angle phi between them marked at the origin, and the projection of the elephant vector onto the tiger's direction shown as a magenta segment with a dashed perpendicular" aria-describedby="figure-46-1"><figcaption id="figure-46-1"><p>The feature-space plot from the first lectures with the tiger vector x superscript 1 and the elephant vector x superscript 2, the angle phi between them marked at the origin, and the projection of the elephant vector onto the tiger's direction shown as a magenta segment with a dashed perpendicular</p><a href="../images/L01-feature-space-2026-09-13/geom_angle.png">Open full-size figure</a></figcaption></figure>
-<p class="provenance">From the MDS lecture</p>
-</div>
-<div class="col">
-<ul>
-<li>Two response vectors: their <strong>distance</strong> (the length of the difference), or their <strong>dot product</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></mrow></msup><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup><mo>=</mo><mi mathvariant="normal">∥</mi><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup><mi mathvariant="normal">∥</mi><mtext> </mtext><mi mathvariant="normal">∥</mi><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup><mi mathvariant="normal">∥</mi><mi>cos</mi><mo>⁡</mo><mi>ϕ</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}^{(1)\top}\mathbf{x}^{(2)} = \|\mathbf{x}^{(1)}\|\,\|\mathbf{x}^{(2)}\|\cos\phi</annotation></semantics></math>, which grows with both lengths and with how well they align</li>
-<li>The RDM holds <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">1 - r</annotation></semantics></math> for all pairs of images, which ignores the lengths. A second table holds the dot products, which keep them</li>
-<li><mark>CKA compares the two tables of dot products. It keeps the lengths and uses no ranks</mark></li>
-</ul>
-</div>
-</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-paginate="true" data-marpit-pagination="47" data-marpit-pagination-total="53" aria-labelledby="heading-47"><p class="page">Slide 47</p>
-<h2 id="heading-47">New today: CKA compares dot products</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L05/42_cka_resnet18_vs_resnet50.svg" alt="Heatmap of linear CKA between every block of an ImageNet-trained ResNet-18 (x axis, stem and blocks 1 to 8) and ResNet-50 (y axis, stem and blocks 1 to 16), measured on 1,854 THINGS images. A dark band runs from bottom-left to top-right: each ResNet-18 block is most similar to the ResNet-50 block at the same relative depth, marked by gold rings, and early-versus-late pairs are least similar" aria-describedby="figure-47-1"><figcaption id="figure-47-1"><p>Heatmap of linear CKA between every block of an ImageNet-trained ResNet-18 (x axis, stem and blocks 1 to 8) and ResNet-50 (y axis, stem and blocks 1 to 16), measured on 1,854 THINGS images. A dark band runs from bottom-left to top-right: each ResNet-18 block is most similar to the ResNet-50 block at the same relative depth, marked by gold rings, and early-versus-late pairs are least similar</p><a href="../images/L05/42_cka_resnet18_vs_resnet50.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Computed: ResNet-18 vs ResNet-50, 1,854 THINGS images</p>
-</div>
-<div class="col">
-<ul>
-<li><strong>CKA</strong> (centered kernel alignment), Kornblith et al. (2019): center each unit (subtract its mean over images), build each system's table of dot products between images (its <strong>Gram matrix</strong>), then compare the two tables as two long lists of numbers</li>
-<li>CKA is 1 when the two differ only by a rotation, a reflection or a uniform rescaling. It is below 1 when one unit is stretched more than another</li>
-<li><mark>A <strong>block</strong> is a group of layers. The highest CKA is between blocks at the same relative depth</mark></li>
-</ul>
-</div>
-</div>
-<div class="ref"><a href="https://arxiv.org/abs/1905.00414" rel="noopener">Kornblith et al. <b>ICML 2019</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-48" data-paginate="true" data-marpit-pagination="48" data-marpit-pagination-total="53" aria-labelledby="heading-48"><p class="page">Slide 48</p>
-<h2 id="heading-48">Comparing RSA and CKA</h2>
-<div class="table-scroll" tabindex="0" role="region" aria-label="Comparing RSA and CKA — table"><table><caption>Comparing RSA and CKA — table</caption>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Another popular score: CKA — table"><table><caption>Another popular score: CKA — table</caption>
 <thead>
 <tr>
 <th scope="col"></th>
 <th scope="col"><strong>RSA</strong></th>
-<th scope="col"><strong>CKA</strong></th>
+<th scope="col"><strong>CKA</strong> (centered kernel alignment)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Compares</td>
-<td>the order of the distances between images</td>
-<td>the dot products between images, lengths kept</td>
+<td>1. Build the matrix</td>
+<td><strong>RDM</strong>: a distance per pair, here <span><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">1 - r</annotation></semantics></math></span></td>
+<td><strong>Gram matrix</strong>: a dot product per pair (units centered)</td>
 </tr>
 <tr>
-<td>Ignores</td>
-<td>any change that keeps that order; how many units, and which</td>
-<td>a rotation or reflection of the units; a uniform rescaling; a shift of the mean</td>
+<td>2. Compare the two matrices</td>
+<td>rank order (Spearman <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math>)</td>
+<td>values (normalized dot product)</td>
 </tr>
 <tr>
-<td>Assumes</td>
-<td>a distance you chose (correlation, Euclidean)</td>
-<td>units centered</td>
-</tr>
-<tr>
-<td>Works on</td>
-<td>any data, people's judgments included</td>
-<td>response matrices only</td>
-</tr>
-<tr>
-<td>Weak when</td>
-<td>few images make the ranks noisy</td>
-<td>a few high-variance directions dominate</td>
+<td>Unchanged by</td>
+<td>any change that keeps the order of the distances</td>
+<td>uniform rescaling, rotation of the units</td>
 </tr>
 </tbody>
 </table></div>
 <ul>
-<li>Both need the same images in the same order. RSA and CKA values are on different scales, so never compare one with the other</li>
-<li><mark>If RSA and CKA disagree, check whether your question is about distances or dot products</mark></li>
+<li>Assignment 2 uses both. By convention, CKA is more common for comparing network layers (Kornblith et al. 2019), RSA for brains and judgments</li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/1905.00414" rel="noopener">Kornblith et al. <b>ICML 2019</b></a> · <a href="https://arxiv.org/abs/2210.16156" rel="noopener">Davari et al. <b>ICLR 2023</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-49" data-paginate="true" data-marpit-pagination="49" data-marpit-pagination-total="53" aria-labelledby="heading-49"><p class="page">Slide 49</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-48" data-paginate="true" data-marpit-pagination="48" data-marpit-pagination-total="61" aria-labelledby="heading-48"><p class="page">Slide 48</p>
+<h2 id="heading-48">CKA on two networks, block by block</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L06/42_cka_resnet18_vs_resnet50.svg" alt="Heatmap of linear CKA between every block of an ImageNet-trained ResNet-18 (x axis, stem and blocks 1 to 8) and ResNet-50 (y axis, stem and blocks 1 to 16), measured on 1,854 THINGS images. A dark band runs from bottom-left to top-right: each ResNet-18 block is most similar to the ResNet-50 block at the same relative depth, marked by gold rings, and early-versus-late pairs are least similar" aria-describedby="figure-48-1"><figcaption id="figure-48-1"><p>Heatmap of linear CKA between every block of an ImageNet-trained ResNet-18 (x axis, stem and blocks 1 to 8) and ResNet-50 (y axis, stem and blocks 1 to 16), measured on 1,854 THINGS images. A dark band runs from bottom-left to top-right: each ResNet-18 block is most similar to the ResNet-50 block at the same relative depth, marked by gold rings, and early-versus-late pairs are least similar</p><a href="../images/L06/42_cka_resnet18_vs_resnet50.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Computed: ResNet-18 vs ResNet-50, 1,854 THINGS images</p>
+</div>
+<div class="col">
+<ul>
+<li>ResNet-18 against ResNet-50, every <strong>block</strong> against every block, 1,854 THINGS images. A block is a group of layers with a skip connection: 8 blocks of 2 layers in ResNet-18, 16 blocks of 3 in ResNet-50</li>
+<li><mark>The highest CKA is between blocks at the same relative depth</mark></li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/1905.00414" rel="noopener">Kornblith et al. <b>ICML 2019</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-49" data-paginate="true" data-marpit-pagination="49" data-marpit-pagination-total="61" aria-labelledby="heading-49"><p class="page">Slide 49</p>
 <h2 id="heading-49">Do networks judge objects the way people do?</h2>
 <div class="capfig">
-<figure><img src="../images/L05/57_triplets.svg" alt="Three THINGS object photographs in a row, a triplet; under them the rule: a representation's odd one out is the object that is not in the most similar pair, by the cosine of the angle between response vectors; a mark shows which object people picked" aria-describedby="figure-49-1"><figcaption id="figure-49-1"><p>Three THINGS object photographs in a row, a triplet; under them the rule: a representation's odd one out is the object that is not in the most similar pair, by the cosine of the angle between response vectors; a mark shows which object people picked</p><a href="../images/L05/57_triplets.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L06/57_triplets.svg" alt="Three THINGS object photographs in a row, a triplet; under them the rule: a representation's odd one out is the object that is not in the most similar pair, by the cosine of the angle between response vectors; a mark shows which object people picked" aria-describedby="figure-49-1"><figcaption id="figure-49-1"><p>Three THINGS object photographs in a row, a triplet; under them the rule: a representation's odd one out is the object that is not in the most similar pair, by the cosine of the angle between response vectors; a mark shows which object people picked</p><a href="../images/L06/57_triplets.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <p class="provenance">Public-domain THINGS photographs (CC0). Odd-one-out rule applied to ResNet-18's late layer</p>
 <ul>
@@ -588,27 +602,8 @@
 <li>A network picks the object left out of its most similar pair (<strong>cosine similarity</strong>). <strong>Agreement</strong> is the fraction of triplets where network and person pick the same. Chance is 1/3</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1038/s41562-020-00951-3" rel="noopener">Hebart et al. <b>Nat Hum Behav 2020</b></a> · <a href="https://doi.org/10.7554/eLife.82580" rel="noopener">Hebart et al. <b>eLife 2023</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-50" data-paginate="true" data-marpit-pagination="50" data-marpit-pagination-total="53" aria-labelledby="heading-50"><p class="page">Slide 50</p>
-<h2 id="heading-50">What sets a network's agreement with people?</h2>
-<ul>
-<li><strong>Muttenthaler et al. (2023)</strong> scored many networks on the THINGS odd-one-out choices</li>
-<li>The <strong>training objective</strong> and <strong>training data</strong> mattered more than architecture or size</li>
-<li>Classification accuracy only says on which side of a category boundary each image falls. <mark>It does not say how objects are arranged within a category</mark></li>
-<li>Two networks with the same accuracy can differ in how they arrange a category's objects. Odd-one-out choices show the difference</li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1038/s41562-020-00951-3" rel="noopener">Hebart et al. <b>Nat Hum Behav 2020</b></a> · <a href="https://arxiv.org/abs/2211.01201" rel="noopener">Muttenthaler et al. <b>ICLR 2023</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-51" data-paginate="true" data-marpit-pagination="51" data-marpit-pagination-total="53" aria-labelledby="heading-51"><p class="page">Slide 51</p>
-<h2 id="heading-51">We have scores. When does a score mean anything?</h2>
-<ul>
-<li>One number each: readout accuracy, shattering, CCGP, RSA, CKA, odd-one-out agreement</li>
-<li><strong>Above chance?</strong> Shuffle one system's images and score again. The score of a real match drops</li>
-<li><strong>Would it hold for other images?</strong> With few images, unrelated systems can look alike</li>
-<li><strong>How high could it be?</strong> Neurons are noisy, so two recordings of IT never agree perfectly</li>
-</ul>
-<p><mark>The next lecture covers baselines and tests that say whether a score means anything</mark></p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-52" data-paginate="true" data-marpit-pagination="52" data-marpit-pagination-total="53" aria-labelledby="heading-52"><p class="page">Slide 52</p>
-<h2 id="heading-52">Further reading for the research trail</h2>
-<p>Optional: a few research-trail entries over the semester. Any paper mentioned in any lecture qualifies, but papers from this block are preferred.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-50" data-paginate="true" data-marpit-pagination="50" data-marpit-pagination-total="61" aria-labelledby="heading-50"><p class="page">Slide 50</p>
+<h2 id="heading-50">Papers from today</h2>
 <ul>
 <li><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a>: hippocampus scores high on shattering and CCGP together</li>
 <li><a href="https://doi.org/10.1038/nature12160" rel="noopener">Rigotti et al. <b>Nature 2013</b></a>: mixed prefrontal neurons make a high-dimensional population</li>
@@ -619,8 +614,8 @@
 <li><a href="https://doi.org/10.1038/s41562-020-00951-3" rel="noopener">Hebart et al. <b>Nat Hum Behav 2020</b></a>: a few dozen dimensions explain odd-one-out choices</li>
 <li><a href="https://arxiv.org/abs/2211.01201" rel="noopener">Muttenthaler et al. <b>ICLR 2023</b></a>: training data and objective mattered more than network size</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-53" data-paginate="true" data-marpit-pagination="53" data-marpit-pagination-total="53" aria-labelledby="heading-53"><p class="page">Slide 53</p>
-<h2 id="heading-53">Minute paper</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-51" data-paginate="true" data-marpit-pagination="51" data-marpit-pagination-total="61" aria-labelledby="heading-51"><p class="page">Slide 51</p>
+<h2 id="heading-51">Minute paper</h2>
 <p>Submit on <strong>Canvas → Minute papers → Minute Paper 7</strong> (access code read out in class).</p>
 <p>Write three brief points in your own words:</p>
 <ol>
@@ -629,4 +624,81 @@
 <li>Another idea you found interesting, and why it matters for brains, behavior or AI</li>
 </ol>
 <p>Credit for a thoughtful attempt, not for being correct.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-52" data-paginate="true" data-class="lead" data-marpit-pagination="52" data-marpit-pagination-total="61" aria-labelledby="heading-52"><p class="page">Slide 52</p>
+<h2 id="heading-52">Appendix</h2>
+<h2 id="extra-slides-not-covered-in-class-useful-for-the-assignment-and-the-research-trail">Extra slides: not covered in class, useful for the assignment and the research trail</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-53" data-paginate="true" data-marpit-pagination="53" data-marpit-pagination-total="61" aria-labelledby="heading-53"><p class="page">Slide 53</p>
+<h2 id="heading-53">Not linearly separable: four examples</h2>
+<figure><img src="../images/L06/ns_gallery.svg" alt="Four panels in a row. XOR: four noisy groups at the corners, a dashed best line, best line 75%. Two rings: a blue inner ring inside a red outer ring, best line 68%. Two moons: two interleaved crescents, blue above and red below, best line 90%. Swiss roll: the rolled sheet in 3-D, the inner half of the sheet blue and the outer half red, best plane 75%" aria-describedby="figure-53-1"><figcaption id="figure-53-1"><p>Four panels in a row. XOR: four noisy groups at the corners, a dashed best line, best line 75%. Two rings: a blue inner ring inside a red outer ring, best line 68%. Two moons: two interleaved crescents, blue above and red below, best line 90%. Swiss roll: the rolled sheet in 3-D, the inner half of the sheet blue and the outer half red, best plane 75%</p><a href="../images/L06/ns_gallery.svg">Open full-size figure</a></figcaption></figure>
+<ul>
+<li>Four toy data sets: XOR; two rings; two moons; and the <strong>Swiss roll</strong> from the lecture on maps, split into the inner and the outer half of the sheet</li>
+<li><mark>In each, no linear decision boundary puts the blue points and the red points on opposite sides</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-54" data-paginate="true" data-marpit-pagination="54" data-marpit-pagination-total="61" aria-labelledby="heading-54"><p class="page">Slide 54</p>
+<h2 id="heading-54">A third unit lifts each one</h2>
+<figure><img src="../images/L06/ns_lifted.svg" alt="The same four examples, each with one new unit. XOR plus x1 times x2: in 3-D the blue groups rise above a gold plane and the red ones drop below it; one plane 100%. Two rings plus x1 squared plus x2 squared: the outer ring rises above the inner ring, and a flat gold plane separates them; 100%. Two moons plus a Gaussian-tuned unit: the points near the unit's preferred point rise, and a tilted gold plane separates the moons; 100%. Swiss roll plus position along the roll: the sheet unrolled flat, position along the roll left to right and height bottom to top, with a vertical gold line splitting it; one threshold 100%" aria-describedby="figure-54-1"><figcaption id="figure-54-1"><p>The same four examples, each with one new unit. XOR plus x1 times x2: in 3-D the blue groups rise above a gold plane and the red ones drop below it; one plane 100%. Two rings plus x1 squared plus x2 squared: the outer ring rises above the inner ring, and a flat gold plane separates them; 100%. Two moons plus a Gaussian-tuned unit: the points near the unit's preferred point rise, and a tilted gold plane separates the moons; 100%. Swiss roll plus position along the roll: the sheet unrolled flat, position along the roll left to right and height bottom to top, with a vertical gold line splitting it; one threshold 100%</p><a href="../images/L06/ns_lifted.svg">Open full-size figure</a></figcaption></figure>
+<ul>
+<li>Each panel adds one unit that is not a weighted sum of the inputs (named above each panel)</li>
+<li>Position along the roll is the coordinate Isomap recovers when it unrolls the <strong>manifold</strong> (the t-SNE and UMAP lecture)</li>
+<li><mark>With the right extra unit, a plane separates the two classes in all four data sets</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-55" data-paginate="true" data-marpit-pagination="55" data-marpit-pagination-total="61" aria-labelledby="heading-55"><p class="page">Slide 55</p>
+<h2 id="heading-55">What sets a network's agreement with people?</h2>
+<ul>
+<li><strong>Muttenthaler et al. (2023)</strong> scored many networks on the THINGS odd-one-out choices</li>
+<li>The <strong>training objective</strong> and <strong>training data</strong> mattered more than architecture or size</li>
+<li>Classification accuracy only says on which side of a category boundary each image falls. <mark>It does not say how objects are arranged within a category</mark></li>
+<li>Two networks with the same accuracy can differ in how they arrange a category's objects. Odd-one-out choices show the difference</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1038/s41562-020-00951-3" rel="noopener">Hebart et al. <b>Nat Hum Behav 2020</b></a> · <a href="https://arxiv.org/abs/2211.01201" rel="noopener">Muttenthaler et al. <b>ICLR 2023</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-56" data-paginate="true" data-marpit-pagination="56" data-marpit-pagination-total="61" aria-labelledby="heading-56"><p class="page">Slide 56</p>
+<h2 id="heading-56">Scaling up: pure and linear populations</h2>
+<figure><img src="../images/L06/rig_pop_f1.svg" alt="Two columns of panels for 200 simulated neurons in the 24 conditions of the sequence task, a third column left empty. Top row, response matrices, 24 conditions by 200 neurons, recognition rows above recall rows, colored from low to high. Bottom row, scree plots of the variance fraction of components 1 to 23. Pure selectivity: seven bars, then nothing; rank 7, PR 6.2. Linear mixed: seven bars, then nothing; rank 7, PR 5.9" aria-describedby="figure-56-1"><figcaption id="figure-56-1"><p>Two columns of panels for 200 simulated neurons in the 24 conditions of the sequence task, a third column left empty. Top row, response matrices, 24 conditions by 200 neurons, recognition rows above recall rows, colored from low to high. Bottom row, scree plots of the variance fraction of components 1 to 23. Pure selectivity: seven bars, then nothing; rank 7, PR 6.2. Linear mixed: seven bars, then nothing; rank 7, PR 5.9</p><a href="../images/L06/rig_pop_f1.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Simulated: 24 conditions, 200 neurons</p>
+<ul>
+<li><strong>Pure</strong>: one variable per neuron. <strong>Linear mixed</strong>: a weighted sum of all three</li>
+<li><mark>PCA of 24 conditions × 200 noiseless neurons: without nonlinear mixing, only 7 dimensions</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-57" data-paginate="true" data-marpit-pagination="57" data-marpit-pagination-total="61" aria-labelledby="heading-57"><p class="page">Slide 57</p>
+<h2 id="heading-57">Scaling up: a nonlinear mixed population</h2>
+<figure><img src="../images/L06/rig_pop_f2.svg" alt="The same panels with the third column filled: nonlinear mixed selectivity. Its response matrix looks as busy as the other two. Its scree plot has 23 bars that fall slowly from 0.07 to 0.02; rank 23, PR 20.7" aria-describedby="figure-57-1"><figcaption id="figure-57-1"><p>The same panels with the third column filled: nonlinear mixed selectivity. Its response matrix looks as busy as the other two. Its scree plot has 23 bars that fall slowly from 0.07 to 0.02; rank 23, PR 20.7</p><a href="../images/L06/rig_pop_f2.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Simulated: 24 conditions, 200 neurons</p>
+<ul>
+<li><strong>Nonlinear mixed</strong>: its own response to each condition. The matrices look alike</li>
+<li><mark>Only nonlinear mixing uses all 23 dimensions</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-58" data-paginate="true" data-marpit-pagination="58" data-marpit-pagination-total="61" aria-labelledby="heading-58"><p class="page">Slide 58</p>
+<h2 id="heading-58">Can the Theme 1 tools see it? 1 of 3: the cube</h2>
+<figure><img src="../images/L06/bern_tools_f1.svg" alt="One row of panels for the cube population of the demo model, eight conditions A to H. Distances (RDM): an 8 by 8 matrix of Euclidean distances between condition means, with four distinct distance levels. MDS map: red dots A to D (context 1) and blue dots E to H (context 2) around a ring, short gold segments joining conditions that differ only in context and pointing in different directions; stress 0.24. Scree: three equal bars for components 1 to 3, none after; rank 3, PR 3.0. At right: shattering 0.72, context CCGP 0.95" aria-describedby="figure-58-1"><figcaption id="figure-58-1"><p>One row of panels for the cube population of the demo model, eight conditions A to H. Distances (RDM): an 8 by 8 matrix of Euclidean distances between condition means, with four distinct distance levels. MDS map: red dots A to D (context 1) and blue dots E to H (context 2) around a ring, short gold segments joining conditions that differ only in context and pointing in different directions; stress 0.24. Scree: three equal bars for components 1 to 3, none after; rank 3, PR 3.0. At right: shattering 0.72, context CCGP 0.95</p><a href="../images/L06/bern_tools_f1.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Simulated: the demo's toy population, 30 units, 8 conditions A–H (context × action × reward)</p>
+<ul>
+<li><strong>Cube</strong> (λ = 0): one direction per variable. Gold segments (same action and reward, other context) are parallel</li>
+<li><mark>On the 2-D map those parallel edges are lost (stress 0.24)</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-59" data-paginate="true" data-marpit-pagination="59" data-marpit-pagination-total="61" aria-labelledby="heading-59"><p class="page">Slide 59</p>
+<h2 id="heading-59">Can the Theme 1 tools see it? 2 of 3: the compromise</h2>
+<figure><img src="../images/L06/bern_tools_f2.svg" alt="The same row for the compromise population, lambda 0.25. RDM: distances more even. MDS map: again a ring of eight dots with short gold segments; stress 0.25. Scree: three large bars and four small ones; rank 7, PR 4.1. At right: shattering 0.80, context CCGP 0.80" aria-describedby="figure-59-1"><figcaption id="figure-59-1"><p>The same row for the compromise population, lambda 0.25. RDM: distances more even. MDS map: again a ring of eight dots with short gold segments; stress 0.25. Scree: three large bars and four small ones; rank 7, PR 4.1. At right: shattering 0.80, context CCGP 0.80</p><a href="../images/L06/bern_tools_f2.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Simulated: the demo's toy population, 30 units, 8 conditions A–H (context × action × reward)</p>
+<ul>
+<li><strong>Compromise</strong> (λ = 0.25): each condition = 0.75 × its cube corner + 0.25 × a random vector</li>
+<li>Shattering rises (0.72 → 0.80), context CCGP falls (0.95 → 0.80)</li>
+<li><mark>The RDM and the map barely change. The readout scores do</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-60" data-paginate="true" data-marpit-pagination="60" data-marpit-pagination-total="61" aria-labelledby="heading-60"><p class="page">Slide 60</p>
+<h2 id="heading-60">Can the Theme 1 tools see it? 3 of 3: random</h2>
+<figure><img src="../images/L06/bern_tools_f3.svg" alt="The same row for the random population, lambda 1. RDM: every off-diagonal entry the same, every condition equally far from every other. MDS map: gold segments crossing at odd angles; stress 0.31. Scree: seven equal bars; rank 7, PR 7.0. At right: shattering 0.99, context CCGP 0.51" aria-describedby="figure-60-1"><figcaption id="figure-60-1"><p>The same row for the random population, lambda 1. RDM: every off-diagonal entry the same, every condition equally far from every other. MDS map: gold segments crossing at odd angles; stress 0.31. Scree: seven equal bars; rank 7, PR 7.0. At right: shattering 0.99, context CCGP 0.51</p><a href="../images/L06/bern_tools_f3.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Simulated: the demo's toy population, 30 units, 8 conditions A–H (context × action × reward)</p>
+<ul>
+<li><strong>Random</strong> (λ = 1): random vectors only; all conditions equally far apart</li>
+<li>Shattering 0.99. Context CCGP 0.51, so nothing transfers</li>
+<li><mark>RDM, map and PR describe the geometry. Only CCGP tests transfer</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-61" data-paginate="true" data-marpit-pagination="61" data-marpit-pagination-total="61" aria-labelledby="heading-61"><p class="page">Slide 61</p>
+<h2 id="heading-61">Single trials in t-SNE: islands mislead</h2>
+<figure><img src="../images/L06/bern_tools_tsne.svg" alt="Three t-SNE maps of single trials, 40 per condition, one dot per trial, blue for context minus and red for context plus, each condition's letter beside its group. Cube: the trials form a ring of touching groups, red and blue alternating. Compromise: groups that touch and partly mix. Random: eight tight, well-separated islands. Under the maps: cube shattering 0.72, context CCGP 0.95; compromise 0.80 and 0.80; random 0.99 and 0.51" aria-describedby="figure-61-1"><figcaption id="figure-61-1"><p>Three t-SNE maps of single trials, 40 per condition, one dot per trial, blue for context minus and red for context plus, each condition's letter beside its group. Cube: the trials form a ring of touching groups, red and blue alternating. Compromise: groups that touch and partly mix. Random: eight tight, well-separated islands. Under the maps: cube shattering 0.72, context CCGP 0.95; compromise 0.80 and 0.80; random 0.99 and 0.51</p><a href="../images/L06/bern_tools_tsne.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Simulated toy population (the three geometries above), single trials; t-SNE perplexity 30</p>
+<ul>
+<li>Random: cleanest islands, nothing transfers (0.51). Cube: islands touch, context transfers best</li>
+<li><mark>A t-SNE map suggests groups. A readout on the responses tests them</mark></li>
+</ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section></main></body></html>
