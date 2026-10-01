@@ -43,7 +43,7 @@
 <li>A <strong>random labeling</strong> (classes by coin flip) is <strong>not linearly separable</strong>: 57% (chance 51%). All 480 neurons: 99%, 100%, 78%</li>
 <li><mark>How the neurons respond decides which splits a readout can learn</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-marpit-scope-exaicivt="" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="64" aria-labelledby="heading-6"><p class="page">Slide 6</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-marpit-scope-lzjogzg8="" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="64" aria-labelledby="heading-6"><p class="page">Slide 6</p>
 <h2 id="heading-6">Two properties of a representation: flexible and abstract</h2>
 
 <div class="table-scroll" tabindex="0" role="region" aria-label="Two properties of a representation: flexible and abstract — table"><table><caption>Two properties of a representation: flexible and abstract — table</caption>
@@ -96,14 +96,14 @@
 </div>
 <div class="col">
 <ul>
-<li><strong>Flexible</strong>: many tasks a downstream neuron could learn from the representation. A task = a split of the stimuli into two groups</li>
+<li>A representation is <strong>flexible</strong> if a downstream neuron could learn many different tasks from it. Here, a task = a split of the stimuli into two groups</li>
 <li>To count them, simplify: each noisy group is one stimulus, shown many times</li>
 <li>Remove the noise: keep one point per stimulus, its mean</li>
 <li><mark>Then count the splits a linear readout can separate</mark></li>
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-marpit-scope-we7cdnhp="" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="64" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-marpit-scope-1tc9fjt6="" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="64" aria-labelledby="heading-11"><p class="page">Slide 11</p>
 <h2 id="heading-11">Flexibility: three stimuli, two representations</h2>
 <div class="row">
 <div class="col fig">
@@ -118,18 +118,21 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1109/PGEC.1965.264137" rel="noopener">Cover <b>IEEE Trans Electron Comput 1965</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-marpit-scope-kdpjnfne="" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="64" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-marpit-scope-vvcldwpi="" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="64" aria-labelledby="heading-12"><p class="page">Slide 12</p>
 <h2 id="heading-12">Higher-dimensional, more flexible</h2>
 <div class="row">
 <div class="col fig">
 <figure><img src="../images/L06/shatter_three_f1.svg" alt="Two blocks of eight small panels, one panel per way to color three stimuli blue or red. Top block, Representation A, general position, 8 of 8: the three stimuli at the corners of a triangle, and every panel has a straight line with the blue stimuli on one side and the red on the other. Bottom block, Representation B, three points on one line, 6 of 8: the same three stimuli on a diagonal line; the two panels where the middle stimulus has the other color from both ends have no line and a thick dashed outline" aria-describedby="figure-12-1"><figcaption id="figure-12-1"><p>Two blocks of eight small panels, one panel per way to color three stimuli blue or red. Top block, Representation A, general position, 8 of 8: the three stimuli at the corners of a triangle, and every panel has a straight line with the blue stimuli on one side and the red on the other. Bottom block, Representation B, three points on one line, 6 of 8: the same three stimuli on a diagonal line; the two panels where the middle stimulus has the other color from both ends have no line and a thick dashed outline</p><a href="../images/L06/shatter_three_f1.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
-- **A**: three points in general position span 2 dimensions. **B**: three points on a line span 1
-- One more dimension lets a readout separate every split (8 of 8 against 6 of 8)
-- <mark>Shattering characterizes the representation: a higher-dimensional one supports more splits, so it is more flexible</mark>
---&gt;
-</div></div><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-marpit-scope-otdt3po2="" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="64" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<ul>
+<li><strong>A</strong>: three points in general position span 2 dimensions. <strong>B</strong>: three points on a line span 1</li>
+<li><mark>Shattering characterizes the representation: A's extra dimension makes every split learnable (8 of 8 against 6 of 8), so A is more flexible</mark></li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1109/PGEC.1965.264137" rel="noopener">Cover <b>IEEE Trans Electron Comput 1965</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-marpit-scope-oc93x433="" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="64" aria-labelledby="heading-13"><p class="page">Slide 13</p>
 <h2 id="heading-13">Shattering four stimuli: 14 of 16 splits</h2>
 <div class="row">
 <div class="col fig">
@@ -140,7 +143,7 @@
 <li>Four stimuli in 2 units, at the corners of a square: 2⁴ = 16 splits</li>
 <li>A linear boundary separates 14 of them. The two it cannot separate are the XOR splits, which put opposite corners together</li>
 <li>Even in <strong>general position</strong> (no three on one line), four points in a plane give 14 of 16, never more</li>
-<li><mark>With two units, no linear readout shatters four stimuli</mark></li>
+<li><mark>Two units cap flexibility: shattering four stimuli needs a third dimension, a unit that is not a weighted sum of the first two</mark></li>
 </ul>
 </div>
 </div>
@@ -222,7 +225,7 @@
 <div class="col">
 <ul>
 <li>Recorded prefrontal neurons are neither pure nor additive: how a neuron responds to an object depends on the task</li>
-<li><strong>Nonlinear mixed selectivity</strong>: the neuron responds to combinations of object and task, as the product unit <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math> of the last lecture (it lifted XOR) responds to combinations of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">x_1</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_2</annotation></semantics></math></li>
+<li><strong>Nonlinear mixed selectivity</strong>: the neuron responds to combinations of object and task, like the lifting unit <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1x_2</annotation></semantics></math> of the last lecture</li>
 <li>Many prefrontal neurons respond this way. Described by one preferred stimulus, they would make little sense</li>
 <li>Outlined: a second neuron, in all 24 conditions. Its response to the second object depends on the first object and on the task</li>
 <li><mark>Is this mixing noise, or part of the code?</mark></li>
@@ -287,7 +290,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-marpit-scope-yxektu2m="" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="64" aria-labelledby="heading-30"><p class="page">Slide 30</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-marpit-scope-tppbcwti="" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="64" aria-labelledby="heading-30"><p class="page">Slide 30</p>
 <h2 id="heading-30">Summary: new units must not be weighted sums</h2>
 <div class="row">
 <div class="col fig">
@@ -388,7 +391,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-marpit-scope-osg07dwx="" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="64" aria-labelledby="heading-38"><p class="page">Slide 38</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-marpit-scope-pcsslggh="" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="64" aria-labelledby="heading-38"><p class="page">Slide 38</p>
 <h2 id="heading-38">Recall: points in general position split every way</h2>
 <div class="row">
 <div class="col fig">
