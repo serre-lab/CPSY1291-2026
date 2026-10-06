@@ -12,8 +12,8 @@
 
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-class="lead" data-marpit-pagination="2" data-marpit-pagination-total="47" aria-labelledby="heading-2"><p class="page">Slide 2</p>
 <h2 id="heading-2">Flexible or abstract: can one population be both?</h2>
-<h2 id="two-scores-of-one-population-shattering-and-ccgp-and-why-they-trade-off">Two scores of one population, shattering and CCGP, and why they trade off</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-marpit-scope-clyqu3q1="" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="47" aria-labelledby="heading-3"><p class="page">Slide 3</p>
+<h2 id="the-geometry-of-a-population-how-it-arranges-its-conditions-decides-whether-it-is-flexible-shattering-or-abstract-ccgp">The geometry of a population: how it arranges its conditions decides whether it is flexible (shattering) or abstract (CCGP)</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-marpit-scope-oxws0qtj="" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="47" aria-labelledby="heading-3"><p class="page">Slide 3</p>
 <h2 id="heading-3">Reminder: shattering measures flexibility</h2>
 <div class="row">
 <div class="col fig">
@@ -52,7 +52,7 @@
 <p class="provenance">Schematic of the task of Bernardi et al. (2020)</p>
 <ul>
 <li><mark>Memorized associations are not enough: the monkey must hold context</mark></li>
-<li>An uncued <strong>context</strong> flips the rules. Neurons are read before the response, so action and value are the <strong>previous</strong> trial's</li>
+<li>An uncued <strong>context</strong> flips the rules. Neurons are read before the response, so action and reward are the <strong>previous</strong> trial's</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="47" aria-labelledby="heading-6"><p class="page">Slide 6</p>
@@ -68,7 +68,7 @@
 <li>1st image after the switch: about 9% correct. Nothing warned the monkey</li>
 <li>2nd to 4th images, not yet seen in the new context: above chance (dashed line, 50%)</li>
 <li><strong>Bernardi et al.</strong> call this <strong>inference</strong>: it needs a variable for context, coded apart from any one image</li>
-<li>The question for the neurons: how must a population hold context to allow this? Shattering and CCGP measure it</li>
+<li>The question for the neurons: what <strong>geometry</strong>, what arrangement of the conditions in the population, allows this? Shattering and CCGP measure it</li>
 </ul>
 </div>
 </div>
@@ -78,14 +78,14 @@
 <div class="row">
 <div class="col fig">
 <figure><img src="../images/L06/bern_geom_clustered.svg" alt="Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context" aria-describedby="figure-7-1"><figcaption id="figure-7-1"><p>Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context</p><a href="../images/L06/bern_geom_clustered.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Cartoon, not recordings: simulated trials, after Bernardi et al. (2020), Fig. 2</p>
+<p class="provenance">Simulated, not recordings: 4 conditions × 15 noisy trials in 3 units, after Bernardi et al. (2020), Fig. 2</p>
 </div>
 <div class="col">
 <ul>
 <li><mark>Abstract, not flexible</mark></li>
-<li><span>Red</span>/<span>blue</span>: context 1/2. The readout (yellow plane) decodes <b>which context</b> the trial is in from the neurons. It is fitted on one condition per context (A+, C+: filled) and tested, weights frozen, on the other two (C−, A−: hollow)</li>
+<li><span>Red</span>/<span>blue</span>: context 1/2. Gold plane: the <b>decision boundary</b> of a readout that decodes which context the trial is in. It is fitted on one condition per context (A+, C+: filled) and tested, weights frozen, on the other two (C−, A−: hollow)</li>
 <li>The conditions cluster by context</li>
-<li><strong>CCGP</strong> 1.0: context transfers. <strong>Shattering</strong> 0.73: conditions within a context cannot be told apart</li>
+<li><strong>CCGP</strong> 1.0: context transfers. <strong>Shattering</strong> 0.73: conditions within a context cannot be told apart. <strong>PR</strong> 1.01: almost one direction, context</li>
 </ul>
 </div>
 </div>
@@ -95,14 +95,14 @@
 <div class="row">
 <div class="col fig">
 <figure><img src="../images/L06/bern_geom_random.svg" alt="Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context" aria-describedby="figure-8-1"><figcaption id="figure-8-1"><p>Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context</p><a href="../images/L06/bern_geom_random.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Cartoon, not recordings: simulated trials, after Bernardi et al. (2020), Fig. 2</p>
+<p class="provenance">Simulated, not recordings: 4 conditions × 15 noisy trials in 3 units, after Bernardi et al. (2020), Fig. 2</p>
 </div>
 <div class="col">
 <ul>
 <li><mark>Flexible, not abstract</mark></li>
-<li><span>Red</span>/<span>blue</span>: context 1/2. Same context readout: fitted on A+, C+ (filled), tested on C−, A− (hollow)</li>
-<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">N = 4</annotation></semantics></math> conditions at random in <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">D = 3</annotation></semantics></math> neurons: <strong>general position</strong>, so every split is separable (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>=</mo><mi>N</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">D = N - 1</annotation></semantics></math>)</li>
-<li>Context <strong>can</strong> be decoded: a plane fitted on all four separates red from blue (shattering 1.0). <strong>CCGP</strong> 0.50: the plane fitted on A+, C+ cuts right through C− and A−</li>
+<li>Gold plane: the same context readout's decision boundary (filled: fitted on; hollow: never seen)</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">N = 4</annotation></semantics></math> conditions at random in <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">D = 3</annotation></semantics></math> units: <strong>general position</strong>, so every split is separable (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>=</mo><mi>N</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">D = N - 1</annotation></semantics></math>). <strong>PR</strong> 2.77</li>
+<li>Context <strong>can</strong> be decoded (shattering 1.0), but <strong>CCGP</strong> is 0.50: the plane fitted on A+, C+ cuts right through C− and A−</li>
 </ul>
 </div>
 </div>
@@ -111,15 +111,15 @@
 <h2 id="heading-9">Toy geometry: a square</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L06/bern_geom_square.svg" alt="Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context, CCGP value" aria-describedby="figure-9-1"><figcaption id="figure-9-1"><p>Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context, CCGP value</p><a href="../images/L06/bern_geom_square.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Cartoon, not recordings: simulated trials, after Bernardi et al. (2020), Fig. 2</p>
+<figure><img src="../images/L06/bern_geom_square.svg" alt="Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context, CCGP reward" aria-describedby="figure-9-1"><figcaption id="figure-9-1"><p>Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context, CCGP reward</p><a href="../images/L06/bern_geom_square.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Simulated, not recordings: 4 conditions × 15 noisy trials in 3 units, after Bernardi et al. (2020), Fig. 2</p>
 </div>
 <div class="col">
 <ul>
 <li><mark>Abstract, but not fully flexible</mark></li>
-<li><span>Red</span>/<span>blue</span>: context 1/2. Context readout (yellow plane): fitted on A+, C+ (filled), tested on C−, A− (hollow)</li>
-<li>Corners of a square: one side is <strong>context</strong> ({A+, C−} vs {A−, C+}), the other <strong>value</strong>, i.e. reward ({A+, C+} vs {A−, C−})</li>
-<li><strong>Generalization</strong>: CCGP 0.78 (context), 0.72 (value). <strong>Shattering</strong> 0.82: the diagonal split, image A (A+, A−) vs image C (C+, C−), fails. It is context XOR value</li>
+<li>Gold plane: the same context readout's decision boundary (filled: fitted on; hollow: never seen)</li>
+<li>Corners of a square (<strong>PR</strong> 2.00): one side is <strong>context</strong> ({A+, C−} vs {A−, C+}), the other <strong>reward</strong> ({A+, C+} vs {A−, C−})</li>
+<li><strong>Generalization</strong>: CCGP 0.78 (context), 0.72 (reward). <strong>Shattering</strong> 0.82: the diagonal split, image A (A+, A−) vs image C (C+, C−), fails. It is context XOR reward</li>
 </ul>
 </div>
 </div>
@@ -128,15 +128,15 @@
 <h2 id="heading-10">Toy geometry: the square, bent</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L06/bern_geom_bent.svg" alt="Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context, CCGP value" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context, CCGP value</p><a href="../images/L06/bern_geom_bent.svg">Open full-size figure</a></figcaption></figure>
-<p class="provenance">Cartoon, not recordings: simulated trials, after Bernardi et al. (2020), Fig. 2</p>
+<figure><img src="../images/L06/bern_geom_bent.svg" alt="Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context, CCGP reward" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>Schematic in the space of three units x1, x2, x3: four conditions A+, C− (red, context 1) and A−, C+ (blue, context 2), each a mean with its noisy trials. A+ and C+ are filled (fitted on), C− and A− hollow (never seen). A gold plane, the context readout fitted on A+ and C+. Bars at right: shattering, CCGP context, CCGP reward</p><a href="../images/L06/bern_geom_bent.svg">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Simulated, not recordings: 4 conditions × 15 noisy trials in 3 units, after Bernardi et al. (2020), Fig. 2</p>
 </div>
 <div class="col">
 <ul>
 <li><mark>Flexible and abstract at once</mark></li>
-<li><span>Red</span>/<span>blue</span>: context 1/2. Context readout (yellow plane): fitted on A+, C+ (filled), tested on C−, A− (hollow)</li>
-<li><strong>Bending</strong> the square adds a dimension: the A and C conditions move apart along a third direction, so the four no longer fit in a plane (PR 2.0 → 2.5)</li>
-<li><strong>Shattering</strong> 1.0: the diagonal split separates too. <strong>Generalization</strong> still holds: CCGP 0.77, 0.73</li>
+<li>Gold plane: the same context readout's decision boundary (filled: fitted on; hollow: never seen)</li>
+<li><strong>Bending</strong> the square adds a dimension: the A and C conditions move apart along a third direction, so the four no longer fit in a plane (PR 2.00 → 2.45)</li>
+<li><strong>Shattering</strong> 1.0: the diagonal split separates too. CCGP barely moves (0.78 → 0.77): <mark>PR helps shattering, not generalization</mark></li>
 </ul>
 </div>
 </div>
@@ -147,23 +147,23 @@
 <div class="interactive-figure interactive-wide">
 
 <div class="print-figure">
-<figure><img src="../images/L06/demo_flexible_abstract.png" alt="The demo at the compromise setting: shattering accuracy 0.80; CCGP 0.80 for context, 0.83 for action, 0.80 for reward; decoding with all conditions in training 0.93 to 0.96; on the condition map, a context readout fitted on six conditions puts both held-out conditions (hollow points) on the correct side of its boundary; the gold segments tilt slightly in different directions; the inset shows three large and four small variances, participation ratio 4.1" aria-describedby="figure-11-2"><figcaption id="figure-11-2"><p>The demo at the compromise setting: shattering accuracy 0.80; CCGP 0.80 for context, 0.83 for action, 0.80 for reward; decoding with all conditions in training 0.93 to 0.96; on the condition map, a context readout fitted on six conditions puts both held-out conditions (hollow points) on the correct side of its boundary; the gold segments tilt slightly in different directions; the inset shows three large and four small variances, participation ratio 4.1</p><a href="../images/L06/demo_flexible_abstract.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L06/demo_flexible_abstract.png" alt="The demo at the compromise setting: shattering accuracy 0.80; CCGP 0.80 for context, 0.83 for action, 0.80 for reward; decoding with all conditions in training 0.93 to 0.96; on the condition map, a context readout fitted on six conditions puts both held-out conditions (hollow points) on the correct side of its boundary; the gold segments tilt slightly in different directions; the inset shows three large and four small variances, participation ratio 4.14" aria-describedby="figure-11-2"><figcaption id="figure-11-2"><p>The demo at the compromise setting: shattering accuracy 0.80; CCGP 0.80 for context, 0.83 for action, 0.80 for reward; decoding with all conditions in training 0.93 to 0.96; on the condition map, a context readout fitted on six conditions puts both held-out conditions (hollow points) on the correct side of its boundary; the gold segments tilt slightly in different directions; the inset shows three large and four small variances, participation ratio 4.14</p><a href="../images/L06/demo_flexible_abstract.png">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <ul>
-<li>λ: cube (0) to general position (1). <mark>Shattering rises, CCGP falls, decoding stays high</mark></li>
+<li>The <strong>mix</strong> slider: cube (0) to general position (1). <mark>Shattering rises, CCGP falls, decoding stays high</mark></li>
 </ul>
 <p class="explorer-links"><a href="../demos/flexible_abstract.html">Eight task conditions (context, action and reward, each two-valued) as responses of 30 model units. A slider mixes the conditions from the corners of a cube (abstract) toward random positions (flexible). A bar chart updates live: shattering accuracy as a black line, CCGP for context, action and reward as filled bars, decoding with all conditions in training as outline bars, chance at 0.5. A map shows the eight condition means, with gold segments joining conditions that differ only in context, and an inset shows how many directions the means use (participation ratio) — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="47" aria-labelledby="heading-12"><p class="page">Slide 12</p>
 <h2 id="heading-12">Hippocampus: context transfers, action does not</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L06/pub_bernardi2020_fig3e.png" alt="Bernardi et al. (2020) Fig. 3e. For hippocampus (HPC), dorsolateral prefrontal cortex (DLPFC) and anterior cingulate cortex (ACC), a vertical axis from 0.4 to 1 labelled shattering dimensionality and CCGP, with a dashed line at 0.5. Short black lines mark the measured CCGP of three variables, each on a set of coloured dots from 100 runs of a perfect-cube model: context in red (HPC 0.96, DLPFC 0.74, ACC 0.81), value of the previous trial in purple (0.79, 0.88, 0.94) and action of the previous trial in orange (0.44, 0.75, 0.90). Short grey lines mark the measured shattering dimensionality (0.70, 0.75, 0.74). Clusters of white dots, the cube model's shattering dimensionality, sit lower, at about 0.60, 0.62 and 0.65" aria-describedby="figure-12-1"><figcaption id="figure-12-1"><p>Bernardi et al. (2020) Fig. 3e. For hippocampus (HPC), dorsolateral prefrontal cortex (DLPFC) and anterior cingulate cortex (ACC), a vertical axis from 0.4 to 1 labelled shattering dimensionality and CCGP, with a dashed line at 0.5. Short black lines mark the measured CCGP of three variables, each on a set of coloured dots from 100 runs of a perfect-cube model: context in red (HPC 0.96, DLPFC 0.74, ACC 0.81), value of the previous trial in purple (0.79, 0.88, 0.94) and action of the previous trial in orange (0.44, 0.75, 0.90). Short grey lines mark the measured shattering dimensionality (0.70, 0.75, 0.74). Clusters of white dots, the cube model's shattering dimensionality, sit lower, at about 0.60, 0.62 and 0.65</p><a href="../images/L06/pub_bernardi2020_fig3e.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L06/pub_bernardi2020_fig3e.png" alt="Bernardi et al. (2020) Fig. 3e. For hippocampus (HPC), dorsolateral prefrontal cortex (DLPFC) and anterior cingulate cortex (ACC), a vertical axis from 0.4 to 1 labelled shattering dimensionality and CCGP, with a dashed line at 0.5. Short black lines mark the measured CCGP of three variables, each on a set of coloured dots from 100 runs of a perfect-cube model: context in red (HPC 0.96, DLPFC 0.74, ACC 0.81), reward of the previous trial (the paper’s ‘value’) in purple (0.79, 0.88, 0.94) and action of the previous trial in orange (0.44, 0.75, 0.90). Short grey lines mark the measured shattering dimensionality (0.70, 0.75, 0.74). Clusters of white dots, the cube model's shattering dimensionality, sit lower, at about 0.60, 0.62 and 0.65" aria-describedby="figure-12-1"><figcaption id="figure-12-1"><p>Bernardi et al. (2020) Fig. 3e. For hippocampus (HPC), dorsolateral prefrontal cortex (DLPFC) and anterior cingulate cortex (ACC), a vertical axis from 0.4 to 1 labelled shattering dimensionality and CCGP, with a dashed line at 0.5. Short black lines mark the measured CCGP of three variables, each on a set of coloured dots from 100 runs of a perfect-cube model: context in red (HPC 0.96, DLPFC 0.74, ACC 0.81), reward of the previous trial (the paper’s ‘value’) in purple (0.79, 0.88, 0.94) and action of the previous trial in orange (0.44, 0.75, 0.90). Short grey lines mark the measured shattering dimensionality (0.70, 0.75, 0.74). Clusters of white dots, the cube model's shattering dimensionality, sit lower, at about 0.60, 0.62 and 0.65</p><a href="../images/L06/pub_bernardi2020_fig3e.png">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
 <li><mark>Context transfers in all three areas, and shattering is high too</mark>: like the compromise in the demo</li>
 <li>Both scores are average accuracies of linear readouts; chance is 0.5 (dashed)</li>
-<li><strong>Black</strong>: CCGP (red context, orange previous action, purple value). <strong>Grey</strong>: shattering. The dots come from the authors' model</li>
+<li><strong>Black</strong>: CCGP (red context, orange previous action, purple reward, the paper’s ‘value’). <strong>Grey</strong>: shattering. The dots come from the authors' model</li>
 <li>Context CCGP: 0.96 HPC, 0.74 DLPFC, 0.81 ACC. Shattering: 0.70, 0.75, 0.74</li>
 <li><strong>Previous action in HPC: 0.44</strong>: below the dashed line, but within chance range (0.41–0.59). Not abstract, yet decodable</li>
 </ul>
@@ -211,7 +211,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>Why it matters: shattering says how many new rules a downstream neuron could learn from the population; CCGP says whether what it learned carries over to new situations, and it drops when the monkeys err.</p>
+<p>Why it matters: both read the population's <strong>geometry</strong>, how its conditions are arranged. Shattering says how many new rules a downstream neuron could learn from the population; CCGP says whether what it learned carries over to new situations, and it drops when the monkeys err.</p>
 <p><mark>Each score is one number about one population. When does such a number mean anything?</mark></p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-class="lead" data-marpit-pagination="15" data-marpit-pagination-total="47" aria-labelledby="heading-15"><p class="page">Slide 15</p>
 <h2 id="heading-15">Baselines and tests</h2>
@@ -296,10 +296,10 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="47" aria-labelledby="heading-24"><p class="page">Slide 24</p>
 <h2 id="heading-24">Hold out every image once: cross-validation</h2>
 <div class="capfig">
-<figure><img src="../images/L07/cross_validation.svg" alt="Left, a schematic of 5-fold cross-validation: five rows labelled fit 1 to fit 5, each a strip of five folds; in row k, fold k is red and marked test and the other four are grey, so every fold is tested exactly once. Right, for one monkey IT site predicted from a network's features, each of the 1,224 images' out-of-fold prediction against its recorded response, scattered along the diagonal, R-squared 0.60 over all images" aria-describedby="figure-24-1"><figcaption id="figure-24-1"><p>Left, a schematic of 5-fold cross-validation: five rows labelled fit 1 to fit 5, each a strip of five folds; in row k, fold k is red and marked test and the other four are grey, so every fold is tested exactly once. Right, for one monkey IT site predicted from a network's features, each of the 1,224 images' out-of-fold prediction against its recorded response, scattered along the diagonal, R-squared 0.60 over all images</p><a href="../images/L07/cross_validation.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L07/cross_validation.svg" alt="Left, a schematic of 5-fold cross-validation: five rows labelled fit 1 to fit 5, each a strip of five folds; in each row a different fold is red and marked test and the other four are grey, so every fold is tested exactly once. Right, for one monkey IT site predicted from a network's features, each of the 1,224 images' out-of-fold prediction against its recorded response, scattered along the diagonal, R-squared 0.60 over all images" aria-describedby="figure-24-1"><figcaption id="figure-24-1"><p>Left, a schematic of 5-fold cross-validation: five rows labelled fit 1 to fit 5, each a strip of five folds; in each row a different fold is red and marked test and the other four are grey, so every fold is tested exactly once. Right, for one monkey IT site predicted from a network's features, each of the 1,224 images' out-of-fold prediction against its recorded response, scattered along the diagonal, R-squared 0.60 over all images</p><a href="../images/L07/cross_validation.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li><strong>k-fold cross-validation</strong> (left): 5 <strong>folds</strong>; fit on four, test on the fifth, rotate. Every image is tested once, by a fit that never saw it</li>
+<li><strong>5-fold cross-validation</strong> (left): 5 <strong>folds</strong>; fit on four, test on the fifth, rotate. Every image is tested once, by a fit that never saw it</li>
 <li>Right: one IT site predicted from ResNet-18 (fit next lecture). Score <strong>R²</strong>: here the squared correlation of prediction and response (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mn>0.77</mn></mrow><annotation encoding="application/x-tex">r = 0.77</annotation></semantics></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup><mo>=</mo><mn>0.60</mn></mrow><annotation encoding="application/x-tex">R^2 = 0.60</annotation></semantics></math>)</li>
 <li><mark>One split can be lucky</mark>: one fold alone gives R² 0.53 to 0.64; all five together, 0.60</li>
 </ul>
@@ -409,7 +409,7 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="47" aria-labelledby="heading-34"><p class="page">Slide 34</p>
 <h2 id="heading-34">Building the neuron: inputs</h2>
 <div class="capfig">
-<figure><img src="../images/2026-09-15/step1_inputs.svg" alt="Inputs x1 through xd drawn as nodes feeding into a single neuron" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Inputs x1 through xd drawn as nodes feeding into a single neuron</p><a href="../images/2026-09-15/step1_inputs.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/2026-09-15/step1_inputs.svg" alt="Inputs x1, x2, …, xi, …, xD drawn as nodes feeding into a single neuron" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Inputs x1, x2, …, xi, …, xD drawn as nodes feeding into a single neuron</p><a href="../images/2026-09-15/step1_inputs.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li>Each input <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3E6D8E"><msub><mi>x</mi><mi>i</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3E6D8E}{x_i}</annotation></semantics></math> is a number: a stimulus feature (a pixel, a sound amplitude) or another neuron's output</li>
@@ -418,7 +418,7 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="47" aria-labelledby="heading-35"><p class="page">Slide 35</p>
 <h2 id="heading-35">Building the neuron: weights</h2>
 <div class="capfig">
-<figure><img src="../images/2026-09-15/step2_weights.svg" alt="Each input connection to the neuron now carries its own weight w1 through wd" aria-describedby="figure-35-1"><figcaption id="figure-35-1"><p>Each input connection to the neuron now carries its own weight w1 through wd</p><a href="../images/2026-09-15/step2_weights.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/2026-09-15/step2_weights.svg" alt="Each input connection to the neuron now carries its own weight w1 through wD" aria-describedby="figure-35-1"><figcaption id="figure-35-1"><p>Each input connection to the neuron now carries its own weight w1 through wD</p><a href="../images/2026-09-15/step2_weights.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li>Each input has a <strong>weight</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><msub><mi>w</mi><mi>i</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{w_i}</annotation></semantics></math> — the model's analogue of a <strong>synaptic strength</strong></li>
@@ -432,7 +432,7 @@
 </div>
 <p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>z</mi><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><mstyle mathcolor="#B5396B"><msub><mi>w</mi><mi>i</mi></msub></mstyle><mtext> </mtext><mstyle mathcolor="#3E6D8E"><msub><mi>x</mi><mi>i</mi></msub></mstyle><mo>+</mo><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle></mrow><annotation encoding="application/x-tex">z = \sum_i \textcolor{#B5396B}{w_i}\, \textcolor{#3E6D8E}{x_i} + \textcolor{#3F7A6B}{b}
 </annotation></semantics></math></div></span></p><ul>
-<li>A <span><b>weighted sum</b></span> of the <span><b>inputs</b></span>, plus a <span><b>bias</b></span> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{b}</annotation></semantics></math> (an adjustable threshold)</li>
+<li>A <span><b>weighted sum</b></span> of the <span><b>inputs</b></span>, plus a <span><b>bias</b></span> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{b}</annotation></semantics></math> (it shifts the threshold: the sum must exceed <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle></mrow><annotation encoding="application/x-tex">-\textcolor{#3F7A6B}{b}</annotation></semantics></math>)</li>
 <li>This <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#1E293B"><mi>z</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#1E293B}{z}</annotation></semantics></math> — the <strong>pre-activation</strong> — is the <strong>linear</strong> part of the computation</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="47" aria-labelledby="heading-37"><p class="page">Slide 37</p>
@@ -465,9 +465,9 @@
 <ul>
 <li>Stack the inputs and weights into vectors <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle><mo separator="true">,</mo><mtext> </mtext><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle><mo>∈</mo><msup><mi mathvariant="normal" data-original-mathvariant="double-struck">ℝ</mi><mi>D</mi></msup></mrow><annotation encoding="application/x-tex">\textcolor{#3E6D8E}{\mathbf{x}},\,\textcolor{#B5396B}{\mathbf{w}}\in\mathbb{R}^{D}</annotation></semantics></math>: the weighted sum is their <strong>dot product</strong></li>
 </ul>
-<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>z</mi><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>D</mi></munderover><mstyle mathcolor="#B5396B"><msub><mi>w</mi><mi>i</mi></msub></mstyle><mtext> </mtext><mstyle mathcolor="#3E6D8E"><msub><mi>x</mi><mi>i</mi></msub></mstyle><mo>+</mo><mi>b</mi><mo>=</mo><msup><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle><mi mathvariant="normal">⊤</mi></msup><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle><mo>+</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">z = \sum_{i=1}^{D} \textcolor{#B5396B}{w_i}\,\textcolor{#3E6D8E}{x_i} + b = \textcolor{#B5396B}{\mathbf{w}}^\top\textcolor{#3E6D8E}{\mathbf{x}} + b
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>z</mi><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>D</mi></munderover><mstyle mathcolor="#B5396B"><msub><mi>w</mi><mi>i</mi></msub></mstyle><mtext> </mtext><mstyle mathcolor="#3E6D8E"><msub><mi>x</mi><mi>i</mi></msub></mstyle><mo>+</mo><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle><mo>=</mo><msup><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle><mi mathvariant="normal">⊤</mi></msup><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle><mo>+</mo><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle></mrow><annotation encoding="application/x-tex">z = \sum_{i=1}^{D} \textcolor{#B5396B}{w_i}\,\textcolor{#3E6D8E}{x_i} + \textcolor{#3F7A6B}{b} = \textcolor{#B5396B}{\mathbf{w}}^\top\textcolor{#3E6D8E}{\mathbf{x}} + \textcolor{#3F7A6B}{b}
 </annotation></semantics></math></div></span></p><ul>
-<li>Geometry (left): <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle><mi mathvariant="normal">⊤</mi></msup><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle><mo>=</mo><mo stretchy="false">∥</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mo stretchy="false">∥</mo><mtext> </mtext><mo stretchy="false">∥</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo stretchy="false">∥</mo><mi>cos</mi><mo>⁡</mo><mi>θ</mi></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}^\top\textcolor{#3E6D8E}{\mathbf{x}} = \lVert\mathbf{w}\rVert\,\lVert\mathbf{x}\rVert\cos\theta</annotation></semantics></math>, the <strong>projection</strong> of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3E6D8E}{\mathbf{x}}</annotation></semantics></math> onto <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math>, scaled by <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">∥</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mo stretchy="false">∥</mo></mrow><annotation encoding="application/x-tex">\lVert\mathbf{w}\rVert</annotation></semantics></math></li>
+<li>Geometry (left): <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle><mi mathvariant="normal">⊤</mi></msup><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle><mo>=</mo><mo stretchy="false">∥</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mo stretchy="false">∥</mo><mtext> </mtext><mo stretchy="false">∥</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo stretchy="false">∥</mo><mi>cos</mi><mo>⁡</mo><mi>ϕ</mi></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}^\top\textcolor{#3E6D8E}{\mathbf{x}} = \lVert\mathbf{w}\rVert\,\lVert\mathbf{x}\rVert\cos\phi</annotation></semantics></math>, the <strong>length of the projection</strong> of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3E6D8E}{\mathbf{x}}</annotation></semantics></math> onto <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math>, times <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">∥</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mo stretchy="false">∥</mo></mrow><annotation encoding="application/x-tex">\lVert\mathbf{w}\rVert</annotation></semantics></math></li>
 <li><strong>Aligned</strong> with <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math> → large; <strong>perpendicular</strong> → zero; <strong>opposite</strong> → negative. <mark>The neuron asks how much of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math> is in the input</mark></li>
 <li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>+</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">\mathbf{w}^\top\mathbf{x}+b</annotation></semantics></math> is the <strong>linear readout</strong> of the last two lectures: a readout is one model neuron</li>
 </ul>
@@ -478,7 +478,7 @@
 <div class="capfig">
 <figure><img src="../images/2026-09-15/01_full.svg" alt="The complete single neuron: weighted inputs summed with a bias, passed through the nonlinearity g to give the activation a" aria-describedby="figure-40-1"><figcaption id="figure-40-1"><p>The complete single neuron: weighted inputs summed with a bias, passed through the nonlinearity g to give the activation a</p><a href="../images/2026-09-15/01_full.svg">Open full-size figure</a></figcaption></figure>
 </div>
-<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>  </mtext><mi>a</mi><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mi>g</mi><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>+</mo><mi>b</mi><mo fence="true">)</mo></mrow><mtext>  </mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow><annotation encoding="application/x-tex">\boxed{\;a \;=\; g\!\left(\mathbf{w}^\top\mathbf{x} + b\right)\;}
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>  </mtext><mi>a</mi><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mstyle mathcolor="#7A4FA3"><mi>g</mi></mstyle><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><msup><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle><mi mathvariant="normal">⊤</mi></msup><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle><mo>+</mo><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle><mo fence="true">)</mo></mrow><mtext>  </mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow><annotation encoding="application/x-tex">\boxed{\;a \;=\; \textcolor{#7A4FA3}{g}\!\left(\textcolor{#B5396B}{\mathbf{w}}^\top\textcolor{#3E6D8E}{\mathbf{x}} + \textcolor{#3F7A6B}{b}\right)\;}
 </annotation></semantics></math></div></span></p><p><mark>Most networks in this course are built from many of these units</mark></p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="47" aria-labelledby="heading-41"><p class="page">Slide 41</p>
 <h2 id="heading-41">A neuron is a feature detector: template matching</h2>
@@ -526,7 +526,7 @@
 </div>
 <div class="col">
 <ul>
-<li>The tuning-curve method of the lecture, applied to the 64 first-layer units of AlexNet: gratings at 24 orientations and 4 phases, rectified, then averaged over phase</li>
+<li>The tuning-curve method of the next lecture, applied to the 64 first-layer units of AlexNet: gratings at 24 orientations and 4 phases, rectified, then averaged over phase</li>
 <li>Top: the four most selective units, each scaled to its own peak</li>
 <li>Bottom: how many units prefer each orientation. Every 15-degree bin holds some units</li>
 </ul>
@@ -541,7 +541,7 @@
 <div class="col">
 <ul>
 <li>AlexNet's first-layer filters that a Gabor fits well, on Ringach's plot</li>
-<li>Filled magenta squares: macaque V1 simple cells (Ringach 2002). Open green circles: the network's filters</li>
+<li>Filled slate-grey squares: macaque V1 simple cells (Ringach 2002). Open green circles: the network's filters</li>
 </ul>
 </div>
 </div>

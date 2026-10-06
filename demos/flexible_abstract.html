@@ -86,7 +86,7 @@ body.embed .hint{font-size:14px}
     <span style="--c:#3F7A6B">CCGP reward</span>
   </div>
   <div class="controls">
-    <label class="slider">Mixing λ, cube to general position
+    <label class="slider">Mix: cube to general position
       <span class="row"><span>cube</span><b id="lamOut">0.25</b><span>general position</span></span>
       <input id="lam" type="range" min="0" max="1" step="0.01" value="0.25"
         aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.25" aria-valuetext="0.25">
@@ -1060,7 +1060,7 @@ body.embed .hint{font-size:14px}
     ctx.fillText('direction', x0, base + 36);
     ctx.fillStyle = COL.ink;
     ctx.font = '15px Poppins, system-ui, sans-serif';
-    ctx.fillText('participation ratio ' + sp.pr.toFixed(1), x0, base + 56);
+    ctx.fillText('participation ratio ' + sp.pr.toFixed(2), x0, base + 56);
   }
   function syncControls() {
     lamInput.value = String(lambda);
@@ -1108,7 +1108,7 @@ body.embed .hint{font-size:14px}
       heldNames.join(' and ') + ', so ' + view.heldCorrect + ' of 2 are on the correct side. ' +
       'Gold segments join conditions that differ only in context. Inset: variance of the eight means along each of 7 directions, ' +
       view.spectrum.frac.map(function (f) { return Math.round(100 * f) + '%'; }).join(', ') +
-      '; participation ratio ' + view.spectrum.pr.toFixed(1) + '.');
+      '; participation ratio ' + view.spectrum.pr.toFixed(2) + '.');
     globalThis.__FLEX_STATE = {
       seed: seed, lambda: lambda, sigma: sigma, ms: ms,
       shatter: metrics.shatter, ccgp: metrics.ccgp.slice(), decode: metrics.decode.slice(),
