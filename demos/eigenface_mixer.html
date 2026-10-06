@@ -3,9 +3,9 @@
 <!--
   eigenface_mixer.html — L03 eigenface mixer and navigable face space
   Static steps (?static=1&step=N):
-    0  Mix tab, all zₖ = 0 (mean face)
-    1  Mix tab, z₁ = +2σ₁ (other zₖ = 0)
-    2  K tab, face index 0 (Olivetti id 0), K = 20
+    0  Mix tab, all z_j = 0 (mean face)
+    1  Mix tab, z₁ = +2σ₁ (other z_j = 0)
+    2  k tab, face index 0 (Olivetti id 0), k = 20
     3  Plane tab, probe at (2σ₁, 0)
   Query: ?embed=1 | ?static=1&step=N | ?tab=mix|k|plane
 -->
@@ -124,12 +124,12 @@ body.static .k-controls input,body.static .mix input{pointer-events:none}
 <div class="wrap">
   <h1>Eigenface mixer and face space</h1>
   <p class="lede">Mix the first eight principal components of the Olivetti faces, watch reconstruction improve with
-  <i class="sc">K</i>, and walk the (<i class="sc">z</i><sub>1</sub>, <i class="sc">z</i><sub>2</sub>) plane.
+  <i class="sc">k</i>, and walk the (<i class="sc">z</i><sub>1</sub>, <i class="sc">z</i><sub>2</sub>) plane.
   Escape exits when embedded.</p>
 
   <div class="tabs" role="tablist" aria-label="Eigenface views">
     <button type="button" role="tab" id="tab-mix" aria-controls="panel-mix" aria-pressed="true" data-tab="mix">Mix</button>
-    <button type="button" role="tab" id="tab-k" aria-controls="panel-k" aria-pressed="false" data-tab="k">K</button>
+    <button type="button" role="tab" id="tab-k" aria-controls="panel-k" aria-pressed="false" data-tab="k">k</button>
     <button type="button" role="tab" id="tab-plane" aria-controls="panel-plane" aria-pressed="false" data-tab="plane">Plane</button>
   </div>
 
@@ -163,24 +163,24 @@ body.static .k-controls input,body.static .mix input{pointer-events:none}
           <figcaption>Original <b class="vec">x</b></figcaption>
         </figure>
         <figure>
-          <canvas id="kRecon" class="face" width="64" height="64" role="img" aria-label="Reconstruction with K components"></canvas>
+          <canvas id="kRecon" class="face" width="64" height="64" role="img" aria-label="Reconstruction with k components"></canvas>
           <figcaption>Reconstruction <b class="vec">x̂</b></figcaption>
         </figure>
       </div>
       <div class="k-controls">
-        <label for="kSlider">Components <i class="sc">K</i>
+        <label for="kSlider">Components <i class="sc">k</i>
           <input type="range" id="kSlider" min="0" max="100" value="0" step="1">
         </label>
-        <div class="k-presets" role="group" aria-label="K presets">
-          <button type="button" class="chip" data-k="1">K = 1</button>
-          <button type="button" class="chip" data-k="5">K = 5</button>
-          <button type="button" class="chip" data-k="20">K = 20</button>
-          <button type="button" class="chip" data-k="50">K = 50</button>
-          <button type="button" class="chip" data-k="100">K = 100</button>
+        <div class="k-presets" role="group" aria-label="k presets">
+          <button type="button" class="chip" data-k="1">k = 1</button>
+          <button type="button" class="chip" data-k="5">k = 5</button>
+          <button type="button" class="chip" data-k="20">k = 20</button>
+          <button type="button" class="chip" data-k="50">k = 50</button>
+          <button type="button" class="chip" data-k="100">k = 100</button>
         </div>
         <p class="status" id="kStatus" role="status" aria-live="polite"></p>
         <p class="note">Centred residual ‖(<b class="vec">x</b> − <b class="vec">μ</b>) − (<b class="vec">x̂</b> − <b class="vec">μ</b>)‖² / ‖<b class="vec">x</b> − <b class="vec">μ</b>‖², comparable with the eigenvalue tail.</p>
-        <p class="note">Tail uses the first 100 components only (hits 0 at <i class="sc">K</i> = 100); the pixel residual stays above 0 because the truncated basis cannot recover the full image.</p>
+        <p class="note">Tail uses the first 100 components only (hits 0 at <i class="sc">k</i> = 100); the pixel residual stays above 0 because the truncated basis cannot recover the full image.</p>
       </div>
     </div>
   </section>
@@ -351,8 +351,8 @@ function updateMix(){
     const a=Math.abs(n); if(a>bestAbs){bestAbs=a;best=k;}
   }
   const msg=bestAbs<1e-6
-    ? `At the mean face. Largest |zₖ/σₖ| is 0.`
-    : `Largest |zₖ/σₖ| is |z${best+1}/σ${best+1}| = ${fmt(bestAbs,2)}; that eigenface carries ${pct(vf[best])} of total variance.`;
+    ? `At the mean face. Largest |z/σ| is 0.`
+    : `Largest |z/σ| is |z${best+1}/σ${best+1}| = ${fmt(bestAbs,2)}; that eigenface carries ${pct(vf[best])} of total variance.`;
   document.getElementById('mixStatus').textContent=msg;
   document.getElementById('live').textContent=msg;
 }
@@ -392,9 +392,9 @@ function updateK(){
   clipBuf();
   paint(document.getElementById('kRecon'),buf);
   const tail=Math.max(0, 1-lam.slice(0,state.K).reduce((a,b)=>a+b,0)/totalVariance);
-  const msg=`Person ${f.person} (id ${f.id}) · K = ${state.K} · centred residual = ${fmt(res,4)} · eigenvalue tail Σₖ>K λₖ / Σ λₖ = ${fmt(tail,4)}`;
-  document.getElementById('kStatus').textContent=msg;
-  document.getElementById('live').textContent=msg;
+  const head=`Person ${f.person} (id ${f.id}) · <i>k</i> = ${state.K} · centred residual = ${fmt(res,4)} · eigenvalue tail `;
+  document.getElementById('kStatus').innerHTML=head+`Σ<sub><i>j</i>&gt;<i>k</i></sub> λ<sub><i>j</i></sub> / Σ<sub><i>j</i></sub> λ<sub><i>j</i></sub> = ${fmt(tail,4)}`;
+  document.getElementById('live').textContent=`Person ${f.person}, k = ${state.K}, centred residual ${fmt(res,4)}, eigenvalue tail (variance beyond the first k components) ${fmt(tail,4)}`;
 }
 
 /* ---------- Plane ---------- */

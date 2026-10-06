@@ -6,7 +6,7 @@
 <title>Flexible or abstract? · L06 · CPSY 1291</title>
 <!--
   Shattering versus CCGP (Bernardi et al. 2020). Eight conditions of three binary variables
-  sit on a cube, in a random cloud, or on a mix of the two. A slider sets the mix.
+  sit on a cube, in general position (a random cloud), or on a mix of the two. A slider sets the mix.
   Query: ?embed=1  ?static=1 (seed 1, λ = 0.25; used for the print figure). No network calls.
   The pure functions live in the script#model block so 2026/figures/check_L06_flexible_abstract.cjs
   can run the same computation.
@@ -69,7 +69,7 @@ body.embed .hint{font-size:14px}
 <body>
 <div class="wrap">
   <h1>Flexible or abstract?</h1>
-  <p class="lede">Eight conditions, three binary variables. A cube keeps one readout valid on conditions it never saw. A random cloud lets a readout solve almost every split, and that readout does not transfer.</p>
+  <p class="lede">Eight conditions, three binary variables. A cube keeps one readout valid on conditions it never saw. Points in general position (a random cloud) let a readout solve almost every split, and that readout does not transfer.</p>
   <div class="stage">
     <section class="panel">
       <h2>Shattering and generalization</h2>
@@ -77,7 +77,7 @@ body.embed .hint{font-size:14px}
     </section>
     <section class="panel">
       <h2>Eight condition means</h2>
-      <div class="canvas-frame"><canvas id="map" tabindex="0" aria-label="Two-dimensional view of the eight condition means. Color is context. Gold segments join conditions that differ only in context."></canvas></div>
+      <div class="canvas-frame"><canvas id="map" tabindex="0" aria-label="Map of the eight condition means. Horizontal: a context readout fitted on six conditions, with its boundary as a vertical line. Filled points were fitted, hollow points held out. Color is context. Gold segments join conditions that differ only in context."></canvas></div>
     </section>
   </div>
   <div class="legend">
@@ -86,8 +86,8 @@ body.embed .hint{font-size:14px}
     <span style="--c:#3F7A6B">CCGP reward</span>
   </div>
   <div class="controls">
-    <label class="slider">Random mixing λ
-      <span class="row"><span>cube</span><b id="lamOut">0.25</b><span>random</span></span>
+    <label class="slider">Mixing λ, cube to general position
+      <span class="row"><span>cube</span><b id="lamOut">0.25</b><span>general position</span></span>
       <input id="lam" type="range" min="0" max="1" step="0.01" value="0.25"
         aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.25" aria-valuetext="0.25">
     </label>
@@ -99,12 +99,12 @@ body.embed .hint{font-size:14px}
     <div class="btns">
       <button type="button" id="bCube" aria-pressed="false">Cube (abstract)</button>
       <button type="button" id="bMix" aria-pressed="true">Compromise</button>
-      <button type="button" id="bRand" aria-pressed="false">Random (flexible)</button>
+      <button type="button" id="bRand" aria-pressed="false">General position (flexible)</button>
       <button type="button" id="bNew">New draw</button>
     </div>
   </div>
-  <p class="live" id="live" aria-live="polite">Shattering – · CCGP context – · decoding context –</p>
-  <p class="hint">Filled bars and the colored numbers are CCGP. Outline bars and the grey numbers are ordinary decoding. The black line is shattering. The dashed line is chance. On the map, letters A–H name the conditions, red is context +, blue is context −, and gold joins a pair that differs only in context.</p>
+  <p class="live" id="live" aria-live="polite">Shattering – · CCGP context – · decoding context – · held-out pair –</p>
+  <p class="hint">Filled bars and the colored numbers are CCGP. Outline bars and the grey numbers are decoding: a readout fitted on trials from all eight conditions and tested on held-out trials of the same conditions, so it never has to transfer. The black line is shattering. The dashed line is chance. On the map, each condition is named as in the task, image and outcome (+ juice, − nothing): red is context 1, blue is context 2, and gold joins a pair that differs only in context. The map's horizontal axis is a context readout fitted on the six filled conditions; the two hollow ones were held out. The grey line is its boundary: red belongs to its right, blue to its left. The vertical axis shows action and reward and, once the cube bends, the direction in which the gold segments differ, so in the cube they are horizontal and parallel. The inset shows how the eight means spread over directions; the participation ratio is about 3 for the cube and 7 in general position.</p>
 </div>
 <script id="model">
 'use strict';
@@ -122,6 +122,7 @@ body.embed .hint{font-size:14px}
   Shattering: the 35 distinct 4-vs-4 splits, fit on training trials, scored on test trials.
   CCGP: for each variable, hold out one of the four conditions on each side (16 ways),
   fit on the other six, score the held-out conditions' test trials.
+  Map: one of those 16 context readouts (see mapView), with its boundary at x = 0.
 */
 (function () {
   var D = 30, N_TRAIN = 20, N_TEST = 20, P = D + 1;
@@ -130,7 +131,12 @@ body.embed .hint{font-size:14px}
   // almost the cube's shattering; scale 2 makes that mix high on both measures.
   var DEFAULT_SIGMA = 0.75;
   var RANDOM_SCALE = 2;
-  var LETTERS = 'ABCDEFGH';
+  // Condition labels as in the task slide: image and outcome (+ juice, − nothing).
+  // Index bits: 4 = context (set = context 1, red), 2 = action (set = release), 1 = reward.
+  // Context 1: A release +, B hold +, C release −, D hold −.
+  // Context 2: A hold −, B release +, C hold +, D release −.
+  var LABELS = {7: 'A+', 5: 'B+', 6: 'C\u2212', 4: 'D\u2212',
+                0: 'A\u2212', 3: 'B+', 1: 'C+', 2: 'D\u2212'};
   var ALL = [0, 1, 2, 3, 4, 5, 6, 7];
 
   function mulberry32(seed) {
@@ -461,11 +467,14 @@ body.embed .hint{font-size:14px}
     }
     return c ? s / c : 0;
   }
-  function topDir(vecs) {
+  // start: optional weights over the vectors for the power iteration. Where the leading
+  // eigenvalue is shared (the cube, and general position), the result is the start's
+  // projection onto that eigenspace, so the start fixes the direction.
+  function topDir(vecs, start) {
     var n = vecs.length, G = new Float64Array(n * n), i, j, v, w, it, s, nn, dir, lam, d;
     for (i = 0; i < n; i++) for (j = 0; j < n; j++) G[i * n + j] = dotD(vecs[i], vecs[j]);
     v = new Float64Array(n);
-    for (i = 0; i < n; i++) v[i] = Math.sin((i + 1) * 1.3) + 0.1 * (i + 1);
+    for (i = 0; i < n; i++) v[i] = start ? start[i] : Math.sin((i + 1) * 1.3) + 0.1 * (i + 1);
     w = new Float64Array(n);
     for (it = 0; it < 80; it++) {
       for (i = 0; i < n; i++) {
@@ -515,6 +524,9 @@ body.embed .hint{font-size:14px}
     }
     return means;
   }
+  // projectMeans is the earlier map (context coding direction on x). The page no longer draws
+  // it; figures/export_L06_flex_populations.cjs still reads its ang30.
+  //
   // The first two principal components of these eight means lie in the cube subspace
   // until the random part catches up (around λ = 0.55). In that subspace the four
   // context segments are the same vector, so the plane draws them parallel and hides
@@ -568,7 +580,7 @@ body.embed .hint{font-size:14px}
         x += c * ctx[d];
         y += c * (devDir[d] + mix[d]);
       }
-      pts.push({x: x, y: y, pos: (i & 4) !== 0, letter: LETTERS[i]});
+      pts.push({x: x, y: y, pos: (i & 4) !== 0, letter: LABELS[i]});
     }
     segs2 = [];
     for (i = 0; i < 4; i++) segs2.push([pts[i | 4].x - pts[i].x, pts[i | 4].y - pts[i].y]);
@@ -580,12 +592,139 @@ body.embed .hint{font-size:14px}
       ang2: meanAcute(segs2)
     };
   }
-  // Square window covering the whole λ path for this seed. Equal units on x and y,
+  // The page's map is the CCGP view of context. One of the 16 CCGP splits is fixed per seed
+  // (seed 1: the first, which holds out D− of context 1 and A− of context 2). The context
+  // readout is fitted on the other six conditions' training trials, exactly as in evaluate().
+  // x = (w·m + b) / |w|: the signed distance of each mean from that readout's boundary, so the
+  // boundary is x = 0 and context 1 lies toward +x. y: see the comment in mapView. The map also
+  // returns the variance spectrum of the eight means (spectrumOf), drawn as an inset.
+  function heldOutPair(seed) { return VARS[0].jobs[((seed >>> 0) + 15) % 16]; }  // seed 1 → split 0
+  var mapTrain = ALL.map(function () { return new Float64Array(N_TRAIN * D); });
+  function mapView(world, lambda, sigma) {
+    var means = mixMeans(world, lambda), job = heldOutPair(world.seed), lab = VARS[0].y;
+    var c, k, d, i, st, w, b, wn, wu, mu, res, pc, pts, x, yv, held, nOk;
+    zeroG(); xtBuf.fill(0);
+    for (k = 0; k < job.train.length; k++) {
+      c = job.train[k];
+      fillFlat(mapTrain[c], means[c], world.epsTrain[c], sigma);
+      st = statsOf(mapTrain[c]);
+      addStat(st); xTy(st, lab[c]);
+    }
+    symmetrize(); applyRidge(); cholesky(Gbuf, Lbuf, P); cholSolve(Lbuf, xtBuf, wBuf, P);
+    w = new Float64Array(D);
+    for (d = 0; d < D; d++) w[d] = wBuf[d];
+    b = wBuf[D]; wn = nrmD(w) || 1; wu = unitD(w);
+    mu = new Float64Array(D);
+    for (i = 0; i < 8; i++) for (d = 0; d < D; d++) mu[d] += means[i][d] / 8;
+    res = [];
+    for (i = 0; i < 8; i++) {
+      var r = new Float64Array(D), p;
+      for (d = 0; d < D; d++) r[d] = means[i][d] - mu[d];
+      p = dotD(r, wu);
+      for (d = 0; d < D; d++) r[d] -= p * wu[d];
+      res.push(r);
+    }
+    // y: where the four gold segments disagree, plus a fixed action/reward mix. In the cube the
+    // segments are one vector, so y is orthogonal to it and they draw horizontal and parallel.
+    // Bending the cube makes them disagree, and y shows that disagreement as different tilts.
+    var segR = [], meanR = new Float64Array(D), dev = [], dd, devDir, bi, ba, a, m2, act, rew, mix;
+    for (i = 0; i < 4; i++) {
+      var sg = new Float64Array(D), q;
+      for (d = 0; d < D; d++) sg[d] = means[i | 4][d] - means[i][d];
+      q = dotD(sg, wu);
+      for (d = 0; d < D; d++) { sg[d] -= q * wu[d]; meanR[d] += sg[d] / 4; }
+      segR.push(sg);
+    }
+    for (i = 0; i < 4; i++) {
+      var dv = new Float64Array(D);
+      for (d = 0; d < D; d++) dv[d] = segR[i][d] - meanR[d];
+      dev.push(dv);
+    }
+    dd = topDir(dev);
+    devDir = dd.dir;
+    if (dd.lam < 1e-6) devDir = new Float64Array(D);
+    else {
+      bi = 0; ba = -1;
+      for (i = 0; i < 4; i++) {
+        a = Math.abs(dotD(dev[i], devDir));
+        if (a > ba) { ba = a; bi = i; }
+      }
+      if (dotD(dev[bi], devDir) < 0) for (d = 0; d < D; d++) devDir[d] = -devDir[d];
+    }
+    m2 = new Float64Array(D);
+    a = dotD(meanR, devDir);
+    for (d = 0; d < D; d++) m2[d] = meanR[d] - a * devDir[d];
+    m2 = unitD(m2);
+    act = codingDir(means, 2, [wu, devDir, m2]);
+    rew = codingDir(means, 1, [wu, devDir, m2, act]);
+    mix = new Float64Array(D);
+    for (d = 0; d < D; d++) mix[d] = act[d] + 0.45 * rew[d];
+    mix = unitD(mix);
+    pc = new Float64Array(D);
+    // Weight 2 on the action/reward mix keeps the eight points apart at λ = 0, 0.25 and 1
+    // (seeds 1–5); the segment tilts stay clearly visible.
+    for (d = 0; d < D; d++) pc[d] = devDir[d] + 2 * mix[d];
+    pc = unitD(pc);
+    pts = []; nOk = 0;
+    for (i = 0; i < 8; i++) {
+      x = (dotD(w, means[i]) + b) / wn;
+      yv = dotD(res[i], pc);
+      held = job.test.indexOf(i) >= 0;
+      if (held && (x >= 0 ? 1 : -1) === lab[i]) nOk++;
+      pts.push({x: x, y: yv, pos: (i & 4) !== 0, letter: LABELS[i], held: held});
+    }
+    return {
+      pts: pts,
+      held: job.test.slice(),
+      heldCorrect: nOk,
+      xLabel: 'context readout (fitted on 6 conditions)',
+      yLabel: 'action, reward and the bend',
+      spectrum: spectrumOf(means.map(function (m) {
+        var v = new Float64Array(D);
+        for (d = 0; d < D; d++) v[d] = m[d] - mu[d];
+        return v;
+      }))
+    };
+  }
+  // Variance of the eight centred means along each principal direction, as fractions of
+  // the total, largest first (7 values: eight points span at most 7 dimensions), and the
+  // participation ratio (sum of variances)^2 / sum of squared variances. Cyclic Jacobi on
+  // the 8 x 8 Gram matrix, whose eigenvalues are those variances up to a common factor.
+  function spectrumOf(cs) {
+    var n = cs.length, A = new Float64Array(n * n), i, j, k, sweep, p, q, app, aqq, apq, th, t, cth, sth, aip, aiq, ev, tot, sq;
+    for (i = 0; i < n; i++) for (j = 0; j < n; j++) A[i * n + j] = dotD(cs[i], cs[j]);
+    for (sweep = 0; sweep < 30; sweep++) {
+      for (p = 0; p < n; p++) for (q = p + 1; q < n; q++) {
+        apq = A[p * n + q];
+        if (Math.abs(apq) < 1e-14) continue;
+        app = A[p * n + p]; aqq = A[q * n + q];
+        th = (aqq - app) / (2 * apq);
+        t = (th >= 0 ? 1 : -1) / (Math.abs(th) + Math.sqrt(th * th + 1));
+        cth = 1 / Math.sqrt(t * t + 1); sth = t * cth;
+        for (k = 0; k < n; k++) {
+          aip = A[k * n + p]; aiq = A[k * n + q];
+          A[k * n + p] = cth * aip - sth * aiq; A[k * n + q] = sth * aip + cth * aiq;
+        }
+        for (k = 0; k < n; k++) {
+          aip = A[p * n + k]; aiq = A[q * n + k];
+          A[p * n + k] = cth * aip - sth * aiq; A[q * n + k] = sth * aip + cth * aiq;
+        }
+      }
+    }
+    ev = [];
+    for (i = 0; i < n; i++) ev.push(Math.max(0, A[i * n + i]));
+    ev.sort(function (x, y) { return y - x; });
+    ev = ev.slice(0, n - 1);
+    tot = 0; sq = 0;
+    for (i = 0; i < ev.length; i++) { tot += ev[i]; sq += ev[i] * ev[i]; }
+    return {frac: ev.map(function (v) { return tot ? v / tot : 0; }), pr: sq ? tot * tot / sq : 0};
+  }
+  // Square window covering the whole λ path for this seed and σ. Equal units on x and y,
   // so a later frame is not rescaled and the segment angles stay honest.
-  function mapLimits(world) {
-    var xmin = Infinity, xmax = -Infinity, ymin = Infinity, ymax = -Infinity, t, p, i, cx, cy, r;
+  function mapLimits(world, sigma) {
+    var xmin = 0, xmax = 0, ymin = Infinity, ymax = -Infinity, t, p, i, cx, cy, r;
     for (t = 0; t <= 20; t++) {
-      p = projectMeans(mixMeans(world, t / 20));
+      p = mapView(world, t / 20, sigma);
       for (i = 0; i < p.pts.length; i++) {
         if (p.pts[i].x < xmin) xmin = p.pts[i].x;
         if (p.pts[i].x > xmax) xmax = p.pts[i].x;
@@ -606,6 +745,7 @@ body.embed .hint{font-size:14px}
     makeWorld: makeWorld,
     evaluate: evaluate,
     projectMeans: projectMeans,
+    mapView: mapView,
     mapLimits: mapLimits
   };
 })();
@@ -625,7 +765,7 @@ body.embed .hint{font-size:14px}
   var seed = 1, lambda = 0.25, sigma = F.DEFAULT_SIGMA;
   var world = F.makeWorld(seed);
   var pending = false, metrics = null;
-  var mapLim = null, mapLimSeed = -1;
+  var mapLim = null, mapLimSeed = -1, mapLimSigma = -1, view = null;
 
   function fmt(v) { return v.toFixed(2); }
   function fit(cv) {
@@ -724,14 +864,14 @@ body.embed .hint{font-size:14px}
     ctx.fillStyle = COL.body;
     geos.forEach(function (g) { ctx.fillText(g.name, g.cx, top + plotH + 8); });
   }
-  function drawMap(means) {
+  function drawMap(proj) {
     var f = fit(map), ctx = f.ctx, w = f.w, h = f.h;
     ctx.clearRect(0, 0, w, h);
-    if (!mapLim || mapLimSeed !== seed) {
-      mapLim = F.mapLimits(world);
+    if (!mapLim || mapLimSeed !== seed || mapLimSigma !== sigma) {
+      mapLim = F.mapLimits(world, sigma);
       mapLimSeed = seed;
+      mapLimSigma = sigma;
     }
-    var proj = F.projectMeans(means);
     var pts = proj.pts;
     var lim = mapLim;
     var left = 28, right = 18, top = 18, bottom = 36;
@@ -744,6 +884,12 @@ body.embed .hint{font-size:14px}
     function X(v) { return ox + (v - lim.xmin) * scale; }
     function Y(v) { return oy + (lim.ymax - v) * scale; }
     var segPx = [], i;
+    // Decision boundary of the context readout: its output is zero at x = 0.
+    var xb = X(0), yTop = oy, yBot = oy + dataH * scale;
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = COL.slate;
+    ctx.beginPath(); ctx.moveTo(xb, yTop + 22); ctx.lineTo(xb, yBot); ctx.stroke();
+    segPx.push([xb, yTop + 22, xb, yBot]);
     ctx.lineWidth = 2.5;
     ctx.strokeStyle = COL.gold;
     for (i = 0; i < 4; i++) {
@@ -759,9 +905,16 @@ body.embed .hint{font-size:14px}
       var p = pts[i], x = X(p.x), y = Y(p.y);
       dots.push({x: x, y: y, pos: p.pos, letter: p.letter});
       ctx.beginPath(); ctx.arc(x, y, 7, 0, 2 * Math.PI);
-      ctx.fillStyle = p.pos ? COL.ctx : COL.neg;
-      ctx.fill();
-      ctx.lineWidth = 1.5; ctx.strokeStyle = '#fff'; ctx.stroke();
+      if (p.held) {
+        // Held out of the fit: hollow, as the "never seen" points on the toy slides.
+        ctx.fillStyle = COL.paper;
+        ctx.fill();
+        ctx.lineWidth = 3; ctx.strokeStyle = p.pos ? COL.ctx : COL.neg; ctx.stroke();
+      } else {
+        ctx.fillStyle = p.pos ? COL.ctx : COL.neg;
+        ctx.fill();
+        ctx.lineWidth = 1.5; ctx.strokeStyle = '#fff'; ctx.stroke();
+      }
     }
     ctx.font = '16px Poppins, system-ui, sans-serif';
     ctx.textBaseline = 'middle';
@@ -823,7 +976,11 @@ body.embed .hint{font-size:14px}
       for (k = 0; k < placed.length; k++) c = Math.min(c, boxBoxDist(rect, placed[k].rect) - 2);
       return c;
     }
-    var placed = [], order = [];
+    ctx.font = '15px Poppins, system-ui, sans-serif';
+    var bTxt = 'boundary', bW = ctx.measureText(bTxt).width;
+    var placed = [{ax: xb - bW / 2, ay: yTop + 10, align: 'left', letter: bTxt, small: true,
+      rect: {l: xb - bW / 2 - 2, t: yTop + 1, r: xb + bW / 2 + 2, b: yTop + 19}}], order = [];
+    ctx.font = '16px Poppins, system-ui, sans-serif';
     for (i = 0; i < dots.length; i++) order.push(i);
     order.sort(function (a, b) { return dots[a].y - dots[b].y; });
     for (var oi = 0; oi < order.length; oi++) {
@@ -853,8 +1010,9 @@ body.embed .hint{font-size:14px}
       }
       placed.push(best);
     }
-    ctx.fillStyle = COL.ink;
     for (i = 0; i < placed.length; i++) {
+      ctx.font = (placed[i].small ? '15px' : '16px') + ' Poppins, system-ui, sans-serif';
+      ctx.fillStyle = placed[i].small ? COL.slate : COL.ink;
       ctx.textAlign = placed[i].align;
       halo(ctx, placed[i].letter, placed[i].ax, placed[i].ay);
     }
@@ -870,6 +1028,39 @@ body.embed .hint{font-size:14px}
     ctx.textBaseline = 'middle';
     ctx.fillText(proj.yLabel, 0, 0);
     ctx.restore();
+    drawSpectrum(ctx, proj.spectrum, ox + dataW * scale + 24, w - 12, oy + 8, oy + dataH * scale);
+  }
+  // Inset right of the map: variance of the eight means along each direction. The cube uses
+  // 3 directions; bending adds the others. Fixed height scale, so settings compare.
+  function drawSpectrum(ctx, sp, x0, x1, y0, y1) {
+    if (!sp || x1 - x0 < 130) return;
+    var n = sp.frac.length, wBox = Math.min(x1 - x0, 230), gap = 6;
+    var bw = (wBox - gap * (n - 1)) / n, top = y0 + 46, base = y1 - 58, hMax = base - top;
+    var i, hb, bx;
+    ctx.fillStyle = COL.ink;
+    ctx.font = '600 15px Poppins, system-ui, sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('Dimensions used', x0, y0 + 14);
+    ctx.fillStyle = COL.slate;
+    ctx.font = '14px Poppins, system-ui, sans-serif';
+    ctx.fillText('variance of the 8 means', x0, y0 + 34);
+    ctx.strokeStyle = COL.rule; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x0, base + 0.5); ctx.lineTo(x0 + wBox, base + 0.5); ctx.stroke();
+    for (i = 0; i < n; i++) {
+      hb = Math.min(1, sp.frac[i] / 0.35) * hMax;
+      bx = x0 + i * (bw + gap);
+      ctx.fillStyle = COL.slate;
+      ctx.fillRect(bx, base - hb, bw, hb);
+      ctx.fillStyle = COL.slate;
+      ctx.textAlign = 'center';
+      ctx.fillText(String(i + 1), bx + bw / 2, base + 18);
+    }
+    ctx.textAlign = 'left';
+    ctx.fillStyle = COL.slate;
+    ctx.fillText('direction', x0, base + 36);
+    ctx.fillStyle = COL.ink;
+    ctx.font = '15px Poppins, system-ui, sans-serif';
+    ctx.fillText('participation ratio ' + sp.pr.toFixed(1), x0, base + 56);
   }
   function syncControls() {
     lamInput.value = String(lambda);
@@ -892,10 +1083,12 @@ body.embed .hint{font-size:14px}
     metrics = F.evaluate(world, lambda, sigma);
     var ms = (typeof performance !== 'undefined') ? performance.now() - t0 : 0;
     syncControls();
+    view = F.mapView(world, lambda, sigma);
     drawChart(metrics);
-    drawMap(metrics.means);
+    drawMap(view);
     var text = 'Shattering ' + fmt(metrics.shatter) + ' · CCGP context ' + fmt(metrics.ccgp[0]) +
-      ' · decoding context ' + fmt(metrics.decode[0]);
+      ' · decoding context ' + fmt(metrics.decode[0]) +
+      ' · held-out pair: ' + view.heldCorrect + ' of 2 on the correct side';
     live.textContent = text;
     chart.setAttribute('aria-label',
       'Bar chart. Shattering ' + fmt(metrics.shatter) +
@@ -903,10 +1096,23 @@ body.embed .hint{font-size:14px}
       ', reward ' + fmt(metrics.ccgp[2]) +
       '. Decoding context ' + fmt(metrics.decode[0]) + ', action ' + fmt(metrics.decode[1]) +
       ', reward ' + fmt(metrics.decode[2]) + '.');
+    var heldNames = view.held.map(function (c) {
+      var p = view.pts[c];
+      return p.letter + ' of context ' + (p.pos ? 1 : 2) + ' on the ' +
+        (p.x >= 0 ? 'context 1' : 'context 2') + ' side';
+    });
+    map.setAttribute('aria-label',
+      'Map of the eight condition means. Horizontal: a context readout fitted on six conditions, ' +
+      'with its boundary as a vertical line; context 1 (red) belongs right of it, context 2 (blue) left. ' +
+      'Vertical: action and reward, plus the direction in which the gold segments differ. The six fitted conditions are filled; the two held out are hollow: ' +
+      heldNames.join(' and ') + ', so ' + view.heldCorrect + ' of 2 are on the correct side. ' +
+      'Gold segments join conditions that differ only in context. Inset: variance of the eight means along each of 7 directions, ' +
+      view.spectrum.frac.map(function (f) { return Math.round(100 * f) + '%'; }).join(', ') +
+      '; participation ratio ' + view.spectrum.pr.toFixed(1) + '.');
     globalThis.__FLEX_STATE = {
       seed: seed, lambda: lambda, sigma: sigma, ms: ms,
       shatter: metrics.shatter, ccgp: metrics.ccgp.slice(), decode: metrics.decode.slice(),
-      live: text
+      heldCorrect: view.heldCorrect, held: view.held.slice(), live: text
     };
     globalThis.__FLEX_READY = true;
   }
@@ -934,8 +1140,8 @@ body.embed .hint{font-size:14px}
   if (STATIC) { seed = 1; lambda = 0.25; sigma = F.DEFAULT_SIGMA; world = F.makeWorld(seed); }
   sigInput.value = String(F.DEFAULT_SIGMA);
   sigma = F.DEFAULT_SIGMA;
-  new ResizeObserver(function () { if (metrics) { drawChart(metrics); drawMap(metrics.means); } }).observe(chart.parentElement);
-  new ResizeObserver(function () { if (metrics) { drawChart(metrics); drawMap(metrics.means); } }).observe(map.parentElement);
+  new ResizeObserver(function () { if (metrics) { drawChart(metrics); drawMap(view); } }).observe(chart.parentElement);
+  new ResizeObserver(function () { if (metrics) { drawChart(metrics); drawMap(view); } }).observe(map.parentElement);
   render();
 })();
 </script>
