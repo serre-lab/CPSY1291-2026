@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Baselines, tests &amp; the model neuron · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Baselines, tests &amp; the model neuron</h1><p>Reader-friendly version of the 47 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L07_baselines-model-neuron.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Baselines, tests &amp; the model neuron</a></li><li><a href="#slide-2">Flexible or abstract: can one population be both?</a></li><li><a href="#slide-3">Reminder: shattering measures flexibility</a></li><li><a href="#slide-4">Reminder: CCGP measures abstraction</a></li><li><a href="#slide-5">The task: a hidden context</a></li><li><a href="#slide-6">The monkeys infer the hidden context</a></li><li><a href="#slide-7">Toy geometry: clustered by context</a></li><li><a href="#slide-8">Toy geometry: points in general position</a></li><li><a href="#slide-9">Toy geometry: a square</a></li><li><a href="#slide-10">Toy geometry: the square, bent</a></li><li><a href="#slide-11">Try it: flexible or abstract?</a></li><li><a href="#slide-12">Hippocampus: context transfers, action does not</a></li><li><a href="#slide-13">Errors: the geometry breaks, the information does not</a></li><li><a href="#slide-14">Recap: measures of one population</a></li><li><a href="#slide-15">Baselines and tests</a></li><li><a href="#slide-16">When does a score mean anything?</a></li><li><a href="#slide-17">1. Is the score above chance?</a></li><li><a href="#slide-18">Correlation by chance: the null distribution</a></li><li><a href="#slide-19">Above chance? Shuffle the images</a></li><li><a href="#slide-20">Readouts: shuffle the labels</a></li><li><a href="#slide-21">Random directions in many dimensions</a></li><li><a href="#slide-22">Few stimuli: unrelated systems can score high</a></li><li><a href="#slide-23">2. Would it hold on new images?</a></li><li><a href="#slide-24">Hold out every image once: cross-validation</a></li><li><a href="#slide-25">Leakage: keep the test images out of every step</a></li><li><a href="#slide-26">Would the ranking hold on a new sample of images?</a></li><li><a href="#slide-27">3. How high could the score be?</a></li><li><a href="#slide-28">Brains are noisy, networks are not</a></li><li><a href="#slide-29">How high could a score be? The noise ceiling</a></li><li><a href="#slide-30">The same area in another brain</a></li><li><a href="#slide-31">Change the measure, and the winner changes</a></li><li><a href="#slide-32">One neuron</a></li><li><a href="#slide-33">What a real neuron does, and what we keep</a></li><li><a href="#slide-34">Building the neuron: inputs</a></li><li><a href="#slide-35">Building the neuron: weights</a></li><li><a href="#slide-36">Building the neuron: summation</a></li><li><a href="#slide-37">Building the neuron: activation and output</a></li><li><a href="#slide-38">Transfer functions: the nonlinearity gg</a></li><li><a href="#slide-39">The weighted sum is a dot product</a></li><li><a href="#slide-40">The single neuron, full picture</a></li><li><a href="#slide-41">A neuron is a feature detector: template matching</a></li><li><a href="#slide-42">Recap</a></li><li><a href="#slide-43">Further reading</a></li><li><a href="#slide-44">Minute paper</a></li><li><a href="#slide-45">Appendix</a></li><li><a href="#slide-46">AlexNet's first layer: tuning curves</a></li><li><a href="#slide-47">Are they the same templates?</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Baselines, tests &amp; the model neuron · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Baselines, tests &amp; the model neuron</h1><p>Reader-friendly version of the 44 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L07_baselines-model-neuron.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Baselines, tests &amp; the model neuron</a></li><li><a href="#slide-2">Flexible or abstract: can one population be both?</a></li><li><a href="#slide-3">Reminder: shattering measures flexibility</a></li><li><a href="#slide-4">Reminder: CCGP measures abstraction</a></li><li><a href="#slide-5">The task: a hidden context</a></li><li><a href="#slide-6">The monkeys infer the hidden context</a></li><li><a href="#slide-7">Toy geometry: clustered by context</a></li><li><a href="#slide-8">Toy geometry: points in general position</a></li><li><a href="#slide-9">Toy geometry: a square</a></li><li><a href="#slide-10">Toy geometry: the square, bent</a></li><li><a href="#slide-11">Try it: flexible or abstract?</a></li><li><a href="#slide-12">Hippocampus: context transfers, action does not</a></li><li><a href="#slide-13">Errors: the geometry breaks, the information does not</a></li><li><a href="#slide-14">Recap: measures of one population</a></li><li><a href="#slide-15">Baselines and tests</a></li><li><a href="#slide-16">When does a score mean anything?</a></li><li><a href="#slide-17">1. Is the score above chance?</a></li><li><a href="#slide-18">Correlation by chance: the null distribution</a></li><li><a href="#slide-19">Above chance? Shuffle the images</a></li><li><a href="#slide-20">Readouts: shuffle the labels</a></li><li><a href="#slide-21">Random directions in many dimensions</a></li><li><a href="#slide-22">Few stimuli: unrelated systems can score high</a></li><li><a href="#slide-23">2. Would it hold on new images?</a></li><li><a href="#slide-24">Hold out every image once: cross-validation</a></li><li><a href="#slide-25">Leakage: keep the test images out of every step</a></li><li><a href="#slide-26">Would the ranking hold on a new sample of images?</a></li><li><a href="#slide-27">3. How high could the score be?</a></li><li><a href="#slide-28">Brains are noisy, networks are not</a></li><li><a href="#slide-29">How high could a score be? The noise ceiling</a></li><li><a href="#slide-30">The same area in another brain</a></li><li><a href="#slide-31">Change the measure, and the winner changes</a></li><li><a href="#slide-32">One neuron</a></li><li><a href="#slide-33">What a real neuron does, and what we keep</a></li><li><a href="#slide-34">Building the neuron: inputs</a></li><li><a href="#slide-35">Building the neuron: weights</a></li><li><a href="#slide-36">Building the neuron: summation</a></li><li><a href="#slide-37">Building the neuron: activation and output</a></li><li><a href="#slide-38">Transfer functions: the nonlinearity gg</a></li><li><a href="#slide-39">The weighted sum is a dot product</a></li><li><a href="#slide-40">The single neuron, full picture</a></li><li><a href="#slide-41">A neuron's weights set a decision boundary</a></li><li><a href="#slide-42">Recap</a></li><li><a href="#slide-43">Further reading for the research trail</a></li><li><a href="#slide-44">Minute paper</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
   <img src="../images/brown-crest-color.png" alt="Brown University crest">
   <div class="vrule"></div>
   <div>
@@ -10,10 +10,10 @@
 <h2 id="heading-1">Baselines, tests &amp; the model neuron</h2>
 <p class="meta">Tuesday, October 6 · Fall 2026</p>
 
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-class="lead" data-marpit-pagination="2" data-marpit-pagination-total="47" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-class="lead" data-marpit-pagination="2" data-marpit-pagination-total="44" aria-labelledby="heading-2"><p class="page">Slide 2</p>
 <h2 id="heading-2">Flexible or abstract: can one population be both?</h2>
 <h2 id="the-geometry-of-a-population-how-it-arranges-its-conditions-decides-whether-it-is-flexible-shattering-or-abstract-ccgp">The geometry of a population: how it arranges its conditions decides whether it is flexible (shattering) or abstract (CCGP)</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-marpit-scope-oxws0qtj="" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="47" aria-labelledby="heading-3"><p class="page">Slide 3</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-marpit-scope-isqrs3cs="" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="44" aria-labelledby="heading-3"><p class="page">Slide 3</p>
 <h2 id="heading-3">Reminder: shattering measures flexibility</h2>
 <div class="row">
 <div class="col fig">
@@ -30,7 +30,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1109/PGEC.1965.264137" rel="noopener">Cover <b>IEEE Trans Electron Comput 1965</b></a> · <a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="47" aria-labelledby="heading-4"><p class="page">Slide 4</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="44" aria-labelledby="heading-4"><p class="page">Slide 4</p>
 <h2 id="heading-4">Reminder: CCGP measures abstraction</h2>
 <div class="row">
 <div class="col fig">
@@ -44,7 +44,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-marpit-pagination="5" data-marpit-pagination-total="47" aria-labelledby="heading-5"><p class="page">Slide 5</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-marpit-pagination="5" data-marpit-pagination-total="44" aria-labelledby="heading-5"><p class="page">Slide 5</p>
 <h2 id="heading-5">The task: a hidden context</h2>
 <div class="capfig">
 <figure><img src="../images/L06/bernardi_task.svg" alt="Schematic of one trial: inter-trial interval 1750 ms, hold the button and fixate 400 ms, one of four images A to D for 500 ms, hold or release within 900 ms, a 500 ms wait, then the outcome, juice or nothing. Below, two tables, each row tagged with its condition. Context 1 (red): A release, juice, A plus; B hold, juice, B plus; C release, none, C minus; D hold, none, D minus. Context 2 (blue): A hold, none, A minus; B release, juice, B plus; C hold, juice, C plus; D release, none, D minus. Between them: switch every 50 to 70 trials, no cue, inferred from outcomes" aria-describedby="figure-5-1"><figcaption id="figure-5-1"><p>Schematic of one trial: inter-trial interval 1750 ms, hold the button and fixate 400 ms, one of four images A to D for 500 ms, hold or release within 900 ms, a 500 ms wait, then the outcome, juice or nothing. Below, two tables, each row tagged with its condition. Context 1 (red): A release, juice, A plus; B hold, juice, B plus; C release, none, C minus; D hold, none, D minus. Context 2 (blue): A hold, none, A minus; B release, juice, B plus; C hold, juice, C plus; D release, none, D minus. Between them: switch every 50 to 70 trials, no cue, inferred from outcomes</p><a href="../images/L06/bernardi_task.svg">Open full-size figure</a></figcaption></figure>
@@ -55,7 +55,7 @@
 <li>An uncued <strong>context</strong> flips the rules. Neurons are read before the response, so action and reward are the <strong>previous</strong> trial's</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="47" aria-labelledby="heading-6"><p class="page">Slide 6</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="44" aria-labelledby="heading-6"><p class="page">Slide 6</p>
 <h2 id="heading-6">The monkeys infer the hidden context</h2>
 <div class="row">
 <div class="col fig">
@@ -73,7 +73,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-marpit-pagination="7" data-marpit-pagination-total="47" aria-labelledby="heading-7"><p class="page">Slide 7</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-marpit-pagination="7" data-marpit-pagination-total="44" aria-labelledby="heading-7"><p class="page">Slide 7</p>
 <h2 id="heading-7">Toy geometry: clustered by context</h2>
 <div class="row">
 <div class="col fig">
@@ -90,7 +90,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="47" aria-labelledby="heading-8"><p class="page">Slide 8</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="44" aria-labelledby="heading-8"><p class="page">Slide 8</p>
 <h2 id="heading-8">Toy geometry: points in general position</h2>
 <div class="row">
 <div class="col fig">
@@ -107,7 +107,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="47" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="44" aria-labelledby="heading-9"><p class="page">Slide 9</p>
 <h2 id="heading-9">Toy geometry: a square</h2>
 <div class="row">
 <div class="col fig">
@@ -124,7 +124,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="47" aria-labelledby="heading-10"><p class="page">Slide 10</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="44" aria-labelledby="heading-10"><p class="page">Slide 10</p>
 <h2 id="heading-10">Toy geometry: the square, bent</h2>
 <div class="row">
 <div class="col fig">
@@ -141,7 +141,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="47" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="44" aria-labelledby="heading-11"><p class="page">Slide 11</p>
 <h2 id="heading-11">Try it: flexible or abstract?</h2>
 <figure><img class="cube-mnemonic" src="../images/L07/cube_mnemonic.svg" alt="Small reminder sketch: a cube whose eight corners are the eight conditions, red for context 1 and blue for context 2, with its edges labelled context, action and reward" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>Small reminder sketch: a cube whose eight corners are the eight conditions, red for context 1 and blue for context 2, with its edges labelled context, action and reward</p><a href="../images/L07/cube_mnemonic.svg">Open full-size figure</a></figcaption></figure>
 <div class="interactive-figure interactive-wide">
@@ -153,7 +153,7 @@
 <ul>
 <li>The <strong>mix</strong> slider: cube (0) to general position (1). <mark>Shattering rises, CCGP falls, decoding stays high</mark></li>
 </ul>
-<p class="explorer-links"><a href="../demos/flexible_abstract.html">Eight task conditions (context, action and reward, each two-valued) as responses of 30 model units. A slider mixes the conditions from the corners of a cube (abstract) toward random positions (flexible). A bar chart updates live: shattering accuracy as a black line, CCGP for context, action and reward as filled bars, decoding with all conditions in training as outline bars, chance at 0.5. A map shows the eight condition means, with gold segments joining conditions that differ only in context, and an inset shows how many directions the means use (participation ratio) — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="47" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<p class="explorer-links"><a href="../demos/flexible_abstract.html">Eight task conditions (context, action and reward, each two-valued) as responses of 30 model units. A slider mixes the conditions from the corners of a cube (abstract) toward random positions (flexible). A bar chart updates live: shattering accuracy as a black line, CCGP for context, action and reward as filled bars, decoding with all conditions in training as outline bars, chance at 0.5. A map shows the eight condition means, with gold segments joining conditions that differ only in context, and an inset shows how many directions the means use (participation ratio) — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="44" aria-labelledby="heading-12"><p class="page">Slide 12</p>
 <h2 id="heading-12">Hippocampus: context transfers, action does not</h2>
 <div class="row">
 <div class="col fig">
@@ -170,7 +170,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="47" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="44" aria-labelledby="heading-13"><p class="page">Slide 13</p>
 <h2 id="heading-13">Errors: the geometry breaks, the information does not</h2>
 <figure><img src="../images/L07/pub_bernardi2020_fig6ab.png" alt="Bernardi et al. (2020) Fig. 6a and 6b. A: context CCGP on correct trials (red) and error trials (magenta) in HPC, DLPFC and ACC; on error trials it is lower in all three areas, about 0.74 to 0.64, 0.72 to 0.65 and 0.67 to 0.60, each marked significant. B: decoding accuracy for context on correct and error trials in the same areas, about 0.70 to 0.63, 0.77 to 0.71 and 0.72 to 0.67, none significant" aria-describedby="figure-13-1"><figcaption id="figure-13-1"><p>Bernardi et al. (2020) Fig. 6a and 6b. A: context CCGP on correct trials (red) and error trials (magenta) in HPC, DLPFC and ACC; on error trials it is lower in all three areas, about 0.74 to 0.64, 0.72 to 0.65 and 0.67 to 0.60, each marked significant. B: decoding accuracy for context on correct and error trials in the same areas, about 0.70 to 0.63, 0.77 to 0.71 and 0.72 to 0.67, none significant</p><a href="../images/L07/pub_bernardi2020_fig6ab.png">Open full-size figure</a></figcaption></figure>
 <ul>
@@ -178,7 +178,7 @@
 <li><strong>A</strong>: context CCGP drops on error trials in all three areas. <strong>B</strong>: decoding of context, with all conditions in training, does not drop significantly</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="47" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="44" aria-labelledby="heading-14"><p class="page">Slide 14</p>
 <h2 id="heading-14">Recap: measures of one population</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Recap: measures of one population — table"><table><caption>Recap: measures of one population — table</caption>
 <thead>
@@ -213,9 +213,9 @@
 </table></div>
 <p>Why it matters: both read the population's <strong>geometry</strong>, how its conditions are arranged. Shattering says how many new rules a downstream neuron could learn from the population; CCGP says whether what it learned carries over to new situations, and it drops when the monkeys err.</p>
 <p><mark>Each score is one number about one population. When does such a number mean anything?</mark></p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-class="lead" data-marpit-pagination="15" data-marpit-pagination-total="47" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-class="lead" data-marpit-pagination="15" data-marpit-pagination-total="44" aria-labelledby="heading-15"><p class="page">Slide 15</p>
 <h2 id="heading-15">Baselines and tests</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="47" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="44" aria-labelledby="heading-16"><p class="page">Slide 16</p>
 <h2 id="heading-16">When does a score mean anything?</h2>
 <div class="capfig">
 <figure><img src="../images/L05/55_rdm_pair.svg" alt="Two 51 by 51 dissimilarity matrices for the same Bao objects in the same category order, with object thumbnails along the edges, from monkey IT (480 neurons, left) and ResNet-18's late layer (4,096 units, right). Both show a light block for faces and lighter blocks within animals and within vehicles" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>Two 51 by 51 dissimilarity matrices for the same Bao objects in the same category order, with object thumbnails along the edges, from monkey IT (480 neurons, left) and ResNet-18's late layer (4,096 units, right). Both show a light block for faces and lighter blocks within animals and within vehicles</p><a href="../images/L05/55_rdm_pair.svg">Open full-size figure</a></figcaption></figure>
@@ -224,10 +224,10 @@
 <ul>
 <li>IT vs ResNet-18: <strong>RSA = 0.71</strong>. Is that high? A quantitative claim needs three things: is it <strong>statistically significant</strong>, is it <strong>reliable</strong> across samples of images, how close is it to its <strong>ceiling</strong>?</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-class="lead" data-marpit-pagination="17" data-marpit-pagination-total="47" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-class="lead" data-marpit-pagination="17" data-marpit-pagination-total="44" aria-labelledby="heading-17"><p class="page">Slide 17</p>
 <h2 id="heading-17">1. Is the score above chance?</h2>
 <h2 id="what-a-meaningless-pairing-scores-shuffles-and-random-baselines">What a meaningless pairing scores: shuffles and random baselines</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="47" aria-labelledby="heading-18"><p class="page">Slide 18</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="44" aria-labelledby="heading-18"><p class="page">Slide 18</p>
 <h2 id="heading-18">Correlation by chance: the null distribution</h2>
 <div class="row">
 <div class="col fig">
@@ -243,7 +243,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="47" aria-labelledby="heading-19"><p class="page">Slide 19</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="44" aria-labelledby="heading-19"><p class="page">Slide 19</p>
 <h2 id="heading-19">Above chance? Shuffle the images</h2>
 <div class="row">
 <div class="col fig">
@@ -260,7 +260,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1371/journal.pcbi.1003553" rel="noopener">Nili et al. <b>PLoS Comput Biol 2014</b></a> · <a href="https://doi.org/10.7554/eLife.82580" rel="noopener">Hebart et al. <b>eLife 2023</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="47" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="44" aria-labelledby="heading-20"><p class="page">Slide 20</p>
 <h2 id="heading-20">Readouts: shuffle the labels</h2>
 <div class="capfig">
 <figure><img src="../images/L07/shuffled_labels.svg" alt="Two panels for a readout of animate versus inanimate from 480 monkey IT neurons, trained on 102 images and tested on 306. Left: accuracy bars; with true labels, training 1.00 and test 0.96; with shuffled training labels, training 1.00 and test 0.56 on average, below a dashed majority-class line at 0.63. Right: histogram of the test accuracy over 1,000 label shuffles, centred near 0.55, with its 95th percentile marked near 0.67 and the true-label test accuracy, 0.96, far to the right" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>Two panels for a readout of animate versus inanimate from 480 monkey IT neurons, trained on 102 images and tested on 306. Left: accuracy bars; with true labels, training 1.00 and test 0.96; with shuffled training labels, training 1.00 and test 0.56 on average, below a dashed majority-class line at 0.63. Right: histogram of the test accuracy over 1,000 label shuffles, centred near 0.55, with its 95th percentile marked near 0.67 and the true-label test accuracy, 0.96, far to the right</p><a href="../images/L07/shuffled_labels.svg">Open full-size figure</a></figcaption></figure>
@@ -271,7 +271,7 @@
 <li><strong>Curse of dimensionality</strong>: more neurons (480) than training images (102), so any labels fit. Deep networks too (<strong>Zhang et al. 2017</strong>)</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. <b>Nature 2020</b></a> · <a href="https://arxiv.org/abs/1611.03530" rel="noopener">Zhang et al. <b>ICLR 2017</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="47" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="44" aria-labelledby="heading-21"><p class="page">Slide 21</p>
 <h2 id="heading-21">Random directions in many dimensions</h2>
 <div class="capfig">
 <figure><img src="../images/L05/61_random_directions_f1.svg" alt="Histograms of the cosine between two random vectors for 2, 10, 100 and 1,000 dimensions, and a curve of the mean absolute cosine against the number of dimensions: in 2 dimensions the cosines spread from minus 1 to 1; as the dimension grows they pile up around 0, and the mean absolute cosine falls roughly as one over the square root of the dimension" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>Histograms of the cosine between two random vectors for 2, 10, 100 and 1,000 dimensions, and a curve of the mean absolute cosine against the number of dimensions: in 2 dimensions the cosines spread from minus 1 to 1; as the dimension grows they pile up around 0, and the mean absolute cosine falls roughly as one over the square root of the dimension</p><a href="../images/L05/61_random_directions_f1.svg">Open full-size figure</a></figcaption></figure>
@@ -281,7 +281,7 @@
 <li><strong>Within one system</strong>: each stimulus is a vector of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> unit responses. In 1,000-D, two random stimulus vectors are nearly perpendicular: mean <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∣</mi><mi>cos</mi><mo>⁡</mo><mi>ϕ</mi><mi mathvariant="normal">∣</mi></mrow><annotation encoding="application/x-tex">|\cos\phi|</annotation></semantics></math> 0.026 (2-D: 0.64)</li>
 <li>More units than stimuli: all stimuli nearly perpendicular, so 102 images in 480 neurons took any labels</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-marpit-pagination="22" data-marpit-pagination-total="47" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-marpit-pagination="22" data-marpit-pagination-total="44" aria-labelledby="heading-22"><p class="page">Slide 22</p>
 <h2 id="heading-22">Few stimuli: unrelated systems can score high</h2>
 <div class="capfig">
 <figure><img src="../images/L05/61_random_directions_f2.svg" alt="Linear CKA between two matrices of random Gaussian numbers, with more units than stimuli, against the number of stimuli on a log axis: near 1 with ten stimuli and falling as stimuli are added, although the two matrices share nothing" aria-describedby="figure-22-1"><figcaption id="figure-22-1"><p>Linear CKA between two matrices of random Gaussian numbers, with more units than stimuli, against the number of stimuli on a log axis: near 1 with ten stimuli and falling as stimuli are added, although the two matrices share nothing</p><a href="../images/L05/61_random_directions_f2.svg">Open full-size figure</a></figcaption></figure>
@@ -290,10 +290,10 @@
 <li><strong>Linear CKA</strong> compares two systems' <strong>Gram matrices</strong> (dot products between stimuli). Two unrelated random systems, 4,096 units: near 1 with 10 stimuli</li>
 <li><mark>Few stimuli, many units: each Gram matrix is mostly its diagonal, alike in any two systems</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-class="lead" data-marpit-pagination="23" data-marpit-pagination-total="47" aria-labelledby="heading-23"><p class="page">Slide 23</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-class="lead" data-marpit-pagination="23" data-marpit-pagination-total="44" aria-labelledby="heading-23"><p class="page">Slide 23</p>
 <h2 id="heading-23">2. Would it hold on new images?</h2>
 <h2 id="two-kinds-of-new-images-images-the-fit-never-saw-cross-validation-and-another-sample-of-images-bootstrap">Two kinds of new images: images the fit never saw (cross-validation), and another sample of images (bootstrap)</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="47" aria-labelledby="heading-24"><p class="page">Slide 24</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="44" aria-labelledby="heading-24"><p class="page">Slide 24</p>
 <h2 id="heading-24">Hold out every image once: cross-validation</h2>
 <div class="capfig">
 <figure><img src="../images/L07/cross_validation.svg" alt="Left, a schematic of 5-fold cross-validation: five rows labelled fit 1 to fit 5, each a strip of five folds; in each row a different fold is red and marked test and the other four are grey, so every fold is tested exactly once. Right, for one monkey IT site predicted from a network's features, each of the 1,224 images' out-of-fold prediction against its recorded response, scattered along the diagonal, R-squared 0.60 over all images" aria-describedby="figure-24-1"><figcaption id="figure-24-1"><p>Left, a schematic of 5-fold cross-validation: five rows labelled fit 1 to fit 5, each a strip of five folds; in each row a different fold is red and marked test and the other four are grey, so every fold is tested exactly once. Right, for one monkey IT site predicted from a network's features, each of the 1,224 images' out-of-fold prediction against its recorded response, scattered along the diagonal, R-squared 0.60 over all images</p><a href="../images/L07/cross_validation.svg">Open full-size figure</a></figcaption></figure>
@@ -303,7 +303,7 @@
 <li>Right: one IT site predicted from ResNet-18 (fit next lecture). Score <strong>R²</strong>: here the squared correlation of prediction and response (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mn>0.77</mn></mrow><annotation encoding="application/x-tex">r = 0.77</annotation></semantics></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup><mo>=</mo><mn>0.60</mn></mrow><annotation encoding="application/x-tex">R^2 = 0.60</annotation></semantics></math>)</li>
 <li><mark>One split can be lucky</mark>: one fold alone gives R² 0.53 to 0.64; all five together, 0.60</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="47" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="44" aria-labelledby="heading-25"><p class="page">Slide 25</p>
 <h2 id="heading-25">Leakage: keep the test images out of every step</h2>
 <ul>
 <li><strong>Leakage</strong>: the test images influence some step of the fit. The test score is then too optimistic</li>
@@ -312,7 +312,7 @@
 <li><mark>Split first, then fit every step on the training images</mark></li>
 </ul>
 <p>Note: in our assignments the IT recordings come already cleaned, with missing values filled and each unit centred and scaled, using all 1,224 images before any split. That is a small leak, accepted to keep the assignments simple. To publish, do these steps on the training images only.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="47" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="44" aria-labelledby="heading-26"><p class="page">Slide 26</p>
 <h2 id="heading-26">Would the ranking hold on a new sample of images?</h2>
 <div class="row">
 <div class="col fig">
@@ -329,10 +329,10 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.7554/eLife.82566" rel="noopener">Schütt et al. <b>eLife 2023</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-class="lead" data-marpit-pagination="27" data-marpit-pagination-total="47" aria-labelledby="heading-27"><p class="page">Slide 27</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-class="lead" data-marpit-pagination="27" data-marpit-pagination-total="44" aria-labelledby="heading-27"><p class="page">Slide 27</p>
 <h2 id="heading-27">3. How high could the score be?</h2>
 <h2 id="noise-in-the-recordings-sets-a-ceiling">Noise in the recordings sets a ceiling</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="47" aria-labelledby="heading-28"><p class="page">Slide 28</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="44" aria-labelledby="heading-28"><p class="page">Slide 28</p>
 <h2 id="heading-28">Brains are noisy, networks are not</h2>
 <div class="capfig">
 <figure><img src="../images/L07/trial_noise_crossing.svg" alt="Responses of one monkey IT electrode on each of 30 repeats of three THINGS images, a chipmunk, a stalagmite and a pan, with a dashed line at each image's mean. The chipmunk responses sit far above the others. The stalagmite's mean is slightly above the pan's, but the two sets of single responses overlap, and the pan comes out above the stalagmite on 9 of the 30 presentations. Beside it, one ResNet-18 unit whose response to each image is identical on every repeat, in the same order" aria-describedby="figure-28-1"><figcaption id="figure-28-1"><p>Responses of one monkey IT electrode on each of 30 repeats of three THINGS images, a chipmunk, a stalagmite and a pan, with a dashed line at each image's mean. The chipmunk responses sit far above the others. The stalagmite's mean is slightly above the pan's, but the two sets of single responses overlap, and the pan comes out above the stalagmite on 9 of the 30 presentations. Beside it, one ResNet-18 unit whose response to each image is identical on every repeat, in the same order</p><a href="../images/L07/trial_noise_crossing.svg">Open full-size figure</a></figcaption></figure>
@@ -343,7 +343,7 @@
 <li><mark>Noise caps every score</mark>. The <strong>split-half reliability</strong>, how well the means of two halves of the repeats agree across images, says how much of the recording repeats</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1016/j.neuron.2024.12.003" rel="noopener">Papale et al. <b>Neuron 2025</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="47" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="44" aria-labelledby="heading-29"><p class="page">Slide 29</p>
 <h2 id="heading-29">How high could a score be? The noise ceiling</h2>
 <div class="row">
 <div class="col fig">
@@ -360,7 +360,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1016/j.neuron.2024.12.003" rel="noopener">Papale et al. <b>Neuron 2025</b></a> · <a href="https://doi.org/10.1371/journal.pcbi.1003553" rel="noopener">Nili et al. <b>PLoS Comput Biol 2014</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="47" aria-labelledby="heading-30"><p class="page">Slide 30</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="44" aria-labelledby="heading-30"><p class="page">Slide 30</p>
 <h2 id="heading-30">The same area in another brain</h2>
 <div class="capfig">
 <figure><img src="../images/L05/56_areas_design.svg" alt="A 6 by 6 design grid: V1, V4 and IT of monkey F and of monkey N along both axes. Cells are labeled by what they compare: the same area in the same animal (the diagonal), the same area in the other animal, and different areas; no values are shown" aria-describedby="figure-30-1"><figcaption id="figure-30-1"><p>A 6 by 6 design grid: V1, V4 and IT of monkey F and of monkey N along both axes. Cells are labeled by what they compare: the same area in the same animal (the diagonal), the same area in the other animal, and different areas; no values are shown</p><a href="../images/L05/56_areas_design.svg">Open full-size figure</a></figcaption></figure>
@@ -371,7 +371,7 @@
 <li><mark>Report a score between its references: the shuffled floor, the noise ceiling, another brain</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1016/j.neuron.2024.12.003" rel="noopener">Papale et al. <b>Neuron 2025</b></a> · <a href="https://doi.org/10.1038/s41586-023-06714-0" rel="noopener">Safaie et al. <b>Nature 2023</b></a> · <a href="https://www.thetransmitter.org/neural-dynamics/neural-population-based-approaches-have-opened-new-windows-into-neural-computations-and-behavior/" rel="noopener">Perich <b>The Transmitter 2025</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="47" aria-labelledby="heading-31"><p class="page">Slide 31</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="44" aria-labelledby="heading-31"><p class="page">Slide 31</p>
 <h2 id="heading-31">Change the measure, and the winner changes</h2>
 <div class="row">
 <div class="col fig">
@@ -387,10 +387,10 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/s41586-020-2350-5" rel="noopener">Bao et al. <b>Nature 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-class="lead" data-marpit-pagination="32" data-marpit-pagination-total="47" aria-labelledby="heading-32"><p class="page">Slide 32</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-class="lead" data-marpit-pagination="32" data-marpit-pagination-total="44" aria-labelledby="heading-32"><p class="page">Slide 32</p>
 <h2 id="heading-32">One neuron</h2>
 <h2 id="a-readout-is-one-model-neuron-what-does-one-unit-respond-to">A readout is one model neuron. What does one unit respond to?</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="47" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="44" aria-labelledby="heading-33"><p class="page">Slide 33</p>
 <h2 id="heading-33">What a real neuron does, and what we keep</h2>
 <div class="row">
 <div class="col fig">
@@ -406,7 +406,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1146/annurev.neuro.28.061604.135703" rel="noopener">London &amp; Häusser <b>Annu Rev Neurosci 2005</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="47" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="44" aria-labelledby="heading-34"><p class="page">Slide 34</p>
 <h2 id="heading-34">Building the neuron: inputs</h2>
 <div class="capfig">
 <figure><img src="../images/2026-09-15/step1_inputs.svg" alt="Inputs x1, x2, …, xi, …, xD drawn as nodes feeding into a single neuron" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Inputs x1, x2, …, xi, …, xD drawn as nodes feeding into a single neuron</p><a href="../images/2026-09-15/step1_inputs.svg">Open full-size figure</a></figcaption></figure>
@@ -415,7 +415,7 @@
 <li>Each input <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3E6D8E"><msub><mi>x</mi><mi>i</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3E6D8E}{x_i}</annotation></semantics></math> is a number: a stimulus feature (a pixel, a sound amplitude) or another neuron's output</li>
 <li>We index them <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3E6D8E"><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>x</mi><mi>i</mi></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>x</mi><mi>D</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3E6D8E}{x_1, x_2, \dots, x_i, \dots, x_D}</annotation></semantics></math> — there are <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> of them in total</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="47" aria-labelledby="heading-35"><p class="page">Slide 35</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="44" aria-labelledby="heading-35"><p class="page">Slide 35</p>
 <h2 id="heading-35">Building the neuron: weights</h2>
 <div class="capfig">
 <figure><img src="../images/2026-09-15/step2_weights.svg" alt="Each input connection to the neuron now carries its own weight w1 through wD" aria-describedby="figure-35-1"><figcaption id="figure-35-1"><p>Each input connection to the neuron now carries its own weight w1 through wD</p><a href="../images/2026-09-15/step2_weights.svg">Open full-size figure</a></figcaption></figure>
@@ -425,7 +425,7 @@
 <li>The <strong>weights</strong> (with the bias) are the <em>adjustable</em> part: the inputs and the form of the computation are given</li>
 <li><mark>This lecture we set the weights by hand. Next lecture the neuron learns them.</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="47" aria-labelledby="heading-36"><p class="page">Slide 36</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="44" aria-labelledby="heading-36"><p class="page">Slide 36</p>
 <h2 id="heading-36">Building the neuron: summation</h2>
 <div class="capfig">
 <figure><img src="../images/2026-09-15/step3_sum.svg" alt="The weighted inputs converge on a summation node that adds them together with a bias b" aria-describedby="figure-36-1"><figcaption id="figure-36-1"><p>The weighted inputs converge on a summation node that adds them together with a bias b</p><a href="../images/2026-09-15/step3_sum.svg">Open full-size figure</a></figcaption></figure>
@@ -435,7 +435,7 @@
 <li>A <span><b>weighted sum</b></span> of the <span><b>inputs</b></span>, plus a <span><b>bias</b></span> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{b}</annotation></semantics></math> (it shifts the threshold: the sum must exceed <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle></mrow><annotation encoding="application/x-tex">-\textcolor{#3F7A6B}{b}</annotation></semantics></math>)</li>
 <li>This <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#1E293B"><mi>z</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#1E293B}{z}</annotation></semantics></math> — the <strong>pre-activation</strong> — is the <strong>linear</strong> part of the computation</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="47" aria-labelledby="heading-37"><p class="page">Slide 37</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="44" aria-labelledby="heading-37"><p class="page">Slide 37</p>
 <h2 id="heading-37">Building the neuron: activation and output</h2>
 <div class="capfig">
 <figure><img src="../images/2026-09-15/step4_activation.svg" alt="The summed input z passes through a nonlinearity g to produce the output activation a" aria-describedby="figure-37-1"><figcaption id="figure-37-1"><p>The summed input z passes through a nonlinearity g to produce the output activation a</p><a href="../images/2026-09-15/step4_activation.svg">Open full-size figure</a></figcaption></figure>
@@ -446,16 +446,16 @@
 <li><strong>Why nonlinear?</strong> Real neurons <strong>threshold</strong> their input, they fire only once it's strong enough</li>
 </ul>
 <div class="ref"><a href="https://proceedings.mlr.press/v15/glorot11a.html" rel="noopener">Glorot, Bordes &amp; Bengio <b>AISTATS 2011</b></a> (ReLU) · <a href="https://dl.acm.org/doi/10.5555/3104322.3104425" rel="noopener">Nair &amp; Hinton <b>ICML 2010</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="47" aria-labelledby="heading-38"><p class="page">Slide 38</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="44" aria-labelledby="heading-38"><p class="page">Slide 38</p>
 <h2 id="heading-38">Transfer functions: the nonlinearity <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math></h2>
 <div class="capfig">
 <figure><img src="../images/2026-09-15/transfer_functions.svg" alt="Five transfer-function curves on one set of axes: ReLU, leaky ReLU, sigmoid, tanh and GELU" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>Five transfer-function curves on one set of axes: ReLU, leaky ReLU, sigmoid, tanh and GELU</p><a href="../images/2026-09-15/transfer_functions.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li>Biophysics: a neuron's <strong>f–I curve</strong> (rate vs current) is 0 below <strong>threshold</strong>, then rises (<strong>ReLU</strong>) and saturates (<strong>sigmoid</strong>, <strong>tanh</strong>)</li>
-<li><strong>ReLU</strong> also makes deep networks easy to train, so it dominates modern networks</li>
+<li><strong>ReLU</strong>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#7A4FA3"><mi>g</mi></mstyle><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\textcolor{#7A4FA3}{g}(z) = \max(0, z)</annotation></semantics></math> (thick line): easy to train in deep networks, so it dominates</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="47" aria-labelledby="heading-39"><p class="page">Slide 39</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="44" aria-labelledby="heading-39"><p class="page">Slide 39</p>
 <h2 id="heading-39">The weighted sum is a dot product</h2>
 <div class="row">
 <div class="col fig">
@@ -473,39 +473,46 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="47" aria-labelledby="heading-40"><p class="page">Slide 40</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="44" aria-labelledby="heading-40"><p class="page">Slide 40</p>
 <h2 id="heading-40">The single neuron, full picture</h2>
 <div class="capfig">
 <figure><img src="../images/2026-09-15/01_full.svg" alt="The complete single neuron: weighted inputs summed with a bias, passed through the nonlinearity g to give the activation a" aria-describedby="figure-40-1"><figcaption id="figure-40-1"><p>The complete single neuron: weighted inputs summed with a bias, passed through the nonlinearity g to give the activation a</p><a href="../images/2026-09-15/01_full.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>  </mtext><mi>a</mi><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mstyle mathcolor="#7A4FA3"><mi>g</mi></mstyle><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><msup><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle><mi mathvariant="normal">⊤</mi></msup><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle><mo>+</mo><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle><mo fence="true">)</mo></mrow><mtext>  </mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow><annotation encoding="application/x-tex">\boxed{\;a \;=\; \textcolor{#7A4FA3}{g}\!\left(\textcolor{#B5396B}{\mathbf{w}}^\top\textcolor{#3E6D8E}{\mathbf{x}} + \textcolor{#3F7A6B}{b}\right)\;}
 </annotation></semantics></math></div></span></p><p><mark>Most networks in this course are built from many of these units</mark></p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="47" aria-labelledby="heading-41"><p class="page">Slide 41</p>
-<h2 id="heading-41">A neuron is a feature detector: template matching</h2>
-<div class="capfig">
-<figure><img src="../images/2026-09-15/rf_01a_template_small_multiples.svg" alt="Left, the template w, a two-pixel patch with values +0.86 and +0.51, each pixel coloured warm for positive and cool for negative values. Right, five two-pixel inputs of length 1, each with its dot product with w and the output a = max(0, wᵀx), no bias: input 1, the same as w, wᵀx = +1.00, a = 1.00; input 2, +0.82, a = 0.82; input 3, +0.57, a = 0.57; input 4, −0.34, a = 0; input 5, the opposite of w, −1.00, a = 0" aria-describedby="figure-41-1"><figcaption id="figure-41-1"><p>Left, the template w, a two-pixel patch with values +0.86 and +0.51, each pixel coloured warm for positive and cool for negative values. Right, five two-pixel inputs of length 1, each with its dot product with w and the output a = max(0, wᵀx), no bias: input 1, the same as w, wᵀx = +1.00, a = 1.00; input 2, +0.82, a = 0.82; input 3, +0.57, a = 0.57; input 4, −0.34, a = 0; input 5, the opposite of w, −1.00, a = 0</p><a href="../images/2026-09-15/rf_01a_template_small_multiples.svg">Open full-size figure</a></figcaption></figure>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="44" aria-labelledby="heading-41"><p class="page">Slide 41</p>
+<h2 id="heading-41">A neuron's weights set a decision boundary</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/2026-09-15/readout_boundary.svg" alt="Two-dimensional inputs x1 and x2. One gold line, the decision boundary w^T x + b = 0, separates filled dots (z &gt; 0, lightly shaded side) from hollow dots (z &lt; 0). A short magenta arrow w starts on the line and points, perpendicular to it, into the z &gt; 0 side" aria-describedby="figure-41-1"><figcaption id="figure-41-1"><p>Two-dimensional inputs x1 and x2. One gold line, the decision boundary w^T x + b = 0, separates filled dots (z &gt; 0, lightly shaded side) from hollow dots (z &lt; 0). A short magenta arrow w starts on the line and points, perpendicular to it, into the z &gt; 0 side</p><a href="../images/2026-09-15/readout_boundary.svg">Open full-size figure</a></figcaption></figure>
 </div>
+<div class="col">
 <ul>
-<li>Among inputs of the same length <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">∥</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo stretchy="false">∥</mo></mrow><annotation encoding="application/x-tex">\lVert\mathbf{x}\rVert</annotation></semantics></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{w}^\top\mathbf{x}</annotation></semantics></math> is largest when <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math> <strong>looks like</strong> the weights <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mrow><annotation encoding="application/x-tex">\mathbf{w}</annotation></semantics></math> — so <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mrow><annotation encoding="application/x-tex">\mathbf{w}</annotation></semantics></math> acts as a stored <strong>template</strong></li>
-<li>All inputs have length 1, so <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{w}^\top\mathbf{x}</annotation></semantics></math> is the cosine of the angle to <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mrow><annotation encoding="application/x-tex">\mathbf{w}</annotation></semantics></math>; ReLU clips negatives to 0</li>
-<li>Set the weights <strong>by hand</strong> to a pattern → the neuron becomes a <strong>detector</strong> for that pattern</li>
+<li>The neuron computes <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>=</mo><msup><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle><mi mathvariant="normal">⊤</mi></msup><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle><mo>+</mo><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle></mrow><annotation encoding="application/x-tex">z = \textcolor{#B5396B}{\mathbf{w}}^\top\textcolor{#3E6D8E}{\mathbf{x}} + \textcolor{#3F7A6B}{b}</annotation></semantics></math>; its <strong>decision boundary</strong> is the line where <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">z = 0</annotation></semantics></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math> is <strong>perpendicular</strong> to the boundary and points to the side where <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">z &gt; 0</annotation></semantics></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{b}</annotation></semantics></math> slides the line without turning it</li>
+<li>With a step or ReLU, the neuron fires only on that side: the same readout as the context readout of the toys, a plane in 3 units</li>
+<li><mark>Every readout in this lecture is one model neuron</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="47" aria-labelledby="heading-42"><p class="page">Slide 42</p>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="44" aria-labelledby="heading-42"><p class="page">Slide 42</p>
 <h2 id="heading-42">Recap</h2>
 <ul>
 <li><strong>Before trusting a score</strong>: its shuffled floor, a test on held-out images, its noise ceiling and the same area in another brain; then resample the images and try more than one measure</li>
-<li><strong>A model neuron</strong>, like a readout, is a weighted sum through a nonlinearity, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>=</mo><mi>g</mi><mo stretchy="false">(</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>+</mo><mi>b</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">a = g(\mathbf{w}^\top\mathbf{x}+b)</annotation></semantics></math>: it responds most to inputs that look like its weights</li>
+<li><strong>A model neuron</strong>, like a readout, is a weighted sum through a nonlinearity, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>=</mo><mstyle mathcolor="#7A4FA3"><mi>g</mi></mstyle><mo stretchy="false">(</mo><msup><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle><mi mathvariant="normal">⊤</mi></msup><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle><mo>+</mo><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">a = \textcolor{#7A4FA3}{g}(\textcolor{#B5396B}{\mathbf{w}}^\top\textcolor{#3E6D8E}{\mathbf{x}}+\textcolor{#3F7A6B}{b})</annotation></semantics></math>: its weights set a decision boundary, with <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math> perpendicular to it</li>
 <li><strong>Next lecture</strong>: characterizing neurons in brains and networks (receptive fields, tuning curves, Gabor fits), from one neuron to a layer, and where the weights come from</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-marpit-pagination="43" data-marpit-pagination-total="47" aria-labelledby="heading-43"><p class="page">Slide 43</p>
-<h2 id="heading-43">Further reading</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-marpit-pagination="43" data-marpit-pagination-total="44" aria-labelledby="heading-43"><p class="page">Slide 43</p>
+<h2 id="heading-43">Further reading for the research trail</h2>
 <ul>
+<li><a href="https://doi.org/10.1016/j.cell.2020.09.031" rel="noopener">Bernardi et al. <b>Cell 2020</b></a>: flexible and abstract at once in hippocampus and prefrontal cortex, and the geometry breaks on error trials</li>
 <li><a href="https://doi.org/10.7554/eLife.82566" rel="noopener">Schütt et al. <b>eLife 2023</b></a>: resampling images and participants to test a model ranking</li>
 <li><a href="https://doi.org/10.1038/s41586-023-06714-0" rel="noopener">Safaie et al. <b>Nature 2023</b></a>: the same population dynamics in the motor cortex of different animals</li>
 <li><a href="https://doi.org/10.1016/j.neuron.2024.12.003" rel="noopener">Papale et al. <b>Neuron 2025</b></a>: V1, V4 and IT in two monkeys, 30 repeats per image</li>
 <li><a href="https://arxiv.org/abs/1611.03530" rel="noopener">Zhang et al. <b>ICLR 2017</b></a>: deep networks fit random labels perfectly</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="47" aria-labelledby="heading-44"><p class="page">Slide 44</p>
+<p>Trail entry 2, due <strong>Fri 10/9</strong>: pick <strong>any paper cited in a lecture so far</strong>, read it, and post <strong>four to six sentences</strong> on Ed under <strong>Research trail</strong>: what it did, what surprised you or what question it left you with, and what you would test next. <strong>Reply once</strong> to a classmate. Best three of four entries count.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-marpit-pagination="44" data-marpit-pagination-total="44" aria-labelledby="heading-44"><p class="page">Slide 44</p>
 <h2 id="heading-44">Minute paper</h2>
 <p>Submit on <strong>Canvas → Minute papers → Minute Paper 8</strong> (access code read out in class).</p>
 <p>Write three brief points in your own words:</p>
@@ -515,35 +522,4 @@
 <li>Another idea you found interesting, and why it matters for brains, behavior or AI</li>
 </ol>
 <p>Credit for a thoughtful attempt, not for being correct.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-class="lead" data-marpit-pagination="45" data-marpit-pagination-total="47" aria-labelledby="heading-45"><p class="page">Slide 45</p>
-<h2 id="heading-45">Appendix</h2>
-<h2 id="the-first-layer-results">The first-layer results</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-marpit-pagination="46" data-marpit-pagination-total="47" aria-labelledby="heading-46"><p class="page">Slide 46</p>
-<h2 id="heading-46">AlexNet's first layer: tuning curves</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L06/03_orientation_tuning.png" alt="Top: tuning curves of four first-layer network units measured with gratings, each peaking at a different orientation. Bottom: histogram of the units' preferred orientations, with units in every 15-degree bin from 0 to 180" aria-describedby="figure-46-1"><figcaption id="figure-46-1"><p>Top: tuning curves of four first-layer network units measured with gratings, each peaking at a different orientation. Bottom: histogram of the units' preferred orientations, with units in every 15-degree bin from 0 to 180</p><a href="../images/L06/03_orientation_tuning.png">Open full-size figure</a></figcaption></figure>
-</div>
-<div class="col">
-<ul>
-<li>The tuning-curve method of the next lecture, applied to the 64 first-layer units of AlexNet: gratings at 24 orientations and 4 phases, rectified, then averaged over phase</li>
-<li>Top: the four most selective units, each scaled to its own peak</li>
-<li>Bottom: how many units prefer each orientation. Every 15-degree bin holds some units</li>
-</ul>
-</div>
-</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-paginate="true" data-marpit-pagination="47" data-marpit-pagination-total="47" aria-labelledby="heading-47"><p class="page">Slide 47</p>
-<h2 id="heading-47">Are they the <em>same</em> templates?</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L06/09_ringach_comparison.svg" alt="Scatter of Gabor width nx against length ny, both in cycles: macaque V1 simple cells cluster near the origin; the network's first-layer filters that a Gabor fits well overlap them but sit systematically larger" aria-describedby="figure-47-1"><figcaption id="figure-47-1"><p>Scatter of Gabor width nx against length ny, both in cycles: macaque V1 simple cells cluster near the origin; the network's first-layer filters that a Gabor fits well overlap them but sit systematically larger</p><a href="../images/L06/09_ringach_comparison.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<div class="col">
-<ul>
-<li>AlexNet's first-layer filters that a Gabor fits well, on Ringach's plot</li>
-<li>Filled slate-grey squares: macaque V1 simple cells (Ringach 2002). Open green circles: the network's filters</li>
-</ul>
-</div>
-</div>
-<div class="ref"><a href="https://doi.org/10.1152/jn.2002.88.1.455" rel="noopener">Ringach <b>J Neurophysiol 2002</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section></main></body></html>
