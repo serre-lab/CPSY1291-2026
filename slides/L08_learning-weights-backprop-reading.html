@@ -163,7 +163,7 @@
 <ul>
 <li>A real neuron's <strong>f–I curve</strong> (firing rate against input current): 0 below <strong>threshold</strong>, then rising, then <strong>saturating</strong></li>
 <li>History: a <strong>step</strong> (McCulloch &amp; Pitts 1943, the perceptron), then <strong>sigmoid</strong> and <strong>tanh</strong>, smooth enough for backpropagation (1986), then <strong>ReLU</strong> (2010s), then <strong>GELU</strong> in transformers</li>
-<li>None is exact: ReLU never saturates, the sigmoid never reaches 0, tanh and leaky ReLU give negative "rates"</li>
+<li>None is exact: ReLU and GELU never saturate, the sigmoid never reaches 0, tanh, leaky ReLU and GELU give negative "rates"</li>
 <li><mark><strong>ReLU</strong> (thick line) dominates: cheap, and deep networks train well with it</mark></li>
 </ul>
 </div>
@@ -176,9 +176,9 @@
 </div>
 <div class="col">
 <ul>
-<li>So far we chose <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{b}</annotation></semantics></math> by hand. A cortical neuron has thousands of synapses, a network millions of weights: <mark>the weights must be learned from examples</mark></li>
-<li>Learning needs a <strong>loss</strong>, one number that measures how wrong the weights are, and <strong>gradient descent</strong>, which changes every weight to lower it</li>
-<li>The nonlinearity <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#7A4FA3"><mi>g</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#7A4FA3}{g}</annotation></semantics></math> sets the kind of output and so the loss: a threshold gives yes or no (perceptron), none a number (linear regression), a sigmoid a probability (logistic regression), a softmax one of many classes</li>
+<li>So far we chose <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><mi>b</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{b}</annotation></semantics></math> by hand. A cortical neuron has thousands of synapses, a network millions, even billions, of weights: <mark>the weights must be learned from examples</mark></li>
+<li>Learning needs a <strong>loss</strong>, one number that measures how wrong the outputs are, and <strong>gradient descent</strong>, which changes every weight to lower it</li>
+<li>The nonlinearity <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#7A4FA3"><mi>g</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#7A4FA3}{g}</annotation></semantics></math> sets the kind of output and so the loss: a threshold gives yes or no (perceptron), no nonlinearity (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#7A4FA3"><mi>g</mi></mstyle><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">\textcolor{#7A4FA3}{g}(z)=z</annotation></semantics></math>) a number (linear regression), a sigmoid a probability (logistic regression), a softmax a probability per class (a soft pick of the largest)</li>
 </ul>
 </div>
 </div>
@@ -193,10 +193,10 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="45" aria-labelledby="heading-21"><p class="page">Slide 21</p>
 <h2 id="heading-21">Where does the target come from?</h2>
 <div class="capfig">
-<figure><img src="../images/2026-10-08/mapping_4.svg" alt="The same diagram for images and captions: the input is an image of a kitten, the output is an image embedding, and the target is the encoded caption a kitten, written by people for the web" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>The same diagram for images and captions: the input is an image of a kitten, the output is an image embedding, and the target is the encoded caption a kitten, written by people for the web</p><a href="../images/2026-10-08/mapping_4.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/2026-10-08/mapping_4.svg" alt="The same diagram for images and captions: the input is an image of a kitten, the output is an image embedding, and the target is the embedding of its caption, a kitten, computed by a text network; captions written by people for the web" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>The same diagram for images and captions: the input is an image of a kitten, the output is an image embedding, and the target is the embedding of its caption, a kitten, computed by a text network; captions written by people for the web</p><a href="../images/2026-10-08/mapping_4.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>Image → its caption, written by people for the web. <mark>The training data decide which mapping the network learns</mark></li>
+<li>Image → its caption, written by people for the web. An image network and a text network turn each into an embedding, and the two embeddings are compared. <mark>The training data decide which mapping the network learns</mark></li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/2005.14165" rel="noopener">Brown et al. <b>NeurIPS 2020</b></a> · <a href="https://arxiv.org/abs/1810.04805" rel="noopener">Devlin et al. <b>NAACL 2019</b></a> · <a href="https://arxiv.org/abs/2104.14294" rel="noopener">Caron et al. <b>ICCV 2021</b></a> · <a href="https://arxiv.org/abs/2111.06377" rel="noopener">He et al. <b>CVPR 2022</b></a> · <a href="https://arxiv.org/abs/2103.00020" rel="noopener">Radford et al. <b>ICML 2021</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-class="lead" data-marpit-pagination="22" data-marpit-pagination-total="45" aria-labelledby="heading-22"><p class="page">Slide 22</p>
