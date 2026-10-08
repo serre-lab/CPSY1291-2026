@@ -286,61 +286,21 @@
 <figure><img src="../images/L08/19_xor_network.svg" alt="A 2-2-1 network drawn left to right, the same drawing as the backpropagation slides that follow. Inputs x1 and x2; magenta weights of 1 from each input to each of the two hidden units; green bias labels b = 0 on hidden unit 1 and b = minus 1 on hidden unit 2; weights 1 and minus 2 from the hidden units to the output y hat, which fires if above 0.5" aria-describedby="figure-30-1"><figcaption id="figure-30-1"><p>A 2-2-1 network drawn left to right, the same drawing as the backpropagation slides that follow. Inputs x1 and x2; magenta weights of 1 from each input to each of the two hidden units; green bias labels b = 0 on hidden unit 1 and b = minus 1 on hidden unit 2; weights 1 and minus 2 from the hidden units to the output y hat, which fires if above 0.5</p><a href="../images/L08/19_xor_network.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>Set by hand: hidden units <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">L</mi><mi mathvariant="normal">U</mi></mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathrm{ReLU}(x_1+x_2)</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">L</mi><mi mathvariant="normal">U</mi></mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathrm{ReLU}(x_1+x_2-1)</annotation></semantics></math>; output <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>a</mi><mn>1</mn><mrow><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></msubsup><mo>−</mo><mn>2</mn><msubsup><mi>a</mi><mn>2</mn><mrow><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">a^{[1]}_1 - 2a^{[1]}_2</annotation></semantics></math>, fires above 0.5. Right on all four</li>
+<li>Unit 1, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">L</mi><mi mathvariant="normal">U</mi></mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathrm{ReLU}(x_1+x_2)</annotation></semantics></math>, acts like <strong>OR</strong>; unit 2, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">L</mi><mi mathvariant="normal">U</mi></mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathrm{ReLU}(x_1+x_2-1)</annotation></semantics></math>, like <strong>AND</strong>. Output <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>a</mi><mn>1</mn><mrow><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></msubsup><mo>−</mo><mn>2</mn><msubsup><mi>a</mi><mn>2</mn><mrow><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></msubsup><mo>&gt;</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">a^{[1]}_1 - 2a^{[1]}_2 &gt; 0.5</annotation></semantics></math>: OR but not AND, which is XOR</li>
 <li>Without the ReLU, the layers collapse into one matrix, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mrow><mo stretchy="false">[</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></msup><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mrow><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{W}^{[2]}\mathbf{W}^{[1]}</annotation></semantics></math>: one line. <mark>How can a network find such weights itself?</mark></li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-class="split" data-marpit-pagination="31" data-marpit-pagination-total="45" aria-labelledby="heading-31"><p class="page">Slide 31</p>
 <h2 id="heading-31">The hidden layer re-represents the input</h2>
 <div class="row">
 <div class="col">
-<div class="table-scroll" tabindex="0" role="region" aria-label="The hidden layer re-represents the input — table"><table><caption>The hidden layer re-represents the input — table</caption>
-<thead>
-<tr>
-<th scope="col"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">x_1</annotation></semantics></math></th>
-<th scope="col"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_2</annotation></semantics></math></th>
-<th scope="col"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>a</mi><mn>1</mn><mrow><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">a^{[1]}_1</annotation></semantics></math></th>
-<th scope="col"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>a</mi><mn>2</mn><mrow><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">a^{[1]}_2</annotation></semantics></math></th>
-<th scope="col"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\hat{y}</annotation></semantics></math></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-</tr>
-<tr>
-<td>0</td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-<td>1</td>
-</tr>
-<tr>
-<td>1</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>1</td>
-</tr>
-<tr>
-<td>1</td>
-<td>1</td>
-<td>2</td>
-<td>1</td>
-<td>0</td>
-</tr>
-</tbody>
-</table></div>
+<figure><img src="../images/L08/19_xor_network.svg" alt="The XOR network of the previous slide: inputs x1 and x2, weights of 1 into both ReLU hidden units, biases 0 and minus 1, output weights 1 and minus 2, output fires if above 0.5" aria-describedby="figure-31-1"><figcaption id="figure-31-1"><p>The XOR network of the previous slide: inputs x1 and x2, weights of 1 into both ReLU hidden units, biases 0 and minus 1, output weights 1 and minus 2, output fires if above 0.5</p><a href="../images/L08/19_xor_network.svg">Open full-size figure</a></figcaption></figure>
 <ul>
 <li>(0,1) and (1,0) coincide in the hidden layer's coordinates <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐚</mi><mrow><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{a}^{[1]}</annotation></semantics></math>: <strong>one line</strong> separates the classes</li>
 <li><mark>The hidden layer turns XOR into a linearly separable problem for the readout</mark></li>
 </ul>
 </div>
 <div class="col fig">
-<figure><img src="../images/L08/11_xor_hidden_space.svg" alt="The four XOR inputs in hidden-unit coordinates h1 and h2: blue (0,0) at the origin, green (0,1) and (1,0) together at (1,0), blue (1,1) at (2,1). One solid gold line separates the green point, on the shaded side, from the two blue points. The caption reads: in the hidden layer, one line suffices" aria-describedby="figure-31-1"><figcaption id="figure-31-1"><p>The four XOR inputs in hidden-unit coordinates h1 and h2: blue (0,0) at the origin, green (0,1) and (1,0) together at (1,0), blue (1,1) at (2,1). One solid gold line separates the green point, on the shaded side, from the two blue points. The caption reads: in the hidden layer, one line suffices</p><a href="../images/L08/11_xor_hidden_space.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L08/11_xor_hidden_space.svg" alt="The four XOR inputs in hidden-unit coordinates a1 and a2 of layer 1: blue (0,0) at the origin, green (0,1) and (1,0) together at (1,0), blue (1,1) at (2,1). One solid gold line separates the green point, on the shaded side, from the two blue points. The caption reads: in the hidden layer, one line suffices" aria-describedby="figure-31-2"><figcaption id="figure-31-2"><p>The four XOR inputs in hidden-unit coordinates a1 and a2 of layer 1: blue (0,0) at the origin, green (0,1) and (1,0) together at (1,0), blue (1,1) at (2,1). One solid gold line separates the green point, on the shaded side, from the two blue points. The caption reads: in the hidden layer, one line suffices</p><a href="../images/L08/11_xor_hidden_space.svg">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-class="lead" data-marpit-pagination="32" data-marpit-pagination-total="45" aria-labelledby="heading-32"><p class="page">Slide 32</p>
@@ -349,7 +309,7 @@
 <h2 id="heading-33">Backpropagation: a long and disputed history</h2>
 <ul>
 <li><strong>1969</strong>: Minsky and Papert show that a perceptron cannot compute XOR. Nobody knows how to train hidden layers, and interest in neural networks fades</li>
-<li><strong>1970–1974</strong>: Linnainmaa describes the general algorithm (reverse-mode automatic differentiation); Werbos proposes it for training networks in his PhD thesis</li>
+<li><strong>1970–1974</strong>: Linnainmaa, studying rounding errors in computer programs, computes all the derivatives of a long calculation in one backward sweep (reverse-mode automatic differentiation); Werbos proposes it for training networks</li>
 <li><strong>1986</strong>: <strong>Rumelhart, Hinton and Williams</strong> show that hidden units trained this way learn useful internal representations. Their Nature paper made backprop the standard method</li>
 <li>Who deserves the credit is still argued. <mark>Hinton's 2024 Nobel Prize in Physics, shared with Hopfield, cited the Boltzmann machine, not backprop</mark>; his 2018 Turing Award, shared with Bengio and LeCun, was for deep learning as a whole</li>
 </ul>
