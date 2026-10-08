@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Learning the weights: gradient descent &amp; backpropagation · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Learning the weights: gradient descent &amp; backpropagation</h1><p>Reader-friendly version of the 30 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L08_learning-weights-backprop.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Learning the weights: gradient descent &amp; backpropagation</a></li><li><a href="#slide-2">You have been using model neurons all along</a></li><li><a href="#slide-5">What a real neuron does</a></li><li><a href="#slide-6">At a synapse: a spike becomes a current</a></li><li><a href="#slide-8">From a neuron to a model neuron</a></li><li><a href="#slide-9">Building the neuron: inputs, weights and sum</a></li><li><a href="#slide-10">The weighted sum is a dot product</a></li><li><a href="#slide-11">A neuron's weights set a decision boundary</a></li><li><a href="#slide-12">One weight vector, two readings</a></li><li><a href="#slide-13">A neuron is a feature detector: template matching</a></li><li><a href="#slide-14">Building the neuron: activation and output</a></li><li><a href="#slide-15">Transfer functions: the nonlinearity gg</a></li><li><a href="#slide-16">From weights set by hand to weights learned</a></li><li><a href="#slide-17">A network maps inputs to outputs</a></li><li><a href="#slide-21">Where does the target come from?</a></li><li><a href="#slide-22">How can a readout learn its weights from labeled examples?</a></li><li><a href="#slide-23">The first learning neuron: the perceptron</a></li><li><a href="#slide-24">Which way is downhill? From derivative to gradient</a></li><li><a href="#slide-25">The delta rule (Widrow–Hoff): step down a smooth error</a></li><li><a href="#slide-26">Try it: perceptron and delta rule, one example at a time</a></li><li><a href="#slide-27">Logistic regression: a probability, then its error</a></li><li><a href="#slide-28">What if no line separates the classes?</a></li><li><a href="#slide-29">Further reading for the research trail</a></li><li><a href="#slide-30">Minute paper</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Learning the weights: gradient descent &amp; backpropagation · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Learning the weights: gradient descent &amp; backpropagation</h1><p>Reader-friendly version of the 29 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L08_learning-weights-backprop.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Learning the weights: gradient descent &amp; backpropagation</a></li><li><a href="#slide-2">You have been using model neurons all along</a></li><li><a href="#slide-5">What a real neuron does</a></li><li><a href="#slide-6">At a synapse: a spike becomes a current</a></li><li><a href="#slide-8">From a neuron to a model neuron</a></li><li><a href="#slide-9">Building the neuron: inputs, weights and sum</a></li><li><a href="#slide-10">The weighted sum is a dot product</a></li><li><a href="#slide-11">A neuron's weights set a decision boundary</a></li><li><a href="#slide-12">One weight vector, two readings</a></li><li><a href="#slide-13">A neuron is a feature detector: template matching</a></li><li><a href="#slide-14">Building the neuron: activation and output</a></li><li><a href="#slide-15">Transfer functions: the nonlinearity gg</a></li><li><a href="#slide-16">From weights set by hand to weights learned</a></li><li><a href="#slide-17">A network maps inputs to outputs</a></li><li><a href="#slide-21">Where does the target come from?</a></li><li><a href="#slide-22">How can a readout learn its weights from labeled examples?</a></li><li><a href="#slide-23">The first learning neuron: the perceptron</a></li><li><a href="#slide-24">Which way is downhill? From derivative to gradient</a></li><li><a href="#slide-25">The delta rule (Widrow–Hoff): step down a smooth error</a></li><li><a href="#slide-26">Try it: perceptron and delta rule, one example at a time</a></li><li><a href="#slide-27">Logistic regression: a probability, then its error</a></li><li><a href="#slide-28">Further reading for the research trail</a></li><li><a href="#slide-29">Minute paper</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
   <img src="../images/brown-crest-color.png" alt="Brown University crest">
   <div class="vrule"></div>
   <div>
@@ -10,7 +10,7 @@
 <h2 id="heading-1">Learning the weights: gradient descent &amp; backpropagation</h2>
 <p class="meta">Thursday, October 8 · Fall 2026</p>
 
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="30" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="29" aria-labelledby="heading-2"><p class="page">Slide 2</p>
 <h2 id="heading-2">You have been using model neurons all along</h2>
 <div class="row">
 <div class="col fig">
@@ -24,7 +24,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-marpit-pagination="5" data-marpit-pagination-total="30" aria-labelledby="heading-5"><p class="page">Slide 5</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-marpit-pagination="5" data-marpit-pagination-total="29" aria-labelledby="heading-5"><p class="page">Slide 5</p>
 <h2 id="heading-5">What a real neuron does</h2>
 <div class="row">
 <div class="col fig">
@@ -40,7 +40,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1146/annurev.neuro.28.061604.135703" rel="noopener">London &amp; Häusser <b>Annu Rev Neurosci 2005</b></a> · <a href="https://serre-lab.github.io/CPSY1291-2026/recitations/neuroscience-background-notes.pdf" rel="noopener">Neuroscience background notes (PDF)</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="30" aria-labelledby="heading-6"><p class="page">Slide 6</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="29" aria-labelledby="heading-6"><p class="page">Slide 6</p>
 <h2 id="heading-6">At a synapse: a spike becomes a current</h2>
 <div class="row">
 <div class="col fig">
@@ -56,7 +56,7 @@
 </div>
 </div>
 <div class="ref">Illustration: <a href="https://commons.wikimedia.org/wiki/File:SynapseSchematic_en.svg" rel="noopener">Thomas Splettstoesser <b>CC BY-SA 4.0</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="30" aria-labelledby="heading-8"><p class="page">Slide 8</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="29" aria-labelledby="heading-8"><p class="page">Slide 8</p>
 <h2 id="heading-8">From a neuron to a model neuron</h2>
 <div class="row">
 <div class="col fig">
@@ -72,7 +72,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="30" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="29" aria-labelledby="heading-9"><p class="page">Slide 9</p>
 <h2 id="heading-9">Building the neuron: inputs, weights and sum</h2>
 <div class="row">
 <div class="col fig">
@@ -86,7 +86,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="30" aria-labelledby="heading-10"><p class="page">Slide 10</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="29" aria-labelledby="heading-10"><p class="page">Slide 10</p>
 <h2 id="heading-10">The weighted sum is a dot product</h2>
 <div class="row">
 <div class="col fig">
@@ -103,7 +103,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="30" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="29" aria-labelledby="heading-11"><p class="page">Slide 11</p>
 <h2 id="heading-11">A neuron's weights set a decision boundary</h2>
 <div class="row">
 <div class="col fig">
@@ -118,7 +118,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="30" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="29" aria-labelledby="heading-12"><p class="page">Slide 12</p>
 <h2 id="heading-12">One weight vector, two readings</h2>
 <div class="capfig">
 <figure><img src="../images/2026-10-08/face_readout.svg" alt="Four 48 by 48 pixel images in a row: the average face, the average non-face, the weights w of a readout trained to tell faces from other objects in Caltech-101 photographs, drawn with positive weights in magenta and negative in blue, and the average face minus the average non-face in the same colours. The weight image has a face-like layout of eyes, nose and mouth. Underneath, the readout's accuracy on held-out photographs" aria-describedby="figure-12-1"><figcaption id="figure-12-1"><p>Four 48 by 48 pixel images in a row: the average face, the average non-face, the weights w of a readout trained to tell faces from other objects in Caltech-101 photographs, drawn with positive weights in magenta and negative in blue, and the average face minus the average non-face in the same colours. The weight image has a face-like layout of eyes, nose and mouth. Underneath, the readout's accuracy on held-out photographs</p><a href="../images/2026-10-08/face_readout.svg">Open full-size figure</a></figcaption></figure>
@@ -129,7 +129,7 @@
 <li>Magenta weights push toward "face", blue toward "non-face". <mark>The weights best separate the classes; they are not the average face</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1016/j.neuroimage.2013.10.067" rel="noopener">Haufe et al. <b>NeuroImage 2014</b></a> · Photographs: <a href="https://data.caltech.edu/records/mzrjq-6wc02" rel="noopener">Caltech-101</a>, Fei-Fei, Fergus &amp; Perona <b>2004</b></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="30" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="29" aria-labelledby="heading-13"><p class="page">Slide 13</p>
 <h2 id="heading-13">A neuron is a feature detector: template matching</h2>
 <div class="capfig">
 <figure><img src="../images/2026-10-08/template_unit.svg" alt="One unit of AlexNet's first layer: its weights shown as a small colour image of an oriented edge. Three inputs of the same length: the same pattern, the pattern rotated by 90 degrees, and a different pattern; under each, the unit's response relative to the first: 1.00 for the same pattern, 0.00 rotated, 0.02 for the different pattern. Right, the tuning curve: the response as the pattern is rotated from 0 to 180 degrees, 1 at 0 degrees, falling to 0 by about 45 degrees, 0 at 90, with a small bump near 160" aria-describedby="figure-13-1"><figcaption id="figure-13-1"><p>One unit of AlexNet's first layer: its weights shown as a small colour image of an oriented edge. Three inputs of the same length: the same pattern, the pattern rotated by 90 degrees, and a different pattern; under each, the unit's response relative to the first: 1.00 for the same pattern, 0.00 rotated, 0.02 for the different pattern. Right, the tuning curve: the response as the pattern is rotated from 0 to 180 degrees, 1 at 0 degrees, falling to 0 by about 45 degrees, 0 at 90, with a small bump near 160</p><a href="../images/2026-10-08/template_unit.svg">Open full-size figure</a></figcaption></figure>
@@ -138,7 +138,7 @@
 <li>A unit of the network you analyse in the assignments: its weights <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math>, drawn as an image, look like the pattern it <strong>detects</strong>; rotating the input traces its <strong>tuning curve</strong> (right)</li>
 <li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math> and every input <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3E6D8E}{\mathbf{x}}</annotation></semantics></math> have length 1, so <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle><mi mathvariant="normal">⊤</mi></msup><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}^\top\textcolor{#3E6D8E}{\mathbf{x}}</annotation></semantics></math> is the cosine of their angle: 1 when <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3E6D8E}{\mathbf{x}}</annotation></semantics></math> looks like <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math>. <mark>The weights act as a template</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="30" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="29" aria-labelledby="heading-14"><p class="page">Slide 14</p>
 <h2 id="heading-14">Building the neuron: activation and output</h2>
 <div class="row">
 <div class="col fig">
@@ -153,7 +153,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://proceedings.mlr.press/v15/glorot11a.html" rel="noopener">Glorot, Bordes &amp; Bengio <b>AISTATS 2011</b></a> (ReLU) · <a href="https://dl.acm.org/doi/10.5555/3104322.3104425" rel="noopener">Nair &amp; Hinton <b>ICML 2010</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="30" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="29" aria-labelledby="heading-15"><p class="page">Slide 15</p>
 <h2 id="heading-15">Transfer functions: the nonlinearity <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math></h2>
 <div class="row">
 <div class="col fig">
@@ -168,7 +168,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="30" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="29" aria-labelledby="heading-16"><p class="page">Slide 16</p>
 <h2 id="heading-16">From weights set by hand to weights learned</h2>
 <div class="row">
 <div class="col fig">
@@ -182,7 +182,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="30" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="29" aria-labelledby="heading-17"><p class="page">Slide 17</p>
 <h2 id="heading-17">A network maps inputs to outputs</h2>
 <div class="capfig">
 <figure><img src="../images/2026-10-08/mapping_0.svg" alt="A diagram from left to right: an input x goes into a network drawn as layers of units with weights w, which produces an output y hat. The output is compared with a target y; the comparison gives the loss, and a dashed arrow labelled adjust w runs back into the network. Caption: inputs and targets decide which mapping the network learns" aria-describedby="figure-17-1"><figcaption id="figure-17-1"><p>A diagram from left to right: an input x goes into a network drawn as layers of units with weights w, which produces an output y hat. The output is compared with a target y; the comparison gives the loss, and a dashed arrow labelled adjust w runs back into the network. Caption: inputs and targets decide which mapping the network learns</p><a href="../images/2026-10-08/mapping_0.svg">Open full-size figure</a></figcaption></figure>
@@ -190,7 +190,7 @@
 <ul>
 <li><strong>Training</strong> adjusts the weights so that, on many examples, the output matches the <strong>target</strong>. <mark>To train a network, choose inputs and targets</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="30" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="29" aria-labelledby="heading-21"><p class="page">Slide 21</p>
 <h2 id="heading-21">Where does the target come from?</h2>
 <div class="capfig">
 <figure><img src="../images/2026-10-08/mapping_4.svg" alt="The same diagram for images and captions: the input is an image of a kitten, the output is an image embedding, and the target is the embedding of its caption, a kitten, computed by a text network; captions written by people for the web" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>The same diagram for images and captions: the input is an image of a kitten, the output is an image embedding, and the target is the embedding of its caption, a kitten, computed by a text network; captions written by people for the web</p><a href="../images/2026-10-08/mapping_4.svg">Open full-size figure</a></figcaption></figure>
@@ -199,9 +199,9 @@
 <li>Image → its caption, written by people for the web. An image network and a text network turn each into an embedding (a vector of numbers), and the two vectors are compared. <mark>The inputs and targets we choose decide which mapping the network learns</mark></li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/2005.14165" rel="noopener">Brown et al. <b>NeurIPS 2020</b></a> · <a href="https://arxiv.org/abs/1810.04805" rel="noopener">Devlin et al. <b>NAACL 2019</b></a> · <a href="https://arxiv.org/abs/2104.14294" rel="noopener">Caron et al. <b>ICCV 2021</b></a> · <a href="https://arxiv.org/abs/2111.06377" rel="noopener">He et al. <b>CVPR 2022</b></a> · <a href="https://arxiv.org/abs/2103.00020" rel="noopener">Radford et al. <b>ICML 2021</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-class="lead" data-marpit-pagination="22" data-marpit-pagination-total="30" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-class="lead" data-marpit-pagination="22" data-marpit-pagination-total="29" aria-labelledby="heading-22"><p class="page">Slide 22</p>
 <h2 id="heading-22">How can a readout learn its weights from labeled examples?</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-class="split" data-marpit-pagination="23" data-marpit-pagination-total="30" aria-labelledby="heading-23"><p class="page">Slide 23</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-class="split" data-marpit-pagination="23" data-marpit-pagination-total="29" aria-labelledby="heading-23"><p class="page">Slide 23</p>
 <h2 id="heading-23">The first learning neuron: the perceptron</h2>
 <div class="capfig">
 <figure><img src="../images/L08/05_perceptron_separable.svg" alt="Three runs of the perceptron rule without a bias, on the same 2-D points separable by a line through the origin, each from a different starting weight vector. In each panel the decision line after every update is drawn from faint to dark, ending in a solid gold line that separates the classes, with the starting and final weight vectors as magenta arrows; under each panel, the mistakes per pass fall to zero" aria-describedby="figure-23-1"><figcaption id="figure-23-1"><p>Three runs of the perceptron rule without a bias, on the same 2-D points separable by a line through the origin, each from a different starting weight vector. In each panel the decision line after every update is drawn from faint to dark, ending in a solid gold line that separates the classes, with the starting and final weight vectors as magenta arrows; under each panel, the mistakes per pass fall to zero</p><a href="../images/L08/05_perceptron_separable.svg">Open full-size figure</a></figcaption></figure>
@@ -212,7 +212,7 @@
 <li><mark>It learns from its mistakes: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math> changes only when the neuron is wrong</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1037/h0042519" rel="noopener">Rosenblatt <b>Psychol Rev 1958</b></a> · <a href="https://doi.org/10.7551/mitpress/11301.001.0001" rel="noopener">Minsky &amp; Papert <b>Perceptrons, MIT Press 1969</b></a> · <a href="https://serre-lab.github.io/CPSY1291-2026/recitations/perceptron-notes.pdf" rel="noopener">Perceptron notes (PDF), with worked examples</a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="30" aria-labelledby="heading-24"><p class="page">Slide 24</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="29" aria-labelledby="heading-24"><p class="page">Slide 24</p>
 <h2 id="heading-24">Which way is downhill? From derivative to gradient</h2>
 <div class="row">
 <div class="col fig">
@@ -227,7 +227,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-class="split" data-marpit-pagination="25" data-marpit-pagination-total="30" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-class="split" data-marpit-pagination="25" data-marpit-pagination-total="29" aria-labelledby="heading-25"><p class="page">Slide 25</p>
 <h2 id="heading-25">The delta rule (Widrow–Hoff): step down a smooth error</h2>
 <div class="row">
 <div class="col fig">
@@ -244,7 +244,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.21236/AD0241531" rel="noopener">Widrow &amp; Hoff <b>IRE WESCON 1960</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="30" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="29" aria-labelledby="heading-26"><p class="page">Slide 26</p>
 <h2 id="heading-26">Try it: perceptron and delta rule, one example at a time</h2>
 <div class="interactive-figure interactive-wide">
 
@@ -252,7 +252,7 @@
 <ul>
 <li>Perceptron: correct, nothing changes; a mistake, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math> moves. Delta rule: every example moves <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math> a little. Watch the loss after each update. Play with it after class</li>
 </ul>
-<p class="explorer-links"><a href="../demos/learning_rules.html">Perceptron learning, one example at a time: two classes of points in the plane and the current decision line. Each click presents one example; the page says whether the neuron classified it correctly, and on a mistake shows the weight vector moving and the line turning. Counters show examples seen, mistakes and passes; a menu switches to the delta rule and logistic regression — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-class="split" data-marpit-pagination="27" data-marpit-pagination-total="30" aria-labelledby="heading-27"><p class="page">Slide 27</p>
+<p class="explorer-links"><a href="../demos/learning_rules.html">Perceptron learning, one example at a time: two classes of points in the plane and the current decision line. Each click presents one example; the page says whether the neuron classified it correctly, and on a mistake shows the weight vector moving and the line turning. Counters show examples seen, mistakes and passes; a menu switches to the delta rule and logistic regression — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-class="split" data-marpit-pagination="27" data-marpit-pagination-total="29" aria-labelledby="heading-27"><p class="page">Slide 27</p>
 <h2 id="heading-27">Logistic regression: a probability, then its error</h2>
 <div class="row">
 <div class="col">
@@ -269,10 +269,8 @@
 <figure><img src="../images/L07/logistic_curves.svg" alt="Two stacked panels. Top: the sigmoid curve, probability p-hat rising from 0 to 1 as the logit z goes from negative to positive, crossing 0.5 at z equals 0. Bottom: cross-entropy against p-hat; for a true class of 1 the loss falls from above 5 to 0 as p-hat goes to 1, and for a true class of 0 it rises the other way" aria-describedby="figure-27-1"><figcaption id="figure-27-1"><p>Two stacked panels. Top: the sigmoid curve, probability p-hat rising from 0 to 1 as the logit z goes from negative to positive, crossing 0.5 at z equals 0. Bottom: cross-entropy against p-hat; for a true class of 1 the loss falls from above 5 to 0 as p-hat goes to 1, and for a true class of 0 it rises the other way</p><a href="../images/L07/logistic_curves.svg">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-class="lead" data-marpit-pagination="28" data-marpit-pagination-total="30" aria-labelledby="heading-28"><p class="page">Slide 28</p>
-<h2 id="heading-28">What if no line separates the classes?</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="30" aria-labelledby="heading-29"><p class="page">Slide 29</p>
-<h2 id="heading-29">Further reading for the research trail</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="29" aria-labelledby="heading-28"><p class="page">Slide 28</p>
+<h2 id="heading-28">Further reading for the research trail</h2>
 <p>Optional: a few research-trail entries over the semester. Any paper mentioned in any lecture qualifies, but papers from this block are preferred.</p>
 <ul>
 <li><a href="https://doi.org/10.1037/h0042519" rel="noopener">Rosenblatt <b>Psychological Review 1958</b></a>: the perceptron, proposed as a model of the brain</li>
@@ -282,8 +280,8 @@
 <li><a href="https://arxiv.org/abs/2211.01201" rel="noopener">Muttenthaler et al. <b>ICLR 2023</b></a>: the training objective matters more than size for matching human choices</li>
 <li><a href="https://doi.org/10.1038/s41586-026-10190-7" rel="noopener">Francioni et al. <b>Nature 2026</b></a>: neurons with opposite effects get error signals of opposite sign</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="30" aria-labelledby="heading-30"><p class="page">Slide 30</p>
-<h2 id="heading-30">Minute paper</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="29" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<h2 id="heading-29">Minute paper</h2>
 <p>Submit on <strong>Canvas → Minute papers → Minute Paper 9</strong> (access code read out in class).</p>
 <p>Write three brief points in your own words:</p>
 <ol>
