@@ -330,6 +330,7 @@
 <li><strong>The goal</strong>: change every weight a little, so that the next time this input is shown, the output lands closer to its target</li>
 <li><strong>For each weight, ask</strong>: if it grew slightly, would the loss go up or down, and how fast? That slope is the gradient; step against it: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo>←</mo><mi>w</mi><mo>−</mo><mi>η</mi><mtext> </mtext><mi mathvariant="normal">∂</mi><mi mathvariant="script">L</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>w</mi></mrow><annotation encoding="application/x-tex">w \leftarrow w - \eta\,\partial\mathcal{L}/\partial w</annotation></semantics></math></li>
 <li>A weight into the output sees the error directly. A hidden unit acts only through the units it feeds, so it gets the output error <strong>sent back</strong> along the same connection, scaled by its weight</li>
+<li>The math behind it is the <strong>chain rule</strong> of calculus. We will not derive it in class (the backpropagation notes do); the next slides show how it works, with numbers</li>
 <li><mark>Activity flows forward to the output; error flows backward to every weight</mark></li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="45" aria-labelledby="heading-37"><p class="page">Slide 37</p>
