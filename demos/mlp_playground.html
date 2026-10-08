@@ -510,10 +510,13 @@ function drawNet(){
   const fontPx=embed()?20:13;
   const padL=fontPx*2.4, padR=fontPx*2.2, padY=14;
   const maxN=Math.max(...sizes);
-  const gap=Math.min(fontPx+8, (Hcss-padY*2)/Math.max(1, maxN-1||1));
+  const gap=Math.min(fontPx+14, (Hcss-padY*2)/Math.max(1, maxN-1||1));
   const pos=[];
   for(let l=0;l<sizes.length;l++){
-    const x=padL+(sizes.length===1?0:(Wcss-padL-padR)*l/(sizes.length-1));
+    // keep the drawing compact: at most ~2.4x as wide as tall, centred in the panel
+    const span=Math.min(Wcss-padL-padR, Hcss*2.4*Math.max(1,sizes.length-1)/2);
+    const x0=padL+(Wcss-padL-padR-span)/2;
+    const x=x0+(sizes.length===1?0:span*l/(sizes.length-1));
     const col=[];
     const n=sizes[l];
     for(let j=0;j<n;j++){
