@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Backpropagation playground — CPSY 1291</title>
+<style>
+ :root{--ink:#1E293B;--taupe:#8A7E70;--mag:#B5396B;--grn:#3F7A6B;--blue:#3E6D8E;--gold:#F2C14E;--bg:#FDFBF7;--slate:#64748B}
+ *{box-sizing:border-box}
+ body{margin:0;font:15px/1.45 Lora,Georgia,serif;color:var(--ink);background:var(--bg)}
+ .page{display:flex;gap:14px;padding:12px;align-items:flex-start;max-width:1120px}
+ #cv{width:520px;height:520px;flex:0 0 auto;background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.12)}
+ .col{width:520px;flex:0 0 auto;display:flex;flex-direction:column;gap:10px;min-width:0}
+ .panel{font-family:Poppins,system-ui,sans-serif;font-size:13px}
+ label{display:block;margin:8px 0 2px;color:var(--taupe)}
+ .panel .ctrl:first-child label{margin-top:0}
+ button{font:inherit;padding:6px 11px;margin:2px 6px 2px 0;border:0;border-radius:7px;
+        background:#EDE7DE;color:var(--ink);cursor:pointer}
+ button.primary{background:var(--gold)}
+ select,input[type=range]{width:100%}
+ select{font:inherit;color:var(--ink);background:#fff;border:1px solid #E4DDD4;border-radius:7px;padding:4px 6px}
+ .grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px}
+ .actions{margin-top:8px}
+ .stat{margin-top:8px;padding:8px 10px;background:#fff;border-radius:8px;
+       box-shadow:0 1px 4px rgba(0,0,0,.08)}
+ .stats{display:flex;gap:8px}
+ .stats .stat{flex:1;margin-top:0}
+ .stat b{font-size:19px}
+ #msg{min-height:2.8em}
+ #net,#loss{width:100%;background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.12);display:block}
+ #net{height:176px}
+ #loss{height:148px}
+ body.embed{overflow:hidden;height:100vh;margin:0}
+ body.embed .page{max-width:none;height:100%;box-sizing:border-box;display:grid;
+   grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto minmax(120px,.85fr) minmax(150px,1.15fr);
+   gap:8px 14px;padding:8px}
+ body.embed .col{display:contents;width:auto}
+ body.embed #cv{grid-column:1;grid-row:1 / span 3;align-self:center;justify-self:start}
+ body.embed .panel{grid-column:2;grid-row:1;width:auto;font-size:20px;line-height:1.25}
+ body.embed .grid{grid-template-columns:1fr 1fr 1fr;column-gap:18px;row-gap:2px}
+ body.embed label{margin:0 0 1px;font-size:20px}
+ body.embed select{font:20px/1.25 Poppins,system-ui,sans-serif;padding:4px 8px}
+ body.embed button{padding:8px 16px;font-size:20px;border-radius:9px;margin:2px 8px 2px 0}
+ body.embed .actions{margin-top:4px}
+ body.embed .stats{margin-top:4px}
+ body.embed .stat{margin-top:4px;padding:4px 12px}
+ body.embed .stats .stat{margin-top:0}
+ body.embed .stat b{font-size:24px}
+ body.embed #msg{min-height:1.4em;font-size:20px}
+ body.embed input[type=range]{height:26px}
+ body.embed #net{grid-column:2;grid-row:2;width:100%;height:100%;min-height:0}
+ body.embed #loss{grid-column:2;grid-row:3;width:100%;height:100%;min-height:0}
+</style>
+</head>
+<body>
+<div class="page">
+  <canvas id="cv" width="520" height="520" aria-label="Two classes of points and the network output. Blue and green are the classes. The pale wash is the network's probability, and the gold line is where that probability is one half."></canvas>
+  <div class="col">
+    <div class="panel">
+      <div class="grid">
+        <div class="ctrl">
+          <label for="data">data</label>
+          <select id="data">
+            <option value="xor" selected>XOR — four clusters</option>
+            <option value="circles">Circles — one inside a ring</option>
+            <option value="moons">Two moons</option>
+            <option value="spirals">Spirals</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label for="layers">hidden layers</label>
+          <select id="layers">
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label for="units">units each — <span id="unitsv">4</span></label>
+          <input id="units" type="range" min="1" max="8" step="1" value="4">
+        </div>
+        <div class="ctrl">
+          <label for="act">hidden activation</label>
+          <select id="act">
+            <option value="relu" selected>ReLU</option>
+            <option value="tanh">tanh</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label for="eta">learning rate η — <span id="etav">0.50</span></label>
+          <input id="eta" type="range" min="-2" max="0.7" step="0.01" value="-0.30">
+        </div>
+        <div class="ctrl">
+          <label for="noise">flipped labels — <span id="noisev">none</span></label>
+          <input id="noise" type="range" min="0" max="30" step="1" value="0">
+        </div>
+      </div>
+      <div class="actions">
+        <button id="step" type="button">step</button>
+        <button class="primary" id="run" type="button">train</button>
+        <button id="reset" type="button">reset weights</button>
+        <button id="regen" type="button">new data</button>
+      </div>
+      <div class="stats">
+        <div class="stat">epoch <b id="ep">0</b></div>
+        <div class="stat">loss <b id="lossv">–</b></div>
+        <div class="stat">training accuracy <b id="acc">–</b></div>
+      </div>
+      <div class="stat" id="msg"></div>
+    </div>
+    <canvas id="net" width="520" height="176" aria-label="The network. Edge thickness is the absolute weight. Magenta edges are positive weights, slate edges are negative."></canvas>
+    <canvas id="loss" width="520" height="148" aria-label="Training loss after each epoch"></canvas>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const BLUE='#3E6D8E', GREEN='#3F7A6B', GOLD='#F2C14E', INK='#1E293B', MAG='#B5396B', SLATE='#64748B';
+const BATCH=16, VIEW=2.05, GRID=96;
+if(new URLSearchParams(location.search).has('embed')) document.body.classList.add('embed');
+
+let dataSeed=1, weightSeed=1;
+let X=[], Yclean=[], Y=[];
+let W=[], b=[];
+let epoch=0, hist=[], metrics={loss:0, acc:0};
+let shuffleRng=mulberry32(1);
+let running=false, raf=0, lastTs=0, bank=0;
+let builtH=-1;
+
+function mulberry32(a){
+  return function(){
+    a|=0; a=a+0x6D2B79F5|0;
+    let t=Math.imul(a^a>>>15, 1|a);
+    t=t+Math.imul(t^t>>>7, 61|t)^t;
+    return ((t^t>>>14)>>>0)/4294967296;
+  };
+}
+function randn(rng){
+  let u=0, v=0;
+  while(u===0) u=rng();
+  while(v===0) v=rng();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+function sigmoid(z){
+  z=Math.max(-40, Math.min(40, z));
+  return 1/(1+Math.exp(-z));
+}
+function crossEntropy(yhat, y){
+  const q=Math.min(1-1e-12, Math.max(1e-12, yhat));
+  return -(y*Math.log(q)+(1-y)*Math.log(1-q));
+}
+function useTanh(){return $('act').value==='tanh'}
+function hidden(z, tanh){return tanh?Math.tanh(z):(z>0?z:0)}
+function hiddenPrime(z, a, tanh){return tanh?(1-a*a):(z>0?1:0)}
+function eta(){return Math.pow(10, +$('eta').value)}
+
+function makeData(kind, seed){
+  const rng=mulberry32(seed);
+  const Xs=[], Ys=[];
+  if(kind==='xor'){
+    const centers=[[-1,-1,0],[1,1,0],[-1,1,1],[1,-1,1]];
+    for(const c of centers) for(let i=0;i<50;i++){
+      Xs.push([c[0]+0.25*randn(rng), c[1]+0.25*randn(rng)]);
+      Ys.push(c[2]);
+    }
+  }else if(kind==='circles'){
+    for(let i=0;i<100;i++){
+      const a0=rng()*2*Math.PI, r0=0.38+0.06*randn(rng);
+      Xs.push([r0*Math.cos(a0), r0*Math.sin(a0)]); Ys.push(0);
+      const a1=rng()*2*Math.PI, r1=1.25+0.06*randn(rng);
+      Xs.push([r1*Math.cos(a1), r1*Math.sin(a1)]); Ys.push(1);
+    }
+  }else if(kind==='moons'){
+    for(let i=0;i<100;i++){
+      const t=i/99*Math.PI, n=0.09;
+      Xs.push([Math.cos(t)+n*randn(rng), Math.sin(t)+n*randn(rng)]); Ys.push(0);
+      Xs.push([1-Math.cos(t)+n*randn(rng), 0.5-Math.sin(t)+n*randn(rng)]); Ys.push(1);
+    }
+    centerScale(Xs, 1.45);
+  }else{
+    for(let i=0;i<100;i++){
+      const t=(i/99)*3.4*Math.PI, r=0.12+(i/99)*1.2, n=0.03;
+      for(let c=0;c<2;c++){
+        const a=t+c*Math.PI;
+        Xs.push([r*Math.cos(a)+n*randn(rng), r*Math.sin(a)+n*randn(rng)]);
+        Ys.push(c);
+      }
+    }
+    centerScale(Xs, 1.5);
+  }
+  return {X:Xs, Y:Ys};
+}
+function centerScale(pts, target){
+  let mx=0, my=0;
+  for(const p of pts){mx+=p[0]; my+=p[1]}
+  mx/=pts.length; my/=pts.length;
+  let r=0;
+  for(const p of pts){p[0]-=mx; p[1]-=my; r=Math.max(r, Math.hypot(p[0], p[1]))}
+  const s=target/(r||1);
+  for(const p of pts){p[0]*=s; p[1]*=s}
+}
+function applyNoise(){
+  const p=+$('noise').value/100;
+  const rng=mulberry32(dataSeed*10007+Math.round(p*1000)+3);
+  Y=Yclean.slice();
+  if(p<=0) return;
+  for(let i=0;i<Y.length;i++) if(rng()<p) Y[i]=1-Y[i];
+}
+function loadData(){
+  const d=makeData($('data').value, dataSeed);
+  X=d.X; Yclean=d.Y;
+  applyNoise();
+}
+
+// First-layer rows point different ways around the circle, plus a little jitter,
+// so a few hidden units are not copies of one line. Later layers are He draws.
+// Every weight after this is learned by the four steps below.
+function initWeights(seed){
+  const rng=mulberry32(seed);
+  const h=+$('units').value, nHid=+$('layers').value;
+  const sizes=[2, ...Array(nHid).fill(h), 1];
+  W=[]; b=[];
+  for(let l=0;l<sizes.length-1;l++){
+    const fan=sizes[l], n=sizes[l+1];
+    const rows=[], bias=[];
+    if(l===0){
+      for(let j=0;j<n;j++){
+        const ang=n===1 ? rng()*2*Math.PI : (j+0.5)*2*Math.PI/n+(rng()-0.5)*0.35;
+        const mag=1.15;
+        rows.push([mag*Math.cos(ang), mag*Math.sin(ang)]);
+        bias.push(0);
+      }
+    }else{
+      const s=Math.sqrt(2/fan);
+      for(let j=0;j<n;j++){
+        const row=[];
+        for(let k=0;k<fan;k++) row.push(s*randn(rng));
+        rows.push(row);
+        bias.push(0);
+      }
+    }
+    W.push(rows); b.push(bias);
+  }
+  builtH=h;
+}
+
+// Step 1 lives here too: the map and the accuracy meter use the same forward pass.
+function forward(x){
+  const tanh=useTanh();
+  const z=[], a=[x];
+  let cur=x;
+  for(let l=0;l<W.length;l++){
+    const zl=[];
+    for(let j=0;j<W[l].length;j++){
+      let s=b[l][j];
+      const row=W[l][j];
+      for(let k=0;k<row.length;k++) s+=row[k]*cur[k];
+      zl.push(s);
+    }
+    z.push(zl);
+    const last=l===W.length-1;
+    cur=zl.map(v=>last?sigmoid(v):hidden(v, tanh));
+    a.push(cur);
+  }
+  return {z, a, yhat:cur[0]};
+}
+
+// One minibatch. The four steps are the lecture's, then a step of gradient descent.
+// Gradients are averaged over the batch before the weights move.
+function sgdBatch(idx, lo, hi){
+  const B=hi-lo;
+  const tanh=useTanh();
+  const gW=W.map(rows=>rows.map(row=>row.map(()=>0)));
+  const gb=b.map(bias=>bias.map(()=>0));
+  for(let t=lo;t<hi;t++){
+    const i=idx[t], x=X[i], y=Y[i];
+
+    // Step 1 — forward: compute and keep z^[l] and a^[l]. a^[0] is the input.
+    const pass=forward(x);
+    const z=pass.z, a=pass.a, yhat=pass.yhat;
+
+    // Step 2 — the error at the output. Sigmoid with cross-entropy: δ^[L] = ŷ − y.
+    let delta=[yhat-y];
+
+    for(let l=W.length-1;l>=0;l--){
+      // Step 4 — gradient = error × activity.
+      // ∂L/∂W^[l] = δ^[l] a^[l−1]ᵀ and ∂L/∂b^[l] = δ^[l].
+      const aPrev=a[l];
+      for(let j=0;j<delta.length;j++){
+        gb[l][j]+=delta[j]/B;
+        const grow=gW[l][j];
+        for(let k=0;k<aPrev.length;k++) grow[k]+=delta[j]*aPrev[k]/B;
+      }
+      if(l===0) break;
+      // Step 3 — send the error backward:
+      // δ^[l−1] = (W^[l]ᵀ δ^[l]) ⊙ g′(z^[l−1]).
+      // Taken after the gradient at this layer, which needs the same δ^[l].
+      const nPrev=z[l-1].length;
+      const back=new Array(nPrev).fill(0);
+      for(let j=0;j<delta.length;j++){
+        const row=W[l][j];
+        for(let k=0;k<nPrev;k++) back[k]+=row[k]*delta[j];
+      }
+      const aHidden=a[l];
+      delta=back.map((d,k)=>d*hiddenPrime(z[l-1][k], aHidden[k], tanh));
+    }
+  }
+  // Update: θ ← θ − η ∇L.
+  const e=eta();
+  for(let l=0;l<W.length;l++){
+    for(let j=0;j<W[l].length;j++){
+      b[l][j]-=e*gb[l][j];
+      const row=W[l][j], grow=gW[l][j];
+      for(let k=0;k<row.length;k++) row[k]-=e*grow[k];
+    }
+  }
+}
+
+function evaluate(){
+  let loss=0, correct=0;
+  const n=X.length;
+  for(let i=0;i<n;i++){
+    const yhat=forward(X[i]).yhat;
+    loss+=crossEntropy(yhat, Y[i]);
+    if((yhat>=0.5?1:0)===Y[i]) correct++;
+  }
+  return {loss:loss/n, acc:n?correct/n:0};
+}
+function blurb(acc){
+  const h=+$('units').value, layers=+$('layers').value, data=$('data').value;
+  if(data==='xor' && h===1)
+    return '1 hidden unit: one line, XOR stays at 75%.';
+  if(data==='xor' && h>=2 && acc>=0.95)
+    return 'Hidden units bend the boundary around all four clusters.';
+  if((data==='circles'||data==='moons'||data==='spirals') && h===1 && layers===1)
+    return 'One hidden unit is still one straight cut.';
+  return 'Magenta weights are positive, slate weights are negative.';
+}
+function show(m){
+  metrics=m;
+  $('ep').textContent=String(epoch);
+  $('lossv').textContent=m.loss.toFixed(3);
+  $('acc').textContent=(100*m.acc).toFixed(1)+'%';
+  $('msg').textContent=blurb(m.acc);
+}
+function runEpoch(){
+  const n=X.length;
+  const idx=new Array(n);
+  for(let i=0;i<n;i++) idx[i]=i;
+  for(let i=n-1;i>0;i--){
+    const j=Math.floor(shuffleRng()*(i+1));
+    const t=idx[i]; idx[i]=idx[j]; idx[j]=t;
+  }
+  for(let s=0;s<n;s+=BATCH) sgdBatch(idx, s, Math.min(n, s+BATCH));
+  epoch++;
+  const m=evaluate();
+  hist.push(m.loss);
+  show(m);
+}
+function resetWeights(advance){
+  stopRun();
+  if(advance) weightSeed++;
+  initWeights(weightSeed);
+  shuffleRng=mulberry32(weightSeed*1009+17);
+  epoch=0;
+  const m=evaluate();
+  hist=[m.loss];
+  show(m);
+}
+function newData(advance){
+  if(advance) dataSeed++;
+  loadData();
+  resetWeights(advance);
+}
+
+function stopRun(){
+  running=false;
+  if(raf){cancelAnimationFrame(raf); raf=0}
+  lastTs=0; bank=0;
+  $('run').textContent='train';
+}
+function loop(ts){
+  if(!running) return;
+  if(lastTs) bank+=ts-lastTs;
+  lastTs=ts;
+  let n=0;
+  while(bank>=1000/30 && n<3){
+    runEpoch();
+    bank-=1000/30;
+    n++;
+  }
+  if(n) draw();
+  raf=requestAnimationFrame(loop);
+}
+
+const cv=$('cv'), netC=$('net'), lossC=$('loss');
+function embed(){return document.body.classList.contains('embed')}
+function setBuf(c, cssW, cssH){
+  const dpr=Math.min(window.devicePixelRatio||1, 2);
+  c.style.width=cssW+'px';
+  c.style.height=cssH+'px';
+  const bw=Math.max(1, Math.round(cssW*dpr)), bh=Math.max(1, Math.round(cssH*dpr));
+  if(c.width!==bw||c.height!==bh){c.width=bw; c.height=bh}
+  const g=c.getContext('2d');
+  g.setTransform(dpr,0,0,dpr,0,0);
+  c._w=cssW; c._h=cssH; c._g=g;
+}
+function fit(){
+  if(embed()){
+    const H=document.documentElement.clientHeight;
+    const W=document.documentElement.clientWidth;
+    const side=Math.max(220, Math.min(H-16, W-620));
+    setBuf(cv, side, side);
+    const nw=Math.max(1, netC.clientWidth), nh=Math.max(1, netC.clientHeight);
+    const lw=Math.max(1, lossC.clientWidth), lh=Math.max(1, lossC.clientHeight);
+    netC.style.width='100%'; netC.style.height='100%';
+    lossC.style.width='100%'; lossC.style.height='100%';
+    const dpr=Math.min(window.devicePixelRatio||1, 2);
+    const nbw=Math.round(nw*dpr), nbh=Math.round(nh*dpr);
+    if(netC.width!==nbw||netC.height!==nbh){netC.width=nbw; netC.height=nbh}
+    const lbw=Math.round(lw*dpr), lbh=Math.round(lh*dpr);
+    if(lossC.width!==lbw||lossC.height!==lbh){lossC.width=lbw; lossC.height=lbh}
+    netC._w=nw; netC._h=nh; lossC._w=lw; lossC._h=lh;
+    netC.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+    lossC.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+  }else{
+    setBuf(cv, 520, 520);
+    setBuf(netC, netC.clientWidth||520, 176);
+    setBuf(lossC, lossC.clientWidth||520, 148);
+  }
+}
+
+function drawField(g, S){
+  const off=drawField.off||(drawField.off=document.createElement('canvas'));
+  if(off.width!==GRID){off.width=GRID; off.height=GRID}
+  const img=off.getContext('2d').createImageData(GRID, GRID);
+  const data=img.data;
+  const field=new Float32Array(GRID*GRID);
+  let p=0;
+  for(let j=0;j<GRID;j++){
+    const y=VIEW-(j/(GRID-1))*2*VIEW;
+    for(let i=0;i<GRID;i++){
+      const x=-VIEW+(i/(GRID-1))*2*VIEW;
+      const pr=forward([x, y]).yhat;
+      field[j*GRID+i]=pr;
+      const conf=Math.abs(pr-0.5)*2;
+      const ink=0.16+0.42*conf;
+      const r=(0x3E*(1-pr)+0x3F*pr)*ink+255*(1-ink);
+      const gc=(0x6D*(1-pr)+0x7A*pr)*ink+255*(1-ink);
+      const bch=(0x8E*(1-pr)+0x6B*pr)*ink+255*(1-ink);
+      data[p++]=r; data[p++]=gc; data[p++]=bch; data[p++]=255;
+    }
+  }
+  off.getContext('2d').putImageData(img, 0, 0);
+  g.imageSmoothingEnabled=true;
+  g.drawImage(off, 0, 0, S, S);
+  return field;
+}
+function drawBoundary(g, S, field){
+  const segs=[];
+  const at=(i,j)=>field[j*GRID+i];
+  const pt=(gx,gy)=>[(gx/(GRID-1))*S, (gy/(GRID-1))*S];
+  const lerp=(a,b)=>{
+    const d=b-a;
+    if(Math.abs(d)<1e-8) return 0.5;
+    return Math.min(1, Math.max(0, (0.5-a)/d));
+  };
+  const CASES=[
+    [], [[3,0]], [[0,1]], [[3,1]], [[1,2]], [[3,0],[1,2]], [[0,2]], [[3,2]],
+    [[2,3]], [[0,2]], [[0,1],[2,3]], [[1,2]], [[1,3]], [[0,1]], [[0,3]]
+  ];
+  for(let j=0;j<GRID-1;j++){
+    for(let i=0;i<GRID-1;i++){
+      const f00=at(i,j), f10=at(i+1,j), f11=at(i+1,j+1), f01=at(i,j+1);
+      let c=0;
+      if(f00>=0.5) c|=1;
+      if(f10>=0.5) c|=2;
+      if(f11>=0.5) c|=4;
+      if(f01>=0.5) c|=8;
+      const pairs=CASES[c];
+      if(!pairs) continue;
+      const edges=[
+        pt(i+lerp(f00,f10), j),
+        pt(i+1, j+lerp(f10,f11)),
+        pt(i+lerp(f01,f11), j+1),
+        pt(i, j+lerp(f00,f01))
+      ];
+      for(const pair of pairs) segs.push([edges[pair[0]], edges[pair[1]]]);
+    }
+  }
+  g.strokeStyle=GOLD; g.lineWidth=Math.max(2.25, S/240); g.lineJoin='round'; g.lineCap='round';
+  g.beginPath();
+  for(const [p0,p1] of segs){g.moveTo(p0[0], p0[1]); g.lineTo(p1[0], p1[1])}
+  g.stroke();
+}
+function drawPoints(g, S){
+  const r=Math.max(3.2, S/130);
+  for(let i=0;i<X.length;i++){
+    const px=(X[i][0]/VIEW+1)*0.5*S;
+    const py=(1-X[i][1]/VIEW)*0.5*S;
+    g.beginPath(); g.arc(px, py, r, 0, Math.PI*2);
+    g.fillStyle=Y[i]?GREEN:BLUE; g.fill();
+    g.lineWidth=1.25; g.strokeStyle='#fff'; g.stroke();
+  }
+}
+function drawNet(){
+  const Wcss=netC._w||netC.clientWidth||520;
+  const Hcss=netC._h||netC.clientHeight||176;
+  const g=netC.getContext('2d');
+  g.clearRect(0,0,Wcss,Hcss);
+  g.fillStyle='#fff'; g.fillRect(0,0,Wcss,Hcss);
+  const sizes=[2, ...W.map(rows=>rows.length)];
+  const fontPx=embed()?20:13;
+  const padL=fontPx*2.4, padR=fontPx*2.2, padY=14;
+  const maxN=Math.max(...sizes);
+  const gap=Math.min(fontPx+8, (Hcss-padY*2)/Math.max(1, maxN-1||1));
+  const pos=[];
+  for(let l=0;l<sizes.length;l++){
+    const x=padL+(sizes.length===1?0:(Wcss-padL-padR)*l/(sizes.length-1));
+    const col=[];
+    const n=sizes[l];
+    for(let j=0;j<n;j++){
+      const y=Hcss/2+(j-(n-1)/2)*gap;
+      col.push([x,y]);
+    }
+    pos.push(col);
+  }
+  const r=Math.max(4, Math.min(11, gap*0.38));
+  for(let l=0;l<W.length;l++){
+    for(let j=0;j<W[l].length;j++){
+      const row=W[l][j];
+      for(let k=0;k<row.length;k++){
+        const w=row[k];
+        g.strokeStyle=w>=0?MAG:SLATE;
+        g.globalAlpha=0.9;
+        g.lineWidth=Math.min(8, 0.8+1.7*Math.abs(w));
+        g.beginPath();
+        g.moveTo(pos[l][k][0], pos[l][k][1]);
+        g.lineTo(pos[l+1][j][0], pos[l+1][j][1]);
+        g.stroke();
+      }
+    }
+  }
+  g.globalAlpha=1;
+  g.font=fontPx+'px Lora, Georgia, serif';
+  g.fillStyle=INK; g.textBaseline='middle';
+  for(let l=0;l<pos.length;l++){
+    for(let j=0;j<pos[l].length;j++){
+      const [x,y]=pos[l][j];
+      g.beginPath(); g.arc(x, y, r, 0, Math.PI*2);
+      g.fillStyle='#fff'; g.fill();
+      g.lineWidth=1.5; g.strokeStyle=INK; g.stroke();
+    }
+  }
+  g.fillStyle=INK; g.textAlign='right';
+  g.fillText('x\u2081', pos[0][0][0]-r-6, pos[0][0][1]);
+  g.fillText('x\u2082', pos[0][1][0]-r-6, pos[0][1][1]);
+  const out=pos[pos.length-1][0];
+  g.textAlign='left';
+  g.fillText('ŷ', out[0]+r+6, out[1]);
+}
+function niceCeil(v){
+  if(!(v>0)) return 1;
+  const e=Math.floor(Math.log10(v)), p=Math.pow(10, e), n=v/p;
+  const f=n<=1?1:n<=2?2:n<=5?5:10;
+  return f*p;
+}
+function fmtAxis(v){
+  if(v===0) return '0';
+  if(Number.isInteger(v)) return String(v);
+  if(v>=10) return v.toFixed(1);
+  return v.toFixed(2);
+}
+function drawLoss(){
+  const Wcss=lossC._w||lossC.clientWidth||520;
+  const Hcss=lossC._h||lossC.clientHeight||148;
+  const g=lossC.getContext('2d');
+  g.clearRect(0,0,Wcss,Hcss);
+  g.fillStyle='#fff'; g.fillRect(0,0,Wcss,Hcss);
+  const big=embed();
+  const fontPx=big?20:12;
+  const padL=big?78:52, padR=big?16:12, padT=big?12:8, padB=big?46:28;
+  const x0=padL, y0=Hcss-padB, x1=Wcss-padR, top=padT+4;
+  let m=0; for(const v of hist) if(v>m) m=v;
+  const ymax=m<=0?1:niceCeil(m*1.08);
+  const yOf=v=>y0-(Math.max(0,v)/ymax)*(y0-top);
+  const xmax=Math.max(hist.length-1, 1);
+  const xOf=i=>x0+(i/xmax)*(x1-x0);
+  g.strokeStyle='#E4DDD4'; g.lineWidth=1; g.beginPath();
+  g.moveTo(x0, padT); g.lineTo(x0, y0); g.lineTo(x1, y0); g.stroke();
+  g.fillStyle='#8A7E70'; g.font=fontPx+'px Lora, Georgia, serif';
+  g.textAlign='right'; g.textBaseline='middle';
+  g.fillText(fmtAxis(ymax), x0-6, yOf(ymax));
+  g.textBaseline='bottom'; g.fillText('0', x0-6, y0-1);
+  g.textAlign='left'; g.textBaseline='top';
+  g.fillText('0', x0, y0+3);
+  if(epoch){g.textAlign='right'; g.fillText(String(epoch), x1, y0+3)}
+  g.textAlign='center'; g.fillText('epoch', (x0+x1)/2, y0+(big?24:14));
+  g.save(); g.translate(big?18:12, (y0+padT)/2); g.rotate(-Math.PI/2);
+  g.textAlign='center'; g.textBaseline='middle'; g.fillText('loss', 0, 0); g.restore();
+  if(hist.length<1) return;
+  g.strokeStyle=INK; g.lineWidth=big?2.5:1.6; g.lineJoin='round'; g.beginPath();
+  hist.forEach((v,i)=>{const x=xOf(i), y=yOf(v); if(i) g.lineTo(x,y); else g.moveTo(x,y)});
+  g.stroke();
+  const lx=xOf(hist.length-1), ly=yOf(hist[hist.length-1]);
+  g.beginPath(); g.arc(lx, ly, big?5.5:3.5, 0, Math.PI*2);
+  g.fillStyle=GOLD; g.fill(); g.lineWidth=1.5; g.strokeStyle=INK; g.stroke();
+}
+function draw(){
+  const S=cv._w||520;
+  const g=cv.getContext('2d');
+  g.clearRect(0,0,S,S);
+  g.fillStyle='#fff'; g.fillRect(0,0,S,S);
+  const field=drawField(g, S);
+  g.strokeStyle='#EDE7DE'; g.lineWidth=1; g.beginPath();
+  g.moveTo(0, S/2); g.lineTo(S, S/2);
+  g.moveTo(S/2, 0); g.lineTo(S/2, S); g.stroke();
+  drawBoundary(g, S, field);
+  drawPoints(g, S);
+  drawNet();
+  drawLoss();
+}
+
+function onArch(){
+  $('unitsv').textContent=$('units').value;
+  const h=+$('units').value;
+  if(h===builtH && arguments[0]!=='force') return;
+  resetWeights(true);
+  fit(); draw();
+}
+$('data').onchange=()=>{newData(false); fit(); draw()};
+$('layers').onchange=()=>onArch('force');
+$('act').onchange=()=>onArch('force');
+$('units').oninput=()=>{
+  $('unitsv').textContent=$('units').value;
+  if(+$('units').value!==builtH) onArch('force');
+};
+$('eta').oninput=()=>$('etav').textContent=eta()<0.1?eta().toFixed(3):eta().toFixed(2);
+$('noise').oninput=()=>{
+  const v=+$('noise').value;
+  $('noisev').textContent=v===0?'none':v+'%';
+  applyNoise();
+  const m=evaluate();
+  if(epoch===0) hist=[m.loss];
+  show(m); draw();
+};
+$('step').onclick=()=>{runEpoch(); draw()};
+$('run').onclick=()=>{
+  if(running){stopRun(); return}
+  running=true; lastTs=0; bank=0;
+  $('run').textContent='pause';
+  raf=requestAnimationFrame(loop);
+};
+$('reset').onclick=()=>{resetWeights(true); draw()};
+$('regen').onclick=()=>{newData(true); fit(); draw()};
+addEventListener('resize', ()=>{fit(); draw()});
+
+newData(false);
+fit();
+draw();
+requestAnimationFrame(()=>{fit(); draw()});
+
+window.__demo={
+  train(n){for(let i=0;i<n;i++) runEpoch(); draw(); return metrics.acc},
+  get metrics(){return {epoch, acc:metrics.acc, loss:metrics.loss, n:X.length}}
+};
+</script>
+</body>
+</html>

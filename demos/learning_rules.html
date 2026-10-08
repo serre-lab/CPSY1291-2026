@@ -1,20 +1,46 @@
 <!doctype html><meta charset="utf-8">
 <title>Perceptron, delta rule, logistic regression — CPSY 1291</title>
 <style>
- :root{--ink:#1E293B;--taupe:#8A7E70;--mag:#B5396B;--grn:#3F7A6B;--gold:#F2C14E;--bg:#FDFBF7}
+ :root{--ink:#1E293B;--taupe:#8A7E70;--mag:#B5396B;--grn:#3F7A6B;--blue:#3E6D8E;--gold:#F2C14E;--bg:#FDFBF7}
  body{margin:0;font:15px/1.45 Lora,Georgia,serif;color:var(--ink);background:var(--bg)}
- .wrap{display:flex;gap:14px;padding:12px}
- canvas{background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.12)}
- .panel{width:260px;font-family:Poppins,system-ui,sans-serif;font-size:13px}
+ .page{display:flex;flex-direction:column}
+ .wrap{display:flex;gap:14px;padding:12px 12px 4px;align-items:flex-start}
+ #cv{width:430px;height:430px;flex:0 0 auto;background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.12)}
+ #loss{display:block;width:100%;height:120px;flex:0 0 120px}
+ .panel{width:300px;flex:0 0 auto;font-family:Poppins,system-ui,sans-serif;font-size:13px}
  label{display:block;margin:9px 0 2px;color:var(--taupe)}
  button{font:inherit;padding:6px 11px;margin:2px 3px 2px 0;border:0;border-radius:7px;
         background:#EDE7DE;cursor:pointer}
  button.primary{background:var(--gold)}
  select,input[type=range]{width:100%}
+ .actions{margin-top:10px}
  .stat{margin-top:10px;padding:8px 10px;background:#fff;border-radius:8px;
        box-shadow:0 1px 4px rgba(0,0,0,.08)}
  .stat b{font-size:19px} #msg b{font-size:inherit} .k{color:var(--taupe)}
+ .stats{display:contents}
+ body.embed{overflow:hidden;height:100vh;margin:0}
+ body.embed .page{height:100%;box-sizing:border-box;display:grid;
+   grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto minmax(160px,1fr);
+   gap:8px 16px;padding:8px}
+ body.embed .wrap{display:contents;padding:0}
+ body.embed #cv{grid-column:1;grid-row:1 / span 2;align-self:center;justify-self:start}
+ body.embed .panel{grid-column:2;grid-row:1;width:auto;max-width:none;min-width:0;
+   font-size:20px;line-height:1.3;display:grid;grid-template-columns:1fr 1fr;
+   column-gap:20px;row-gap:4px;align-content:start;align-items:center}
+ body.embed .panel > label:first-of-type,
+ body.embed #rule,body.embed .actions,body.embed .stats{grid-column:1 / -1}
+ body.embed label{margin:0;font-size:20px}
+ body.embed select{font:20px/1.3 Poppins,system-ui,sans-serif;padding:6px 8px}
+ body.embed button{padding:10px 18px;font-size:20px;border-radius:9px;margin:2px 6px 2px 0}
+ body.embed .actions{margin-top:2px}
+ body.embed .stats{display:flex;gap:8px;align-items:stretch}
+ body.embed .stats .stat{flex:1;min-width:0;margin-top:0;padding:8px 12px}
+ body.embed .stats #msg{flex:1.45;min-height:0;font-size:20px}
+ body.embed .stat b{font-size:24px}
+ body.embed input[type=range]{height:28px}
+ body.embed #loss{grid-column:2;grid-row:2;width:100%;height:100%;flex:none;min-height:0}
 </style>
+<div class="page">
 <div class="wrap">
   <canvas id="cv" width="430" height="430"></canvas>
   <div class="panel">
@@ -26,88 +52,333 @@
     </select>
     <label>learning rate η — <span id="etav">0.05</span></label>
     <input type="range" id="eta" min="-3" max="0" step="0.05" value="-1.3">
+    <label for="noise">class overlap — none … large (<span id="noisev">0.00</span>)</label>
+    <input type="range" id="noise" min="0" max="1.2" step="0.05" value="0">
     <label>flipped labels — <span id="ovv">none</span></label>
     <input type="range" id="ov" min="0" max="40" step="2" value="0">
-    <div style="margin-top:10px">
-      <button class="primary" id="run">run</button><button id="step">one pass</button>
-      <button id="reset">reset w</button><button id="regen">new data</button>
+    <div class="actions">
+      <button class="primary" id="next" type="button">next example</button><button id="run" type="button">run</button><button id="step" type="button">one pass</button>
+      <button id="reset" type="button">reset w</button><button id="regen" type="button">new data</button>
+      <label><input type="checkbox" id="pause" checked> pause on mistakes</label>
     </div>
-    <div class="stat">updates this pass <b id="upd">–</b><br>
+    <div class="stats">
+    <div class="stat">examples seen <b id="seen">0</b><br>
+      <span class="k">mistakes so far</span> <b id="mis">0</b><br>
+      updates this pass <b id="upd">–</b><br>
       <span class="k">total</span> <b id="tot">0</b> &nbsp; <span class="k">pass</span> <b id="ep">0</b></div>
     <div class="stat"><span class="k">training accuracy</span> <b id="acc">–</b><br>
       <span class="k">length of w</span> <b id="nrm">0</b></div>
-    <div class="stat" id="msg" style="min-height:2.6em"></div>
+    <div class="stat" id="msg" style="min-height:4.4em"></div>
+    </div>
   </div>
 </div>
+<canvas id="loss" height="120" aria-label="Training loss after each example presented"></canvas>
+</div>
 <script>
-const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),S=430;
-let pts=[],w=[0,0],b=0,ep=0,tot=0,timer=null;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let S=430;
+const sc=n=>n*(S/430);
+let pts=[],order=[],w=[0,0],b=0,ep=0,tot=0,seen=0,misTot=0,misPass=0,passUpd=0,cursor=0;
+let hi=null,ghost=null,timer=null,hist=[];
 const $=id=>document.getElementById(id);
 const eta=()=>Math.pow(10,+$('eta').value);
-const toPx=p=>[S/2+p[0]*70,S/2-p[1]*70];
+const toPx=p=>[S/2+p[0]*sc(70),S/2-p[1]*sc(70)];
+const cname=y=>y>0?'green':'blue';
+if(new URLSearchParams(location.search).has('embed')) document.body.classList.add('embed');
 
-function regen(){
-  pts=[];const ov=+$('ov').value/100;
-  for(let i=0;i<70;i++){
-    const s=i<35?-1:1, x=s*(0.9+Math.random()*1.6)+ (Math.random()-.5)*.5;
-    let y=(Math.random()-.5)*3.4;
-    let lab=s;
-    if(Math.random()<ov) lab=-s;                 // flip a fraction of the labels
-    pts.push({x:[x,y],y:lab});
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    const t=a[i]; a[i]=a[j]; a[j]=t;
   }
+  return a;
+}
+function stopRun(){
+  if(timer!==null){clearTimeout(timer);timer=null;$('run').textContent='run';}
+}
+function gaussian(){
+  return Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(2*Math.PI*Math.random());
+}
+function regen(){
+  pts=[]; const ov=+$('ov').value/100, noise=+$('noise').value;
+  // Points spread over the plane, labelled by a tilted line that misses the origin
+  // (0.8 x1 - 0.6 x2 = 0, through the origin), with a thin empty margin: separable, but only just,
+  // so the perceptron needs several passes and the bias has to move too.
+  while(pts.length<70){
+    const x=-2.6+5.2*Math.random(), y=-2.6+5.2*Math.random();
+    const d=0.8*x-0.6*y;   // line through the origin: no bias needed
+    if(Math.abs(d)<0.12) continue;
+    let lab=d>0?1:-1;
+    if(Math.random()<ov) lab=-lab;
+    // Jitter positions only after assigning labels; zero noise preserves the margin.
+    pts.push({x:noise?[x+noise*gaussian(),y+noise*gaussian()]:[x,y],y:lab});
+  }
+  order=shuffle([...pts.keys()]);
   reset();
 }
-function reset(){w=[0,0];b=0;ep=0;tot=0;$('tot').textContent=0;$('ep').textContent=0;$('nrm').textContent='0.00';
-  $('upd').textContent='–';draw();say('');}
-function acc(){let c=0;for(const p of pts) if(Math.sign(p.x[0]*w[0]+p.x[1]*w[1]+b||1)===p.y)c++;
-  return c/pts.length;}
-function pass(){
-  const e=eta(),rule=$('rule').value;let u=0;
-  const order=[...pts.keys()].sort(()=>Math.random()-.5);
-  for(const i of order){
-    const p=pts[i],z=p.x[0]*w[0]+p.x[1]*w[1]+b;
-    if(rule==='perceptron'){
-      if(p.y*z<=0){w[0]+=e*p.y*p.x[0];w[1]+=e*p.y*p.x[1];b+=e*p.y;u++;}
-    }else if(rule==='logistic'){
-      const t=(p.y+1)/2, ph=1/(1+Math.exp(-z));   // label coded 1/0; p-hat = sigmoid(z)
-      const d=t-ph;                               // y - p-hat: the gradient step of cross-entropy
-      w[0]+=e*d*p.x[0];w[1]+=e*d*p.x[1];b+=e*d;
-      if(Math.abs(d)>1e-6)u++;
-    }else{
-      const d=p.y-z;                              // linear output, no threshold
-      w[0]+=e*d*p.x[0];w[1]+=e*d*p.x[1];b+=e*d;
-      if(Math.abs(d)>1e-6)u++;
-    }
+function zOf(p){return p.x[0]*w[0]+p.x[1]*w[1]+b}
+function lossValue(){
+  const n=pts.length; if(!n) return 0;
+  const rule=$('rule').value;
+  if(rule==='perceptron'){
+    let m=0;
+    for(const p of pts) if(p.y*zOf(p)<=0) m++;
+    return m/n;
   }
-  ep++;tot+=u;$('upd').textContent=u;$('tot').textContent=tot;$('ep').textContent=ep;
-  $('acc').textContent=(100*acc()).toFixed(1)+'%';
-  $('nrm').textContent=Math.hypot(w[0],w[1]).toFixed(2);
-  if($('rule').value==='perceptron'&&u===0) say('The perceptron has <b>stopped</b>. Every point is on the correct side, so no test fires and nothing changes — however narrow the gap it left.');
-  else if($('rule').value==='logistic'&&ep>6) say('Logistic regression is <b>still updating</b>, by less and less. On separable data it can always grow <b>w</b> to be more confident, so the length of w keeps rising.');
-  else if($('rule').value==='delta'&&ep>6) say('The delta rule is <b>still updating</b>. It is chasing the target value ±1, not just the correct side, so there is always some error left.');
+  if(rule==='logistic'){
+    let s=0;
+    for(const p of pts){
+      const t=(p.y+1)/2;
+      const z=Math.max(-40, Math.min(40, zOf(p)));
+      const ph=1/(1+Math.exp(-z));
+      const q=Math.min(1-1e-12, Math.max(1e-12, ph));
+      s+=-(t*Math.log(q)+(1-t)*Math.log(1-q));
+    }
+    return s/n;
+  }
+  let s=0;
+  for(const p of pts){const d=p.y-zOf(p); s+=0.5*d*d}
+  return s/n;
+}
+function lossWord(){return $('rule').value==='perceptron'?'errors':'ℒ'}
+function fmt2(v){return v.toFixed(2)}
+function reset(){
+  stopRun();
+  w=[0,0]; b=0; ep=0; tot=0; seen=0; misTot=0; misPass=0; passUpd=0; cursor=0;
+  hi=null; ghost=null; hist=[];
+  $('seen').textContent='0'; $('mis').textContent='0';
+  $('tot').textContent='0'; $('ep').textContent='0';
+  $('nrm').textContent='0.00'; $('upd').textContent='–'; $('acc').textContent='–';
+  say($('rule').value==='perceptron'
+    ? 'w starts at 0: the first example is always a mistake'
+    : 'w starts at 0. This rule updates on every example, by how wrong it is.');
+  fitEmbed();
   draw();
 }
+function acc(){
+  let c=0;
+  for(const p of pts) if(Math.sign(p.x[0]*w[0]+p.x[1]*w[1]+b||1)===p.y) c++;
+  return c/pts.length;
+}
+function updateOne(p){
+  const e=eta(), rule=$('rule').value;
+  const z=p.x[0]*w[0]+p.x[1]*w[1]+b;
+  const mistake=p.y*z<=0;
+  if(rule==='perceptron'){
+    if(mistake){w[0]+=e*p.y*p.x[0]; w[1]+=e*p.y*p.x[1]; return {z,updated:true,mistake};}
+    return {z,updated:false,mistake:false};
+  }
+  if(rule==='logistic'){
+    const t=(p.y+1)/2, ph=1/(1+Math.exp(-z));
+    const d=t-ph;
+    w[0]+=e*d*p.x[0]; w[1]+=e*d*p.x[1];
+    return {z,updated:Math.abs(d)>1e-6,mistake};
+  }
+  const d=p.y-z;
+  w[0]+=e*d*p.x[0]; w[1]+=e*d*p.x[1];
+  return {z,updated:Math.abs(d)>1e-6,mistake};
+}
+function paintNums(){
+  $('seen').textContent=seen; $('mis').textContent=misTot;
+  $('upd').textContent=passUpd; $('tot').textContent=tot; $('ep').textContent=ep;
+  $('acc').textContent=(100*acc()).toFixed(1)+'%';
+  $('nrm').textContent=Math.hypot(w[0],w[1]).toFixed(2);
+}
+function pass(){
+  stopRun();
+  hi=null; ghost=null; cursor=0; misPass=0; passUpd=0;
+  const ord=[...pts.keys()].sort(()=>Math.random()-.5);
+  let u=0;
+  for(const i of ord) if(updateOne(pts[i]).updated) u++;
+  ep++; tot+=u; passUpd=u;
+  paintNums();
+  const rule=$('rule').value;
+  if(rule==='perceptron'&&u===0) say('The perceptron has <b>stopped</b>. Every point is on the correct side, so no test fires and nothing changes — however narrow the gap it left.');
+  else if(rule==='logistic'&&ep>6) say('Logistic regression is <b>still updating</b>, by less and less. On separable data it can always grow <b>w</b> to be more confident, so the length of w keeps rising.');
+  else if(rule==='delta'&&ep>6) say('The delta rule is <b>still updating</b>. It is chasing the target value ±1, not just the correct side, so there is always some error left.');
+  fitEmbed();
+  draw();
+}
+function saidOf(z){return z>0?'green':z<0?'blue':'nothing';}
+function nextExample(){
+  if(!pts.length) return;
+  if(cursor===0){misPass=0; passUpd=0;}
+  const showing=ep+1;
+  const p=pts[order[cursor]];
+  const oldW=[w[0],w[1]], oldB=b;
+  const before=lossValue();
+  const res=updateOne(p);
+  const after=lossValue();
+  hist.push(after);
+  const n=cursor+1;
+  const label=cname(p.y), said=saidOf(res.z);
+  hi=order[cursor];
+  if(res.mistake){misPass++; misTot++;}
+  if(res.updated){passUpd++; tot++; ghost={w:oldW,b:oldB};}
+  else {ghost=null;}
+  seen++; cursor++;
+  let end='';
+  if(cursor>=pts.length){
+    ep++;
+    end='<br>End of pass '+ep+': '+misPass+' mistakes';
+    cursor=0;
+  }
+  const rule=$('rule').value;
+  let msg;
+  if(rule==='perceptron'){
+    if(res.mistake){
+      const dir=p.y>0?'toward':'away from';
+      msg='Example '+n+': label '+label+', the neuron says '+said+' — mistake: w moves '+dir+' this example.';
+    }else{
+      msg='Example '+n+': label '+label+', the neuron says '+said+' — correct, nothing changes.';
+    }
+  }else{
+    msg='Example '+n+': label '+label+', the neuron says '+said+' — updates on every example, by how wrong it is.';
+  }
+  say(msg+' '+lossWord()+' before '+fmt2(before)+' → after '+fmt2(after)+'.'+end);
+  $('seen').textContent=seen; $('mis').textContent=misTot;
+  $('upd').textContent=passUpd; $('tot').textContent=tot;
+  $('ep').textContent=cursor===0?ep:showing;
+  $('acc').textContent=(100*acc()).toFixed(1)+'%';
+  $('nrm').textContent=Math.hypot(w[0],w[1]).toFixed(2);
+  fitEmbed();
+  draw();
+  return res;
+}
 function say(h){$('msg').innerHTML=h}
+function strokeLine(ww,bb,style,width){
+  if(!ww[0]&&!ww[1]) return;
+  const f=x=>-(ww[0]*x+bb)/(ww[1]||1e-9);
+  const a=toPx([-3,f(-3)]), c=toPx([3,f(3)]);
+  ctx.strokeStyle=style; ctx.lineWidth=width; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(c[0],c[1]); ctx.stroke();
+}
+function drawArrow(ww,style,label=false){
+  const R=sc(88);
+  const norm=Math.hypot(ww[0],ww[1]);
+  if(!norm) return;
+  const dx=ww[0]/norm*R, dy=-ww[1]/norm*R;
+  const p0=[S/2,S/2], p1=[p0[0]+dx,p0[1]+dy];
+  ctx.save();
+  ctx.strokeStyle=style; ctx.fillStyle=style; ctx.lineWidth=sc(2.5); ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(p0[0],p0[1]); ctx.lineTo(p1[0],p1[1]); ctx.stroke();
+  const ang=Math.atan2(dy,dx), ah=sc(9);
+  ctx.beginPath();
+  ctx.moveTo(p1[0],p1[1]);
+  ctx.lineTo(p1[0]-ah*Math.cos(ang-.45), p1[1]-ah*Math.sin(ang-.45));
+  ctx.lineTo(p1[0]-ah*Math.cos(ang+.45), p1[1]-ah*Math.sin(ang+.45));
+  ctx.closePath(); ctx.fill();
+  if(label){
+    ctx.font='bold '+sc(15)+'px Georgia, serif';
+    ctx.fillText('w',p1[0]+sc(8),p1[1]-sc(8));
+  }
+  ctx.restore();
+}
 function draw(){
   ctx.clearRect(0,0,S,S);
-  ctx.strokeStyle='#EDE7DE';ctx.beginPath();ctx.moveTo(0,S/2);ctx.lineTo(S,S/2);
-  ctx.moveTo(S/2,0);ctx.lineTo(S/2,S);ctx.stroke();
-  if(w[0]||w[1]){                                  // decision boundary
-    const f=x=>-(w[0]*x+b)/(w[1]||1e-9);
-    const a=toPx([-3,f(-3)]),c=toPx([3,f(3)]);
-    ctx.strokeStyle='#1E293B';ctx.lineWidth=2;ctx.beginPath();
-    ctx.moveTo(a[0],a[1]);ctx.lineTo(c[0],c[1]);ctx.stroke();
-  }
+  ctx.strokeStyle='#EDE7DE'; ctx.lineWidth=sc(1); ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(0,S/2); ctx.lineTo(S,S/2);
+  ctx.moveTo(S/2,0); ctx.lineTo(S/2,S); ctx.stroke();
+  if(ghost) strokeLine(ghost.w, ghost.b, 'rgba(30,41,59,.28)', sc(2));
+  strokeLine(w, b, '#1E293B', sc(2));
   for(const p of pts){
-    const q=toPx(p.x);ctx.beginPath();ctx.arc(q[0],q[1],5,0,7);
-    ctx.fillStyle=p.y>0?'#B5396B':'#3F7A6B';ctx.fill();
+    const q=toPx(p.x); ctx.beginPath(); ctx.arc(q[0],q[1],sc(5),0,Math.PI*2);
+    ctx.fillStyle=p.y>0?'#3F7A6B':'#3E6D8E'; ctx.fill();
   }
+  if(hi!=null){
+    const q=toPx(pts[hi].x);
+    ctx.beginPath(); ctx.arc(q[0],q[1],sc(11),0,Math.PI*2);
+    ctx.lineWidth=sc(3); ctx.strokeStyle='#1E293B'; ctx.stroke();
+    ctx.lineWidth=sc(2); ctx.strokeStyle='#F2C14E'; ctx.stroke();
+  }
+  if(ghost) drawArrow(ghost.w,'rgba(181,57,107,.28)');
+  if(w[0]||w[1]) drawArrow(w,'#B5396B',true);
+  else {
+    ctx.fillStyle='#B5396B'; ctx.font=sc(13)+'px Georgia, serif';
+    ctx.fillText('w = 0',S/2+sc(8),S/2-sc(8));
+  }
+  drawLoss();
 }
-$('run').onclick=()=>{if(timer){clearInterval(timer);timer=null;$('run').textContent='run';}
-  else{timer=setInterval(pass,220);$('run').textContent='stop';}};
-$('step').onclick=pass; $('reset').onclick=reset; $('regen').onclick=regen;
+function niceCeil(v){
+  if(!(v>0)) return 1;
+  const e=Math.floor(Math.log10(v)), p=Math.pow(10,e), n=v/p;
+  const f=n<=1?1:n<=2?2:n<=5?5:10;
+  return f*p;
+}
+function fmtAxis(v){
+  if(v===0) return '0';
+  if(Number.isInteger(v)) return String(v);
+  if(v>=10) return v.toFixed(1);
+  return v.toFixed(2);
+}
+function drawLoss(){
+  const c=$('loss'), embed=document.body.classList.contains('embed');
+  const dpr=Math.min(window.devicePixelRatio||1, 2);
+  const W=c.clientWidth||document.documentElement.clientWidth||600;
+  const H=embed?Math.max(120, c.clientHeight||180):120;
+  const fontPx=embed?20:12;
+  const bw=Math.round(W*dpr), bh=Math.round(H*dpr);
+  if(c.width!==bw||c.height!==bh){c.width=bw; c.height=bh}
+  const g=c.getContext('2d');
+  g.setTransform(dpr,0,0,dpr,0,0);
+  g.clearRect(0,0,W,H);
+  g.fillStyle='#fff'; g.fillRect(0,0,W,H);
+  const yTitle=$('rule').value==='perceptron'?'errors':'loss ℒ';
+  const padL=embed?84:58, padR=embed?18:14, padT=embed?14:8, padB=embed?54:32;
+  const x0=padL, y0=H-padB, x1=W-padR, top=padT+6;
+  let m=0; for(const v of hist) if(v>m) m=v;
+  const ymax=m<=1?1:niceCeil(m*1.12);
+  const yOf=v=>y0-(Math.max(0,v)/ymax)*(y0-top);
+  const xmax=Math.max(hist.length,1);
+  const xOf=n=>x0+(n/xmax)*(x1-x0-8);
+  g.strokeStyle='#E4DDD4'; g.lineWidth=1; g.beginPath();
+  g.moveTo(x0,padT); g.lineTo(x0,y0); g.lineTo(x1,y0); g.stroke();
+  g.fillStyle='#8A7E70'; g.font=fontPx+'px Lora, Georgia, serif';
+  g.textAlign='right'; g.textBaseline='middle';
+  g.fillText(fmtAxis(ymax), x0-5, yOf(ymax));
+  g.textBaseline='bottom'; g.fillText('0', x0-5, y0-1);
+  g.textAlign='left'; g.textBaseline='top';
+  g.fillText('0', x0, y0+(embed?2:3));
+  if(hist.length){g.textAlign='right'; g.fillText(String(hist.length), x1, y0+(embed?2:3))}
+  g.textAlign='center'; g.fillText('examples presented', (x0+x1)/2, y0+(embed?26:16));
+  g.save(); g.translate(embed?22:14,(y0+padT)/2); g.rotate(-Math.PI/2);
+  g.textAlign='center'; g.textBaseline='middle'; g.fillText(yTitle,0,0); g.restore();
+  if(!hist.length) return;
+  g.strokeStyle='#1E293B'; g.lineWidth=embed?2.75:1.75; g.lineJoin='round'; g.beginPath();
+  hist.forEach((v,i)=>{const x=xOf(i+1), y=yOf(v); if(i) g.lineTo(x,y); else g.moveTo(x,y)});
+  g.stroke();
+  const lx=xOf(hist.length), ly=yOf(hist[hist.length-1]);
+  g.beginPath(); g.arc(lx,ly,embed?6:4,0,Math.PI*2);
+  g.fillStyle='#F2C14E'; g.fill(); g.lineWidth=1.5; g.strokeStyle='#1E293B'; g.stroke();
+}
+function fitEmbed(){
+  if(!document.body.classList.contains('embed')) return;
+  const H=document.documentElement.clientHeight;
+  const W=document.documentElement.clientWidth;
+  const pad=16;
+  const side=Math.max(280, Math.min(H-pad, W-520));
+  const dpr=Math.min(window.devicePixelRatio||1, 2);
+  const buf=Math.round(side*dpr);
+  cv.style.width=side+'px'; cv.style.height=side+'px';
+  if(cv.width!==buf||cv.height!==buf){cv.width=buf; cv.height=buf}
+  S=buf;
+}
+function runExample(){
+  const res=nextExample();
+  timer=setTimeout(runExample,$('pause').checked&&res?.updated?700:60);
+}
+$('next').onclick=()=>{stopRun(); nextExample();};
+$('run').onclick=()=>{
+  if(timer!==null) stopRun();
+  else {$('run').textContent='stop'; runExample();}
+};
+$('step').onclick=pass;
+$('reset').onclick=reset;
+$('regen').onclick=regen;
 $('eta').oninput=()=>$('etav').textContent=eta().toFixed(3);
-$('ov').oninput=()=>{$('ovv').textContent=$('ov').value==='0'?'none':$('ov').value+'% of labels';regen();};
+$('noise').oninput=()=>{$('noisev').textContent=(+$('noise').value).toFixed(2); regen();};
+$('ov').oninput=()=>{$('ovv').textContent=$('ov').value==='0'?'none':$('ov').value+'% of labels'; regen();};
 $('rule').onchange=reset;
+addEventListener('resize',()=>{fitEmbed(); draw();});
 regen();
 </script>
