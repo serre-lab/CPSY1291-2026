@@ -334,7 +334,7 @@ opt     = torch.optim.SGD(model.parameters(), lr=<span class="hljs-number">0.1</
 <ul>
 <li>One <strong>step</strong>: a <strong>batch</strong> of examples forward, their average loss, its gradient, an update. One <strong>epoch</strong>: every training example once. The <code>model</code> line alone sets a readout or a hidden layer</li>
 <li><code>backward()</code> <strong>computes</strong> the gradients. <code>opt</code>, the <strong>optimizer</strong>, turns them into weight changes in <code>step()</code></li>
-<li><mark>This is last lecture's training loop, written for a whole layer: forward, loss, gradient, step, repeat</mark></li>
+<li><mark>Last lecture's learning cycle, now as code: forward, loss, gradient, step, repeat</mark></li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="41" aria-labelledby="heading-30"><p class="page">Slide 30</p>
 <h2 id="heading-30">Autograd: you never write the backward pass</h2>
