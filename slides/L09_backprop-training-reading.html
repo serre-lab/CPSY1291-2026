@@ -312,7 +312,7 @@ opt = torch.optim.Adam(model[<span class="hljs-number">2</span>].parameters(), l
 <div class="col">
 <ul>
 <li><strong>Full batch:</strong> the gradient over all <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math> training examples at every step. Exact, but slow for large <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></li>
-<li><strong>Minibatch:</strong> shuffle the data, then take one step per batch of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math> examples (often 32 to 256). One step is also called an <strong>iteration</strong>; an epoch now holds many steps</li>
+<li><strong>Minibatch:</strong> shuffle the data, then take one step per batch of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math> examples (often 32 to 256). One step is also called an <strong>iteration</strong> or update; an epoch holds many</li>
 <li>Each minibatch gradient is a noisy estimate of the full one. It is much cheaper, and the noise can help the weights escape shallow dips in the loss</li>
 <li>With <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">B = 1</annotation></semantics></math> this is the original <strong>stochastic gradient descent</strong> (PyTorch's <code>optim.SGD</code>: this step at any batch size)</li>
 </ul>
