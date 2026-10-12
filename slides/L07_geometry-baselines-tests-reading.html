@@ -13,7 +13,7 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-class="lead" data-marpit-pagination="2" data-marpit-pagination-total="34" aria-labelledby="heading-2"><p class="page">Slide 2</p>
 <h2 id="heading-2">Flexible or abstract: can one population be both?</h2>
 <h2 id="the-geometry-of-a-population-how-it-arranges-its-conditions-decides-whether-it-is-flexible-shattering-or-abstract-ccgp">The geometry of a population: how it arranges its conditions decides whether it is flexible (shattering) or abstract (CCGP)</h2>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-marpit-scope-ljjup8uy="" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="34" aria-labelledby="heading-3"><p class="page">Slide 3</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-marpit-scope-ibwtdrhy="" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="34" aria-labelledby="heading-3"><p class="page">Slide 3</p>
 <h2 id="heading-3">Reminder: shattering measures flexibility</h2>
 <div class="row">
 <div class="col fig">
@@ -300,7 +300,7 @@
 </div>
 <ul>
 <li><strong>5-fold cross-validation</strong> (left): 5 <strong>folds</strong>; fit on four, test on the fifth, rotate. Every image is tested once, by a fit that never saw it</li>
-<li>Right: one IT site predicted from ResNet-18 (fit next lecture). Score <strong>R²</strong>: here the squared correlation of prediction and response (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mn>0.77</mn></mrow><annotation encoding="application/x-tex">r = 0.77</annotation></semantics></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup><mo>=</mo><mn>0.60</mn></mrow><annotation encoding="application/x-tex">R^2 = 0.60</annotation></semantics></math>)</li>
+<li>Right: one IT site predicted from ResNet-18 (fit next lecture). Score: the squared correlation of prediction and response (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mn>0.77</mn></mrow><annotation encoding="application/x-tex">r = 0.77</annotation></semantics></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>r</mi><mn>2</mn></msup><mo>=</mo><mn>0.60</mn></mrow><annotation encoding="application/x-tex">r^2 = 0.60</annotation></semantics></math>)</li>
 <li><mark>One split can be lucky</mark>: one fold alone gives R² 0.53 to 0.64; all five together, 0.60</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="34" aria-labelledby="heading-25"><p class="page">Slide 25</p>
@@ -311,7 +311,7 @@
 <li>Small leak: z-scoring with the mean of all images. Large leak: choosing units or settings by their test score; then even pure noise can look predictive</li>
 <li><mark>Split first, then fit every step on the training images</mark></li>
 </ul>
-<p>Note: in our assignments the IT recordings come already cleaned, with missing values filled and each unit centred and scaled, using all 1,224 images before any split. That is a small leak, accepted to keep the assignments simple. To publish, do these steps on the training images only.</p>
+<p>Note: our assignments fill missing IT values with each neuron's mean over the training views and z-score on training rows. One fill is reused across cross-validation folds: a small leak, accepted to keep the code simple. To publish, redo these steps inside each fold.</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="34" aria-labelledby="heading-26"><p class="page">Slide 26</p>
 <h2 id="heading-26">Would the ranking hold on a new sample of images?</h2>
 <div class="row">
