@@ -103,7 +103,10 @@
 <h2 id="heading-10">One line fails on XOR; simpler rules do not</h2>
 <ul>
 <li><strong>XOR</strong> (first panel below): one neuron, one line, at best 3 of the 4 points right</li>
-<li>But XOR is built from simpler rules, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>  </mtext><msub><mi>x</mi><mn>1</mn></msub><mtext> </mtext><mtext>XOR</mtext><mtext> </mtext><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>∨</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>∧</mo><mi mathvariant="normal">¬</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>∧</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\;x_1 \,\text{XOR}\, x_2 = (x_1 \lor x_2) \land \lnot(x_1 \land x_2)</annotation></semantics></math>, and each of those is <strong>one perceptron</strong>, one line (other panels)</li>
+<li>But XOR is built from simpler rules, each <strong>one perceptron</strong> with one line (other panels):</li>
+</ul>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mtext> </mtext><mtext>XOR</mtext><mtext> </mtext><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>∨</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>∧</mo><mi mathvariant="normal">¬</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>∧</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">x_1 \,\text{XOR}\, x_2 = (x_1 \lor x_2) \land \lnot(x_1 \land x_2)
+</annotation></semantics></math></div></span></p><ul>
 <li><mark>Stack them: OR and NOT-AND in a first layer, a neuron combining them in a second</mark></li>
 </ul>
 <div class="capfig">
