@@ -5,30 +5,28 @@
 
 \begin{document}
 
-\handouthead{11}{Attention, transformers, and generative models}
-  {Three lectures of mechanics, in one session}
-  {Week 11 \ $\cdot$\ hold this after Lecture 18; Assignment 5 is due Tue 11/24}
+\handouthead{11}{Attention and the transformer}
+  {What Assignment 4 needs from Lecture 17}
+  {Week 11 \ $\cdot$\ hold this after Lecture 17; Assignment 4 is due Tue 11/24}
 
 \section*{What this session is for}
 \addcontentsline{toc}{section}{What this session is for}
 
-This is the longest handout of the term and the last one about content, because
-the calendar leaves no alternative: Assignment 5 covers Lectures 15--18, it is
-due on Tuesday 11/24, Thanksgiving recess begins the day after, and the final
-exam is the first day back. So Lectures 16, 17 and 18 have to share one session.
+This is the last handout about content. Assignment 4 covers Lectures 15--17 and
+is due on Tuesday 11/24. Recitation 10 did recurrence and dynamics (Lectures 15
+and 16); this handout finishes the assignment's scope with Lecture 17. Generative
+models (Lecture 14) and large language models (Lecture 18) are not on the
+assignment; they are on Exam 2, and Recitation 12 reviews them.
 
-Read it in three passes rather than one. Section~1 (attention) is the part
-everything else depends on, and it is worth doing slowly with a pencil. Section~2
-(generation) is short. Section~3 (VAEs and diffusion) is two objectives, each of
-which is five lines of code once you have seen it written down.
+Read it in two passes. Section~1 (attention) is the part everything else depends
+on, and it is worth doing slowly with a pencil. Sections~2 and 3 are short.
 
 \begin{keybox}
-\ask{The one idea, and it covers all three lectures.} Every model here is
-built from the same two moves: compute a set of \emph{weights} that say how much
-each thing should contribute, and take a weighted average. Attention does it over
-positions in a sequence. A VAE does it over a distribution of latent codes.
-Diffusion does it over time steps of a noising process. The differences are in
-what is being averaged and what determines the weights.
+\ask{The one idea.} Attention computes a set of \emph{weights} that say how much
+each position should contribute, and takes a weighted average of what the
+positions offer. A modern Hopfield update does exactly the same thing, with the
+cue as the query and the stored patterns as keys and values (Section~3). The
+differences are in what is averaged and what determines the weights.
 \end{keybox}
 
 \section{Attention}
@@ -38,7 +36,11 @@ what is being averaged and what determines the weights.
 A sequence of $T$ tokens, each embedded as a $d$-dimensional vector, is a matrix
 $\boldsymbol{X}$ of shape $(T, d)$. Everything in a transformer operates on that
 matrix. Note what has been given up compared to an RNN: there is no order in a
-matrix's rows unless you put it there, which is why positional encodings exist.
+matrix's rows unless you put it there, which is why a learned table of
+\textbf{positional embeddings} is added to each symbol's vector. What is gained:
+any position reaches any other in one step, and all $T$ rows come out of a few
+matrix products. The price is $T\times T$ scores, so doubling the sequence
+length quadruples the cost.
 
 \subsection{Q, K, V are three views of the same input}
 
@@ -52,20 +54,14 @@ All three are linear projections of the \emph{same} $\boldsymbol{X}$ --- that is
 what makes it \emph{self}-attention. The names are a retrieval metaphor: a query
 is matched against keys, and the matching keys' values are returned.
 
-\subsection{Scaled dot-product attention, in four lines}
+\subsection{Scaled dot-product attention}
 
 \[
 \mathrm{Attention}(\boldsymbol{Q},\boldsymbol{K},\boldsymbol{V})
 = \mathrm{softmax}\!\left(\frac{\boldsymbol{Q}\boldsymbol{K}^{\!\top}}{\sqrt{d_k}}\right)\boldsymbol{V}
 \]
 
-\begin{lstlisting}
-scores = Q @ K.transpose(-2, -1) / math.sqrt(d_k)    # (T, T)
-if mask is not None:
-    scores = scores.masked_fill(mask == 0, float('-inf'))
-A = torch.softmax(scores, dim=-1)                    # (T, T), rows sum to 1
-out = A @ V                                          # (T, d_v)
-\end{lstlisting}
+Masked positions get a score of $-\infty$ before the softmax, so their weight is exactly 0. Writing this as code is part of Assignment~4.
 
 Track the shapes, because they are the whole thing:
 
@@ -93,10 +89,12 @@ nonsense that runs perfectly.
 softmax, because zeroing afterwards leaves rows that no longer sum to one.
 \end{keybox}
 
-\subsection{Multi-head, which is only a reshape}
+\subsection{Multi-head: split, attend, concatenate}
 
-Split the $d$ dimensions into $H$ groups, run the same operation on each, and
-concatenate the results. It lets different heads attend to different things.
+Split the $d$ dimensions into $H$ groups, run the same operation on each,
+concatenate the results, and let a final matrix $\boldsymbol{W}_O$ mix the heads
+back to width $d$. Each head has its own three projections, so different heads
+can attend to different things at the cost of one wide head.
 
 \begin{lstlisting}
 # (N, T, d) -> (N, H, T, d//H)
@@ -111,139 +109,98 @@ as independent problems.
 
 \subsection{Reading an attention map, carefully}
 
-The $(T, T)$ matrix $\boldsymbol{A}$ is tempting to plot and interpret. Three
-cautions, all of which have caused published overclaims:
+The $(T, T)$ matrix $\boldsymbol{A}$ is tempting to plot and interpret. Single
+heads in trained language models do track relations people can name --- verb to
+object, pronoun to referent --- but three cautions apply:
 
 \begin{itemize}
   \item There are $H$ heads per layer and many layers, so ``the attention map''
-        is a choice among dozens, and they disagree.
-  \item Attention weights are \emph{not} feature importances. A position can be
-        attended to heavily and contribute little, because what it contributes
-        is its \emph{value} vector, not itself.
-  \item The residual stream carries information around the attention block
-        entirely, so a position with zero attention is not disconnected.
+        is one choice among many.
+  \item A map shows \emph{where} a head reads, not \emph{why} the output is what
+        it is.
+  \item A map is a hypothesis. Changing the input, or switching the head off,
+        tests it.
 \end{itemize}
 
 \begin{keybox}
-\ask{The one-sentence version.} An attention map tells you where information was
-\emph{routed}, not what the model \emph{used}. Recitation 9's whole discipline
-applies here too.
+\ask{The one-sentence version.} An attention map is a hypothesis about where
+information is read, and needs an intervention before it explains anything ---
+the discipline of the attribution maps in Recitation 9.
 \end{keybox}
 
-\section{Autoregressive generation}
+\section{Training and generation}
 
-Training a language model is next-token prediction with teacher forcing ---
-exactly the mechanism from Recitation 10, at scale. Generation is a loop:
+\subsection{One forward pass, $T$ training examples}
+
+A language model predicts the next symbol at every position. The target at
+position $t$ is the symbol at $t+1$, and the loss is the cross-entropy averaged
+over positions, in nats:
+\[
+\mathcal{L} = -\frac{1}{T}\sum_{t=1}^{T}\log \hat{y}^{\langle t\rangle}_{\,y^{\langle t+1\rangle}}.
+\]
+The \textbf{causal mask} sets every score above the diagonal to $-\infty$, so
+position $t$ cannot read the symbol it must predict. With the mask, one forward
+pass gives all $T$ predictions. The input is the true text, not the model's own
+guesses: this is teacher forcing, from Recitation 10.
+
+\subsection{The bigram baseline}
+
+Count, in the training text, how often each symbol follows each other one:
+\[
+P(\text{next}=b \mid \text{current}=a) = \frac{\text{count}(a\to b)}{\text{count}(a)}.
+\]
+Score the table with the same cross-entropy, on the same held-out text. A bigram
+table reads one symbol of context and the transformer can read the whole left
+context, so the gap between the two losses is what the longer context is worth.
+As in the baselines lecture, a score means something only next to a baseline
+computed on the same data.
+
+\subsection{Generation is a loop}
 
 \begin{lstlisting}
 for _ in range(n_new):
     logits = model(idx)[:, -1, :] / temperature      # last position only
-    if top_k is not None:
-        v, _ = torch.topk(logits, top_k)
-        logits[logits < v[:, [-1]]] = float('-inf')
     probs = torch.softmax(logits, dim=-1)
     nxt   = torch.multinomial(probs, num_samples=1)  # SAMPLE, do not argmax
     idx   = torch.cat([idx, nxt], dim=1)
 \end{lstlisting}
 
+If the text grows longer than the context, keep only the last $T$ symbols.
+
 \begin{center}
 \begin{tabular}{@{}ll@{}}
 \toprule
-Knob & What it does \\
+\texttt{temperature} & What it does \\
 \midrule
-\texttt{temperature} $\to 0$ & approaches greedy: repetitive, often degenerate \\
-\texttt{temperature} $= 1$ & samples from the model's own distribution \\
-\texttt{temperature} $> 1$ & flatter, more surprising, less coherent \\
-\texttt{top\_k} & restricts to the $k$ most likely tokens before sampling \\
+$\to 0$ & approaches greedy: repetitive, often loops \\
+$= 1$ & samples from the model's own distribution \\
+$> 1$ & flatter, more surprising, less coherent \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \begin{keybox}
 \ask{Sampling is not a detail of the model.} Two very different outputs from the
-same weights differ only in these two numbers, so any claim about ``what the
-model does'' has to state them. A surprising fraction of published prompting
-results are partly results about a temperature setting.
+same weights can differ only in the temperature, so any claim about ``what the
+model does'' has to state it.
 \end{keybox}
 
-A useful measurement, and one you can do on a laptop: \textbf{surprisal}, the
-negative log probability the model assigned to the token that actually occurred.
-It is the quantity that correlates with human reading times, which is the whole
-basis of using language models as models of language processing.
+\section{The Hopfield update is one attention step}
 
-\begin{lstlisting}
-logp = torch.log_softmax(model(idx).logits, dim=-1)
-surprisal = -logp[0, :-1].gather(1, idx[0, 1:, None]) / math.log(2)   # in bits
-\end{lstlisting}
-
-\section{Generative models, two objectives}
-
-\subsection{VAE: the reparameterization trick and the ELBO}
-
-The encoder outputs a \emph{distribution} over codes rather than a code. You
-cannot backpropagate through ``draw a sample'', so you rewrite the sample as a
-deterministic function of the parameters plus fixed noise:
-
+A modern Hopfield network keeps its stored patterns as the rows of
+$\boldsymbol{X}$ and recalls from a cue $\boldsymbol{s}$ with a softmax:
 \[
-\boldsymbol{z} = \boldsymbol{\mu} + \boldsymbol{\sigma}\odot\boldsymbol{\varepsilon},
-\qquad \boldsymbol{\varepsilon}\sim\mathcal{N}(0, \boldsymbol{I}).
+\boldsymbol{s}\;\leftarrow\;\boldsymbol{X}^{\top}\,\mathrm{softmax}\big(\beta\,\boldsymbol{X}\,\boldsymbol{s}\big).
 \]
-
-Now the randomness sits in $\boldsymbol{\varepsilon}$, which needs no gradient,
-and $\boldsymbol{\mu}$ and $\boldsymbol{\sigma}$ are on the differentiable path.
-
-\begin{lstlisting}
-mu, logvar = encoder(x).chunk(2, dim=1)      # predict log-variance, not variance
-std = torch.exp(0.5 * logvar)
-z   = mu + std * torch.randn_like(std)       # the reparameterization trick
-xhat = decoder(z)
-
-recon = F.mse_loss(xhat, x, reduction='sum')
-kl    = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-loss  = recon + beta * kl
-\end{lstlisting}
-
-The network predicts \texttt{logvar} rather than the variance so that its output
-is unconstrained --- a variance must be positive, and $\exp$ enforces that for
-free. The two loss terms pull against each other: reconstruction wants codes
-that are distinct and informative, the KL wants them close to a standard normal
-so that the space is smooth and samplable. \texttt{beta} sets the exchange rate,
-and the whole character of the model follows from it.
-
-\begin{keybox}
-\ask{The failure mode with a name.} If the KL term dominates --- large
-\texttt{beta}, or a decoder powerful enough to reconstruct without help --- the
-encoder collapses to the prior, $\boldsymbol{\mu}\to0$ and
-$\boldsymbol{\sigma}\to1$, and the latent code carries \emph{nothing}. Samples
-still look fine because the decoder learned the data on its own. This is
-posterior collapse, and the diagnostic is to check whether the KL term goes to
-zero.
-\end{keybox}
-
-\subsection{Diffusion: one closed form and a five-line loss}
-
-Adding Gaussian noise repeatedly has a closed form, so you never simulate the
-forward process step by step:
-
-\[
-\boldsymbol{x}_t = \sqrt{\bar\alpha_t}\,\boldsymbol{x}_0 +
-\sqrt{1-\bar\alpha_t}\,\boldsymbol{\varepsilon}.
-\]
-
-That is the whole reason training is cheap: pick a random $t$, jump straight
-there, and ask the network to name the noise.
-
-\begin{lstlisting}
-t   = torch.randint(0, T, (x0.shape[0],))
-eps = torch.randn_like(x0)
-xt  = abar[t].sqrt()[:, None] * x0 + (1 - abar[t]).sqrt()[:, None] * eps
-loss = F.mse_loss(model(xt, t), eps)          # predict the noise you added
-\end{lstlisting}
-
-The training objective is a mean squared error. That is all it is. The
-complexity of diffusion models lives entirely in the \emph{sampling} loop, which
-runs the learned denoiser backwards many times, and in the architecture of the
-denoiser --- not in the loss.
+Read it in three steps: $\boldsymbol{X}\boldsymbol{s}$ gives one match score per
+stored pattern, the softmax turns the scores into weights, and
+$\boldsymbol{X}^{\top}$ times the weights is a weighted average of the stored
+patterns. That is attention for one query,
+$\mathrm{softmax}(\boldsymbol{q}\boldsymbol{K}^{\!\top}/\sqrt{d_k})\boldsymbol{V}$,
+with the cue as the query, the stored patterns as both keys and values (no
+learned projections: $\boldsymbol{W}_K=\boldsymbol{W}_V=\boldsymbol{I}$), and
+$\beta$ in the role of $1/\sqrt{d_k}$. A large $\beta$ sharpens the weights, so
+recall picks out one stored pattern.
 
 \section{Exercises}
 
@@ -257,15 +214,18 @@ works at $d_k = 8$ and fails at $d_k = 512$. Why?
 anything error? What does the model now compute?
 
 \ask{4.} A colleague shows an attention map and says it proves the model bases
-its answer on the word ``not''. Give two objections.
+its answer on the word ``not''. Give two objections, and the test that would
+settle it.
 
 \ask{5.} Generation at \texttt{temperature=0.1} produces the same sentence
 repeated forever. Explain in terms of the sampling loop.
 
-\ask{6.} Your VAE's KL term drops to almost zero within a few epochs, and
-reconstructions look good. What has happened, and is the model useful?
+\ask{6.} In the toy text ``that hat ate the tea'', what is
+$P(\text{next}=\text{a}\mid\text{current}=\text{h})$ under a bigram table? Your
+transformer's held-out loss equals the table's. What has it learned?
 
-\ask{7.} Diffusion training is a plain MSE. Where did all the complexity go?
+\ask{7.} In the modern Hopfield update, which quantity plays the query, which the
+keys, which the values, and which $1/\sqrt{d_k}$?
 
 \subsection*{Answers}
 
@@ -285,25 +245,22 @@ positions and the output is a weighted combination with weights that do not sum
 to one. It trains, badly, with no diagnostic.
 
 \ask{4.} (i) There are many heads and many layers; ``the attention map'' is one
-choice among dozens that disagree. (ii) Attention weight is not importance --- a
-position contributes its \emph{value} vector, which may be near zero, and the
-residual stream carries information around the block regardless.
+choice among many. (ii) A map shows where a head reads, not why the output is
+what it is. The test is an intervention: change the input (remove or replace
+``not'') or switch the head off, and see whether the answer changes.
 
 \ask{5.} At low temperature the softmax is nearly one-hot, so sampling is
-effectively \texttt{argmax}. The model deterministically picks its most likely
-continuation, enters a state it has seen before, and cycles. Raising the
-temperature or using \texttt{top\_k} with sampling breaks the loop.
+effectively \texttt{argmax}. The model picks its most likely continuation every
+time, and always taking the most likely symbol tends to loop. Raising the
+temperature breaks the loop.
 
-\ask{6.} Posterior collapse: the encoder has matched the prior and the latent
-code carries no information, with the decoder reconstructing on its own. It is
-not useful as a \emph{representation} --- $\boldsymbol{z}$ tells you nothing about
-$\boldsymbol{x}$ --- even though samples may look fine. Lower \texttt{beta}, or
-weaken the decoder.
+\ask{6.} The symbol h is followed by a twice and by e once, so $2/3$. A
+transformer that only matches the bigram table has used no more than one symbol
+of context: its attention is not reading the rest of the left context. Check the
+mask, the positional embeddings, and whether it trained at all.
 
-\ask{7.} Into the sampling loop, which runs the learned denoiser backwards
-across many steps, and into the denoiser architecture. The training objective is
-genuinely just ``predict the noise you added'', which is why diffusion models are
-much easier to train than GANs.
+\ask{7.} The cue $\boldsymbol{s}$ is the query; the stored patterns
+$\boldsymbol{X}$ are both the keys and the values; $\beta$ plays $1/\sqrt{d_k}$.
 
 \section*{Cheat sheet}
 \addcontentsline{toc}{section}{Cheat sheet}
@@ -317,11 +274,10 @@ attention scores          & \texttt{Q @ K.transpose(-2,-1) / sqrt(d\_k)} \\
 a causal mask             & \texttt{masked\_fill(mask == 0, float('-inf'))} \emph{before} softmax \\
 the softmax axis          & \texttt{dim=-1} --- over keys, always \\
 split into heads          & \texttt{view(N,T,H,d//H).transpose(1,2)} \\
+the next-symbol target    & the input shifted by one position \\
+a bigram baseline         & \texttt{count(a$\to$b) / count(a)}, scored on held-out text \\
 sample a token            & \texttt{torch.multinomial(probs, 1)} --- not \texttt{argmax} \\
-surprisal in bits         & \texttt{-log\_softmax(...).gather(...) / log(2)} \\
-the reparameterization    & \texttt{mu + torch.exp(0.5*logvar) * randn\_like(mu)} \\
-the KL term               & \texttt{-0.5 * sum(1 + logvar - mu**2 - logvar.exp())} \\
-a diffusion training step & \texttt{mse\_loss(model(xt, t), eps)} \\
+a modern Hopfield update  & \texttt{X.T @ softmax(beta * X @ s)} \\
 \bottomrule
 \end{tabular}
 \end{center}

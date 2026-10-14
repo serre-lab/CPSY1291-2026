@@ -1,5 +1,5 @@
 # Fdb version 4
-["lualatex"] 1790088118.8955 "handout-11-attention-transformers-generative.tex" "handout-11-attention-transformers-generative.pdf" "handout-11-attention-transformers-generative" 1790088119.87705 0
+["lualatex"] 1791988827.35853 "handout-11-attention-transformers-generative.tex" "handout-11-attention-transformers-generative.pdf" "handout-11-attention-transformers-generative" 1791988828.72423 0
   "/System/Library/Fonts/Menlo.ttc" 1786589515 2156036 ec05dfca6821d85440da0899493002c3 ""
   "/Users/tserre/Library/Fonts/Lora-Italic.ttf" 1782578605.38076 48852 0670dad11a0ba7369fccb78df6ac4ac5 ""
   "/Users/tserre/Library/Fonts/Lora-Regular.ttf" 1782578605.10839 47444 5016349e9de4b2eeac85fa2ed374f7fe ""
@@ -20,7 +20,7 @@
   "/Users/tserre/Library/texlive/2026/texmf-var/luatex-cache/generic/fonts/streams/loraitalicttf-1.luc" 1782578837.40326 40600 d3b6138b219a9861f99f1e45260df9dd ""
   "/Users/tserre/Library/texlive/2026/texmf-var/luatex-cache/generic/fonts/streams/loraregularttf-1.luc" 1782578837.41652 37577 f62da3f26e24e53b34e9588ae71c9aad ""
   "/Users/tserre/Library/texlive/2026/texmf-var/luatex-cache/generic/fonts/streams/lorasemiboldttf-1.luc" 1782578837.38982 37952 efb1db5b1905fac5be750ddc1601a9f7 ""
-  "/Users/tserre/Library/texlive/2026/texmf-var/luatex-cache/generic/names/luaotfload-lookup-cache.luc" 1789667560.35862 7749 9e41a451a24ebea806f3e25294b8b017 ""
+  "/Users/tserre/Library/texlive/2026/texmf-var/luatex-cache/generic/names/luaotfload-lookup-cache.luc" 1791825194.77583 8803 5d6f05fcfe5404832224d325923f0504 ""
   "/Users/tserre/Library/texlive/2026/texmf-var/luatex-cache/generic/names/luaotfload-names.luc.gz" 1787953802.99001 443774 af380ea31097394c02216f1276fb9166 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/jknappen/ec/ectt1000.tfm" 1136768653 1536 06717a2b50de47d4087ac0e6cd759455 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy5.tfm" 1246382020 1120 1e8878807317373affa7f7bba4cf2f6a ""
@@ -64,11 +64,14 @@
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmsy8.tfm" 1136768653 1120 8b7d695260f3cff42e636090a8002094 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb" 1248133631 30251 6afa5cb1d0204815a708a080681d4674 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb" 1248133631 36299 5f9df58c2139e7edcf37c8fca4bd384d ""
+  "/usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb" 1248133631 37166 8ab3487cbe3ab49ebce74c29ea2418db ""
   "/usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb" 1248133631 35469 70d41d2b9ea31d5d813066df7c99281c ""
   "/usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb" 1248133631 36912 b448ef9ad9d7228ec3c6e71005136d55 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1248133631 35752 024fb6c41858982481f6968b5fc26508 ""
+  "/usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb" 1248133631 32734 69e00a6b65cedb993666e42eedb3d48f ""
   "/usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb" 1248133631 32726 0a1aea6fcd6468ee2cf64d891f5c43c8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1248133631 32569 5e5ddc8df908dea60932f3c484a54c0d ""
+  "/usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb" 1248133631 32587 1788b0c1c5b39540c96f5e42ccd6dae8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb" 1248133631 32626 4f5c1b83753b1dd3a97d1b399a005b4b ""
   "/usr/local/texlive/2026/texmf-dist/tex/context/base/mkii/supp-pdf.mkii" 1461363279 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "/usr/local/texlive/2026/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty" 1576625341 40635 c40361e206be584d448876bba8a64a3b ""
@@ -269,8 +272,8 @@
   "/usr/local/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1777611456 5573038 b99aad5e4898a9034e953632f940512b ""
   "/usr/local/texlive/2026/texmf-var/web2c/luahbtex/lualatex.fmt" 1774209566 5656314 899e889479224af2498ffb6faace451f ""
   "cpsy1291-handout.sty" 1790088100.71131 3227 cbe3823df1f928855a13331e1f936607 ""
-  "handout-11-attention-transformers-generative.aux" 1790088119.72341 8415 979aa9d0e86b16f3482e802f0a3c2f67 "lualatex"
-  "handout-11-attention-transformers-generative.tex" 1787140092.30802 14294 20038f745f03d73d2d8e179783ef6299 ""
+  "handout-11-attention-transformers-generative.aux" 1791988828.51335 8444 c7e73e1b348adae71a9dd4da67be2b6e "lualatex"
+  "handout-11-attention-transformers-generative.tex" 1791988819.96108 12485 f6c09130ac10b557ee2a58e9302decd3 ""
   (generated)
   "handout-11-attention-transformers-generative.aux"
   "handout-11-attention-transformers-generative.log"

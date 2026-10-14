@@ -6,58 +6,60 @@ math: katex
 ---
 
 <!-- ===========================================================================
-  CPSY 1291 — RECITATION 11: Attention, transformers, and generative models
-  TA-led, 80 minutes. Optional. Week 11 — hold this after Lecture 18.
-  Assignment 5 is due Tue 11/24. This is the LAST content session of the term.
+  CPSY 1291 — RECITATION 11: Attention and the transformer
+  TA-led, 80 minutes. Optional. Week 11 — hold this after Lecture 17.
+  Assignment 4 is due Tue 11/24. This is the LAST content session of the term.
 
-  WHY THREE LECTURES IN ONE SESSION: A5 covers L15-L18, it is due Tue 11/24,
-  Thanksgiving recess starts the next day, and the final exam is the first day
-  back. Week 12's session has to be the final review. There is no other slot.
+  SCOPE: Assignment 4 covers Lectures 15-17. Recitation 10 did recurrence and
+  dynamics (L15-L16); this session finishes the assignment's scope with
+  Lecture 17: the attention head, multi-head attention, the causal mask, the
+  next-character loss, the bigram baseline, generation, and the bridge from
+  the Hopfield network to attention. Generative models (L14) and LLMs (L18)
+  are not on A4; they are on Exam 2, and next week's review covers them.
 
-  BUDGET: attention ~42 min, generation ~10 min, VAE + diffusion ~26 min. 5 min
-  close. Attention is the part everything else depends on — protect it.
+  BUDGET: attention ~39 min, training and generation ~18 min, Hopfield to
+  attention 7 min, exercise 8 min, close 3 min. Attention is the part
+  everything else depends on — protect it.
 
-  IF YOU RUN LONG: cut the diffusion slides and point at the handout. Do NOT
+  IF YOU RUN LONG: shorten the bigram slide and point at the handout. Do NOT
   cut the three-details slide on attention (sqrt(d_k), dim=-1, -inf masking),
   which is where the assignment's bugs will come from.
 
-  MATERIAL: handout-11-attention-transformers-generative.pdf — the longest of
-  the term, seven exercises. Tell them to read it in three passes, not one.
+  MATERIAL: handout-11-attention-transformers-generative.pdf, seven exercises.
 ============================================================================ -->
 
 <div class="eyebrow">Recitation 11</div>
 
-# Attention, transformers, generative models
+# Attention and the transformer
 
-## Three lectures of mechanics, one session
+## What Assignment 4 needs from Lecture 17
 
 <!--
-2 min. Be straight about why this session is dense: A5 covers L15-L18, it is due
-next Tuesday, Thanksgiving follows immediately, and the final is the first day
-back. Week 12 has to be the exam review.
+2 min. Say the scope straight away: this is the last part of Assignment 4,
+which covers Lectures 15-17 and is due next Tuesday. Recitation 10 did
+recurrence and dynamics; today is attention.
 
-Tell them the handout is the longest of the term and is meant to be read in
-three passes rather than one.
+Say also what is NOT here: generative models and LLMs. Both are on Exam 2, and
+next week's review session covers them.
 -->
 
 ---
 
-# The one idea — and it covers all three lectures
+# The one idea
 
-<mark>Compute a set of weights saying how much each thing contributes. Take a weighted average.</mark>
+<mark>Compute a set of weights saying how much each position contributes. Take a weighted average of what the positions offer.</mark>
 
-- **attention** — over positions in a sequence
-- **a VAE** — over a distribution of latent codes
-- **diffusion** — over time steps of a noising process
+- **attention** — the weights come from how well a query matches each key
+- **a modern Hopfield update** — the same step, with the cue as the query and the stored patterns as keys and values
 
 The differences are in *what* is averaged and *what sets* the weights.
 
 <!--
-5 min. This framing does real work — it lets them see three lectures as
-variations rather than three separate things to memorize before the final.
+5 min. This framing ties the two halves of Assignment 4 together: the Hopfield
+network from last week and the attention head from this one are one operation.
+The end of the session makes that exact.
 
-Do not oversell it. The models differ in important ways. But the shape is
-genuinely shared, and noticing that is worth five minutes.
+Do not oversell it before the equations are up. Say it, then move on.
 -->
 
 ---
@@ -68,16 +70,18 @@ $T$ tokens, each a $d$-dimensional vector → a matrix $\boldsymbol{X}$ of shape
 
 <mark>Notice what has been given up: a matrix's rows have no order unless you put it there.</mark>
 
-That is why positional encodings exist. An RNN got order for free and paid for
+That is why positional embeddings exist. An RNN got order for free and paid for
 it with a sequential loop.
 
 <!--
 5 min. The trade is the point: transformers gave up built-in order to gain
-parallelism, then bought order back with positional encodings.
+parallelism, then bought order back with a learned table of positions added to
+each symbol's vector.
 
-Ask the room: what else did they gain? Every position can see every other in one
-step, so there is no long product of Jacobians — the vanishing-gradient problem
-from last week simply does not arise.
+Ask the room: what else did they gain? Every position can reach every other in
+one step, so there is no long product of Jacobians — the vanishing-gradient
+problem from last week does not arise. The price: T × T scores, so doubling the
+sequence length quadruples the cost.
 -->
 
 ---
@@ -104,14 +108,10 @@ looks at an encoder.
 
 ---
 
-# Attention, in four lines
+# Attention, step by step
 
-```python
-scores = Q @ K.transpose(-2, -1) / math.sqrt(d_k)   # (T, T)
-scores = scores.masked_fill(mask == 0, float('-inf'))
-A = torch.softmax(scores, dim=-1)                   # rows sum to 1
-out = A @ V                                         # (T, d_v)
-```
+$$\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V,\qquad \text{masked entries set to } -\infty \text{ before the softmax}$$
+
 
 | step | shape | meaning |
 |---|---|---|
@@ -146,7 +146,7 @@ to one, the model trains badly, and there is no diagnostic at all.
 
 ---
 
-# Multi-head is only a reshape
+# Multi-head: split, attend, concatenate
 
 ```python
 Q = Q.view(N, T, H, d // H).transpose(1, 2)     # (N, H, T, d/H)
@@ -154,13 +154,15 @@ Q = Q.view(N, T, H, d // H).transpose(1, 2)     # (N, H, T, d/H)
 out = out.transpose(1, 2).reshape(N, T, d)      # concatenate back
 ```
 
-Split $d$ into $H$ groups, run the same operation on each, concatenate.
+Split $d$ into $H$ groups, run the same operation on each, concatenate; $\mathbf{W}_O$ then mixes the heads back to width $d$.
 
 <mark>The `transpose(1, 2)` puts heads next to the batch axis, so the matmuls treat them as independent problems.</mark>
 
 <!--
-5 min. Demystify it: there is no new mathematics in multi-head attention, only
-bookkeeping that lets different heads attend to different things.
+5 min. Demystify it: there is no new attention mathematics in multi-head
+attention. Each head has its own three projections of width d/H, so the cost is
+that of one wide head, and the model gets several independent weight patterns
+per layer.
 
 The transpose is the only subtle part and it is worth pointing at twice —
 before and after.
@@ -170,19 +172,62 @@ before and after.
 
 # Reading an attention map, carefully
 
-- There are $H$ heads per layer and many layers. **"The" attention map is one choice among dozens, and they disagree.**
-- Attention weight is **not** importance — a position contributes its *value* vector, which may be near zero.
-- The **residual stream** carries information around the block entirely.
+- There are $H$ heads per layer and many layers. **"The" attention map is one choice among many.**
+- A map shows **where** a head reads, not **why** the output is what it is.
+- A map is a hypothesis. **Change the input, or switch the head off**, to test it.
 
-<mark>An attention map tells you where information was <em>routed</em>, not what the model <em>used</em>.</mark>
+<mark>The same discipline as the attribution maps of Recitation 9: map, then intervention.</mark>
 
 <!--
 6 min. Recitation 9's whole discipline applies again, and saying so explicitly
 helps — this is the third time this term that a compelling picture has turned
 out to answer a different question than the one being asked of it.
 
-All three objections have caused published overclaims. If a student is planning
-an attention-map figure for their project, this slide is for them.
+Single heads in trained language models do track relations people can name
+(verb to object, pronoun to referent). That is a finding about where they read.
+If a student is planning an attention-map figure for their project, this slide
+is for them.
+-->
+
+---
+
+# One forward pass, $T$ training examples
+
+- The target at position $t$ is the symbol at $t+1$; the loss is the cross-entropy, averaged over positions
+- The **causal mask** keeps position $t$ from reading the symbol it must predict
+- So one pass over a sequence of length $T$ gives $T$ predictions, each with its own target
+
+<mark>Feeding the true text as input, not the model's own guesses, is teacher forcing — Recitation 10's mismatch, at every position at once.</mark>
+
+<!--
+7 min. The mask matters because training is parallel: the whole sequence goes in
+at once. Without it, position t could read the word it must predict, the loss
+would fall to nearly zero, and generation would fail.
+
+Ask: what does the first row of the masked attention matrix look like? It can
+only read itself, so its single weight is 1.
+-->
+
+---
+
+# The bigram baseline
+
+Count, in the training text, how often each symbol follows each other one:
+
+$$P(\text{next}=b \mid \text{current}=a) = \frac{\text{count}(a\to b)}{\text{count}(a)}$$
+
+Score it with **the same cross-entropy, on the same held-out text**.
+
+<mark>If the transformer's held-out loss is not lower than the bigram's, it has not used more than one symbol of context.</mark>
+
+<!--
+6 min. Quick check for the room, on the lecture's toy text "that hat ate the
+tea": what is P(next = a | current = h)? h is followed by a twice and by e once,
+so 2/3.
+
+Then the point: a loss means something only next to a baseline computed on the
+same data, the rule from the baselines lecture. The gap between the two losses is
+what the longer context is worth.
 -->
 
 ---
@@ -191,7 +236,6 @@ an attention-map figure for their project, this slide is for them.
 
 ```python
 logits = model(idx)[:, -1, :] / temperature
-if top_k: logits[logits < topk_threshold] = float('-inf')
 probs = torch.softmax(logits, dim=-1)
 nxt   = torch.multinomial(probs, 1)         # SAMPLE, not argmax
 idx   = torch.cat([idx, nxt], dim=1)
@@ -199,111 +243,39 @@ idx   = torch.cat([idx, nxt], dim=1)
 
 | temperature | result |
 |---|---|
-| $\to 0$ | greedy: repetitive, often degenerate |
+| $\to 0$ | greedy: repetitive, often loops |
 | $=1$ | samples the model's own distribution |
 | $>1$ | flatter, more surprising, less coherent |
 
 <!--
 5 min. Land the consequence: two very different outputs from the SAME weights
-differ only in these two numbers.
+differ only in this one number.
 
-So any claim about "what the model does" has to state them — and a surprising
-fraction of published prompting results are partly results about a temperature
-setting. That is worth their skepticism.
+So any claim about "what the model does" has to state it. If the text grows
+longer than the context, keep only the last T symbols before the next pass.
 -->
 
 ---
 
-# Surprisal — the measurement you can do on a laptop
+# The Hopfield update is one attention step
 
-```python
-logp = torch.log_softmax(model(idx).logits, dim=-1)
-surprisal = -logp[0, :-1].gather(1, idx[0, 1:, None]) / math.log(2)   # bits
-```
+$$\mathbf{s}\;\leftarrow\;\mathbf{X}^{\top}\,\mathrm{softmax}\big(\beta\,\mathbf{X}\,\mathbf{s}\big)
+\qquad\qquad
+\mathrm{softmax}\!\left(\frac{\mathbf{q}\,\mathbf{K}^{\top}}{\sqrt{d_k}}\right)\mathbf{V}$$
 
-The negative log probability the model gave to the token that actually occurred.
-
-<mark>It correlates with human reading times — which is the whole basis of using language models as models of language processing.</mark>
-
-<!--
-5 min. This is the most project-friendly thing in the session: a real
-psycholinguistic measurement, computable on a CPU, with a genuine literature
-behind it.
-
-Say that explicitly for anyone still choosing a final project topic.
--->
-
----
-
-# VAE: the trick that makes sampling differentiable
-
-You cannot backpropagate through "draw a sample". So rewrite the sample:
-
-$$\boldsymbol{z} = \boldsymbol{\mu} + \boldsymbol{\sigma}\odot\boldsymbol{\varepsilon}, \qquad \boldsymbol{\varepsilon}\sim\mathcal{N}(0,\boldsymbol{I})$$
-
-```python
-mu, logvar = encoder(x).chunk(2, dim=1)
-z = mu + torch.exp(0.5 * logvar) * torch.randn_like(mu)
-```
-
-<mark>The randomness now sits in $\boldsymbol{\varepsilon}$, which needs no gradient. $\boldsymbol{\mu}$ and $\boldsymbol{\sigma}$ are on the differentiable path.</mark>
+- the cue $\mathbf{s}$ is the query; the stored patterns $\mathbf{X}$ are both keys and values
+- no learned projections: $\mathbf{W}_K=\mathbf{W}_V=\mathbf{I}$
+- $\beta$ plays the role of $1/\sqrt{d_k}$
 
 <!--
-6 min. The trick is genuinely clever and worth admiring for a moment.
+7 min. Read the left side in three steps: X s gives one match score per stored
+pattern; the softmax turns the scores into weights; X transpose times the
+weights is a weighted average of the stored patterns. The right side is the
+same three steps with the cue renamed query.
 
-Note why the network predicts LOGVAR rather than variance: a variance must be
-positive, and exp enforces that for free, so the network's output is
-unconstrained. Small design decisions like this are everywhere and are usually
-unexplained in papers.
--->
-
----
-
-# The two terms pull against each other
-
-```python
-recon = F.mse_loss(xhat, x, reduction='sum')
-kl    = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-loss  = recon + beta * kl
-```
-
-- **reconstruction** wants codes that are distinct and informative
-- **KL** wants them close to $\mathcal{N}(0, I)$, so the space is smooth and samplable
-
-`beta` sets the exchange rate — and the character of the model follows from it.
-
-<!--
-5 min. Then give the failure mode with a name: if the KL dominates, the encoder
-collapses to the prior, mu -> 0 and sigma -> 1, and the latent carries NOTHING.
-
-Samples still look fine, because the decoder learned the data on its own. This
-is posterior collapse. The diagnostic is one line: check whether the KL term
-goes to zero.
--->
-
----
-
-# Diffusion: one closed form, one MSE
-
-$$\boldsymbol{x}_t = \sqrt{\bar\alpha_t}\,\boldsymbol{x}_0 + \sqrt{1-\bar\alpha_t}\,\boldsymbol{\varepsilon}$$
-
-```python
-t   = torch.randint(0, T, (x0.shape[0],))
-eps = torch.randn_like(x0)
-xt  = abar[t].sqrt()[:,None]*x0 + (1-abar[t]).sqrt()[:,None]*eps
-loss = F.mse_loss(model(xt, t), eps)      # predict the noise you added
-```
-
-<mark>The training objective is a mean squared error. That is all it is.</mark>
-
-<!--
-6 min. The closed form is why training is cheap: pick a random t, jump straight
-there, never simulate the forward process.
-
-Then answer the obvious question — where did the complexity go? Into the
-SAMPLING loop, which runs the denoiser backwards many times, and into the
-denoiser's architecture. Not into the loss. That is also why diffusion models
-are so much easier to train than GANs.
+This is the bridge in the second half of Assignment 4, and it closes the loop on
+the first slide. Ask what a large beta does: it sharpens the weights, so recall
+picks out one stored pattern.
 -->
 
 ---
@@ -311,32 +283,37 @@ are so much easier to train than GANs.
 # EXERCISE
 
 1. You delete the $\sqrt{d_k}$. Training works at $d_k=8$, fails at $d_k=512$. Why?
-2. Your VAE's KL drops to near zero in a few epochs and reconstructions look good. What happened?
+2. You mask by multiplying the attention weights by 0 **after** the softmax. What is wrong?
+3. Your transformer's held-out loss equals the bigram table's. What has it learned?
 
 <!--
-6 min. Answers:
+8 min. Answers:
 
 (1) Dot products of d_k-dimensional vectors grow like sqrt(d_k). At 512 the
 unscaled scores are large, the softmax saturates to nearly one-hot, and its
 gradient is nearly zero. At 8 the scores are small enough that it hardly matters.
 
-(2) Posterior collapse. The encoder matched the prior, z carries no information,
-and the decoder reconstructs on its own. Not useful as a REPRESENTATION even
-though samples look fine. Lower beta, or weaken the decoder.
+(2) The softmax has already given weight to the masked positions, so the rows no
+longer sum to one, and the unmasked positions get less than their share. Mask
+with -inf before the softmax.
+
+(3) Nothing that one symbol of context does not already give. Its attention is
+not using the rest of the left context — check the mask, the positions, and
+whether it trained at all.
 -->
 
 ---
 
 # Where this lands
 
-- **Assignment 5** — attention shapes, a generation loop, and one generative objective
-- **The final (Tue 12/1)** — L09–L19, and next week's session is the review
-- **Your project** — surprisal, attention maps, and latent spaces are all laptop-scale
+- **Assignment 4** — the attention head, the causal mask, the next-character loss against a bigram baseline, generation, and Hopfield to attention
+- **Exam 2 (Tue 12/1)** — L09–L19, and next week's session is the review
+- **Your project** — attention maps are laptop-scale, and they need the same checks as any map
 
-<mark>Next week: the final exam review. Held before Thanksgiving, because the exam is the first day back.</mark>
+<mark>Next week: the Exam 2 review. Held before Thanksgiving, because the exam is the first day back.</mark>
 
 <!--
-3 min. Point at handout-11.pdf and repeat the three-passes advice.
+3 min. Point at handout-11.pdf.
 
 Say the week-12 timing loudly and more than once — the review session is BEFORE
 recess and the exam is the Tuesday after. Anyone who assumes the usual rhythm

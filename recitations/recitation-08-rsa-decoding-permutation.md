@@ -8,7 +8,7 @@ math: katex
 <!-- ===========================================================================
   CPSY 1291 — RECITATION 8: Comparing representations
   TA-led, 80 minutes. Optional. Week 8 — hold this after Lecture 12.
-  Assignment 4 is due Tue 11/10.
+  Assignment 3 is due Thu 11/5.
 
   SCOPE: the machinery behind RSA and decoding, and the three statistical traps
   that make published versions of both analyses wrong. Lecture 12 supplies the
@@ -318,15 +318,17 @@ Invariant to rotation and isotropic scaling, **not** to arbitrary invertible map
 toward 1 for almost any pair of matrices — a good bug to warn about, because the
 result looks like a strong finding.
 
-Callback to Lecture 5: the metric zoo disagrees with itself, and that is a live
-problem in the field rather than a technicality. Running two is cheap.
+Callback to Lecture 7: change the measure and the winner changes (RSA put
+CLIP first, CKA ResNet-18), and Lecture 12 showed the scores disagree across
+networks. That is a live problem in the field rather than a technicality.
+Running two is cheap.
 -->
 
 ---
 
 # Where this lands
 
-- **Assignment 4** — RSA between CNN layers and neural data, decoding, and the honest $p$
+- **Assignment 3** — comparing CNN layers with neural data, and the honest $p$
 - **Your project** — every one of these traps is one you can fall into in three weeks
 - **Any lab you join** — the noise ceiling and `GroupKFold` are working knowledge
 

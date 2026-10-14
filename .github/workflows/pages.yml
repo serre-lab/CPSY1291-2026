@@ -51,6 +51,7 @@ jobs:
             [ -f _site/notation-reference.pdf ] && echo '<li><a href="notation-reference.pdf">Notation reference (PDF)</a></li>'
             echo '<li><a href="colab-setup.html">Colab setup</a></li>'
             echo '</ul>'
+            echo '<p>Slides and notes © 2026 Thomas Serre, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>: you may reuse and adapt them with credit. Figures from published papers belong to their authors and publishers and are not covered by this license.</p>'
           } > _site/index.html
       - uses: actions/upload-pages-artifact@v3
   deploy:

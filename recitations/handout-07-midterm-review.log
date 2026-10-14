@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.22)  22 SEP 2026 10:41
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.22)  14 OCT 2026 10:29
  restricted system commands enabled.
 **handout-07-midterm-review.tex
 (./handout-07-midterm-review.tex
@@ -1048,22 +1048,9 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 
 {/usr/local/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 LaTeX Font Info:    Font shape `TU/Menlo(0)/m/n' will be
-(Font)              scaled to size 9.41699pt on input line 95.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 121.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 121.
-
-[2]
-Overfull \hbox (53.33743pt too wide) in paragraph at lines 175--185
- [] 
- []
-
-[3] [4] [5] [6] [7] (./handout-07-midterm-review.aux)
+(Font)              scaled to size 9.41699pt on input line 98.
+ [2] [3] [4] [5]
+[6] [7] [8] (./handout-07-midterm-review.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
@@ -1071,32 +1058,35 @@ L3 programming layer <2026-01-19>
 )
 
 Here is how much of LuaTeX's memory you used:
- 28244 strings out of 476076
+ 28255 strings out of 476076
  125086,1373583 words of node,token memory allocated
- 536 words of node memory still in use:
-   7 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 2 glyph, 8 attribute, 57 glue_spec,
- 8 attribute_list, 2 write nodes
-   avail lists: 1:1,2:489,3:291,4:100,5:1104,6:52,7:7601,8:20,9:345,10:12,11:507
+ 540 words of node memory still in use:
+   7 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 2 glyph, 9 attribute, 57 glue_spec,
+ 9 attribute_list, 2 write nodes
+   avail lists: 1:1,2:518,3:282,4:101,5:1189,6:44,7:8091,8:27,9:330,10:13,11:510
 
- 50044 multiletter control sequences out of 65536+600000
- 105 fonts using 10341343 bytes
- 131i,9n,127p,1213b,565s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 50049 multiletter control sequences out of 65536+600000
+ 107 fonts using 10431919 bytes
+ 131i,10n,127p,1213b,565s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </System/Library/Fonts/Menlo.ttc></Users/tserre/Library/Fonts/Lora-Italic.ttf></
 Users/tserre/Library/Fonts/Lora-SemiBold.ttf></Users/tserre/Library/Fonts/Lora-R
 egular.ttf></Users/tserre/Library/Fonts/Poppins-SemiBold.ttf></Users/tserre/Libr
 ary/Fonts/Poppins-Regular.ttf></usr/local/texlive/2026/texmf-dist/fonts/type1/pu
-blic/amsfonts/cm/cmex10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/publ
-ic/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmmib10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/ams
-fonts/cm/cmr10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmr8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/c
-m/cmsy10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmsy8.pfb>
-Output written on handout-07-midterm-review.pdf (7 pages, 137256 bytes).
+blic/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmex10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmmi8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsf
+onts/cm/cmmib10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmr10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmr6.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmr8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy
+10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.
+pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm
+10.pfb>
+Output written on handout-07-midterm-review.pdf (8 pages, 172835 bytes).
 
-PDF statistics: 168 PDF objects out of 1000 (max. 8388607)
- 131 compressed objects within 2 object streams
- 24 named destinations out of 1000 (max. 1048576)
- 112 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 192 PDF objects out of 1000 (max. 8388607)
+ 151 compressed objects within 2 object streams
+ 30 named destinations out of 1000 (max. 1048576)
+ 120 words of extra memory for PDF output out of 10000 (max. 100000000)
 

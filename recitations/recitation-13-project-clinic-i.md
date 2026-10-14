@@ -7,9 +7,9 @@ math: katex
 
 <!-- ===========================================================================
   CPSY 1291 — RECITATION 13: Project clinic I
-  TA-led, 80 minutes. Optional. Week 13 — the final exam is Tue 12/1 and
+  TA-led, 80 minutes. Optional. Week 13 — Exam 2 is Tue 12/1 and
   project work begins Thu 12/3, so hold this at the end of week 13.
-  Presentations are Mon 12/21.
+  The poster session (report due) is Mon 12/21.
 
   FORMAT: half teaching, half workshop. Slides 2-13 are about 48 minutes.
   Then break the room into project groups and have each group write its

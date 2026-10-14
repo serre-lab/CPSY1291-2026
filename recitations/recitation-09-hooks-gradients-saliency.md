@@ -8,7 +8,7 @@ math: katex
 <!-- ===========================================================================
   CPSY 1291 — RECITATION 9: Looking inside a network
   TA-led, 80 minutes. Optional. Week 9 — hold this after Lecture 13.
-  Assignment 4 is due Tue 11/10, so this is the last session before it.
+  Assignment 3 is due Thu 11/5, so this is the last session before it.
 
   SCOPE: hooks, gradients w.r.t. the input, saliency, Grad-CAM, maximally
   activating patches, feature visualization — each PAIRED with the check that
@@ -365,7 +365,8 @@ is worth having.
 
 # Where this lands
 
-- **Assignment 4** — hooks to get layer activations, and attribution you have to argue about
+- **Assignment 3** — hooks to get layer activations
+- **Exam 2** — attribution maps and the checks that test them (Lecture 13)
 - **Lecture 19** — human-alignment scores are exactly the pipeline on the last slide
 - **Your project** — if it involves a figure of what a model "looks at", every check here applies
 

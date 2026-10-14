@@ -7,15 +7,15 @@ math: katex
 
 <!-- ===========================================================================
   CPSY 1291 — RECITATION 4: One neuron, and the calculus of learning
-  TA-led, 80 minutes. Optional. Week 4 — hold this AFTER Lecture 6
-  (the model neuron). Assignment 2 is due Tue 10/13.
+  TA-led, 80 minutes. Optional. Week 4 — hold this AFTER Lecture 8
+  (the model neuron). Assignment 2 is due Sun 10/18.
 
   HOW TO RUN THIS DECK: every slide's presenter note gives a timing, what to
   say, and (where relevant) the answer to the exercise on the slide.
 
   SCOPE: Part A is the geometry of one unit (|w||x|cos theta, angles,
   gratings, tuning curves). Part B is the calculus every learning rule in the
-  course is built from. Do NOT teach backpropagation as an algorithm — L08
+  course is built from. Do NOT teach backpropagation as an algorithm — L09
   does that. Teach the chain rule as a pipeline and let the lecture name it.
 
   AUDIENCE SPLIT: roughly half the room has had calculus. Say at the top that
@@ -235,7 +235,7 @@ Each factor is **local** — one stage, and quantities that stage already has.
 5 min. The most important slide in Part B. Walk backwards through the three
 factors on the board, naming each stage as you pass it.
 
-Do not call this "backpropagation" as an algorithm — Lecture 8 does that, and
+Do not call this "backpropagation" as an algorithm — Lecture 9 does that, and
 pre-empting it costs the lecture its punchline. Here it is just the chain rule
 applied to a three-stage pipeline.
 -->
@@ -298,7 +298,7 @@ processing. Three literatures, three names, one derivation — "move the weights
 in proportion to the error, along the input."
 
 Say out loud: if you can reproduce those two lines you never have to memorize
-any of the three, including on the midterm.
+any of the three, including on Exam 1.
 -->
 
 ---
@@ -324,7 +324,7 @@ plt.semilogy(losses)      # a log y-axis, always
 Mention the classical decaying schedule eta_t = eta_0/(1+t): shrinks fast enough
 to settle, slowly enough to still travel any finite distance. Say that this
 condition has a name (Robbins-Monro) and that the fashionable schedulers later
-in the term do NOT satisfy it — a thread to pick up in Lecture 17.
+in the term do NOT satisfy it — a thread Lecture 10 picks up.
 -->
 
 ---

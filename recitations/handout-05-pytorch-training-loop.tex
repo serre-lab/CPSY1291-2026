@@ -7,7 +7,7 @@
 
 \handouthead{5}{PyTorch: tensors, autograd, and the training loop}
   {The five lines that train every network in this course}
-  {Week 5 \ $\cdot$\ hold this after Lecture 8; Assignment 2 is due Tue 10/13}
+  {Week 5 \ $\cdot$\ hold this after Lecture 9; Assignment 2 is due Sun 10/18}
 
 \section*{What this session is for}
 \addcontentsline{toc}{section}{What this session is for}
@@ -151,7 +151,7 @@ sum(p.numel() for p in model.parameters())     # count the parameters
 \texttt{nn.Sequential} is enough for everything in Assignment 2. Note that
 \texttt{ReLU} is a layer here, sitting \emph{between} the linear layers ---
 without it the whole stack collapses to a single linear map, which is exactly
-the point Lecture 8 makes about why depth needs nonlinearity.
+the point Lecture 9 makes about why depth needs nonlinearity.
 
 \subsection{The output layer, and the trap}
 

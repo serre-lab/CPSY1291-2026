@@ -8,13 +8,12 @@ math: katex
 <!-- ===========================================================================
   CPSY 1291 — RECITATION 6: Held-out data, and images through a network
   TA-led, 80 minutes. Optional. Week 6 — hold this AFTER Lecture 10.
-  Assignment 3 is due Tue 10/27.
+  Assignment 3 is released Thu 10/22 and due Thu 11/5.
 
-  WHY THIS SESSION CARRIES TWO TOPICS: the midterm is Thu 10/22 and
-  Recitation 7 is given over to it entirely, so there is no session between
-  Lecture 11 (the CNN lecture, Tue 10/20) and the A3 deadline. Part B
-  therefore delivers the convolution arithmetic a few days before the lecture
-  that motivates it. Do not apologize for this on the slide; just teach it.
+  WHY THIS SESSION CARRIES TWO TOPICS: Exam 1 is Thu 10/22 and Recitation 7
+  is given over to it entirely, so Part B delivers the convolution arithmetic
+  Assignment 3 needs a week before Lecture 11 (the CNN lecture, Tue 10/20)
+  motivates it. Do not apologize for this on the slide; just teach it.
 
   TIMING: Part A ~46 min, Part B ~32 min. If you run long, cut the hooks slide
   — Recitation 9 covers hooks properly — but do NOT cut the output-size slide.
@@ -27,7 +26,7 @@ math: katex
 
 # Held-out data, and images
 
-## Two topics, because the midterm eats next week
+## Two topics, because Exam 1 takes next week
 
 <!--
 2 min. Say the plan: Part A is the discipline of held-out data — the most
@@ -35,7 +34,7 @@ transferable 45 minutes of the term, and it applies to a psychology experiment
 as directly as to a network. Part B is the arithmetic of convolutions, arriving
 a few days before Lecture 11 so that the assignment is not blocked.
 
-Say plainly that next week's session is the midterm review and nothing else.
+Say plainly that next week's session is the Exam 1 review and nothing else.
 -->
 
 ---
@@ -422,15 +421,17 @@ If you are running short on time, this is the slide to cut.
 # Where this lands
 
 - **Assignment 3** — train/validation curves, seeds and error bars, images through a pretrained network
-- **The midterm** — the three splits and the four curve shapes are examinable
+- **Exam 2** — the three splits and the four curve shapes (Lecture 10) are examinable
 - **Your final project, and every project after it**
 
-Next week: **the midterm review**, and nothing else.
+Next week: **the Exam 1 review**, and nothing else.
 
 <!--
-2 min. Point at handout-06.pdf. Say which parts are examinable, since the
-midterm is nine days away and this is the last content session before it.
+2 min. Point at handout-06.pdf. Say which parts are examinable, and when:
+the three splits and the curve shapes are Lecture 10, so they belong to Exam 2.
+Exam 1, nine days away, has held-out data only as Lecture 7's cross-validation
+and leakage.
 
-Announce next week's format now: worked problems from L01-L08, bring questions,
-no new material.
+Announce next week's format now: worked problems from L01-L08 and the four
+steps of backpropagation from L09, bring questions, no new material.
 -->

@@ -40,7 +40,7 @@ math: katex
 
 <!--
 2 min. Set the frame explicitly: part 1 is behind them, parts 2 and 3 are this
-week, and A1 is due Monday 9/29. This session front-loads the ideas part 2
+week, and A1 is due Tuesday 9/29. This session front-loads the ideas part 2
 assumes and the library mechanics parts 2-3 use, then hands out the code
 skeletons for the four sections that the test-solve showed stop people cold.
 
@@ -77,7 +77,7 @@ skeletons are printed in the handout so nothing needs transcribing.
 
 - **Psychological space** *(Lecture 2)* — ratings behave as if stimuli sit at points in an internal metric space; **MDS** (*multidimensional scaling*) recovers the map: the $n \times n$ dissimilarity matrix goes in, a 2-D point per item comes out, placed so map distances match the dissimilarities. Why 2e–2f are a claim, not a plot.
 - **Shepard's law** *(Lecture 2)* — generalization falls off like $e^{-d}$; the Gaussian is the rival, and they differ **near $d=0$**. What 2g and 2j actually test.
-- **Depth ↔ ventral stream** *(Lecture 3)* — early layers ↔ early areas, deep layers ↔ IT (a high-level visual brain area). Why 2k tracks depth, and why part 3 puts fc6 (a deep network layer) next to IT recordings.
+- **Depth ↔ ventral stream** *(Lecture 1)* — early layers ↔ early areas, deep layers ↔ IT (a high-level visual brain area). Why 2k tracks depth, and why part 3 puts fc6 (a deep network layer) next to IT recordings.
 
 <mark>Today is the technical side: the library calls, the pitfalls, the skeletons.</mark>
 
@@ -729,7 +729,7 @@ material. If the room is silent, re-run the worked pipeline with a bad p0
 (say p0=[0.001, 50]) and let them watch the "Optimal parameters not found"
 failure from the call-sheet slide actually happen, then fix it.
 
-Close with logistics: A1 is due Monday 9/29; restart-and-run-all before
+Close with logistics: A1 is due Tuesday 9/29; restart-and-run-all before
 submitting re-runs the t-SNE sweep, so budget for it. Office hours and
 linear-algebra-notes.pdf / a1-programming-notes.pdf for everything else.
 -->

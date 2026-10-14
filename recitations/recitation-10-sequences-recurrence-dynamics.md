@@ -8,10 +8,12 @@ math: katex
 <!-- ===========================================================================
   CPSY 1291 — RECITATION 10: Sequences, recurrence, and dynamics
   TA-led, 80 minutes. Optional. Week 10 — hold this after Lecture 15.
-  Assignment 5 is due Tue 11/24.
+  Assignment 4 is released Tue 11/10 and due Tue 11/24.
 
-  SCOPE: two lectures, one object. L14 treats the RNN as a sequence machine,
-  L15 treats the same equations as a dynamical system. Teach them as one thing
+  SCOPE: two lectures, one object. L15 treats the RNN as a sequence machine,
+  L16 treats the same equations as a dynamical system. A Tuesday session
+  comes two days before Lecture 16, so the dynamics half arrives early, as
+  Recitation 6's convolution arithmetic did. Teach them as one thing
   seen twice — that framing is the point of the session.
 
   THE DEMO: if you can run code live, the highest-value five minutes is
@@ -20,7 +22,7 @@ math: katex
   see the straight line.
 
   IF YOU RUN LONG: shorten the Hopfield block. Do not cut fixed points — the
-  assignment and Lecture 15 both turn on them.
+  assignment and Lecture 16 both turn on them.
 
   MATERIAL: handout-10-sequences-recurrence-dynamics.pdf, six exercises.
 ============================================================================ -->
@@ -32,8 +34,8 @@ math: katex
 ## Two lectures, one object
 
 <!--
-2 min. Say the frame: Lecture 14 gave you a machine that processes sequences.
-Lecture 15 gave you a dynamical system with fixed points. They are the same
+2 min. Say the frame: Lecture 15 gave you a machine that processes sequences.
+Lecture 16 gives you a dynamical system with fixed points. They are the same
 equations, and today is about seeing that.
 
 The second view is the one that lets you reverse-engineer a trained network
@@ -181,7 +183,7 @@ gradients from ABOVE. It does nothing whatsoever for gradients that are too
 small, and students try it anyway.
 
 The gating mechanism in one sentence is the highlighted line. The three gates are
-bookkeeping around that idea, and Lecture 14 already gave them.
+bookkeeping around that idea, and Lecture 15 already gave them.
 -->
 
 ---
@@ -281,7 +283,7 @@ integrator, or a working-memory store.
 
 Push: what task would produce this? Any task requiring the network to accumulate
 evidence over time and hold the running total. That is exactly the decision-
-making result from Lecture 15.
+making result from Lecture 16 (Mante et al.'s trained network).
 -->
 
 ---
@@ -332,24 +334,25 @@ Recall converges to spurious states — blends and mixtures — rather than to t
 stored patterns, and it degrades further the more you store.
 
 Worth noting: this is a graceful, gradual failure, not a cliff, and modern
-"dense associative memory" variants push the capacity far higher. Lecture 15
-mentions the connection to energy-based models and to attention.
+"dense associative memory" variants push the capacity far higher. Lecture 16
+connects it to energy-based models, and Lecture 17 shows that a modern Hopfield
+update is one attention step.
 -->
 
 ---
 
 # Where this lands
 
-- **Assignment 5** — RNN shapes, gradient behavior over long sequences, and a Hopfield network
-- **Lecture 16** — attention exists because these two walls are real
-- **The final** — L14 and L15 are both examinable
+- **Assignment 4** — recurrent networks, and a Hopfield network
+- **Lecture 17** — attention exists because these two walls are real
+- **Exam 2** — L15 and L16 are both examinable
 
-Next week: **attention, transformers, and generative models** — the last content session, and the A5 clinic.
+Next week: **attention and the transformer** — the last content session, and the A4 clinic.
 
 <!--
 3 min. Point at handout-10.pdf.
 
-Say next week's shape now, because it is unusual: it covers three lectures in
-one session because Assignment 5 is due the following Tuesday and Thanksgiving
-follows immediately. It will be dense and the handout is the longest of the term.
+Say next week's shape now: it is the last content session, held the evening
+of Lecture 17, one week before Assignment 4 is due (Tue 11/24). It finishes the
+assignment's scope: attention, the transformer block, and generation.
 -->

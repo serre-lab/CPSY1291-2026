@@ -7,8 +7,8 @@ math: katex
 
 <!-- ===========================================================================
   CPSY 1291 — RECITATION 5: PyTorch, tensors, autograd, and the training loop
-  TA-led, 80 minutes. Optional. Week 5 — hold this AFTER Lecture 8
-  (MLPs and backpropagation). Assignment 2 is due Tue 10/13.
+  TA-led, 80 minutes. Optional. Week 5 — hold this AFTER Lecture 9
+  (hidden layers and backpropagation). Assignment 2 is due Sun 10/18.
 
   HOW TO RUN THIS DECK: presenter notes carry timing, what to say, and the
   answers to the exercises.
@@ -192,7 +192,7 @@ they inspect AlexNet's first layer and get (64, 3, 11, 11) they read it as
 "64 filters" rather than "64 inputs".
 
 Ask the room what happens if you delete the ReLU. Answer: the stack collapses
-to a single linear map — more parameters, no more power. That is Lecture 8's
+to a single linear map — more parameters, no more power. That is Lecture 9's
 point and it is worth hearing twice.
 -->
 
@@ -365,7 +365,7 @@ expressive power.
 
 Push: so is the extra layer useless? Not quite — it constrains the map to rank
 at most 16, which is a real (and sometimes useful) restriction. Nice place to
-mention that this is exactly what a linear autoencoder does, which is Lecture 10.
+mention that this is exactly what a linear autoencoder does, which is Lecture 11.
 -->
 
 ---

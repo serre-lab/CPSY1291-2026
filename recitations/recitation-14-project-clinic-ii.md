@@ -8,7 +8,7 @@ math: katex
 <!-- ===========================================================================
   CPSY 1291 — RECITATION 14: Project clinic II
   TA-led, 80 minutes. Optional. Week 14 — the last class meeting is Thu 12/10
-  and presentations are Mon 12/21 at 9:00 AM.
+  and the poster session (report due) is Mon 12/21 at 9:00 AM.
 
   FORMAT: 40 minutes of teaching, then 40 minutes of workshop. In the
   workshop, each group puts ONE figure on the screen and the room applies the

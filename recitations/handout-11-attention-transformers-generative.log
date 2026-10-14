@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.22)  22 SEP 2026 10:41
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.22)  14 OCT 2026 10:40
  restricted system commands enabled.
 **handout-11-attention-transformers-generative.tex
 (./handout-11-attention-transformers-generative.tex
@@ -1046,30 +1046,29 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 10.
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Font shape `TU/Menlo(0)/m/n' will be
-(Font)              scaled to size 9.41699pt on input line 45.
+(Font)              scaled to size 9.41699pt on input line 47.
 LaTeX Font Info:    Font shape `TU/Menlo(0)/m/n' will be
-(Font)              scaled to size 8.6pt on input line 45.
+(Font)              scaled to size 8.6pt on input line 47.
  [1
 
 {/usr/local/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 LaTeX Font Info:    Font shape `TU/Menlo(0)/b/n' will be
-(Font)              scaled to size 9.41699pt on input line 89.
- [2] [3] [4] [5]
-Underfull \hbox (badness 10000) in paragraph at lines 317--318
+(Font)              scaled to size 9.41699pt on input line 85.
+ [2]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 133.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 133.
+
+[3] [4]
+Underfull \hbox (badness 10000) in paragraph at lines 274--275
 []|\TU/Menlo(0)/m/n/10.95 masked_fill(mask == 0, float('-inf'))
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 322--323
-[]|\TU/Menlo(0)/m/n/10.95 mu + torch.exp(0.5*logvar) *
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 323--324
-[]|\TU/Menlo(0)/m/n/10.95 -0.5 * sum(1 + logvar - mu**2 -
- []
-
-[6] (./handout-11-attention-transformers-generative.aux)
+[5] (./handout-11-attention-transformers-generative.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
@@ -1077,33 +1076,36 @@ L3 programming layer <2026-01-19>
 )
 
 Here is how much of LuaTeX's memory you used:
- 28500 strings out of 476076
- 305427,1373583 words of node,token memory allocated
- 548 words of node memory still in use:
-   7 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 2 glyph, 11 attribute, 57 glue_spec
-, 11 attribute_list, 2 write nodes
-   avail lists: 1:8,2:2831,3:325,4:6457,5:5728,6:59,7:9537,8:36,9:13394,10:41,11
-:701
- 50265 multiletter control sequences out of 65536+600000
+ 28427 strings out of 476076
+ 195464,1373583 words of node,token memory allocated
+ 560 words of node memory still in use:
+   7 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 2 glyph, 14 attribute, 57 glue_spec
+, 14 attribute_list, 2 write nodes
+   avail lists: 1:2,2:1672,3:322,4:3823,5:3811,6:59,7:9214,8:40,9:7382,10:32,11:
+633
+ 50218 multiletter control sequences out of 65536+600000
  107 fonts using 11335759 bytes
- 131i,8n,127p,1232b,687s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 131i,9n,127p,1232b,687s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </System/Library/Fonts/Menlo.ttc></System/Library/Fonts/Menlo.ttc></Users/tserre
 /Library/Fonts/Lora-Italic.ttf></Users/tserre/Library/Fonts/Lora-SemiBold.ttf></
 Users/tserre/Library/Fonts/Lora-Regular.ttf></Users/tserre/Library/Fonts/Poppins
 -SemiBold.ttf></Users/tserre/Library/Fonts/Poppins-Regular.ttf></usr/local/texli
 ve/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive
 /2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2
-026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2026
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/local/texlive/2026/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2026/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2026/texmf-d
-ist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2026/texmf-dis
-t/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-Output written on handout-11-attention-transformers-generative.pdf (6 pages, 13
-7688 bytes).
+026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2026
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2026/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/local/texlive/2026/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2026/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2026/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2026/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2026/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2026/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmsy8.pfb>
+Output written on handout-11-attention-transformers-generative.pdf (5 pages, 15
+7541 bytes).
 
-PDF statistics: 212 PDF objects out of 1000 (max. 8388607)
- 173 compressed objects within 2 object streams
- 59 named destinations out of 1000 (max. 1048576)
- 120 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 198 PDF objects out of 1000 (max. 8388607)
+ 157 compressed objects within 2 object streams
+ 33 named destinations out of 1000 (max. 1048576)
+ 128 words of extra memory for PDF output out of 10000 (max. 100000000)
 
