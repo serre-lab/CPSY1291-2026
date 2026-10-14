@@ -276,6 +276,21 @@ the figure cannot be rebuilt.
 
 ---
 
+# Track your runs: Weights & Biases
+
+- A project trains many runs. Keep every run's settings and curves in one place, not in your memory
+- [Weights & Biases](https://wandb.ai/site) (W&B) is free for students: `pip install wandb`, `wandb.init(project="cpsy1291", config={...})`, then `wandb.log({"train_loss": ..., "val_acc": ...})` once per epoch
+- Every run gets its learning curves, its settings and a link you can share with your group
+- Optional: a CSV per run (habit 2) works too. What matters is that you can compare runs a week later
+
+<!--
+10 min, live. Open a Colab notebook, run three short trainings with different learning rates, and show the W&B dashboard comparing their validation curves.
+Point out the config: every setting that changed between runs must be in it, or the comparison is useless.
+Students need a free account (academic plan); no data leaves their notebook beyond the logged numbers.
+-->
+
+---
+
 # The deadline that matters is day 9
 
 | by | you have |
