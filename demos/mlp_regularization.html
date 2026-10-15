@@ -84,8 +84,8 @@
           <input id="ntrain" type="range" min="10" max="200" step="10" value="30">
         </div>
         <div class="ctrl">
-          <label for="eta">learning rate η — <span id="etav">0.50</span></label>
-          <input id="eta" type="range" min="-2" max="0.7" step="0.01" value="-0.30">
+          <label for="eta">learning rate η — <span id="etav">0.032</span></label>
+          <input id="eta" type="range" min="-2" max="0.7" step="0.01" value="-1.50">
         </div>
         <div class="ctrl">
           <label for="noise">flipped labels — <span id="noisev">15%</span></label>
@@ -219,10 +219,10 @@ function flip(Ys, seed, p){
 function applyNoise(){
   const p=+$('noise').value/100;
   Y=flip(Yclean, dataSeed*10007+Math.round(p*1000)+3, p);
-  Yt=flip(Ytclean, dataSeed*7919+Math.round(p*1000)+11, p);
+  Yt=Ytclean;   // held-out points keep their true labels: the loss measures fit to the real boundary
 }
 // Training points: a random subset of one draw; held-out points: all 200 of an independent draw
-// from the same distribution, with labels flipped at the same rate.
+// from the same distribution, scored on their true labels.
 function loadData(){
   const kind=$('data').value, n=+$('ntrain').value;
   const d=makeData(kind, dataSeed), dt=makeData(kind, dataSeed+50000);
@@ -422,7 +422,7 @@ function loop(ts){
   lastTs=ts;
   let n=0;
   while(bank>=1000/30 && n<3){
-    for(let r=0;r<4;r++) runEpoch();
+    for(let r=0;r<8;r++) runEpoch();
     bank-=1000/30;
     n++;
   }
@@ -653,7 +653,7 @@ function drawLoss(){
   }
   g.font=fontPx+'px Lora, Georgia, serif'; g.textAlign='right'; g.textBaseline='top';
   g.fillStyle=INK; g.fillText('training loss', x1-4, padT+2);
-  g.fillStyle=GREEN; g.fillText('held-out loss', x1-4, padT+4+fontPx*1.25);
+  g.fillStyle=GREEN; g.fillText('held-out loss (true labels)', x1-4, padT+4+fontPx*1.25);
   const lx=xOf(hist.length-1), ly=yC(hist[hist.length-1]);
   g.beginPath(); g.arc(lx, ly, big?5.5:3.5, 0, Math.PI*2);
   g.fillStyle=GOLD; g.fill(); g.lineWidth=1.5; g.strokeStyle=INK; g.stroke();
