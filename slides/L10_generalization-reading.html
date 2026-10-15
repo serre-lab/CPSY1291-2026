@@ -21,7 +21,7 @@
 <li><strong>Hidden layers</strong> re-represent the inputs, so a readout can separate classes that no single line separates, as in XOR</li>
 <li><strong>Backpropagation</strong> gives the gradient of the loss for every weight: error at the output, sent backward, error × activity</li>
 <li><strong>The training loop</strong>: forward pass, loss, <code>backward()</code>, <code>step()</code>, repeated over epochs</li>
-<li>Each weight update, one <strong>step</strong> of gradient descent, used <mark>all the training images</mark>, with a fixed step size <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi></mrow><annotation encoding="application/x-tex">\eta</annotation></semantics></math></li>
+<li>Each <strong>step</strong> of gradient descent used <mark>all the training images</mark> and a fixed learning rate <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi></mrow><annotation encoding="application/x-tex">\eta</annotation></semantics></math></li>
 </ul>
 </div>
 </div>
