@@ -303,7 +303,7 @@
 </div>
 <ul>
 <li><strong>The IT readout</strong> (logistic): all 300 training images right; a longer <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math> only adds confidence</li>
-<li>A penalty stops it: <mark>same accuracy, less confidence</mark></li>
+<li>A penalty stops it: <mark>same accuracy, less confidence</mark>. (If the training classes overlapped, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐰</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{w}}</annotation></semantics></math> would stop)</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="54" aria-labelledby="heading-30"><p class="page">Slide 30</p>
 <h2 id="heading-30">More data, or altered copies of it</h2>
@@ -386,7 +386,7 @@
 <h2 id="heading-38">Where do V1 simple cells sit?</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L06/12_ringach_cells_toy.svg" alt="Scatter of Gabor width nx against length ny, both in cycles, for 93 macaque V1 simple cells: most cluster near the origin, below about 0.6 on both axes, with a few longer fields. Three blue stars mark the toy units A, B and C of the Gabor-fit slide: A and B sit among the cells, C lies beyond most of them" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>Scatter of Gabor width nx against length ny, both in cycles, for 93 macaque V1 simple cells: most cluster near the origin, below about 0.6 on both axes, with a few longer fields. Three blue stars mark the toy units A, B and C of the Gabor-fit slide: A and B sit among the cells, C lies beyond most of them</p><a href="../images/L06/12_ringach_cells_toy.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L10/ringach_frame1_cells.svg" alt="Scatter of Gabor width nx against length ny, both in cycles, for 93 macaque V1 simple cells: most cluster near the origin, below about 0.6 on both axes, with a few longer fields. Three blue stars mark the toy units A, B and C of the Gabor-fit slide: A and B sit among the cells, C lies beyond most of them" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>Scatter of Gabor width nx against length ny, both in cycles, for 93 macaque V1 simple cells: most cluster near the origin, below about 0.6 on both axes, with a few longer fields. Three blue stars mark the toy units A, B and C of the Gabor-fit slide: A and B sit among the cells, C lies beyond most of them</p><a href="../images/L10/ringach_frame1_cells.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -402,7 +402,7 @@
 <h2 id="heading-39">Quantified: V1 cells and AlexNet's first layer</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L06/09_ringach_comparison.svg" alt="Scatter of Gabor width nx against length ny, both in cycles: macaque V1 simple cells cluster near the origin; the network's first-layer filters that a Gabor fits well overlap them but sit systematically larger" aria-describedby="figure-39-1"><figcaption id="figure-39-1"><p>Scatter of Gabor width nx against length ny, both in cycles: macaque V1 simple cells cluster near the origin; the network's first-layer filters that a Gabor fits well overlap them but sit systematically larger</p><a href="../images/L06/09_ringach_comparison.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L10/ringach_frame2_alexnet.svg" alt="The same scatter and axes as the previous slide, with the toy units removed: macaque V1 simple cells as grey squares near the origin, and AlexNet's first-layer filters that a Gabor fits well as open green circles; the filters overlap the cells but sit systematically larger" aria-describedby="figure-39-1"><figcaption id="figure-39-1"><p>The same scatter and axes as the previous slide, with the toy units removed: macaque V1 simple cells as grey squares near the origin, and AlexNet's first-layer filters that a Gabor fits well as open green circles; the filters overlap the cells but sit systematically larger</p><a href="../images/L10/ringach_frame2_alexnet.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -434,8 +434,8 @@
 <figure><img src="../images/L06/06_phase_rectification.svg" alt="Bar chart for one Gabor unit and a grating at its preferred orientation shown at four phases: the weighted sums are plus one, plus one, minus one, minus one and average to zero; after rectifying, the responses are one, one, zero, zero and average to one half. Thumbnails of the four gratings and of the unit's weights sit under the bars" aria-describedby="figure-41-1"><figcaption id="figure-41-1"><p>Bar chart for one Gabor unit and a grating at its preferred orientation shown at four phases: the weighted sums are plus one, plus one, minus one, minus one and average to zero; after rectifying, the responses are one, one, zero, zero and average to one half. Thumbnails of the four gratings and of the unit's weights sit under the bars</p><a href="../images/L06/06_phase_rectification.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>One hand-built Gabor unit, a grating at its best orientation. For orientation alone, average over where the stripes sit (<strong>phase</strong>); but half a cycle flips the weighted sum's <strong>sign</strong>, and the average cancels</li>
-<li><strong>Rectify</strong> first, with a ReLU, and the average keeps the unit's preference. <mark>Rectifying stops positive and negative sums from cancelling</mark></li>
+<li>To measure a unit's orientation tuning alone, average its response over where the stripes sit (<strong>phase</strong>). A raw weighted sum flips <strong>sign</strong> after half a cycle, and the average cancels</li>
+<li>A neuron's firing rate is never negative: model it as <strong>rectified</strong>, like a ReLU. <mark>A rectified unit keeps its preference, as a real cell does</mark>. The Gabor fit itself uses the weights and needs no rectification</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="54" aria-labelledby="heading-42"><p class="page">Slide 42</p>
 <h2 id="heading-42">Deeper in: how selective is one IT site for objects?</h2>
