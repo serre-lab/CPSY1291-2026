@@ -643,7 +643,7 @@ function drawLoss(){
   if(epoch){g.textAlign='right'; g.fillText(String(epoch), x1, y0+3)}
   g.textAlign='center'; g.fillText('epoch', (x0+x1)/2, y0+(big?24:14));
   g.save(); g.translate(big?18:12, (y0+padT)/2); g.rotate(-Math.PI/2);
-  g.textAlign='center'; g.textBaseline='middle'; g.fillText('loss', 0, 0); g.restore();
+  g.textAlign='center'; g.textBaseline='middle'; g.fillText('cross-entropy', 0, 0); g.restore();
   if(hist.length<1) return;
   const yC=v=>yOf(Math.min(v, ymax));
   for(const [h,col] of [[histT,GREEN],[hist,INK]]){
