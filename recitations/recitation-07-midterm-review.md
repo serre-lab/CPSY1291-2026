@@ -331,21 +331,21 @@ The lecture's XOR network, same starting weights: hidden $\mathbf{w}_1 = (0.50, 
 $\mathbf{w}_2 = (0.30, 0.80)$, output weights $(0.70, -0.60)$, biases 0, ReLU hidden
 units, sigmoid output, cross-entropy.
 
-Input $(0, 1)$, target $1$. Run the four steps.
+Input $(1, 1)$, target $0$ (XOR of 1 and 1). Run the four steps.
 
 <!--
 7 min. Answers, two decimals:
-Step 1. z1 = 0.50·0 − 0.40·1 = −0.40, so a1 = 0 (ReLU off). z2 = 0.30·0 +
-0.80·1 = 0.80, so a2 = 0.80. Output z = 0.70·0 − 0.60·0.80 = −0.48,
-ŷ = σ(−0.48) = 0.38. Loss −log 0.38 = 0.96.
-Step 2. δ_out = ŷ − y = −0.62.
-Step 3. δ1 = −0.62 × 0.70 × 0 = 0: unit 1 was off and gets no error.
-δ2 = −0.62 × (−0.60) × 1 = 0.37.
-Step 4. Output weights: −0.62 × a1 = 0 and −0.62 × 0.80 = −0.49. Unit 2's
-weights: 0.37 × x = (0, 0.37). Unit 1's weights: 0. Biases: −0.62, 0, 0.37.
+Step 1. z1 = 0.50 − 0.40 = 0.10, so a1 = 0.10. z2 = 0.30 + 0.80 = 1.10, so a2 = 1.10.
+Output z = 0.70·0.10 − 0.60·1.10 = −0.59, ŷ = σ(−0.59) = 0.36. Loss −log(1 − 0.36) = 0.44.
+Step 2. δ_out = ŷ − y = 0.36: the output was too high.
+Step 3. δ1 = 0.36 × 0.70 × 1 = 0.25 (unit 1 excites the output: decrease it).
+δ2 = 0.36 × (−0.60) × 1 = −0.21 (unit 2 inhibits the output: increase it).
+Step 4. Output weights: 0.36 × 0.10 = 0.04 and 0.36 × 1.10 = 0.39. Unit 1's
+weights: 0.25 × (1, 1) = (0.25, 0.25). Unit 2's weights: −0.21 × (1, 1) = (−0.21, −0.21).
+Biases: 0.36 (output), 0.25 and −0.21 (hidden).
 
-The point to land: the ReLU gates the error. Unit 1 was off for this input, so
-none of its incoming weights move. One step with η = 1 raises ŷ to 0.65.
+The point to land: each hidden error is the output error sent back through that unit's
+outgoing weight, so its sign follows the sign of the weight. One step with η = 1 lowers ŷ to 0.11.
 -->
 
 ---

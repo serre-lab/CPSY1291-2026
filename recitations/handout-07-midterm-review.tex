@@ -356,7 +356,7 @@ $\Delta\mathbf{w}$ in terms of $\mathbf{x}$.
 \ask{16.} The lecture's XOR network with its starting weights (hidden
 $\mathbf{w}_1=(0.50,-0.40)$, $\mathbf{w}_2=(0.30,0.80)$, output weights
 $(0.70,-0.60)$, biases 0, ReLU hidden units, sigmoid output, cross-entropy).
-Input $(0,1)$, target 1. Run the four steps of backpropagation and give every
+Input $(1,1)$, target 0 (XOR of 1 and 1). Run the four steps of backpropagation and give every
 gradient.
 
 \subsection*{Answers}
@@ -435,16 +435,15 @@ $\Delta\mathbf{w}=\eta\,(y-\hat p)\,\mathbf{x}$: $0.5\,\eta\,\mathbf{x}$ for the
 first and $0.9\,\eta\,\mathbf{x}$ for the second, so the more confidently wrong
 neuron moves more.
 
-\ask{16.} \emph{Step 1.} $z^{[1]}_1=-0.40$, so $a^{[1]}_1=0$ (off);
-$z^{[1]}_2=0.80$, so $a^{[1]}_2=0.80$. $z^{[2]}=0.70\cdot0-0.60\cdot0.80=-0.48$,
-$\hat y=\sigma(-0.48)=0.38$, loss $-\log0.38=0.96$. \emph{Step 2.}
-$\delta^{[2]}=\hat y-y=-0.62$. \emph{Step 3.}
-$\delta^{[1]}_1=-0.62\times0.70\times0=0$: the unit was off and gets no error.
-$\delta^{[1]}_2=-0.62\times(-0.60)\times1=0.37$. \emph{Step 4.} Output weights:
-$-0.62\times0=0$ and $-0.62\times0.80=-0.49$. Unit~1's weights: $(0,0)$.
-Unit~2's weights: $0.37\times(0,1)=(0,\,0.37)$. Biases: $-0.62$ (output), $0$
-and $0.37$ (hidden). The ReLU gates the error: nothing into unit~1 moves on this
-example. One step with $\eta=1$ raises $\hat y$ to 0.65.
+\ask{16.} \emph{Step 1.} $z^{[1]}_1=0.50-0.40=0.10$ and $z^{[1]}_2=0.30+0.80=1.10$,
+both passed by the ReLU. $z^{[2]}=0.70\cdot0.10-0.60\cdot1.10=-0.59$,
+$\hat y=\sigma(-0.59)=0.36$, loss $-\log(1-0.36)=0.44$. \emph{Step 2.}
+$\delta^{[2]}=\hat y-y=0.36$: the output was too high. \emph{Step 3.}
+$\delta^{[1]}_1=0.36\times0.70\times1=0.25$ and $\delta^{[1]}_2=0.36\times(-0.60)\times1=-0.21$:
+each sign follows the sign of the unit's outgoing weight. \emph{Step 4.} Output weights:
+$0.36\times0.10=0.04$ and $0.36\times1.10=0.39$. Unit~1's weights: $0.25\times(1,1)=(0.25,\,0.25)$.
+Unit~2's weights: $-0.21\times(1,1)=(-0.21,\,-0.21)$. Biases: $0.36$ (output), $0.25$
+and $-0.21$ (hidden). One step with $\eta=1$ lowers $\hat y$ to 0.11.
 
 \section*{The night before}
 \addcontentsline{toc}{section}{The night before}
