@@ -375,8 +375,9 @@ function show(m){
   metrics=m;
   tmetrics=evaluate(Xt, Yt);
   $('ep').textContent=String(epoch);
-  $('acc').textContent=(100*m.acc).toFixed(0)+'%';
-  $('tacc').textContent=(100*tmetrics.acc).toFixed(0)+'%';
+  // Before the first step the weights are random, so the meter shows nothing rather than a chance-level score
+  $('acc').textContent=epoch? (100*m.acc).toFixed(0)+'%' : '–';
+  $('tacc').textContent=epoch? (100*tmetrics.acc).toFixed(0)+'%' : '–';
 }
 function runEpoch(){
   const n=X.length;
