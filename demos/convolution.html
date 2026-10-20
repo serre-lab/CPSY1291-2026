@@ -20,7 +20,7 @@ button.primary{background:var(--gold);border-color:var(--gold)}
 </head><body><main>
 <div class="panel"><h2>image, filter window in magenta</h2><canvas id="img" width="96" height="96" style="width:420px;height:420px"></canvas></div>
 <div class="panel"><h2>filter w (7 × 7)</h2><canvas id="flt" width="7" height="7" style="width:168px;height:168px"></canvas>
-<div class="stat" style="min-height:48px;width:280px;text-align:center">at this position: <b id="dot" style="display:inline-block;min-width:56px;font-variant-numeric:tabular-nums">–</b><br><span id="relu" style="display:inline-block;min-height:22px"></span></div>
+<div class="stat" style="height:52px;width:240px;text-align:center;white-space:nowrap;overflow:hidden">at this position: <b id="dot" style="display:inline-block;min-width:56px;font-variant-numeric:tabular-nums">–</b><br><span id="relu" style="display:inline-block;min-height:22px"></span></div>
 <label style="font-size:16px">filter <select id="kind"><option value="v">oriented edge, vertical (Gabor)</option><option value="h">oriented edge, horizontal (Gabor)</option><option value="d">oriented edge, 45° (Gabor)</option><option value="c">centre–surround (difference of Gaussians)</option></select></label></div>
 <div class="panel"><h2>feature map: max(0, w·x)</h2><canvas id="map" width="90" height="90" style="width:420px;height:420px"></canvas></div>
 <div class="controls">
@@ -43,7 +43,7 @@ function response(i,j){let s=0;const m=patchMean(i,j);for(let y=0;y<K;y++)for(le
 function drawImage(){const c=$('img'),g=c.getContext('2d'),d=g.createImageData(N,N);for(let y=0;y<N;y++)for(let x=0;x<N;x++){const v=Math.round(IMG[y][x]*255),k=4*(y*N+x);d.data[k]=d.data[k+1]=d.data[k+2]=v;d.data[k+3]=255;}g.putImageData(d,0,0);const i=Math.floor(pos/M),j=pos%M;g.strokeStyle='#B5396B';g.lineWidth=1;g.strokeRect(j+0.5,i+0.5,K-1,K-1);}
 function drawFilter(){const c=$('flt'),g=c.getContext('2d'),d=g.createImageData(K,K);let mx=0;for(const r of W)for(const v of r)mx=Math.max(mx,Math.abs(v));for(let y=0;y<K;y++)for(let x=0;x<K;x++){const v=W[y][x]/mx,k=4*(y*K+x);if(v>=0){d.data[k]=181;d.data[k+1]=57;d.data[k+2]=107;d.data[k+3]=Math.round(255*v);}else{d.data[k]=62;d.data[k+1]=109;d.data[k+2]=142;d.data[k+3]=Math.round(-255*v);}}g.fillStyle='#fff';g.fillRect(0,0,K,K);g.putImageData(d,0,0);}
 function drawMap(){const c=$('map'),g=c.getContext('2d'),d=g.createImageData(M,M);const mx=MAXR;for(let k=0;k<M*M;k++){const q=4*k;if(!done[k]){d.data[q]=240;d.data[q+1]=238;d.data[q+2]=233;}else{const v=Math.round(255*Math.max(0,out[k])/mx);d.data[q]=d.data[q+1]=d.data[q+2]=v;}d.data[q+3]=255;}g.putImageData(d,0,0);}
-function show(){const i=Math.floor(pos/M),j=pos%M;$('pos').textContent=`${i}, ${j}`;const r=response(i,j);$('dot').textContent=r.toFixed(2);$('relu').textContent=r>0?'positive: the window matches the filter':'negative or zero: ReLU writes 0';drawImage();drawMap();}
+function show(){const i=Math.floor(pos/M),j=pos%M;$('pos').textContent=`${i}, ${j}`;const r=response(i,j);$('dot').textContent=r.toFixed(2);$('relu').textContent=r>0?'positive: matches the filter':'≤ 0: ReLU writes 0';drawImage();drawMap();}
 function stepOnce(){if(pos>=M*M)return false;const i=Math.floor(pos/M),j=pos%M;out[pos]=response(i,j);done[pos]=1;pos++;return pos<M*M;}
 function stop(){if(timer){clearInterval(timer);timer=null;$('run').textContent='slide';}}
 $('step').onclick=()=>{stop();stepOnce();show();};

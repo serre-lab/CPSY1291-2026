@@ -38,7 +38,7 @@
 <p class="provenance">Computed: one monkey IT site (Bao et al. 2020), 1,224 object images, 512 late-layer units of ResNet-18; a random fifth held out</p>
 <ul>
 <li><strong>Encoding model</strong>: one IT site from 512 units by <strong>ridge regression</strong>, λ by cross-validation inside the training images (<code>RidgeCV</code>); too small a λ overfits (held-out <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">R^2</annotation></semantics></math> 0.28 vs 0.69)</li>
-<li><mark>You fit this in the second assignment</mark>: one IT site, one layer. The next fits V1, V4 and IT electrodes from each of ResNet-50's 16 blocks</li>
+<li><mark>You fit this in the second assignment</mark>: one IT site, one layer. The next assignment predicts V1, V4 and IT responses from each of ResNet-50's 16 blocks</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="64" aria-labelledby="heading-10"><p class="page">Slide 10</p>
 <h2 id="heading-10">Regularization 2: dropout</h2>
@@ -58,7 +58,7 @@
 <figure><img src="../images/L09/02_poly_samples_coef3.svg" alt="The same four panels with panel 4 highlighted and its fitted polynomial written out with the coefficients; the other panels dimmed. Four panels of the same degree-9 polynomial fitted to more and more noisy points from the dashed sine-shaped curve. N equals 10: the curve swings far off, error on new points 0.86. N equals 15: close to the dashed curve, 0.34. N equals 30: 0.35. N equals 100: the fitted curve follows the dashed one, training error 0.28, error on new points 0.31. Under each panel the size of the coefficient vector: 1.1 million, 46,000, 37,000, 8,700. Open green circles: 25 of the new points the error on new points is measured on" aria-describedby="figure-15-1"><figcaption id="figure-15-1"><p>The same four panels with panel 4 highlighted and its fitted polynomial written out with the coefficients; the other panels dimmed. Four panels of the same degree-9 polynomial fitted to more and more noisy points from the dashed sine-shaped curve. N equals 10: the curve swings far off, error on new points 0.86. N equals 15: close to the dashed curve, 0.34. N equals 30: 0.35. N equals 100: the fitted curve follows the dashed one, training error 0.28, error on new points 0.31. Under each panel the size of the coefficient vector: 1.1 million, 46,000, 37,000, 8,700. Open green circles: 25 of the new points the error on new points is measured on</p><a href="../images/L09/02_poly_samples_coef3.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>The fitted polynomial, N = 100: ‖w‖ = 8,700; the data alone tame the fit</li>
+<li>The fitted polynomial, N = 100: ‖w‖ = 8,700; with more points the curve stops swinging between them</li>
 </ul>
 <div class="ref"><a href="https://www.microsoft.com/en-us/research/publication/pattern-recognition-machine-learning/" rel="noopener">Bishop <b>Pattern Recognition and Machine Learning, Springer 2006</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="64" aria-labelledby="heading-16"><p class="page">Slide 16</p>
@@ -67,7 +67,7 @@
 <figure><img src="../images/L09/07_augmentation.png" alt="Eight versions of one photograph of a pink orchid, each made by a torchvision transform: original, horizontal flip, resized crop, colour jitter, rotation, affine warp, perspective, random erasing with a grey patch" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>Eight versions of one photograph of a pink orchid, each made by a torchvision transform: original, horizontal flip, resized crop, colour jitter, rotation, affine warp, perspective, random erasing with a grey patch</p><a href="../images/L09/07_augmentation.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li><strong>Data augmentation</strong>: train on altered copies that keep the label: flips, crops, colour, rotation, warps, erased patches. <mark>An augmentation states what should not change the label</mark></li>
+<li><strong>Data augmentation</strong>: train on altered copies that keep the label: flips, crops, colour, rotation, warps, erased patches. <mark>Choose transformations that should not change the label</mark></li>
 </ul>
 <div class="ref"><a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks" rel="noopener">Krizhevsky, Sutskever &amp; Hinton <b>NeurIPS 2012</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="64" aria-labelledby="heading-17"><p class="page">Slide 17</p>
@@ -82,12 +82,12 @@
 ])
 </code></marp-pre>
 <ul>
-<li>Each epoch draws a fresh random version of every image, so the network never sees the same picture twice. <mark>Flips that would change the label stay out</mark>: a 6 is not a 9</li>
+<li>Each epoch draws a fresh random version of every image, so the network rarely sees the same picture twice. <mark>Flips that would change the label stay out</mark>: a 6 is not a 9</li>
 </ul>
 <div class="ref"><a href="https://pytorch.org/vision/stable/transforms.html" rel="noopener">torchvision.transforms <b>documentation</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-class="lead" data-marpit-pagination="18" data-marpit-pagination-total="64" aria-labelledby="heading-18"><p class="page">Slide 18</p>
 <h2 id="heading-18">From the multilayer perceptron to the convolutional network</h2>
-<h2 id="an-image-is-a-grid-of-numbers-a-dense-layer-on-it-is-wasteful-and-objects-move-the-same-detector-at-every-position">An image is a grid of numbers. A dense layer on it is wasteful, and objects move: the same detector, at every position</h2>
+<h2 id="a-dense-layer-on-an-image-needs-a-weight-for-every-pixel-and-an-object-can-appear-anywhere-a-small-filter-applied-at-every-position">A dense layer on an image needs a weight for every pixel, and an object can appear anywhere: a small filter, applied at every position</h2>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="64" aria-labelledby="heading-19"><p class="page">Slide 19</p>
 <h2 id="heading-19">Dense versus convolutional: where the weights go</h2>
 <div class="capfig">
@@ -127,7 +127,7 @@
 <p class="explorer-links"><a href="../demos/convolution.html">Convolution demo: the course tiger in grey levels with a 7 by 7 filter window; step or slide the window across the image and watch the feature map fill in with max(0, w·x) at each position; four filters to choose from: vertical, horizontal and diagonal stripes, and centre–surround — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-marpit-pagination="23" data-marpit-pagination-total="64" aria-labelledby="heading-23"><p class="page">Slide 23</p>
 <h2 id="heading-23">Convolution: one filter, slid over the image</h2>
 <ul>
-<li>A <strong>filter</strong> (or <strong>kernel</strong>), a small grid of weights like a <strong>simple cell</strong>'s receptive field, slid over the image; at each position the dot product, then ReLU: a <strong>feature map</strong>. <mark>Shift the image and the map shifts with it</mark></li>
+<li>A <strong>filter</strong> (or <strong>kernel</strong>), a small grid of weights, a template, slid over the image; at each position the dot product, then ReLU: a <strong>feature map</strong>. <mark>Shift the image and the map shifts with it</mark></li>
 </ul>
 <div></div>
 <div class="capfig">
@@ -162,7 +162,7 @@
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-class="lead" data-marpit-pagination="26" data-marpit-pagination-total="64" aria-labelledby="heading-26"><p class="page">Slide 26</p>
 <h2 id="heading-26">Which brain areas turn an image into an object?</h2>
-<h2 id="the-same-two-operations-were-in-cortex-all-along-what-was-known-by-2000-and-the-model-built-on-it">The same two operations were in cortex all along: what was known by 2000, and the model built on it</h2>
+<h2 id="simple-and-complex-cells-the-weighted-sum-and-the-pooling-of-the-last-slides-found-in-cortex-decades-earlier">Simple and complex cells: the weighted sum and the pooling of the last slides, found in cortex decades earlier</h2>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-marpit-pagination="27" data-marpit-pagination-total="64" aria-labelledby="heading-27"><p class="page">Slide 27</p>
 <h2 id="heading-27">Core object recognition: animal or not?</h2>
 <div>
@@ -175,14 +175,14 @@
 <video src="../images/L11/cauchoix2016_monkey_task.mp4" controls="" muted="" loop="" playsinline="" title="A macaque monkey doing the rapid animal / non-animal task: photographs flash on a screen and the monkey answers at a response box, 19 seconds"></video>
 </div>
 <ul>
-<li>Monkeys trained on the task answer as fast as people; a few electrodes over the middle and higher ventral areas: <mark>the category can be read from their activity</mark>, and the read-out tracks their answers</li>
+<li>Monkeys trained on the task answer as fast as people. From a few electrodes over V4 and posterior IT, <mark>a linear readout recovers the category</mark>, and it errs on the same images as the monkeys</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1016/j.neuroimage.2015.10.012" rel="noopener">Cauchoix, Crouzet, Fize &amp; Serre <b>NeuroImage 2016</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="64" aria-labelledby="heading-29"><p class="page">Slide 29</p>
 <h2 id="heading-29">The ventral stream: a hierarchy of areas</h2>
 <ul>
 <li>Tuning gets more complex (edges, parts, objects) and more tolerant of position and size</li>
-<li>In <strong>IT</strong>, a linear readout of ~100 neurons reports the category: untangling, measured</li>
+<li>In <strong>IT</strong>, a linear readout of ~100 neurons reports the category: a linear classifier separates the categories</li>
 </ul>
 <div></div>
 <div>
@@ -193,7 +193,7 @@
 <h2 id="heading-30">Retina and LGN: Kuffler's centre–surround cells</h2>
 <figure class="portraits"><figure><img src="../images/L11/portrait_kuffler.png" alt="Stephen Kuffler" aria-describedby="figure-30-1"><figcaption id="figure-30-1"><p>Stephen Kuffler</p><a href="../images/L11/portrait_kuffler.png">Open full-size figure</a></figcaption></figure><figcaption>Stephen Kuffler</figcaption></figure>
 <ul>
-<li>A ganglion cell of the retina, and an LGN cell after it: light on the <strong>+</strong> centre excites, on the <strong>−</strong> surround inhibits (left: <strong>on-centre</strong>, and its mirror image, <strong>off-centre</strong>); <mark>uniform light does nothing</mark>. Right, Kuffler's records: these cells report local contrast, not brightness</li>
+<li>A cell's <strong>receptive field</strong>: the patch of the visual field where light changes its firing. For a retinal ganglion or LGN cell, light on the <strong>+</strong> centre excites, on the <strong>−</strong> surround inhibits (left: <strong>on-centre</strong>, and its mirror image, <strong>off-centre</strong>); <mark>uniform light does nothing</mark>. Right, Kuffler's records: these cells report local contrast, not brightness</li>
 </ul>
 <div></div>
 <div>
@@ -249,7 +249,7 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="64" aria-labelledby="heading-35"><p class="page">Slide 35</p>
 <h2 id="heading-35">Up the hierarchy: larger fields, more complex selectivity</h2>
 <ul>
-<li>From V1 to IT each neuron's window grows, from a degree to most of the visual field, and <mark>what drives it changes from bars to objects</mark>: a gradual increase in field size and in the complexity of the preferred stimulus</li>
+<li>From V1 to IT, receptive fields grow from about a degree to most of the visual field, and <mark>the preferred stimulus changes from bars to objects</mark></li>
 </ul>
 <div></div>
 <div class="capfig">
@@ -275,7 +275,7 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-50" data-paginate="true" data-marpit-pagination="50" data-marpit-pagination-total="64" aria-labelledby="heading-50"><p class="page">Slide 50</p>
 <h2 id="heading-50">Mechanism: simple cells converge on a complex cell</h2>
 <ul>
-<li>Past the fields: <mark>five narrow bumps, one broad response</mark></li>
+<li>Past the fields: <mark>each simple cell covers a narrow range, the complex cell a broad one</mark></li>
 </ul>
 <div></div>
 <div class="capfig">
@@ -308,7 +308,7 @@
 <div class="ref"><a href="https://doi.org/10.1098/rspb.1977.0085" rel="noopener">Hubel &amp; Wiesel <b>Proc R Soc B 1977</b></a> · Kandel, Schwartz &amp; Jessell, <b>Principles of Neural Science</b></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-53" data-paginate="true" data-class="lead" data-marpit-pagination="53" data-marpit-pagination-total="64" aria-labelledby="heading-53"><p class="page">Slide 53</p>
 <h2 id="heading-53">Building vision from biology</h2>
-<h2 id="1980-to-2012-simple-and-complex-cells-repeated-into-a-hierarchy-the-neocognitron-hmax-then-the-networks-that-took-over">1980 to 2012: simple and complex cells repeated into a hierarchy, the Neocognitron, HMAX, then the networks that took over</h2>
+<h2 id="1980-to-2012-the-neocognitron-and-hmax-stack-simple-and-complex-cells-into-a-hierarchy">1980 to 2012: the Neocognitron and HMAX stack simple and complex cells into a hierarchy</h2>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-54" data-paginate="true" data-class="split" data-marpit-pagination="54" data-marpit-pagination-total="64" aria-labelledby="heading-54"><p class="page">Slide 54</p>
 <h2 id="heading-54">Fukushima's Neocognitron (1980)</h2>
 <div class="row">
