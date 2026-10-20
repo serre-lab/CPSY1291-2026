@@ -2,7 +2,8 @@
 <style>
 :root{--bg:#FAF9F5;--ink:#1E293B;--muted:#64748B;--mag:#B5396B;--gold:#F2C14E;--blue:#3E6D8E}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,system-ui,sans-serif}
-main{display:grid;grid-template-columns:470px 200px 470px;gap:30px;justify-content:center;align-items:start;padding:12px 16px}
+main{display:grid;grid-template-columns:440px 200px 440px;gap:30px;justify-content:center;align-items:start;padding:10px 16px}
+.controls{order:-1}
 .panel{display:flex;flex-direction:column;align-items:center;gap:8px}
 .panel h2{font-size:17px;font-weight:500;margin:0;color:var(--muted);height:22px}
 canvas{background:#fff;border:1px solid #d9d4cc}
@@ -13,10 +14,10 @@ button.primary{background:var(--gold);border-color:var(--gold)}
 </style>
 <script>if(new URLSearchParams(location.search).has('embed'))document.documentElement.dataset.embed='1';</script>
 <script src="template_matching_data.js"></script></head><body><main>
-<div class="panel"><h2>the image: a grid of numbers (click to cut a template)</h2><canvas id="img" width="470" height="470"></canvas></div>
+<div class="panel"><h2>the image: a grid of numbers (click to cut a template)</h2><canvas id="img" width="470" height="470" style="width:440px;height:440px"></canvas></div>
 <div class="panel"><h2>template w (5 × 5)</h2><canvas id="tpl" width="150" height="150"></canvas><div class="stat" style="min-width:0">match here<br><b id="dot">–</b></div></div>
-<div class="panel"><h2>match at every position: w · x (ReLU)</h2><canvas id="map" width="470" height="470"></canvas></div>
-<div class="controls"><button id="step" type="button">step</button><button id="run" class="primary" type="button">slide</button><button id="all" type="button">finish</button><button id="reset" type="button">reset</button><span class="stat">position <b id="pos">0, 0</b> of 20 × 20 · best so far <b id="best">–</b></span></div>
+<div class="panel"><h2>match at every position: w · x (ReLU)</h2><canvas id="map" width="470" height="470" style="width:440px;height:440px"></canvas></div>
+<div class="controls"><button id="step" type="button">step</button><button id="run" class="primary" type="button" style="font-size:18px;padding:8px 22px">▶ slide the template</button><button id="all" type="button">finish</button><button id="reset" type="button">reset</button><span class="stat">position <b id="pos">0, 0</b> of 20 × 20 · best so far <b id="best">–</b></span></div>
 </main><script>
 const $=id=>document.getElementById(id); const IMG=window.TM_IMAGE, N=IMG.length, K=5, M=N-K+1, CELL=470/N;
 let ti=9, tj=9, W=[], pos=0, out=new Float32Array(M*M), done=new Uint8Array(M*M), timer=null, MAXR=1;
