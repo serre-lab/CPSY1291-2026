@@ -127,7 +127,7 @@
 <p class="explorer-links"><a href="../demos/convolution.html">Convolution demo: the course tiger in grey levels with a 7 by 7 filter window; step or slide the window across the image and watch the feature map fill in with max(0, w·x) at each position; four filters to choose from: vertical, horizontal and diagonal stripes, and centre–surround — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-marpit-pagination="23" data-marpit-pagination-total="64" aria-labelledby="heading-23"><p class="page">Slide 23</p>
 <h2 id="heading-23">Convolution: one filter, slid over the image</h2>
 <ul>
-<li>A <strong>filter</strong> (or <strong>kernel</strong>): a small grid of weights, the template of the previous slide. At each position, multiply by the pixels under it and sum; a <strong>ReLU</strong> sets negatives to 0</li>
+<li>A <strong>filter</strong> (or <strong>kernel</strong>): a small grid of weights, a template, like a <strong>simple cell</strong>'s receptive field. At each position, multiply by the pixels under it and sum; a <strong>ReLU</strong> sets negatives to 0</li>
 <li>The result is a <strong>feature map</strong>: how well each part of the image matches the filter</li>
 <li>Same weights everywhere: shift the image, and the map shifts with it (<strong>equivariance</strong>)</li>
 </ul>
@@ -280,7 +280,7 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-51" data-paginate="true" data-marpit-pagination="51" data-marpit-pagination-total="64" aria-labelledby="heading-51"><p class="page">Slide 51</p>
 <h2 id="heading-51">V1 in one picture: ganglion → simple → complex</h2>
 <ul>
-<li>Left to right, ganglion or LGN cells, simple cells, complex cells: centre–surround → oriented at one position → oriented anywhere nearby: <mark>a weighted sum, then a pooling</mark>, the two operations every stage of today's models repeats</li>
+<li>Left to right, ganglion or LGN cells, <strong>simple cells</strong>, <strong>complex cells</strong>: centre–surround → oriented at one position → oriented anywhere nearby: <mark>a weighted sum, then a pooling</mark>, the two operations every stage of today's models repeats</li>
 </ul>
 <div></div>
 <div class="capfig">
@@ -350,7 +350,7 @@
 <figure><img src="../images/L11/pooling.svg" alt="A 4 by 4 feature map with values 0 to 6, shaded in four 2 by 2 windows. Upper arrow: max-pooling with 2 by 2 windows and stride 2 keeps the largest value in each window, giving the 2 by 2 map 5, 1, 1, 6. Lower arrow: global average pooling averages all 16 values into one number, 1.625" aria-describedby="figure-57-1"><figcaption id="figure-57-1"><p>A 4 by 4 feature map with values 0 to 6, shaded in four 2 by 2 windows. Upper arrow: max-pooling with 2 by 2 windows and stride 2 keeps the largest value in each window, giving the 2 by 2 map 5, 1, 1, 6. Lower arrow: global average pooling averages all 16 values into one number, 1.625</p><a href="../images/L11/pooling.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>A map says <em>where</em> a feature is, to the pixel; recognition needs <em>whether</em>, roughly where. <strong>Max-pooling</strong> keeps the largest value in each window: the same answer when the feature shifts a little, <mark>tolerance to position</mark>: the complex cell, and HMAX's C stages</li>
+<li>A map says <em>where</em> a feature is, to the pixel; recognition needs <em>whether</em>, roughly where. <strong>Max-pooling</strong> keeps the largest value in each window: the same answer when the feature shifts a little, <mark>tolerance to position</mark>: what a <strong>complex cell</strong> does, and HMAX's C stages</li>
 <li><strong>Global average pooling</strong> averages each map over all positions: one number per channel; together they form the image's <strong>feature vector</strong>, the readout's input</li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/1312.4400" rel="noopener">Lin, Chen &amp; Yan <b>ICLR 2014</b></a></div>
