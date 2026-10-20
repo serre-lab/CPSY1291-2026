@@ -126,15 +126,15 @@
 </ul>
 <p class="explorer-links"><a href="../demos/convolution.html">Convolution demo: the course tiger in grey levels with a 7 by 7 filter window; step or slide the window across the image and watch the feature map fill in with max(0, w·x) at each position; four filters to choose from: vertical, horizontal and diagonal stripes, and centre–surround — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-marpit-pagination="23" data-marpit-pagination-total="64" aria-labelledby="heading-23"><p class="page">Slide 23</p>
 <h2 id="heading-23">Convolution: one filter, slid over the image</h2>
-<div class="capfig">
-<figure><img src="../images/L11/conv_frame1.png" alt="The tiger photograph in grey levels, 224 by 224, an arrow to one 11 by 11 vertical Gabor filter, an arrow to the feature map, 224 by 224, bright where the image has vertical stripes" aria-describedby="figure-23-1"><figcaption id="figure-23-1"><p>The tiger photograph in grey levels, 224 by 224, an arrow to one 11 by 11 vertical Gabor filter, an arrow to the feature map, 224 by 224, bright where the image has vertical stripes</p><a href="../images/L11/conv_frame1.png">Open full-size figure</a></figcaption></figure>
-</div>
-<p class="provenance">Computed on the tiger photograph of the first lecture</p>
 <ul>
 <li>A <strong>filter</strong> (or <strong>kernel</strong>): a small grid of weights, the template of the previous slide. At each position, multiply by the pixels under it and sum; a <strong>ReLU</strong> sets negatives to 0</li>
 <li>The result is a <strong>feature map</strong>: how well each part of the image matches the filter</li>
 <li>Same weights everywhere: shift the image, and the map shifts with it (<strong>equivariance</strong>)</li>
 </ul>
+<div></div>
+<div class="capfig">
+<figure><img src="../images/L11/conv_frame1.png" alt="The tiger photograph in grey levels, 224 by 224, an arrow to one 11 by 11 vertical Gabor filter, an arrow to the feature map, 224 by 224, bright where the image has vertical stripes" aria-describedby="figure-23-1"><figcaption id="figure-23-1"><p>The tiger photograph in grey levels, 224 by 224, an arrow to one 11 by 11 vertical Gabor filter, an arrow to the feature map, 224 by 224, bright where the image has vertical stripes</p><a href="../images/L11/conv_frame1.png">Open full-size figure</a></figcaption></figure>
+</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="64" aria-labelledby="heading-24"><p class="page">Slide 24</p>
 <h2 id="heading-24">One filter gives one map; a layer gives a stack of maps</h2>
 <ul>
@@ -280,10 +280,9 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-51" data-paginate="true" data-marpit-pagination="51" data-marpit-pagination-total="64" aria-labelledby="heading-51"><p class="page">Slide 51</p>
 <h2 id="heading-51">V1 in one picture: ganglion → simple → complex</h2>
 <ul>
-<li>Centre–surround → oriented at one position → oriented anywhere nearby: <mark>a weighted sum, then a pooling</mark>, the two operations every stage of today's models repeats</li>
+<li>Left to right, ganglion or LGN cells, simple cells, complex cells: centre–surround → oriented at one position → oriented anywhere nearby: <mark>a weighted sum, then a pooling</mark>, the two operations every stage of today's models repeats</li>
 </ul>
 <div></div>
-<div><span>ganglion / LGN cells</span><span>simple cells</span><span>complex cells</span></div>
 <div class="capfig">
 <figure><img src="../images/L11/pub_hw_ganglion_simple_complex.png" alt="Three columns of icons: an on-centre and an off-centre circle; an oriented bar on a dark or light background at one position; an oriented bar with arrows showing it can move across the field" aria-describedby="figure-51-1"><figcaption id="figure-51-1"><p>Three columns of icons: an on-centre and an off-centre circle; an oriented bar on a dark or light background at one position; an oriented bar with arrows showing it can move across the field</p><a href="../images/L11/pub_hw_ganglion_simple_complex.png">Open full-size figure</a></figcaption></figure>
 </div>
@@ -363,20 +362,14 @@
 <ul>
 <li>Max-pooling 2 × 2 halves each map: 224 × 224 → 112 × 112, the four channels kept. <mark>Where each stripe is, roughly; that it is there, exactly</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-59" data-paginate="true" data-class="split" data-marpit-pagination="59" data-marpit-pagination-total="64" aria-labelledby="heading-59"><p class="page">Slide 59</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-59" data-paginate="true" data-marpit-pagination="59" data-marpit-pagination-total="64" aria-labelledby="heading-59"><p class="page">Slide 59</p>
 <h2 id="heading-59">HMAX worked: predictions from V1 to behaviour</h2>
-<div class="row">
-<div class="col fig">
+<div class="capfig">
 <figure><img src="../images/L11/pub_serre2010_acm_table.png" alt="Table from Serre and Poggio 2010: quantitative data compatible with the model, by area. Psychophysics: rapid animal categorization and the face inversion effect; LOC: face processing in fMRI; PFC: the differential role of IT and PFC in categorization; IT: tuning and invariance properties, read-out for object category, the average effect in IT; V4: the MAX operation, tuning for two-bar stimuli, two-spot interaction, tuning for boundary conformation, tuning for Cartesian and non-Cartesian gratings; V1: simple and complex cell tuning properties, the MAX operation in a subset of complex cells. Rows in blue are predictions the model made before the data, rows in red data consistent with the model, rows in black data used to set its parameters" aria-describedby="figure-59-1"><figcaption id="figure-59-1"><p>Table from Serre and Poggio 2010: quantitative data compatible with the model, by area. Psychophysics: rapid animal categorization and the face inversion effect; LOC: face processing in fMRI; PFC: the differential role of IT and PFC in categorization; IT: tuning and invariance properties, read-out for object category, the average effect in IT; V4: the MAX operation, tuning for two-bar stimuli, two-spot interaction, tuning for boundary conformation, tuning for Cartesian and non-Cartesian gratings; V1: simple and complex cell tuning properties, the MAX operation in a subset of complex cells. Rows in blue are predictions the model made before the data, rows in red data consistent with the model, rows in black data used to set its parameters</p><a href="../images/L11/pub_serre2010_acm_table.png">Open full-size figure</a></figcaption></figure>
 </div>
-<div class="col">
 <ul>
-<li>One model, one set of parameters, tested from V1 to behaviour</li>
-<li><strong>Black</strong>: data used to set the parameters. <strong>Red</strong>: data the model agrees with. <strong>Blue</strong>: <mark>predictions made before the data</mark>, such as the MAX in V4 and in some V1 complex cells</li>
-<li>V4 tuning for curved boundaries (Pasupathy &amp; Connor) and the IT read-out of category (Hung et al.) came out of the same units</li>
+<li>One model, one set of parameters, tested from V1 to behaviour. <strong>Black</strong>: data used to set the parameters; <strong>red</strong>: data it agrees with; <strong>blue</strong>: <mark>predictions made before the data</mark>, such as the MAX in V4 and in V1 complex cells</li>
 </ul>
-</div>
-</div>
 <div class="ref"><a href="https://doi.org/10.1145/1831407.1831425" rel="noopener">Serre &amp; Poggio <b>Commun ACM 2010</b></a> · <a href="https://doi.org/10.1152/jn.2001.86.5.2505" rel="noopener">Pasupathy &amp; Connor <b>J Neurophysiol 2001</b></a> · <a href="https://doi.org/10.1126/science.1117593" rel="noopener">Hung, Kreiman, Poggio &amp; DiCarlo <b>Science 2005</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-60" data-paginate="true" data-class="split" data-marpit-pagination="60" data-marpit-pagination-total="64" aria-labelledby="heading-60"><p class="page">Slide 60</p>
 <h2 id="heading-60">The test on behaviour: rapid animal categorization</h2>
