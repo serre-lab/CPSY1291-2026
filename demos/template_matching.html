@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Template matching: one template, every position</title>
+<style>
+:root{--bg:#FAF9F5;--ink:#1E293B;--muted:#64748B;--mag:#B5396B;--gold:#F2C14E;--blue:#3E6D8E}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,system-ui,sans-serif}
+main{display:grid;grid-template-columns:470px 200px 470px;gap:30px;justify-content:center;align-items:start;padding:12px 16px}
+.panel{display:flex;flex-direction:column;align-items:center;gap:8px}
+.panel h2{font-size:17px;font-weight:500;margin:0;color:var(--muted);height:22px}
+canvas{background:#fff;border:1px solid #d9d4cc}
+.controls{grid-column:1/-1;display:flex;gap:14px 22px;align-items:center;justify-content:center;font-size:16px;flex-wrap:wrap}
+button{font:inherit;padding:6px 14px;border:1px solid #c9c2b7;border-radius:8px;background:#fff;cursor:pointer}
+button.primary{background:var(--gold);border-color:var(--gold)}
+.stat{font-size:16px;color:var(--muted);min-width:300px;text-align:center}.stat b{color:var(--ink);font-variant-numeric:tabular-nums;display:inline-block;min-width:48px}
+</style>
+<script>if(new URLSearchParams(location.search).has('embed'))document.documentElement.dataset.embed='1';</script>
+<script src="template_matching_data.js"></script></head><body><main>
+<div class="panel"><h2>the image: a grid of numbers (click to cut a template)</h2><canvas id="img" width="470" height="470"></canvas></div>
+<div class="panel"><h2>template w (5 × 5)</h2><canvas id="tpl" width="150" height="150"></canvas><div class="stat" style="min-width:0">match here<br><b id="dot">–</b></div></div>
+<div class="panel"><h2>match at every position: w · x (ReLU)</h2><canvas id="map" width="470" height="470"></canvas></div>
+<div class="controls"><button id="step" type="button">step</button><button id="run" class="primary" type="button">slide</button><button id="all" type="button">finish</button><button id="reset" type="button">reset</button><span class="stat">position <b id="pos">0, 0</b> of 20 × 20 · best so far <b id="best">–</b></span></div>
+</main><script>
+const $=id=>document.getElementById(id); const IMG=window.TM_IMAGE, N=IMG.length, K=5, M=N-K+1, CELL=470/N;
+let ti=9, tj=9, W=[], pos=0, out=new Float32Array(M*M), done=new Uint8Array(M*M), timer=null, MAXR=1;
+function cut(){W=[];let s=0;for(let y=0;y<K;y++){const r=[];for(let x=0;x<K;x++){r.push(IMG[ti+y][tj+x]);s+=IMG[ti+y][tj+x];}W.push(r);}const m=s/(K*K);let n=0;for(const r of W)for(const v of r)n+=(v-m)*(v-m);n=Math.sqrt(n)||1;W=W.map(r=>r.map(v=>(v-m)/n));}
+function resp(i,j){let s=0,m=0;for(let y=0;y<K;y++)for(let x=0;x<K;x++)m+=IMG[i+y][j+x];m/=K*K;let n=0;for(let y=0;y<K;y++)for(let x=0;x<K;x++)n+=(IMG[i+y][j+x]-m)**2;n=Math.sqrt(n)||1;for(let y=0;y<K;y++)for(let x=0;x<K;x++)s+=W[y][x]*(IMG[i+y][j+x]-m)/n;return s;}
+function pre(){MAXR=1e-6;for(let i=0;i<M;i++)for(let j=0;j<M;j++)MAXR=Math.max(MAXR,resp(i,j));}
+function drawImg(){const g=$('img').getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,470,470);g.font='11px Poppins,sans-serif';g.textAlign='center';g.textBaseline='middle';for(let y=0;y<N;y++)for(let x=0;x<N;x++){const v=IMG[y][x];const c=Math.round(40+v*21);g.fillStyle=`rgb(${c},${c},${c})`;g.fillRect(x*CELL,y*CELL,CELL,CELL);g.fillStyle=v>4?'#111':'#eee';g.fillText(v,x*CELL+CELL/2,y*CELL+CELL/2);}
+ g.lineWidth=3;g.strokeStyle='#3E6D8E';g.strokeRect(tj*CELL+1.5,ti*CELL+1.5,K*CELL-3,K*CELL-3);const i=Math.floor(pos/M),j=pos%M;g.strokeStyle='#B5396B';g.strokeRect(j*CELL+1.5,i*CELL+1.5,K*CELL-3,K*CELL-3);}
+function drawTpl(){const g=$('tpl').getContext('2d');const c=150/K;let mx=0;for(const r of W)for(const v of r)mx=Math.max(mx,Math.abs(v));g.fillStyle='#fff';g.fillRect(0,0,150,150);for(let y=0;y<K;y++)for(let x=0;x<K;x++){const v=W[y][x]/(mx||1);g.fillStyle=v>=0?`rgba(181,57,107,${v})`:`rgba(62,109,142,${-v})`;g.fillRect(x*c,y*c,c,c);}}
+function drawMap(){const g=$('map').getContext('2d');g.fillStyle='#F0EEE9';g.fillRect(0,0,470,470);const c=470/M;let bi=-1,bv=-1;for(let k=0;k<M*M;k++){if(!done[k])continue;const v=Math.max(0,out[k])/MAXR;const s=Math.round(255*v);g.fillStyle=`rgb(${s},${s},${s})`;g.fillRect((k%M)*c,Math.floor(k/M)*c,c,c);if(out[k]>bv){bv=out[k];bi=k;}}if(bi>=0){g.lineWidth=3;g.strokeStyle='#F2C14E';g.strokeRect((bi%M)*c+1.5,Math.floor(bi/M)*c+1.5,c-3,c-3);$('best').textContent=bv.toFixed(2);}else $('best').textContent='–';}
+function show(){const i=Math.floor(pos/M),j=pos%M;$('pos').textContent=`${i}, ${j}`;$('dot').textContent=resp(i,j).toFixed(2);drawImg();drawMap();}
+function stepOnce(){if(pos>=M*M)return false;out[pos]=resp(Math.floor(pos/M),pos%M);done[pos]=1;pos++;return pos<M*M;}
+function stop(){if(timer){clearInterval(timer);timer=null;$('run').textContent='slide';}}
+$('step').onclick=()=>{stop();stepOnce();show();};
+$('run').onclick=()=>{if(timer){stop();return;}$('run').textContent='pause';timer=setInterval(()=>{for(let k=0;k<3;k++)if(!stepOnce()){stop();break;}show();},50);};
+$('all').onclick=()=>{stop();while(stepOnce());pos=M*M-1;show();};
+$('reset').onclick=()=>{stop();pos=0;out.fill(0);done.fill(0);show();};
+$('img').onclick=e=>{const r=$('img').getBoundingClientRect();const x=Math.floor((e.clientX-r.left)/r.width*N),y=Math.floor((e.clientY-r.top)/r.height*N);tj=Math.min(Math.max(x-2,0),N-K);ti=Math.min(Math.max(y-2,0),N-K);cut();pre();drawTpl();$('reset').onclick();};
+cut();pre();drawTpl();show();
+</script></body></html>
