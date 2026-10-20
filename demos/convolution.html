@@ -2,10 +2,10 @@
 <style>
 :root{--bg:#FAF9F5;--ink:#1E293B;--muted:#64748B;--mag:#B5396B;--green:#3F7A6B;--gold:#F2C14E;--blue:#3E6D8E}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,system-ui,sans-serif}
-main{display:grid;grid-template-columns:360px 300px 340px;gap:28px;align-items:start;justify-content:center;padding:10px 18px}
+main{display:grid;grid-template-columns:420px 240px 420px;gap:28px;align-items:start;justify-content:center;padding:10px 18px}
 .controls{order:-1}
 .panel{display:flex;flex-direction:column;align-items:center;gap:8px}
-.panel h2{font-size:18px;font-weight:500;margin:0;color:var(--muted)}
+.panel h2{font-size:18px;font-weight:500;margin:0;color:var(--muted);white-space:nowrap;height:24px}
 canvas{image-rendering:pixelated;background:#fff;border:1px solid #d9d4cc}
 .controls{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;justify-content:center;font-size:16px}
 .controls label{display:flex;gap:8px;align-items:center}
@@ -18,11 +18,11 @@ button.primary{background:var(--gold);border-color:var(--gold)}
 <script>if(new URLSearchParams(location.search).has('embed'))document.documentElement.dataset.embed='1';</script>
 <script src="convolution_data.js"></script>
 </head><body><main>
-<div class="panel"><h2>image (grey levels), the filter's window in magenta</h2><canvas id="img" width="96" height="96" style="width:360px;height:360px"></canvas></div>
+<div class="panel"><h2>image, filter window in magenta</h2><canvas id="img" width="96" height="96" style="width:420px;height:420px"></canvas></div>
 <div class="panel"><h2>filter w (7 × 7)</h2><canvas id="flt" width="7" height="7" style="width:168px;height:168px"></canvas>
 <div class="stat" style="min-height:48px;width:280px;text-align:center">at this position: <b id="dot" style="display:inline-block;min-width:56px;font-variant-numeric:tabular-nums">–</b><br><span id="relu" style="display:inline-block;min-height:22px"></span></div>
 <label style="font-size:16px">filter <select id="kind"><option value="v">oriented edge, vertical (Gabor)</option><option value="h">oriented edge, horizontal (Gabor)</option><option value="d">oriented edge, 45° (Gabor)</option><option value="c">centre–surround (difference of Gaussians)</option></select></label></div>
-<div class="panel"><h2>feature map: max(0, w·x) at every position</h2><canvas id="map" width="90" height="90" style="width:340px;height:340px"></canvas></div>
+<div class="panel"><h2>feature map: max(0, w·x)</h2><canvas id="map" width="90" height="90" style="width:420px;height:420px"></canvas></div>
 <div class="controls">
 <button id="step" type="button">step</button><button id="run" class="primary" type="button" style="font-size:18px;padding:8px 22px">▶ slide the filter</button><button id="all" type="button">finish</button><button id="reset" type="button">reset</button>
 <label>speed <input id="speed" type="range" min="1" max="60" value="12"></label>
