@@ -22,9 +22,9 @@ button.primary{background:var(--gold);border-color:var(--gold)}
 <div class="panel"><h2>filter w (7 × 7)</h2><canvas id="flt" width="7" height="7" style="width:168px;height:168px"></canvas>
 <div class="stat" style="height:52px;width:240px;text-align:center;white-space:nowrap;overflow:hidden">at this position: <b id="dot" style="display:inline-block;min-width:56px;font-variant-numeric:tabular-nums">–</b><br><span id="relu" style="display:inline-block;min-height:22px"></span></div>
 <label style="font-size:16px">filter <select id="kind"><option value="v">oriented edge, vertical (Gabor)</option><option value="h">oriented edge, horizontal (Gabor)</option><option value="d">oriented edge, 45° (Gabor)</option><option value="c">centre–surround (difference of Gaussians)</option></select></label></div>
-<div class="panel"><h2>feature map: max(0, w·x)</h2><canvas id="map" width="90" height="90" style="width:420px;height:420px"></canvas></div>
+<div class="panel"><h2 id="maptitle">feature map: max(0, w·x)</h2><canvas id="map" width="90" height="90" style="width:420px;height:420px"></canvas><canvas id="pool" width="45" height="45" style="width:420px;height:420px;display:none"></canvas></div>
 <div class="controls">
-<button id="step" type="button">step</button><button id="run" class="primary" type="button" style="font-size:18px;padding:8px 22px">▶ slide the filter</button><button id="all" type="button">finish</button><button id="reset" type="button">reset</button>
+<button id="step" type="button">step</button><button id="run" class="primary" type="button" style="font-size:18px;padding:8px 22px">▶ slide the filter</button><button id="all" type="button">finish</button><button id="reset" type="button">reset</button><button id="poolbtn" type="button" style="display:none">max-pool 2 × 2</button>
 <label>speed <input id="speed" type="range" min="1" max="60" value="12"></label>
 <span class="stat">position <b id="pos" style="display:inline-block;min-width:64px;font-variant-numeric:tabular-nums">0, 0</b> of 90 × 90</span>
 </div>
@@ -52,4 +52,17 @@ $('all').onclick=()=>{stop();while(stepOnce());pos=M*M-1;show();};
 $('reset').onclick=()=>{stop();pos=0;out.fill(0);done.fill(0);show();};
 $('kind').onchange=()=>{W=FILTERS[$('kind').value]();precompute();drawFilter();$('reset').onclick();};
 precompute();drawFilter();show();
+
+function cmap(v){const s=Math.round(255*Math.max(0,Math.min(1,v)));return [s,s,s];}
+// --- 2 x 2 max-pooling (shown when the page is opened with ?pool=1) ---
+const POOLMODE=new URLSearchParams(location.search).has('pool');
+const PM=Math.floor(M/2); let pooled=new Float32Array(PM*PM), ppos=0, ptimer=null;
+function drawPool(){const c=$('pool'),g=c.getContext('2d'),d=g.createImageData(PM,PM);for(let k=0;k<PM*PM;k++){const q=4*k;if(k>=ppos){d.data[q]=240;d.data[q+1]=238;d.data[q+2]=233;}else{const v=Math.max(0,pooled[k])/MAXR;const col=cmap(v);d.data[q]=col[0];d.data[q+1]=col[1];d.data[q+2]=col[2];}d.data[q+3]=255;}g.putImageData(d,0,0);
+ const m=$('map').getContext('2d'); drawMap(); if(ppos<PM*PM){const i=Math.floor(ppos/PM),j=ppos%PM; m.strokeStyle='#F2C14E'; m.lineWidth=1; m.strokeRect(2*j+0.5,2*i+0.5,1.5,1.5);} }
+function poolStep(n){for(let t=0;t<n&&ppos<PM*PM;t++){const i=Math.floor(ppos/PM),j=ppos%PM;let mx=-1e9;for(let a=0;a<2;a++)for(let b=0;b<2;b++)mx=Math.max(mx,out[(2*i+a)*M+(2*j+b)]);pooled[ppos]=mx;ppos++;}drawPool();}
+if(POOLMODE){$('poolbtn').style.display='';}
+$('poolbtn').onclick=()=>{ if(pos<M*M-1){while(stepOnce());pos=M*M-1;show();}
+  $('map').style.display='none'; $('pool').style.display=''; $('maptitle').textContent='after 2 × 2 max-pooling: 45 × 45';
+  ppos=0; pooled.fill(0); if(ptimer)clearInterval(ptimer); ptimer=setInterval(()=>{poolStep(12); if(ppos>=PM*PM){clearInterval(ptimer);ptimer=null;}},30); };
+const _reset=$('reset').onclick; $('reset').onclick=()=>{ if(ptimer){clearInterval(ptimer);ptimer=null;} $('pool').style.display='none'; $('map').style.display=''; $('maptitle').textContent='feature map: max(0, w·x)'; _reset(); };
 </script></body></html>
