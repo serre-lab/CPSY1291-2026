@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Try it: split-half reliability — CPSY 1291</title>
+<!--
+  split_half.html — L13: the split-half reliability of one recording site, and how it grows with
+  the number of presentations averaged. Majaj et al. (2015) IT and V4 sites, 3,200 images.
+
+  Left: the mean response to each image over half A against half B (n presentations each), r, and
+  the Spearman-Brown correction to the mean of all 2n. Middle: corrected reliability against the
+  number of presentations in the mean, the range of 20 random splits (grey), the splits drawn
+  here (dots), and the Spearman-Brown prophecy from n = 1 (dashed). Right: all sites of the
+  same area at the current n, this site in gold, and the noise ceiling sqrt(reliability).
+
+  Query parameters:
+    ?embed=1      hide h1 / lede / footer; fill viewport; no page scroll
+    ?static=1     controls inert (PDF still)
+    ?site=0..3  ?n=1..14  ?all=1   initial state
+
+  Keys: arrows (n), N new split, 1-4 site, A all presentations, Escape exits when embedded.
+  Data: split_half_data.js -> window.SplitHalfData (make_L13_splithalf_demo_data.py, seed 1291).
+  The page's random splits use the same generator as the script, so its first 20 splits are the
+  script's 20; everything is computed here from the stored presentations. No network requests.
+-->
+<style>
+:root{
+  --bg:#FAF9F5; --ink:#1E293B; --body:#334155; --muted:#64748B; --rule:#E7E3DA;
+  --blue:#3E6D8E; --mag:#B5396B; --green:#3F7A6B; --pop:#B23A2E; --gold:#F2C14E; --focus:#0969da;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--body);
+  font:18px/1.35 Poppins,system-ui,-apple-system,sans-serif}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1680px;margin:0 auto;padding:14px 16px 18px}
+h1{margin:0 0 4px;font-size:28px;line-height:1.2;color:var(--ink)}
+.lede{margin:0 0 10px;font-size:18px;color:var(--muted);max-width:90ch}
+.toolbar{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center;margin:0 0 6px}
+.toolbar .ctl{display:inline-flex;align-items:center;gap:8px}
+.toolbar label{font-size:18px;color:var(--ink);font-weight:600;white-space:nowrap}
+select,button{font:inherit;font-size:18px;color:var(--ink);background:var(--bg);
+  border:1px solid var(--muted);border-radius:4px;padding:4px 10px;min-height:36px}
+button{cursor:pointer}
+button.primary{background:var(--gold);border-color:#C99A1E;font-weight:600}
+input[type=range]{width:200px;accent-color:var(--mag)}
+input[type=range]:disabled{opacity:.45}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--mag)}
+.n-val{font-variant-numeric:tabular-nums;font-weight:400;color:var(--body);min-width:19ch;display:inline-block}
+.stage{display:flex;gap:12px;align-items:stretch;min-height:520px}
+.panel{min-width:0;min-height:0;display:flex;flex-direction:column;gap:3px}
+.panel.scatter{flex:0 0 auto;width:520px}
+.panel.mid,.panel.right{flex:1 1 0}
+.panel h2{margin:0;font-size:18px;color:var(--ink);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.frame{flex:1;min-height:0;position:relative;border:1px solid var(--rule);background:var(--bg)}
+.frame canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ceiling{margin:0;font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.3;min-height:1.3em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ceiling b{color:var(--green)}
+.status{margin:6px 0 0;font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.3;min-height:1.3em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.footer{margin-top:8px;font-size:14px;color:var(--muted)}
+html.embed,body.embed{overflow:hidden}
+body.embed .wrap{max-width:none;width:100%;height:100vh;padding:6px 10px 6px;display:flex;flex-direction:column}
+body.embed h1,body.embed .lede,body.embed .footer{display:none}
+body.embed .stage{flex:1;min-height:0}
+body.static .toolbar{pointer-events:none;opacity:.6}
+@media (max-width:1000px){
+  .stage{flex-direction:column;min-height:0}
+  .panel.scatter{width:auto!important}
+  .frame{min-height:360px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<script>
+(()=>{const q=new URLSearchParams(location.search);
+  if(q.has('embed')) document.documentElement.classList.add('embed');})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <h1>Try it: split-half reliability of one site</h1>
+  <p class="lede">One recording site, 3,200 images, 28 presentations each (Majaj et al. 2015). Split the
+    presentations into two halves of <i>n</i>, average each half per image, and correlate the two means over
+    the images. Move <i>n</i>, draw new splits, change site.</p>
+
+  <div class="toolbar" role="group" aria-label="Split-half reliability controls">
+    <span class="ctl"><label for="site">Site</label>
+      <select id="site" aria-describedby="status"></select></span>
+    <span class="ctl"><label for="n">Presentations per half</label>
+      <input id="n" type="range" min="1" max="14" step="1" value="7" aria-describedby="status">
+      <span class="n-val" id="n-val" aria-hidden="true"></span></span>
+    <button type="button" id="new-split" class="primary" aria-label="Draw a new random split of the presentations">New split</button>
+    <span class="ctl"><input type="checkbox" id="all"><label for="all">all presentations (odd vs even)</label></span>
+  </div>
+
+  <div class="stage" id="stage">
+    <section class="panel scatter" aria-labelledby="h-sc">
+      <h2 id="h-sc">One dot per image: half A against half B</h2>
+      <div class="frame"><canvas id="sc" role="img" aria-labelledby="h-sc" aria-describedby="status"></canvas></div>
+    </section>
+    <section class="panel mid" aria-labelledby="h-cv">
+      <h2 id="h-cv">Reliability against presentations averaged</h2>
+      <div class="frame"><canvas id="cv" role="img" aria-label="Spearman-Brown corrected split-half reliability against the number of presentations in the mean, 2 to 28: the range of 20 random splits as a grey band, the splits drawn so far as dots, the Spearman-Brown prediction from one presentation as a dashed line, and a gold cursor at the current value"></canvas></div>
+    </section>
+    <section class="panel right" aria-labelledby="h-hs">
+      <h2 id="h-hs">All sites of this area at this <i>n</i></h2>
+      <div class="frame"><canvas id="hs" role="img" aria-label="Histogram of the corrected split-half reliability of every site in the same area at the current number of presentations, with this site marked in gold and the median marked"></canvas></div>
+      <p class="ceiling" id="ceiling"></p>
+    </section>
+  </div>
+
+  <p class="status" id="status" role="status" aria-live="polite" aria-atomic="true"></p>
+
+  <p class="footer">Data: Majaj, Hong, Solomon &amp; DiCarlo (2015), public Brain-Score assembly, 70–170 ms window;
+    the first 28 presentations of each image in repetition order; the odd/even mode uses all presentations
+    (28 or 51). Everything is computed in the page from the stored responses — Escape exits when embedded.</p>
+</div>
+
+<script src="split_half_data.js"></script>
+<script>
+(function(){
+'use strict';
+const D=window.SplitHalfData;
+if(!D||!D.sites) throw new Error('split_half_data.js did not load');
+
+const q=new URLSearchParams(location.search);
+if(q.has('embed')) document.body.classList.add('embed');
+if(q.has('static')) document.body.classList.add('static');
+const isStatic=document.body.classList.contains('static');
+const $=id=>document.getElementById(id);
+const COL={bg:'#FAF9F5',ink:'#1E293B',body:'#334155',muted:'#64748B',rule:'#E7E3DA',
+  blue:'#3E6D8E',mag:'#B5396B',green:'#3F7A6B',pop:'#B23A2E',gold:'#F2C14E'};
+const FONT='Poppins,system-ui,sans-serif';
+const NI=D.n_images, NP=D.n_pres, NMAX=D.n_max;
+
+// ---- decode the stored responses ----
+function b64(s){const bin=atob(s);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u;}
+const RESP=b64(D.resp_b64);                                     // [site][image][rep] uint8
+const OE=new Uint16Array(b64(D.oddeven_b64).buffer);            // [site][image][odd,even] uint16 LE
+if(RESP.length!==D.sites.length*NI*NP) throw new Error('response block has the wrong size');
+
+// ---- the script's random number generator, bit for bit ----
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function makeSplit(k){
+  const rnd=mulberry32(D.seed+k), perm=new Uint8Array(NI*NP);
+  for(let i=0;i<NI;i++){
+    const o=i*NP; for(let t=0;t<NP;t++) perm[o+t]=t;
+    for(let j=NP-1;j>0;j--){const m=Math.floor(rnd()*(j+1));const tmp=perm[o+j];perm[o+j]=perm[o+m];perm[o+m]=tmp;}
+  }
+  return perm;
+}
+
+// ---- statistics ----
+function pearson(a,b){
+  const n=a.length; let ma=0,mb=0; for(let i=0;i<n;i++){ma+=a[i];mb+=b[i];} ma/=n; mb/=n;
+  let sab=0,saa=0,sbb=0; for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sab+=x*y;saa+=x*x;sbb+=y*y;}
+  return sab/Math.sqrt(saa*sbb);
+}
+const sb=r=>2*r/(1+r);
+/** Half means for site s under permutation perm at n per half (in the stored byte units). */
+function halves(s,perm,n){
+  const A=new Float64Array(NI), B=new Float64Array(NI), base=s*NI*NP;
+  for(let i=0;i<NI;i++){
+    const o=i*NP, r0=base+o; let sa=0,sb2=0;
+    for(let t=0;t<n;t++) sa+=RESP[r0+perm[o+t]];
+    for(let t=n;t<2*n;t++) sb2+=RESP[r0+perm[o+t]];
+    A[i]=sa/n; B[i]=sb2/n;
+  }
+  return {A,B};
+}
+/** r and corrected r at every n = 1..NMAX for site s under perm (nested halves). */
+function curve(s,perm){
+  const r=new Float64Array(NMAX), c=new Float64Array(NMAX), base=s*NI*NP;
+  const cs=new Float64Array(NI*NP);
+  for(let i=0;i<NI;i++){const o=i*NP, r0=base+o; let acc=0; for(let t=0;t<NP;t++){acc+=RESP[r0+perm[o+t]];cs[o+t]=acc;}}
+  const A=new Float64Array(NI), B=new Float64Array(NI);
+  for(let n=1;n<=NMAX;n++){
+    for(let i=0;i<NI;i++){const o=i*NP; const a=cs[o+n-1]; A[i]=a/n; B[i]=(cs[o+2*n-1]-a)/n;}
+    r[n-1]=pearson(A,B); c[n-1]=sb(r[n-1]);
+  }
+  return {r,c};
+}
+function oddEven(s){
+  const A=new Float64Array(NI), B=new Float64Array(NI), base=s*NI*2;
+  for(let i=0;i<NI;i++){A[i]=OE[base+2*i];B[i]=OE[base+2*i+1];}
+  return {A,B};
+}
+
+// ---- state ----
+const state={site:0,n:7,all:false,splits:[],curves:[],cur:0};
+function siteInfo(){return D.sites[state.site];}
+function areaIdx(area){const out=[];D.all.area.forEach((a,i)=>{if(a===area)out.push(i);});return out;}
+const AREA={IT:areaIdx('IT'),V4:areaIdx('V4')};
+function ensureCurves(){
+  const arr=state.curves[state.site]||(state.curves[state.site]=[]);
+  for(let k=arr.length;k<state.splits.length;k++) arr[k]=curve(state.site,state.splits[k]);
+  return arr;
+}
+function newSplit(){state.splits.push(makeSplit(state.splits.length));state.cur=state.splits.length-1;render();}
+
+/** Everything the readouts need for the current state. */
+function current(){
+  const s=siteInfo(), si=s.index, area=s.area, peers=AREA[area];
+  if(state.all){
+    const vals=peers.map(i=>D.all.oddeven_sb[i]);
+    const mine=D.all.oddeven_sb[si];
+    const pct=Math.round(100*vals.filter(v=>v<mine).length/vals.length);
+    const {A,B}=oddEven(state.site);
+    const r=pearson(A,B);
+    return {mode:'all',r,c:sb(r),mine,vals,pct,A,B,scaleA:s.oe_scale,offA:s.oe_offset,
+      label:'odd vs even presentations',meanOf:'all presentations'};
+  }
+  const n=state.n, cv=ensureCurves()[state.cur];
+  const vals=peers.map(i=>D.all.sb_mean[i][n-1]);
+  const mine=D.all.sb_mean[si][n-1];
+  const pct=Math.round(100*vals.filter(v=>v<mine).length/vals.length);
+  const {A,B}=halves(state.site,state.splits[state.cur],n);
+  return {mode:'split',r:cv.r[n-1],c:cv.c[n-1],mine,vals,pct,A,B,scaleA:s.scale,offA:s.offset,
+    label:`two halves of ${n}`,meanOf:`mean of ${2*n}`};
+}
+
+// ---- canvas helpers ----
+function setup(cv){
+  const dpr=window.devicePixelRatio||1, w=cv.clientWidth, h=cv.clientHeight;
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=COL.bg; ctx.fillRect(0,0,w,h); ctx.font=`18px ${FONT}`; ctx.textBaseline='middle';
+  return {ctx,w,h};
+}
+function fmt(x,d=2){return (Math.round(x*10**d)/10**d).toFixed(d);}
+function niceTicks(lo,hi,target){
+  const span=hi-lo, raw=span/target, p=10**Math.floor(Math.log10(raw)); let st=p;
+  for(const m of [1,2,2.5,5,10]){if(raw<=m*p){st=m*p;break;}}
+  const out=[]; for(let v=Math.ceil(lo/st)*st; v<=hi+1e-9; v+=st) out.push(+v.toFixed(6)); return out;
+}
+/** Rotated y-axis label in the gutter left of the tick numbers (gutter = mL − tick width). */
+function yLabel(ctx,text,x,yc){
+  ctx.save(); ctx.translate(x,yc); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillStyle=COL.body;
+  ctx.font=`18px ${FONT}`; ctx.fillText(text,0,0); ctx.restore();
+}
+
+// ---- left: scatter ----
+function drawScatter(c){
+  const cv=$('sc'), {ctx,w,h}=setup(cv);
+  const s=siteInfo();
+  const A=c.A, B=c.B, n=A.length;
+  const all=new Float64Array(2*n); all.set(A); all.set(B,n);
+  const sorted=Float64Array.from(all).sort();
+  const lo=sorted[Math.floor(0.002*(2*n-1))], hi=sorted[Math.floor(0.998*(2*n-1))];
+  const toV=v=>c.offA+c.scaleA*v;
+  const vlo=toV(lo), vhi=toV(hi);
+  const GUT=72, mT=14, mB=56, side=Math.min(w-GUT-14,h-mT-mB);
+  const mL=GUT+Math.floor((w-GUT-14-side)/2), pw=side, ph=side;
+  const X=v=>mL+(v-lo)/(hi-lo)*pw, Y=v=>mT+ph-(v-lo)/(hi-lo)*ph;
+  // grid + ticks (in response units)
+  ctx.strokeStyle=COL.rule; ctx.lineWidth=1; ctx.fillStyle=COL.body; ctx.font=`18px ${FONT}`;
+  const ticks=niceTicks(vlo,vhi,5);
+  ctx.textAlign='center';
+  for(const t of ticks){const v=(t-c.offA)/c.scaleA; if(v<lo||v>hi)continue; const x=X(v);
+    ctx.beginPath();ctx.moveTo(x,mT);ctx.lineTo(x,mT+ph);ctx.stroke(); ctx.fillText(String(t),x,mT+ph+14);}
+  ctx.textAlign='right';
+  for(const t of ticks){const v=(t-c.offA)/c.scaleA; if(v<lo||v>hi)continue; const y=Y(v);
+    ctx.beginPath();ctx.moveTo(mL,y);ctx.lineTo(mL+pw,y);ctx.stroke(); ctx.fillText(String(t),mL-8,y);}
+  ctx.strokeStyle=COL.muted; ctx.lineWidth=1.4; ctx.strokeRect(mL,mT,pw,ph);
+  // points
+  ctx.save(); ctx.beginPath(); ctx.rect(mL,mT,pw,ph); ctx.clip();
+  ctx.fillStyle='rgba(178,58,46,0.35)';
+  for(let i=0;i<n;i++){ctx.beginPath();ctx.arc(X(A[i]),Y(B[i]),2.4,0,6.2832);ctx.fill();}
+  ctx.setLineDash([8,6]); ctx.strokeStyle=COL.muted; ctx.lineWidth=1.8;
+  ctx.beginPath();ctx.moveTo(X(lo),Y(lo));ctx.lineTo(X(hi),Y(hi));ctx.stroke(); ctx.setLineDash([]);
+  ctx.restore();
+  // axis labels
+  ctx.fillStyle=COL.body; ctx.textAlign='center'; ctx.font=`18px ${FONT}`;
+  const pres=state.n===1?'1 presentation':`${state.n} presentations`;
+  const xl=c.mode==='all'?'mean of odd presentations':`mean of half A (${pres})`;
+  const yl=c.mode==='all'?'mean of even presentations':`mean of half B (${pres})`;
+  ctx.fillText(xl,mL+pw/2,h-18);
+  yLabel(ctx,yl,mL-GUT+14,mT+ph/2);
+  // readout box (opaque, over the upper-left points)
+  const l1=c.mode==='all'?`r = ${fmt(c.r)}, odd vs even presentations`:`r = ${fmt(c.r)} between ${c.label}`;
+  const l2=c.mode==='all'?`Spearman–Brown corrected: ${fmt(c.c)}`:`Spearman–Brown, ${c.meanOf}: ${fmt(c.c)}`;
+  ctx.font=`600 20px ${FONT}`; let bw=Math.max(ctx.measureText(l1).width,ctx.measureText(l2).width)+20;
+  if(bw>pw-16){ctx.font=`600 18px ${FONT}`; bw=Math.max(ctx.measureText(l1).width,ctx.measureText(l2).width)+20;}
+  const rf=ctx.font;
+  ctx.font=`18px ${FONT}`; const cap=`${s.area} site ${s.id}, 3,200 images`, cw=ctx.measureText(cap).width+20;
+  ctx.fillStyle='rgba(250,249,245,0.94)'; ctx.fillRect(mL+8,mT+8,Math.max(bw,cw),84);
+  ctx.font=rf; ctx.fillStyle=COL.ink; ctx.textAlign='left'; ctx.fillText(l1,mL+18,mT+24);
+  ctx.fillStyle=COL.green; ctx.fillText(l2,mL+18,mT+50);
+  ctx.font=`18px ${FONT}`; ctx.fillStyle=COL.muted; ctx.fillText(cap,mL+18,mT+78);
+}
+
+// ---- middle: reliability against presentations ----
+function drawCurve(c){
+  const cv=$('cv'), {ctx,w,h}=setup(cv);
+  const s=siteInfo(), si=s.index;
+  const mL=74,mR=18,mT=16,mB=56, pw=w-mL-mR, ph=h-mT-mB;
+  const ylo=-0.1, yhi=1;
+  const X=m=>mL+(m-2)/(28-2)*pw, Y=v=>mT+ph-(Math.max(ylo,Math.min(yhi,v))-ylo)/(yhi-ylo)*ph;
+  ctx.strokeStyle=COL.rule; ctx.lineWidth=1; ctx.fillStyle=COL.body; ctx.textAlign='right';
+  for(let v=0;v<=1.0001;v+=0.2){const y=Y(v);ctx.beginPath();ctx.moveTo(mL,y);ctx.lineTo(mL+pw,y);ctx.stroke();ctx.fillText(v.toFixed(1),mL-8,y);}
+  ctx.textAlign='center';
+  for(const m of [4,8,12,16,20,24,28]){ctx.fillText(String(m),X(m),mT+ph+14);}
+  ctx.strokeStyle=COL.muted; ctx.lineWidth=1.4; ctx.strokeRect(mL,mT,pw,ph);
+  ctx.save(); ctx.beginPath(); ctx.rect(mL,mT,pw,ph); ctx.clip();
+  // band: 20-split range
+  ctx.fillStyle='rgba(100,116,139,0.22)'; ctx.beginPath();
+  for(let n=1;n<=NMAX;n++){const x=X(2*n),y=Y(s.sb_max[n-1]); n===1?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+  for(let n=NMAX;n>=1;n--) ctx.lineTo(X(2*n),Y(s.sb_min[n-1]));
+  ctx.closePath(); ctx.fill();
+  // mean of 20 splits
+  ctx.strokeStyle=COL.muted; ctx.lineWidth=1.5; ctx.beginPath();
+  for(let n=1;n<=NMAX;n++){const x=X(2*n),y=Y(D.all.sb_mean[si][n-1]); n===1?ctx.moveTo(x,y):ctx.lineTo(x,y);} ctx.stroke();
+  // Spearman-Brown prophecy from n = 1
+  const r1=D.all.raw_mean[si][0];
+  ctx.setLineDash([9,6]); ctx.strokeStyle=COL.green; ctx.lineWidth=2.2; ctx.beginPath();
+  for(let m=2;m<=28;m++){const v=m*r1/(1+(m-1)*r1); m===2?ctx.moveTo(X(m),Y(v)):ctx.lineTo(X(m),Y(v));} ctx.stroke(); ctx.setLineDash([]);
+  // splits drawn here
+  const curves=ensureCurves();
+  ctx.fillStyle='rgba(181,57,107,0.45)';
+  curves.forEach((cu,k)=>{if(k===state.cur)return; for(let n=1;n<=NMAX;n++){ctx.beginPath();ctx.arc(X(2*n),Y(cu.c[n-1]),3,0,6.2832);ctx.fill();}});
+  const cu=curves[state.cur];
+  ctx.strokeStyle=COL.mag; ctx.lineWidth=2; ctx.beginPath();
+  for(let n=1;n<=NMAX;n++){const x=X(2*n),y=Y(cu.c[n-1]); n===1?ctx.moveTo(x,y):ctx.lineTo(x,y);} ctx.stroke();
+  ctx.fillStyle=COL.mag; for(let n=1;n<=NMAX;n++){ctx.beginPath();ctx.arc(X(2*n),Y(cu.c[n-1]),4.5,0,6.2832);ctx.fill();}
+  if(c.mode==='split'){
+    const x=X(2*state.n); ctx.strokeStyle=COL.gold; ctx.lineWidth=4; ctx.beginPath();ctx.moveTo(x,mT);ctx.lineTo(x,mT+ph);ctx.stroke();
+    ctx.fillStyle=COL.ink; ctx.beginPath();ctx.arc(x,Y(c.c),7,0,6.2832);ctx.fill();
+  }else{
+    const y=Y(s.oddeven_sb); ctx.setLineDash([4,5]); ctx.strokeStyle=COL.gold; ctx.lineWidth=4;
+    ctx.beginPath();ctx.moveTo(mL,y);ctx.lineTo(mL+pw,y);ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=COL.ink; ctx.textAlign='right'; ctx.font=`600 18px ${FONT}`;
+    ctx.fillText(`odd vs even, all presentations: ${fmt(s.oddeven_sb)}`,mL+pw-8,y-14);
+  }
+  ctx.restore();
+  // legend, bottom right on an opaque box (the curves rise, so that corner stays free)
+  ctx.font=`18px ${FONT}`; ctx.textAlign='left';
+  const lw=Math.max(ctx.measureText('range of 20 random splits').width,ctx.measureText(`splits drawn here (${curves.length})`).width,
+    ctx.measureText(`Spearman–Brown from n = 1 (r = ${fmt(r1)})`).width)+44;
+  let lx=mL+pw-lw-6, ly=mT+ph-66;
+  ctx.fillStyle='rgba(250,249,245,0.94)'; ctx.fillRect(lx-8,ly-18,lw+8,78);
+  ctx.fillStyle='rgba(100,116,139,0.22)'; ctx.fillRect(lx,ly-7,22,14); ctx.fillStyle=COL.body; ctx.fillText('range of 20 random splits',lx+30,ly);
+  ly+=24; ctx.fillStyle=COL.mag; ctx.beginPath();ctx.arc(lx+11,ly,4.5,0,6.2832);ctx.fill(); ctx.fillStyle=COL.body; ctx.fillText(`splits drawn here (${curves.length})`,lx+30,ly);
+  ly+=24; ctx.setLineDash([9,6]); ctx.strokeStyle=COL.green; ctx.lineWidth=2.2; ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(lx+22,ly);ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=COL.body; ctx.fillText(`Spearman–Brown from n = 1 (r = ${fmt(r1)})`,lx+30,ly);
+  // axis labels
+  ctx.fillStyle=COL.body; ctx.textAlign='center';
+  ctx.fillText('presentations in each mean (2n)',mL+pw/2,h-18);
+  yLabel(ctx,'split-half reliability, corrected',14,mT+ph/2);
+}
+
+// ---- right: histogram ----
+function drawHist(c){
+  const cv=$('hs'), {ctx,w,h}=setup(cv);
+  const s=siteInfo(), vals=c.vals;
+  const lo=-0.2, hi=1, bw=0.05, nb=Math.round((hi-lo)/bw);
+  const counts=new Array(nb).fill(0);
+  for(const v of vals){let b=Math.floor((Math.max(lo,Math.min(hi-1e-9,v))-lo)/bw); counts[b]++;}
+  const cmax=Math.max(...counts);
+  const mL=62,mR=14,mT=34,mB=80, pw=w-mL-mR, ph=h-mT-mB;
+  const X=v=>mL+(v-lo)/(hi-lo)*pw, Y=k=>mT+ph-k/cmax*ph*0.92;
+  ctx.fillStyle=COL.body; ctx.textAlign='center';
+  for(let v=-0.2;v<=1.0001;v+=0.2){ctx.fillText(v.toFixed(1),X(v),mT+ph+14);}
+  ctx.textAlign='right'; const yt=niceTicks(0,cmax,4);
+  ctx.strokeStyle=COL.rule; ctx.lineWidth=1;
+  for(const t of yt){const y=Y(t);ctx.beginPath();ctx.moveTo(mL,y);ctx.lineTo(mL+pw,y);ctx.stroke();ctx.fillText(String(t),mL-8,y);}
+  ctx.fillStyle=COL.muted;
+  for(let b=0;b<nb;b++){if(!counts[b])continue; const x0=X(lo+b*bw), x1=X(lo+(b+1)*bw); ctx.fillRect(x0+1,Y(counts[b]),x1-x0-2,mT+ph-Y(counts[b]));}
+  ctx.strokeStyle=COL.muted; ctx.lineWidth=1.4; ctx.strokeRect(mL,mT,pw,ph);
+  // median
+  const sorted=vals.slice().sort((a,b)=>a-b), med=sorted.length%2?sorted[(sorted.length-1)/2]:(sorted[sorted.length/2-1]+sorted[sorted.length/2])/2;
+  ctx.setLineDash([6,5]); ctx.strokeStyle=COL.ink; ctx.lineWidth=2; ctx.beginPath();ctx.moveTo(X(med),mT);ctx.lineTo(X(med),mT+ph);ctx.stroke(); ctx.setLineDash([]);
+  // this site
+  const xm=X(Math.max(lo,Math.min(hi,c.mine)));
+  ctx.strokeStyle=COL.gold; ctx.lineWidth=5; ctx.beginPath();ctx.moveTo(xm,mT);ctx.lineTo(xm,mT+ph);ctx.stroke();
+  // labels above the plot; side by side when they would collide, kept inside the plot width
+  ctx.font=`600 18px ${FONT}`;
+  const tMine=`this site ${fmt(c.mine)}`, tMed=`median ${fmt(med)}`;
+  const wMine=ctx.measureText(tMine).width, wMed=ctx.measureText(tMed).width;
+  let xl1=Math.min(Math.max(xm,mL+wMine/2),mL+pw-wMine/2), xl2=Math.min(Math.max(X(med),mL+wMed/2),mL+pw-wMed/2);
+  const y1=mT-14, y2=mT-14;
+  if(Math.abs(xl1-xl2)<(wMine+wMed)/2+16){
+    const mid=(xl1+xl2)/2, left=xl1<=xl2, span=wMine+wMed+16;
+    let start=Math.max(mL,Math.min(mid-span/2,mL+pw-span));
+    if(left){xl1=start+wMine/2; xl2=start+wMine+16+wMed/2;} else {xl2=start+wMed/2; xl1=start+wMed+16+wMine/2;}
+  }
+  ctx.textAlign='center'; ctx.fillStyle='#8A6A10'; ctx.fillText(tMine,xl1,y1);
+  ctx.fillStyle=COL.ink; ctx.fillText(tMed,xl2,y2);
+  // captions under the axis: short enough for the panel at every n
+  ctx.font=`18px ${FONT}`; ctx.fillStyle=COL.body; ctx.textAlign='center';
+  ctx.fillText('corrected reliability',mL+pw/2,mT+ph+40);
+  const sub=c.mode==='all'?`${vals.length} ${s.area} sites, odd vs even`:`${vals.length} ${s.area} sites, mean of 20 splits`;
+  ctx.fillStyle=COL.muted; ctx.fillText(sub,mL+pw/2,h-16);
+  yLabel(ctx,'sites',14,mT+ph/2);
+}
+
+// ---- text readouts ----
+function writeText(c){
+  const s=siteInfo();
+  const ceil=$('ceiling');
+  if(c.mine>0) ceil.innerHTML=`noise ceiling: a model of this site can reach at most r = √${fmt(c.mine)} = <b>${fmt(Math.sqrt(c.mine))}</b>`;
+  else ceil.textContent='noise ceiling: reliability at or below 0, nothing repeatable to predict';
+  // if the line does not fit the panel, use the short form
+  if(ceil.scrollWidth>ceil.clientWidth+1){
+    ceil.innerHTML=c.mine>0?`noise ceiling: r ≤ √${fmt(c.mine)} = <b>${fmt(Math.sqrt(c.mine))}</b>`:'noise ceiling: reliability ≤ 0';
+  }
+  const ord=p=>p+(p%100>=11&&p%100<=13?'th':['th','st','nd','rd'][Math.min(p%10,4)]||'th');
+  const head=c.mode==='all'?`All presentations, odd vs even:`:`n = ${state.n} per half (${2*state.n} presentations):`;
+  $('status').textContent=`${head} r = ${fmt(c.r)} between the halves; Spearman–Brown, ${c.meanOf}: ${fmt(c.c)}. `+
+    `This site is at the ${ord(c.pct)} percentile of the ${c.vals.length} ${s.area} sites.`;
+  $('n-val').textContent=`${state.n} per half, ${2*state.n} in all`;
+}
+
+function render(){
+  const c=current();
+  drawScatter(c); drawCurve(c); drawHist(c); writeText(c);
+}
+
+// ---- layout: the scatter stays square ----
+function layout(){
+  const stage=$('stage'), sc=document.querySelector('.panel.scatter');
+  if(window.innerWidth<=1000) return;
+  const hh=sc.querySelector('h2').offsetHeight+3;
+  const side=Math.max(240,Math.min(stage.clientHeight-hh, stage.clientWidth*0.4));
+  sc.style.width=side+'px';
+}
+const ro=new ResizeObserver(()=>{layout();requestAnimationFrame(render);});
+ro.observe($('stage'));
+
+// ---- controls ----
+const sel=$('site');
+D.sites.forEach((s,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=`${i+1}. ${s.label}`;sel.appendChild(o);});
+function setSite(i){i=Math.max(0,Math.min(D.sites.length-1,i|0));state.site=i;sel.value=String(i);render();}
+function setN(n){n=Math.max(1,Math.min(NMAX,n|0));state.n=n;$('n').value=String(n);render();}
+function setAll(v){state.all=!!v;$('all').checked=state.all;$('n').disabled=state.all;render();}
+sel.addEventListener('change',()=>setSite(+sel.value));
+$('n').addEventListener('input',()=>setN(+$('n').value));
+$('new-split').addEventListener('click',newSplit);
+$('all').addEventListener('change',()=>setAll($('all').checked));
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&window.parent!==window){window.parent.postMessage({type:'cpsy-exit-interactive'},'*');return;}
+  if(isStatic) return;
+  const tag=e.target&&e.target.tagName;
+  if(tag==='INPUT'||tag==='SELECT'||tag==='BUTTON'){
+    if(e.target.id==='n'||e.key.length!==1) return;      // the slider keeps its own arrows
+  }
+  if(e.key==='n'||e.key==='N'){e.preventDefault();newSplit();}
+  else if(e.key==='a'||e.key==='A'){e.preventDefault();setAll(!state.all);}
+  else if(/^[1-4]$/.test(e.key)){e.preventDefault();setSite(+e.key-1);}
+  else if(!state.all&&(e.key==='ArrowLeft'||e.key==='ArrowDown')){e.preventDefault();setN(state.n-1);}
+  else if(!state.all&&(e.key==='ArrowRight'||e.key==='ArrowUp')){e.preventDefault();setN(state.n+1);}
+});
+
+// ---- boot ----
+state.splits.push(makeSplit(0)); state.cur=0;
+layout();
+setSite(q.has('site')?+q.get('site'):0);
+setN(q.has('n')?+q.get('n'):7);
+setAll(q.get('all')==='1');
+
+window.SplitHalf={
+  state(){
+    const s=siteInfo(), c=current(), cu0=curve(state.site,state.splits[0]);
+    const oe=oddEven(state.site), r=pearson(oe.A,oe.B);
+    return {site:s.id,n:state.n,all:state.all,r:c.r,sb:c.c,pct:c.pct,splits:state.splits.length,
+      split0:{1:cu0.r[0],7:cu0.r[6],14:cu0.r[13]},oddeven:{r,sb:sb(r)}};
+  },
+  setSite,setN,setAll,newSplit,render
+};
+})();
+</script>
+</body>
+</html>

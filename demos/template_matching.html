@@ -37,4 +37,6 @@ $('all').onclick=()=>{stop();while(stepOnce());pos=M*M-1;show();};
 $('reset').onclick=()=>{stop();pos=0;out.fill(0);done.fill(0);show();};
 $('img').onclick=e=>{const r=$('img').getBoundingClientRect();const x=Math.floor((e.clientX-r.left)/r.width*N),y=Math.floor((e.clientY-r.top)/r.height*N);tj=Math.min(Math.max(x-2,0),N-K);ti=Math.min(Math.max(y-2,0),N-K);cut();pre();drawTpl();$('reset').onclick();};
 cut();pre();drawTpl();show();
+/* Escape hands keyboard focus back to the deck so PageDown/arrows move slides again. */
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&window.parent!==window){window.parent.postMessage({type:'cpsy-exit-interactive'},'*');try{window.parent.focus();}catch(_){}}});
 </script></body></html>

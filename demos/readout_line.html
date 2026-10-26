@@ -174,6 +174,8 @@ document.getElementById('bReset').onclick=()=>{h=init();showTest=false;bShow.set
 if(STATIC){h=fitLine();showTest=true;bShow.setAttribute('aria-pressed','true');}
 new ResizeObserver(resize).observe(cv.parentElement);
 })();
+/* Escape hands keyboard focus back to the deck so PageDown/arrows move slides again. */
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&window.parent!==window){window.parent.postMessage({type:'cpsy-exit-interactive'},'*');try{window.parent.focus();}catch(_){}}});
 </script>
 </body>
 </html>

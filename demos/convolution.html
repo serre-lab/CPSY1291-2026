@@ -11,6 +11,7 @@ canvas{image-rendering:pixelated;background:#fff;border:1px solid #d9d4cc}
 .controls label{display:flex;gap:8px;align-items:center}
 button{font:inherit;padding:6px 14px;border:1px solid #c9c2b7;border-radius:8px;background:#fff;cursor:pointer}
 button.primary{background:var(--gold);border-color:var(--gold)}
+select{font-family:Poppins,system-ui,sans-serif;font-size:20px;padding:4px 8px;border:1px solid #c9c2b7;border-radius:8px;background:#fff;color:var(--ink)}
 .stat{font-size:16px;color:var(--muted)}
 .stat b{color:var(--ink);font-weight:600}
 [data-embed] body{padding:0}
@@ -22,7 +23,7 @@ button.primary{background:var(--gold);border-color:var(--gold)}
 <div class="panel"><h2>filter w (7 × 7)</h2><canvas id="flt" width="7" height="7" style="width:168px;height:168px"></canvas>
 <div class="stat" style="height:52px;width:240px;text-align:center;white-space:nowrap;overflow:hidden">at this position: <b id="dot" style="display:inline-block;min-width:56px;font-variant-numeric:tabular-nums">–</b><br><span id="relu" style="display:inline-block;min-height:22px"></span></div>
 <label style="font-size:16px">filter <select id="kind"><option value="v">oriented edge, vertical (Gabor)</option><option value="h">oriented edge, horizontal (Gabor)</option><option value="d">oriented edge, 45° (Gabor)</option><option value="c">centre–surround (difference of Gaussians)</option></select></label></div>
-<div class="panel"><h2 id="maptitle">feature map: max(0, w·x)</h2><canvas id="map" width="90" height="90" style="width:420px;height:420px"></canvas><canvas id="pool" width="45" height="45" style="width:420px;height:420px;display:none"></canvas></div>
+<div class="panel"><h2 id="maptitle">feature map: max(0, <b>w</b>·<b>x</b>)</h2><canvas id="map" width="90" height="90" style="width:420px;height:420px"></canvas><canvas id="pool" width="45" height="45" style="width:420px;height:420px;display:none"></canvas></div>
 <div class="controls">
 <button id="step" type="button">step</button><button id="run" class="primary" type="button" style="font-size:18px;padding:8px 22px">▶ slide the filter</button><button id="all" type="button">finish</button><button id="reset" type="button">reset</button><button id="poolbtn" type="button" style="display:none">max-pool 2 × 2</button>
 <label>speed <input id="speed" type="range" min="1" max="60" value="12"></label>
@@ -64,5 +65,7 @@ if(POOLMODE){$('poolbtn').style.display='';}
 $('poolbtn').onclick=()=>{ if(pos<M*M-1){while(stepOnce());pos=M*M-1;show();}
   $('map').style.display='none'; $('pool').style.display=''; $('maptitle').textContent='after 2 × 2 max-pooling: 45 × 45';
   ppos=0; pooled.fill(0); if(ptimer)clearInterval(ptimer); ptimer=setInterval(()=>{poolStep(12); if(ppos>=PM*PM){clearInterval(ptimer);ptimer=null;}},30); };
-const _reset=$('reset').onclick; $('reset').onclick=()=>{ if(ptimer){clearInterval(ptimer);ptimer=null;} $('pool').style.display='none'; $('map').style.display=''; $('maptitle').textContent='feature map: max(0, w·x)'; _reset(); };
+/* Escape hands keyboard focus back to the deck so PageDown/arrows move slides again. */
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&window.parent!==window){window.parent.postMessage({type:'cpsy-exit-interactive'},'*');try{window.parent.focus();}catch(_){}}});
+const _reset=$('reset').onclick; $('reset').onclick=()=>{ if(ptimer){clearInterval(ptimer);ptimer=null;} $('pool').style.display='none'; $('map').style.display=''; $('maptitle').innerHTML='feature map: max(0, <b>w</b>·<b>x</b>)'; _reset(); };
 </script></body></html>

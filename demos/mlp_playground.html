@@ -664,6 +664,8 @@ window.__demo={
   train(n){for(let i=0;i<n;i++) runEpoch(); draw(); return metrics.acc},
   get metrics(){return {epoch, acc:metrics.acc, loss:metrics.loss, n:X.length}}
 };
+/* Escape hands keyboard focus back to the deck so PageDown/arrows move slides again. */
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&window.parent!==window){window.parent.postMessage({type:'cpsy-exit-interactive'},'*');try{window.parent.focus();}catch(_){}}});
 </script>
 </body>
 </html>

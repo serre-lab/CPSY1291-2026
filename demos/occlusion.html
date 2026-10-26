@@ -1,0 +1,147 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Occlusion explorer: cover a region and watch five class probabilities</title>
+<style>
+:root{--bg:#FAF9F5;--ink:#1E293B;--muted:#64748B;--mag:#B5396B;--green:#3F7A6B;--gold:#F2C14E;--blue:#3E6D8E;--track:#E7E3DA}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,system-ui,sans-serif;font-size:18px}
+main{display:grid;grid-template-columns:448px minmax(360px,520px) 448px;gap:8px 32px;align-items:start;justify-content:center;padding:6px 18px;max-width:1680px;margin:0 auto}
+.controls{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:center;font-size:18px;min-height:40px}
+.controls label{display:flex;gap:8px;align-items:center;white-space:nowrap}
+button,select{font:inherit;font-size:18px;padding:5px 12px;border:1px solid #c9c2b7;border-radius:8px;background:#fff;color:var(--ink);cursor:pointer}
+button.primary{background:var(--gold);border-color:var(--gold);font-weight:500}
+button[aria-pressed=true]{background:var(--track)}
+.panel{display:flex;flex-direction:column;gap:6px;min-width:0}
+.panel h2{font-size:18px;font-weight:500;margin:0;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:24px}
+canvas{display:block;width:448px;height:448px;border:1px solid #d9d4cc;background:#fff;touch-action:none}
+#photo{cursor:grab}#photo:active{cursor:grabbing}
+#photo:focus-visible,#map:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.bars{display:flex;flex-direction:column;gap:14px;padding-top:2px}
+.bar{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center}
+.bar label{display:flex;gap:10px;align-items:center;font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.bar input{width:20px;height:20px;margin:0;accent-color:var(--mag)}
+.bar.sel label{font-weight:600}
+.bar .val{font-size:20px;font-variant-numeric:tabular-nums;min-width:68px;text-align:right}
+.bar .track{grid-column:1/-1;position:relative;height:24px;background:var(--track);border-radius:4px;overflow:hidden}
+.bar .fill{position:absolute;left:0;top:0;bottom:0;background:var(--blue);width:0;transition:width .08s linear}
+.bar.sel .fill{background:var(--mag)}
+.bar .tick{position:absolute;top:-2px;bottom:-2px;width:3px;margin-left:-1px;background:var(--ink)}
+.pos{font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}.pos b{color:var(--ink);font-weight:600;display:inline-block;min-width:150px}
+.foot{grid-column:1/-1;display:flex;justify-content:space-between;gap:24px;align-items:baseline;font-size:18px;color:var(--muted);margin:0}
+.foot p{margin:0}
+#status{color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.credit{white-space:nowrap}
+</style>
+<script>if(new URLSearchParams(location.search).has('embed'))document.documentElement.dataset.embed='1';</script>
+<script src="occlusion_data.js"></script>
+</head><body><main>
+<div class="controls">
+<label>square <select id="size" aria-label="square size in pixels"><option value="16">16 px</option><option value="32" selected>32 px</option><option value="64">64 px</option></select></label>
+<button id="sweep" class="primary" type="button">▶ sweep every position</button>
+<button id="reset" type="button">reset</button>
+<label>map scale <select id="scale" aria-label="colour scale of the occlusion map"><option value="fixed">fixed, 0 to clean p of springer</option><option value="own">each class's own peak</option></select></label>
+<span class="pos">square top-left <b id="pos">row 0, col 0</b></span>
+</div>
+<div class="panel"><h2>photograph with the grey square (drag it, or use the arrow keys)</h2><canvas id="photo" width="448" height="448" tabindex="0" role="img" aria-label="photograph"></canvas></div>
+<div class="panel"><h2>probability of five classes (black tick = clean image)</h2><div class="bars" id="bars" role="radiogroup" aria-label="class shown in the occlusion map"></div></div>
+<div class="panel"><h2 id="maptitle">occlusion map</h2><canvas id="map" width="448" height="448" tabindex="0" role="img" aria-label="occlusion map, nothing visited yet"></canvas></div>
+<div class="foot"><p id="status" role="status" aria-live="polite"></p><p class="credit">Precomputed: ResNet-50 at every 8-pixel position; the square snaps to them.</p></div>
+</main>
+<script>
+(function(){
+const $=id=>document.getElementById(id), D=window.OCCL, q=new URLSearchParams(location.search);
+const STATIC=q.has('static'), REDUCED=STATIC||matchMedia('(prefers-reduced-motion: reduce)').matches;
+const N=224, STRIDE=D.stride, SC=D.scale, NC=D.classes.length, DPR=Math.min(2,devicePixelRatio||1);
+const clean=D.clean.map(v=>v/SC);
+const npos=s=>(N-s)/STRIDE+1, idx=(t,l,s)=>(t/STRIDE)*npos(s)+l/STRIDE;
+const prob=(c,t,l,s)=>D.p[String(s)][c][idx(t,l,s)]/SC;
+const visited={}; D.sizes.forEach(s=>visited[s]=new Uint8Array(npos(s)*npos(s)));
+const acc=new Float32Array(N*N), cnt=new Uint16Array(N*N), grey=new Float32Array(N*N);
+let cls=0, size=32, row=0, col=0, scale='fixed', sweeping=null;
+
+// ---- photograph ----
+const photoCv=$('photo'), mapCv=$('map');
+for(const cv of [photoCv,mapCv]){cv.width=448*DPR;cv.height=448*DPR;}
+const img=new Image(); const off=document.createElement('canvas'); off.width=off.height=N; const og=off.getContext('2d',{willReadFrequently:true});
+const mapOff=document.createElement('canvas'); mapOff.width=mapOff.height=N; const mg=mapOff.getContext('2d');
+const mapData=mg.createImageData(N,N);
+img.onload=()=>{og.drawImage(img,0,0);const d=og.getImageData(0,0,N,N).data;for(let k=0;k<N*N;k++)grey[k]=0.299*d[4*k]+0.587*d[4*k+1]+0.114*d[4*k+2];boot();};
+img.src='data:image/jpeg;base64,'+D.jpeg;
+
+function drawPhoto(){const g=photoCv.getContext('2d');g.setTransform(DPR,0,0,DPR,0,0);g.imageSmoothingEnabled=true;g.clearRect(0,0,448,448);g.drawImage(img,0,0,448,448);
+ const k=448/N;g.fillStyle=`rgb(${D.grey.join(',')})`;g.fillRect(col*k,row*k,size*k,size*k);g.lineWidth=3;g.strokeStyle='#B5396B';g.strokeRect(col*k+1.5,row*k+1.5,size*k-3,size*k-3);
+ photoCv.setAttribute('aria-label',`photograph of an English springer and a hen with a ${size}-pixel grey square, top-left at row ${row}, column ${col}`);}
+
+// ---- bars ----
+const rows=[];
+D.classes.forEach((name,i)=>{const div=document.createElement('div');div.className='bar';
+ div.innerHTML=`<label><input type="radio" name="cls" value="${i}" aria-label="show the occlusion map for ${name}">${name}</label><span class="val"></span><div class="track"><div class="fill"></div><div class="tick" title="clean image: ${clean[i].toFixed(3)}" style="left:${(100*clean[i]).toFixed(2)}%"></div></div>`;
+ $('bars').appendChild(div);rows.push(div);div.querySelector('input').addEventListener('change',()=>setClass(i));});
+function drawBars(){for(let i=0;i<NC;i++){const p=prob(i,row,col,size);rows[i].querySelector('.fill').style.width=(100*p).toFixed(2)+'%';rows[i].querySelector('.val').textContent=p.toFixed(3);rows[i].classList.toggle('sel',i===cls);rows[i].querySelector('input').checked=i===cls;}}
+
+// ---- map ----
+function addVisit(t,l,s){const k=idx(t,l,s);if(visited[s][k])return;visited[s][k]=1;const d=clean[cls]-prob(cls,t,l,s);
+ for(let y=t;y<t+s;y++){const o=y*N;for(let x=l;x<l+s;x++){acc[o+x]+=d;cnt[o+x]++;}}}
+function rebuildMap(){acc.fill(0);cnt.fill(0);for(const s of D.sizes){const v=visited[s],n=npos(s);for(let k=0;k<v.length;k++)if(v[k]){v[k]=0;addVisit(Math.floor(k/n)*STRIDE,(k%n)*STRIDE,s);}}}
+function mapStats(){let peak=0,pk=-1,nv=0;for(let k=0;k<N*N;k++)if(cnt[k]){const v=acc[k]/cnt[k];if(v>peak){peak=v;pk=k;}}for(const s of D.sizes)for(const v of visited[s])nv+=v;return{peak,pk,nv};}
+function drawMap(){const st=mapStats();const vmax=scale==='own'?(st.peak>0?st.peak:clean[0]):clean[0];const d=mapData.data,L=D.inferno;
+ for(let k=0;k<N*N;k++){const g=grey[k],q=4*k;if(cnt[k]){const v=Math.max(0,Math.min(1,(acc[k]/cnt[k])/vmax)),c=L[Math.round(255*v)];d[q]=0.38*g+0.62*c[0];d[q+1]=0.38*g+0.62*c[1];d[q+2]=0.38*g+0.62*c[2];}else{d[q]=d[q+1]=d[q+2]=g;}d[q+3]=255;}
+ mg.putImageData(mapData,0,0);const g2=mapCv.getContext('2d');g2.setTransform(DPR,0,0,DPR,0,0);g2.imageSmoothingEnabled=false;g2.drawImage(mapOff,0,0,448,448);
+ $('maptitle').textContent=`occlusion map for ${D.classes[cls]}: drop p0 − p (${scale==='own'?'own peak':'fixed'} scale, 0 to ${vmax.toFixed(3)})`;
+ const where=st.pk>=0?` largest drop ${st.peak.toFixed(3)} near row ${Math.floor(st.pk/N)}, column ${st.pk%N}`:'';
+ mapCv.setAttribute('aria-label',`occlusion map for ${D.classes[cls]}: ${st.nv} positions visited;${where||' no drop yet'}`);}
+
+// ---- status (one aria-live line, at most every 300 ms) ----
+let lastStatus=0, statusTimer=null;
+function statusText(){return `square ${size} px at row ${row}, col ${col}: `+D.classes.map((n,i)=>`${n} ${prob(i,row,col,size).toFixed(3)}`).join(', ');}
+function announce(){const now=performance.now();clearTimeout(statusTimer);const go=()=>{lastStatus=performance.now();$('status').textContent=statusText();};if(now-lastStatus>=300)go();else statusTimer=setTimeout(go,300-(now-lastStatus));}
+
+function render(){drawPhoto();drawBars();drawMap();$('pos').textContent=`row ${row}, col ${col}`;announce();}
+function setPos(t,l,visit=true){row=Math.max(0,Math.min(N-size,Math.round(t/STRIDE)*STRIDE));col=Math.max(0,Math.min(N-size,Math.round(l/STRIDE)*STRIDE));if(visit)addVisit(row,col,size);render();}
+function setSize(s){if(!D.sizes.includes(s))return;size=s;$('size').value=String(s);setPos(row,col);}
+function setClass(i){cls=i;rebuildMap();render();}
+function reset(){stopSweep();for(const s of D.sizes)visited[s].fill(0);acc.fill(0);cnt.fill(0);render();}
+
+// ---- sweep (about 3 s) ----
+function stopSweep(){if(sweeping){cancelAnimationFrame(sweeping.raf);const {r,c}=sweeping;sweeping=null;$('sweep').textContent='▶ sweep every position';$('sweep').setAttribute('aria-pressed','false');setPos(r,c,false);}}
+function sweep(){if(sweeping){stopSweep();return;}const s=size,n=npos(s),total=n*n,r0=row,c0=col;
+ if(REDUCED){for(let k=0;k<total;k++)addVisit(Math.floor(k/n)*STRIDE,(k%n)*STRIDE,s);render();return;}
+ let k=0,t0=null;$('sweep').textContent='pause';$('sweep').setAttribute('aria-pressed','true');
+ const frame=ts=>{if(t0===null)t0=ts;const target=Math.min(total,Math.ceil(total*(ts-t0)/3000));
+  for(;k<target;k++){const t=Math.floor(k/n)*STRIDE,l=(k%n)*STRIDE;addVisit(t,l,s);row=t;col=l;}
+  render();if(k<total)sweeping.raf=requestAnimationFrame(frame);else{sweeping=null;$('sweep').textContent='▶ sweep every position';$('sweep').setAttribute('aria-pressed','false');setPos(r0,c0,false);}};
+ sweeping={raf:requestAnimationFrame(frame),r:r0,c:c0};}
+
+// ---- controls ----
+$('size').addEventListener('change',()=>setSize(+$('size').value));
+$('scale').addEventListener('change',()=>{scale=$('scale').value;drawMap();});
+$('sweep').addEventListener('click',sweep);
+$('reset').addEventListener('click',reset);
+let dragging=false;
+const toImg=e=>{const r=photoCv.getBoundingClientRect();return[(e.clientY-r.top)/r.height*N-size/2,(e.clientX-r.left)/r.width*N-size/2];};
+photoCv.addEventListener('pointerdown',e=>{if(sweeping)stopSweep();dragging=true;photoCv.setPointerCapture(e.pointerId);photoCv.focus({preventScroll:true});setPos(...toImg(e));});
+photoCv.addEventListener('pointermove',e=>{if(!dragging)return;const [t,l]=toImg(e);const nt=Math.max(0,Math.min(N-size,Math.round(t/STRIDE)*STRIDE)),nl=Math.max(0,Math.min(N-size,Math.round(l/STRIDE)*STRIDE));if(nt!==row||nl!==col)setPos(t,l);});
+const up=()=>{dragging=false;};photoCv.addEventListener('pointerup',up);photoCv.addEventListener('pointercancel',up);
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'&&window.parent!==window){window.parent.postMessage({type:'cpsy-exit-interactive'},'*');try{window.parent.focus();}catch(_){}return;}
+ const tag=e.target&&e.target.tagName;if(tag==='SELECT'||tag==='INPUT')return;
+ const step=e.shiftKey?4*STRIDE:STRIDE;
+ if(e.key==='ArrowLeft'){e.preventDefault();stopSweep();setPos(row,col-step);}
+ else if(e.key==='ArrowRight'){e.preventDefault();stopSweep();setPos(row,col+step);}
+ else if(e.key==='ArrowUp'){e.preventDefault();stopSweep();setPos(row-step,col);}
+ else if(e.key==='ArrowDown'){e.preventDefault();stopSweep();setPos(row+step,col);}
+ else if(e.key==='+'||e.key==='='){e.preventDefault();setSize(D.sizes[Math.min(D.sizes.length-1,D.sizes.indexOf(size)+1)]);}
+ else if(e.key==='-'||e.key==='_'){e.preventDefault();setSize(D.sizes[Math.max(0,D.sizes.indexOf(size)-1)]);}
+ else if(e.key>='1'&&e.key<=String(NC)){e.preventDefault();setClass(+e.key-1);}
+ else if(e.key==='s'||e.key==='S'){e.preventDefault();sweep();}
+ else if(e.key==='r'||e.key==='R'){e.preventDefault();reset();}
+});
+
+function boot(){
+ if(q.has('size'))size=+q.get('size')||size;$('size').value=String(size);
+ if(q.has('cls')){const v=q.get('cls'),i=/^\d+$/.test(v)?+v:D.classes.indexOf(v);if(i>=0&&i<NC)cls=i;}
+ if(q.has('scale')){scale=q.get('scale')==='own'?'own':'fixed';$('scale').value=scale;}
+ const r=q.has('row')?+q.get('row'):0,c=q.has('col')?+q.get('col'):0;
+ if(q.has('sweep')){const n=npos(size);for(let k=0;k<n*n;k++)addVisit(Math.floor(k/n)*STRIDE,(k%n)*STRIDE,size);}
+ setPos(r,c);
+ window.__demo={get state(){return{cls,size,row,col,scale,probs:D.classes.map((n,i)=>prob(i,row,col,size)),map:mapStats()}},setPos,setSize,setClass,sweep,reset};
+}
+})();
+</script></body></html>

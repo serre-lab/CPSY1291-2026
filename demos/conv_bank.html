@@ -8,7 +8,7 @@ main{display:grid;grid-template-columns:420px 150px 440px;gap:36px;align-items:s
 .panel h2{font-size:18px;font-weight:500;margin:0;color:var(--muted);white-space:nowrap;height:24px}
 canvas{image-rendering:pixelated;background:#fff;border:1px solid #d9d4cc}
 .filters{display:flex;flex-direction:column;gap:10px}
-.maps{display:grid;grid-template-columns:210px 210px;gap:12px}
+.maps{display:grid;grid-template-columns:204px 204px;gap:12px}
 button{font:inherit;padding:6px 14px;border:1px solid #c9c2b7;border-radius:8px;background:#fff;cursor:pointer}
 button.primary{background:var(--gold);border-color:var(--gold);font-size:18px;padding:8px 22px}
 .stat{font-size:16px;color:var(--muted);white-space:nowrap}.stat b{color:var(--ink);font-variant-numeric:tabular-nums;display:inline-block;min-width:64px}
@@ -30,7 +30,7 @@ F.forEach((W,f)=>{let mx=1e-6;for(let i=0;i<M;i++)for(let j=0;j<M;j++)mx=Math.ma
 const fc=[],mc=[];
 F.forEach((W,f)=>{const c=document.createElement('canvas');c.width=K;c.height=K;c.style.cssText='width:96px;height:96px';$('flts').appendChild(c);fc.push(c);
  const d=c.getContext('2d').createImageData(K,K);let mx=0;W.forEach(r=>r.forEach(v=>mx=Math.max(mx,Math.abs(v))));for(let y=0;y<K;y++)for(let x=0;x<K;x++){const v=W[y][x]/mx,q=4*(y*K+x);if(v>=0){d.data[q]=181;d.data[q+1]=57;d.data[q+2]=107;d.data[q+3]=255*v;}else{d.data[q]=62;d.data[q+1]=109;d.data[q+2]=142;d.data[q+3]=-255*v;}}c.getContext('2d').putImageData(d,0,0);
- const m=document.createElement('canvas');m.width=M;m.height=M;m.style.cssText='width:210px;height:210px';$('maps').appendChild(m);mc.push(m);});
+ const m=document.createElement('canvas');m.width=M;m.height=M;m.style.cssText='width:204px;height:204px';$('maps').appendChild(m);mc.push(m);});
 function draw(){const g=$('img').getContext('2d'),d=g.createImageData(N,N);for(let y=0;y<N;y++)for(let x=0;x<N;x++){const v=Math.round(IMG[y][x]*255),q=4*(y*N+x);d.data[q]=d.data[q+1]=d.data[q+2]=v;d.data[q+3]=255;}g.putImageData(d,0,0);const i=Math.floor(pos/M),j=pos%M;g.strokeStyle='#B5396B';g.strokeRect(j+0.5,i+0.5,K-1,K-1);
  mc.forEach((c,f)=>{const h=c.getContext('2d'),e=h.createImageData(M,M);for(let k=0;k<M*M;k++){const q=4*k;if(k>=pos){e.data[q]=240;e.data[q+1]=238;e.data[q+2]=233;}else{const v=Math.round(255*Math.max(0,OUT[f][k])/MAX[f]);e.data[q]=e.data[q+1]=e.data[q+2]=v;}e.data[q+3]=255;}h.putImageData(e,0,0);});
  $('pos').textContent=`${i}, ${j}`;}
@@ -41,4 +41,6 @@ $('run').onclick=()=>{if(timer){stop();return;}$('run').textContent='pause';time
 $("all").onclick=()=>{stop();while(step());pos=M*M;draw();$("pos").textContent="89, 89";};
 $('reset').onclick=()=>{stop();pos=0;draw();};
 draw();
+/* Escape hands keyboard focus back to the deck so PageDown/arrows move slides again. */
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&window.parent!==window){window.parent.postMessage({type:'cpsy-exit-interactive'},'*');try{window.parent.focus();}catch(_){}}});
 </script></body></html>

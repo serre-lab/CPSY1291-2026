@@ -721,6 +721,8 @@ window.__demo={
   set(o){for(const k in o){$(k).value=o[k]; $(k).dispatchEvent(new Event(k==='drop'||k==='data'||k==='layers'?'change':'input'))}},
   get metrics(){return {epoch, acc:metrics.acc, loss:metrics.loss, tacc:tmetrics.acc, tloss:tmetrics.loss, n:X.length}}
 };
+/* Escape hands keyboard focus back to the deck so PageDown/arrows move slides again. */
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&window.parent!==window){window.parent.postMessage({type:'cpsy-exit-interactive'},'*');try{window.parent.focus();}catch(_){}}});
 </script>
 </body>
 </html>
