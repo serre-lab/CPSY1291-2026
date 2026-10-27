@@ -312,7 +312,7 @@
 <ul>
 <li>The <strong>encoder</strong> is every layer before the readout. <strong>Frozen</strong>: its weights stay fixed. <strong>Fine-tuning</strong>: keep training some pretrained weights on the new task</li>
 <li>A middle road between a new readout on frozen features and backprop into every layer: freeze <code>conv1</code> to <code>layer3</code>; fine-tune <code>layer4</code> and the readout</li>
-<li>One warning for any pretrained network: its <strong>BatchNorm</strong> layers behave differently in training and evaluation mode. <mark>Call <code>model.eval()</code> before running it on new images, and keep frozen layers in eval mode while fine-tuning</mark>; the mechanism is in the reading, the expectation is that you do this every time</li>
+<li>One warning: <strong>BatchNorm</strong> behaves differently in training and evaluation mode. <mark>Call <code>model.eval()</code> on new images; keep frozen layers in eval mode while fine-tuning</mark>, every time (mechanism in the reading)</li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/2202.10054" rel="noopener">Kumar, Raghunathan, Jones, Ma &amp; Liang <b>ICLR 2022</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-class="prov-air" data-marpit-pagination="28" data-marpit-pagination-total="65" aria-labelledby="heading-28"><p class="page">Slide 28</p>
