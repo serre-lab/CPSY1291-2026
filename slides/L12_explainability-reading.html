@@ -26,7 +26,6 @@
 </div>
 <ul>
 <li>Hubel and Wiesel's two cell types in V1: the <strong>simple cell</strong>, a weighted sum, selective for an oriented bar at one position; the <strong>complex cell</strong>, which pools simple cells and responds to the same bar anywhere nearby</li>
-<li><mark>Convolution plays the simple cell (selectivity); max-pooling plays the complex cell (tolerance to position)</mark></li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-class="prov-air" data-marpit-pagination="6" data-marpit-pagination-total="46" aria-labelledby="heading-6"><p class="page">Slide 6</p>
 <h2 id="heading-6">Complex cells, again: one orientation, anywhere nearby</h2>
@@ -102,7 +101,7 @@
 <div class="ref"><a href="https://doi.org/10.1126/science.8418487" rel="noopener">Gallant, Braun &amp; Van Essen <b>Science 1993</b></a> · <a href="https://doi.org/10.1152/jn.1996.76.4.2718" rel="noopener">Gallant et al. <b>J Neurophysiol 1996</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-class="prov-air" data-marpit-pagination="11" data-marpit-pagination-total="46" aria-labelledby="heading-11"><p class="page">Slide 11</p>
 <h2 id="heading-11">What the cells prefer, area by area</h2>
-<div class="capfig">
+<div>
 <figure><img src="../images/L11/pub_kobatake_tanaka1994_critical_features.png" alt="Kobatake and Tanaka's 1994 table of critical features by area, four columns: V2, a triangle and a bullseye; V4, stars, a cross, textured and curved shapes; posterior IT, a leaf shape, a cross, concentric rings, a half disc; anterior IT, striped bars, a dark blob, a face, a circle on a stem, a flask" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>Kobatake and Tanaka's 1994 table of critical features by cortical area, four columns. V2: a triangle and a bullseye. V4: a star, a circle with a dot, a textured bar, a cross, a dark square with a corner, concentric rings. Posterior IT: a leaf shape, a cross, concentric rings, a star, a half disc, a dotted bar, a striped half circle. Anterior IT: a striped block, a dark blob, concentric rings, a cartoon face, a square with a dark bar, a circle on a stem, a flask shape, a blob, a striped bar with a ball. Preferred stimuli grow from simple patterns to object parts and faces.</p><a href="../images/L11/pub_kobatake_tanaka1994_critical_features.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
@@ -121,7 +120,7 @@
 <div class="ref"><a href="https://doi.org/10.1152/jn.2001.86.5.2505" rel="noopener">Pasupathy &amp; Connor <b>J Neurophysiol 2001</b></a> · <a href="https://doi.org/10.7554/eLife.38242" rel="noopener">Pospisil, Pasupathy &amp; Bair <b>eLife 2018</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-class="prov-air" data-marpit-pagination="13" data-marpit-pagination-total="46" aria-labelledby="heading-13"><p class="page">Slide 13</p>
 <h2 id="heading-13">V2: naturalistic textures</h2>
-<div class="capfig">
+<div>
 <figure><img src="../images/L12/pub_freeman2013_texture_examples.png" alt="Nine texture discs in three rows: a honeycomb, a pile of pea pods and a perforated metal sheet. Left column, the original photographs; middle, spectrally matched noise, shapeless grey blotches; right, naturalistic textures that keep the cells, pods and holes as distorted but recognizable structure" aria-describedby="figure-13-1"><figcaption id="figure-13-1"><p>Nine texture discs in three rows: a honeycomb, a pile of pea pods and a perforated metal sheet. Left column, the original photographs; middle, spectrally matched noise, shapeless grey blotches; right, naturalistic textures that keep the cells, pods and holes as distorted but recognizable structure. Freeman et al. 2013 made the middle column by matching only the statistics V1-like filters measure, and the right column by also matching the correlations between those filters. V2 neurons respond more to the right column than to the middle one; V1 neurons respond about equally.</p><a href="../images/L12/pub_freeman2013_texture_examples.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
@@ -163,7 +162,7 @@
 </div>
 <div class="col">
 <ul>
-<li>S and C alternate, V1 to IT; pooling by the <strong>max</strong>, over position and over <strong>scale</strong> (next slide)</li>
+<li>S and C alternate, V1 to IT. <strong>S</strong> units: template matching, a convolution, like a simple cell. <strong>C</strong> units: <mark>a <strong>max</strong>, like a complex cell, for tolerance to position and <strong>scale</strong></mark> (next slide)</li>
 <li><strong>Hyperparameters</strong> (receptive-field sizes, tuning widths, pooling ranges) set by hand to match physiology, not fit to the task: "graduate student descent"</li>
 <li><mark>No backprop</mark>: S2 units learn by simple unsupervised, Hebbian-like rules, picking up frequent combinations of C1 features (from orientations to corners and curves); only the readout sees labels</li>
 </ul>
