@@ -135,8 +135,8 @@
 <figure><img src="../images/L11/tvsd_montage_4col.png" alt="A montage of THINGS photographs of everyday objects, eight of the test images of the THINGS Ventral Stream Spiking Dataset" aria-describedby="figure-14-1"><figcaption id="figure-14-1"><p>A montage of eight THINGS photographs of everyday objects from the test set of the THINGS Ventral Stream Spiking Dataset, in two rows of four, on natural or plain backgrounds.</p><a href="../images/L11/tvsd_montage_4col.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>A linear readout of a few hundred IT sites names the category of a cut-out on grey (Hung et al. 2005, in the reading); today's sets are photographs. <strong>THINGS</strong>: 1,854 object concepts. <strong>TVSD</strong> (Papale et al. 2025): 22,248 of them, two monkeys, <strong>Utah arrays</strong> in V1, V4 and IT at once. <strong>Triple-N</strong> (Li et al. 2026): <strong>Neuropixels</strong> probes through IT, its face and body patches included, during scene photographs. <strong>NSD</strong> (Allen et al. 2022): 73,000 photographs, eight people, 7 T fMRI</li>
-<li>The tools changed too: <mark>one microelectrode, one cell at a time</mark> (Hubel and Wiesel, Pasupathy and Connor) → Utah arrays, a 10 × 10 grid left in place for months → Neuropixels, hundreds of sites on one shank → fMRI voxels</li>
+<li>A linear readout of a few hundred IT sites names the category of a cut-out on grey (Hung et al. 2005, in the reading); today's sets are photographs. <strong>THINGS</strong>: 1,854 object concepts. <strong>TVSD</strong> (Papale et al. 2025): 22,248 of them, two monkeys, <strong>Utah arrays</strong> in V1, V4 and IT at once. <strong>Triple-N</strong> (Li et al. 2026): <strong>Neuropixels</strong> probes through IT, its face and body patches included, during scene photographs. <strong>NSD</strong> (Allen et al. 2022): 7 T fMRI, eight people, 73,000 photographs</li>
+<li>The tools changed too: <mark>one microelectrode, one cell at a time</mark> → Utah arrays, a 10 × 10 grid left in for months → Neuropixels, hundreds of sites on one shank → fMRI voxels</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1016/j.neuron.2024.12.003" rel="noopener">Papale et al. <b>Neuron 2025</b></a> · <a href="https://doi.org/10.1371/journal.pone.0223792" rel="noopener">Hebart et al. <b>PLOS ONE 2019</b></a> · <a href="https://doi.org/10.1038/s41593-026-02322-z" rel="noopener">Li et al. <b>Nat Neurosci 2026</b></a> · <a href="https://doi.org/10.1038/s41593-021-00962-x" rel="noopener">Allen et al. <b>Nat Neurosci 2022</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-class="split" data-marpit-pagination="15" data-marpit-pagination-total="65" aria-labelledby="heading-15"><p class="page">Slide 15</p>
@@ -300,9 +300,9 @@
 <figure><img src="../images/L11/resnet50_stages_f1.svg" alt="ResNet-50 from left to right: a 224 by 224 tiger image; conv1, a 7 by 7 convolution at stride 2, 112 by 112; max-pool, 56 by 56; layer1, 3 blocks, 56 by 56; layer2, 4 blocks, 28 by 28; layer3, 6 blocks, 14 by 14; layer4, 3 blocks, 7 by 7; global average, 1 by 1; readout" aria-describedby="figure-26-1"><figcaption id="figure-26-1"><p>ResNet-50 drawn left to right as a chain of squares joined by arrows, each labelled with its map size. A 224 by 224 photograph of a tiger (the image), then conv1, a 7 by 7 convolution at stride 2, 112 by 112; max-pool, 56 by 56; layer1, 3 blocks, 56 by 56; layer2, 4 blocks, 28 by 28; layer3, 6 blocks, 14 by 14; layer4, 3 blocks, 7 by 7; global average, 1 by 1; and a readout box. The four block groups are outlined in magenta and the squares shrink from left to right. The point: 16 residual blocks in four groups, each group after the first halving the maps' height and width.</p><a href="../images/L11/resnet50_stages_f1.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>ResNet-50 stacks 16 <strong>residual blocks</strong> (each adds its input back to its output, so 50 layers train; reading) in four <strong>block groups</strong>, named <code>layer1</code> to <code>layer4</code> in PyTorch. Each group after the first starts by halving the maps' height and width</li>
+<li>ResNet-50 stacks 16 <strong>residual blocks</strong> (each adds its input back to its output; reading) in four <strong>block groups</strong>, named <code>layer1</code> to <code>layer4</code> in PyTorch. Each group after the first starts by halving the maps' height and width</li>
 <li><code>layer4</code> is the last group: its 7 × 7 maps are averaged (global average pooling) into the image's feature vector, then a readout names the category</li>
-<li>The ResNet-18 you recorded earlier in the course uses the same names; its <code>layer1</code>, <code>layer3</code> and <code>layer4</code> were the early, middle and late stages</li>
+<li>The ResNet-18 you recorded earlier uses the same names: <code>layer1</code>, <code>layer3</code>, <code>layer4</code> were its early, middle and late stages</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-class="prov-air" data-marpit-pagination="27" data-marpit-pagination-total="65" aria-labelledby="heading-27"><p class="page">Slide 27</p>
 <h2 id="heading-27">Freeze the encoder, or fine-tune the last block group</h2>
@@ -312,7 +312,7 @@
 <ul>
 <li>The <strong>encoder</strong> is every layer before the readout. <strong>Frozen</strong>: its weights stay fixed. <strong>Fine-tuning</strong>: keep training some pretrained weights on the new task</li>
 <li>A middle road between a new readout on frozen features and backprop into every layer: freeze <code>conv1</code> to <code>layer3</code>; fine-tune <code>layer4</code> and the readout</li>
-<li><mark>Freezing the weights does not freeze BatchNorm</mark>, the layer that rescales each channel by statistics of the current minibatch (reading): in <code>model.train()</code> the frozen layers' running statistics still change. Keep their BatchNorm in evaluation mode</li>
+<li><mark>Freezing the weights does not freeze BatchNorm</mark> (the per-channel rescaling layer; reading): in <code>model.train()</code> the frozen layers' running statistics still change. Keep their BatchNorm in evaluation mode</li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/2202.10054" rel="noopener">Kumar, Raghunathan, Jones, Ma &amp; Liang <b>ICLR 2022</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-class="prov-air" data-marpit-pagination="28" data-marpit-pagination-total="65" aria-labelledby="heading-28"><p class="page">Slide 28</p>
@@ -485,7 +485,7 @@
 <li>Stacking more plain layers made networks <em>harder</em> to train: a 56-layer network reached higher training error than a 20-layer one</li>
 <li>A <strong>residual block</strong> computes a change <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">F</mi><mo stretchy="false">(</mo><mi mathvariant="bold-italic">A</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{F}(\boldsymbol{A})</annotation></semantics></math> and adds it to its input: output <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false">(</mo><mi mathvariant="bold-italic">A</mi><mo>+</mo><mi mathvariant="script">F</mi><mo stretchy="false">(</mo><mi mathvariant="bold-italic">A</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">g(\boldsymbol{A} + \mathcal{F}(\boldsymbol{A}))</annotation></semantics></math>. The added path is a <strong>skip connection</strong></li>
 <li>If a block is not needed, its change can stay near zero and the input passes through: networks of 50 to 152 layers trained well</li>
-<li>Each convolution is followed by <strong>BatchNorm</strong>, explained two slides on</li>
+<li>Each convolution is followed by <strong>BatchNorm</strong>, explained on its own slide</li>
 </ul>
 </div>
 </div>
