@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Models of the ventral stream, and what networks compute · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Models of the ventral stream, and what networks compute</h1><p>Reader-friendly version of the 65 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L12_explainability.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Models of the ventral stream, and what networks compute</a></li><li><a href="#slide-2">Where we left off</a></li><li><a href="#slide-5">Complex cells, again: one orientation, anywhere nearby</a></li><li><a href="#slide-6">Reminder: a convolutional layer slides one filter</a></li><li><a href="#slide-7">Cortical columns: every orientation, at every position</a></li><li><a href="#slide-8">A hierarchy in V1. Does it continue?</a></li><li><a href="#slide-9">Anatomy orders the areas: Felleman and Van Essen</a></li><li><a href="#slide-10">What the cells prefer, area by area</a></li><li><a href="#slide-11">V4: curvature at an angular position</a></li><li><a href="#slide-12">V4: beyond bars, non-Cartesian gratings</a></li><li><a href="#slide-13">V2: naturalistic textures</a></li><li><a href="#slide-14">Photographs and whole-stream recordings</a></li><li><a href="#slide-15">Fukushima's Neocognitron (1980)</a></li><li><a href="#slide-16">HMAX: a hierarchy constrained by physiology</a></li><li><a href="#slide-17">Pooling over position, and over scale</a></li><li><a href="#slide-18">The same two steps, higher up</a></li><li><a href="#slide-19">Pooling: from a map to fewer numbers</a></li><li><a href="#slide-20">HMAX worked: predictions from V1 to behaviour</a></li><li><a href="#slide-21">The test on behaviour: rapid animal categorization</a></li><li><a href="#slide-22">Then scale took over</a></li><li><a href="#slide-23">Same operations, a different recipe</a></li><li><a href="#slide-24">AlexNet (2012): the first layer it learned</a></li><li><a href="#slide-25">A mini-HMAX in PyTorch: the network you will train</a></li><li><a href="#slide-26">ResNet-50: four block groups</a></li><li><a href="#slide-27">Freeze the encoder, or fine-tune the last block group</a></li><li><a href="#slide-28">Three ResNet-50s, one architecture, three trainings</a></li><li><a href="#slide-29">Explainability</a></li><li><a href="#slide-30">Occlusion: cover a region and watch the score</a></li><li><a href="#slide-31">Ways to ask which pixels mattered</a></li><li><a href="#slide-32">Four maps of one decision</a></li><li><a href="#slide-33">Saliency: the gradient at the pixels</a></li><li><a href="#slide-34">SmoothGrad, and integrated gradients</a></li><li><a href="#slide-35">Grad-CAM: the gradient at the last feature maps</a></li><li><a href="#slide-36">Testing a map, and more methods: pointers</a></li><li><a href="#slide-37">Test the map: change the image</a></li><li><a href="#slide-38">Recap</a></li><li><a href="#slide-39">Going further: more of the network</a></li><li><a href="#slide-40">Up the hierarchy: larger fields, more complex selectivity</a></li><li><a href="#slide-41">Reading the category from a few hundred IT sites</a></li><li><a href="#slide-42">Stride and padding set the size of a map</a></li><li><a href="#slide-43">VGG (2014): small filters, stacked</a></li><li><a href="#slide-44">Deeper networks: add the input back</a></li><li><a href="#slide-45">Batch normalization</a></li><li><a href="#slide-46">Training mode and evaluation mode</a></li><li><a href="#slide-47">In code: a saliency map</a></li><li><a href="#slide-48">Each map answers for one class</a></li><li><a href="#slide-49">Try it: cover a region, watch five scores</a></li><li><a href="#slide-50">Going further: testing a map, shortcuts</a></li><li><a href="#slide-51">Test the map: delete pixels in the map's order</a></li><li><a href="#slide-52">Sanity check: does the map need the trained weights?</a></li><li><a href="#slide-53">A map shows where, not what</a></li><li><a href="#slide-54">Right for the wrong reason: can we catch a shortcut?</a></li><li><a href="#slide-55">Planting a shortcut</a></li><li><a href="#slide-56">Catching the snow rule</a></li><li><a href="#slide-57">What a map tells you, and what it does not</a></li><li><a href="#slide-58">Going further: units, concepts and directions</a></li><li><a href="#slide-59">Network Dissection: do units align with concepts?</a></li><li><a href="#slide-60">More features than units</a></li><li><a href="#slide-61">Sparse autoencoders find directions</a></li><li><a href="#slide-62">Sparse autoencoders on vision models</a></li><li><a href="#slide-63">Does scale make units easier to interpret?</a></li><li><a href="#slide-64">Further reading for the research trail</a></li><li><a href="#slide-65">Minute paper</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Models of the ventral stream, and what networks compute · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Models of the ventral stream, and what networks compute</h1><p>Reader-friendly version of the 65 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L12_explainability.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Models of the ventral stream, and what networks compute</a></li><li><a href="#slide-2">Where we left off</a></li><li><a href="#slide-5">Complex cells, again: one orientation, anywhere nearby</a></li><li><a href="#slide-6">Reminder: a convolutional layer slides one filter</a></li><li><a href="#slide-7">Cortical columns: every orientation, at every position</a></li><li><a href="#slide-8">A hierarchy in V1. Does it continue?</a></li><li><a href="#slide-9">Anatomy orders the areas: Felleman and Van Essen</a></li><li><a href="#slide-10">What the cells prefer, area by area</a></li><li><a href="#slide-11">V4: curvature at an angular position</a></li><li><a href="#slide-12">V4: beyond bars, non-Cartesian gratings</a></li><li><a href="#slide-13">V2: naturalistic textures</a></li><li><a href="#slide-14">Photographs and whole-stream recordings</a></li><li><a href="#slide-15">Fukushima's Neocognitron (1980)</a></li><li><a href="#slide-16">HMAX: a hierarchy constrained by physiology</a></li><li><a href="#slide-17">Pooling over position, and over scale</a></li><li><a href="#slide-18">The same two steps, higher up</a></li><li><a href="#slide-19">Pooling: from a map to fewer numbers</a></li><li><a href="#slide-20">HMAX worked: predictions from V1 to behaviour</a></li><li><a href="#slide-21">The test on behaviour: rapid animal categorization</a></li><li><a href="#slide-22">Then scale took over</a></li><li><a href="#slide-23">Same operations, different settings and learning</a></li><li><a href="#slide-24">AlexNet (2012): the first layer it learned</a></li><li><a href="#slide-25">A mini-HMAX in PyTorch: the network you will train</a></li><li><a href="#slide-26">ResNet-50: four block groups</a></li><li><a href="#slide-27">Freeze the encoder, or fine-tune the last block group</a></li><li><a href="#slide-28">Three ResNet-50s, one architecture, three trainings</a></li><li><a href="#slide-29">Explainability</a></li><li><a href="#slide-30">Occlusion: cover a region and watch the score</a></li><li><a href="#slide-31">Ways to ask which pixels mattered</a></li><li><a href="#slide-32">Four maps of one decision</a></li><li><a href="#slide-33">Saliency: the gradient at the pixels</a></li><li><a href="#slide-34">SmoothGrad, and integrated gradients</a></li><li><a href="#slide-35">Grad-CAM: the gradient at the last feature maps</a></li><li><a href="#slide-36">Testing a map, and more methods: pointers</a></li><li><a href="#slide-37">Test the map: change the image</a></li><li><a href="#slide-38">Recap</a></li><li><a href="#slide-39">Going further: more of the network</a></li><li><a href="#slide-40">Up the hierarchy: larger fields, more complex selectivity</a></li><li><a href="#slide-41">Reading the category from a few hundred IT sites</a></li><li><a href="#slide-42">Stride and padding set the size of a map</a></li><li><a href="#slide-43">VGG (2014): small filters, stacked</a></li><li><a href="#slide-44">Deeper networks: add the input back</a></li><li><a href="#slide-45">Batch normalization</a></li><li><a href="#slide-46">Training mode and evaluation mode</a></li><li><a href="#slide-47">In code: a saliency map</a></li><li><a href="#slide-48">Each map answers for one class</a></li><li><a href="#slide-49">Try it: cover a region, watch five scores</a></li><li><a href="#slide-50">Going further: testing a map, shortcuts</a></li><li><a href="#slide-51">Test the map: delete pixels in the map's order</a></li><li><a href="#slide-52">Sanity check: does the map need the trained weights?</a></li><li><a href="#slide-53">A map shows where, not what</a></li><li><a href="#slide-54">Right for the wrong reason: can we catch a shortcut?</a></li><li><a href="#slide-55">Planting a shortcut</a></li><li><a href="#slide-56">Catching the snow rule</a></li><li><a href="#slide-57">What a map tells you, and what it does not</a></li><li><a href="#slide-58">Going further: units, concepts and directions</a></li><li><a href="#slide-59">Network Dissection: do units align with concepts?</a></li><li><a href="#slide-60">More features than units</a></li><li><a href="#slide-61">Sparse autoencoders find directions</a></li><li><a href="#slide-62">Sparse autoencoders on vision models</a></li><li><a href="#slide-63">Does scale make units easier to interpret?</a></li><li><a href="#slide-64">Further reading for the research trail</a></li><li><a href="#slide-65">Minute paper</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
   <img src="../images/brown-crest-color.png" alt="Brown University crest">
   <div class="vrule"></div>
   <div>
@@ -16,7 +16,7 @@
 <figure><img src="../images/L11/pub_hw_ganglion_simple_complex.png" alt="Three columns of icons: an on-centre and an off-centre circle; an oriented bar on a dark or light background at one position; an oriented bar with arrows showing it can move across the field" aria-describedby="figure-2-1"><figcaption id="figure-2-1"><p>Three columns of icons summarizing Hubel and Wiesel's V1: on the left an on-centre and an off-centre circle for retinal and LGN cells; in the middle an oriented bar at one position for a simple cell; on the right an oriented bar with arrows showing it can sit anywhere in the field, for a complex cell. The point: a weighted sum builds selectivity, a pooling builds tolerance.</p><a href="../images/L11/pub_hw_ganglion_simple_complex.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>Last lecture: a <strong>filter</strong> slid over the image gives a <strong>feature map</strong>; then the ventral stream, retina to V1</li>
+<li>Last lecture: a <strong>filter</strong> slid over the image gives a <strong>feature map</strong>; then the eye to V1</li>
 <li>Hubel and Wiesel's two cell types: the <strong>simple cell</strong>, a weighted sum (selectivity for an oriented bar at one position), and the <strong>complex cell</strong>, a pooling (the same bar anywhere nearby). The minute paper's pairing: <mark>convolution is the simple cell and buys selectivity; max-pooling is the complex cell and buys tolerance to position</mark></li>
 <li>We stopped at the complex cell. Today: the complex cell again, the areas above V1, the models built from them; then open the trained network</li>
 </ul>
@@ -26,15 +26,15 @@
 <figure><img src="../images/L11/pooling_frame6.svg" alt="Computed on model cells. Left: five identical simple cells in a row, their oriented receptive fields overlapping, a yellow bar of light at one position, spike trains next to each cell, all converging on one complex cell below, which sums them. Right: response against the bar's position, five overlapping bumps for the simple cells and the complex cell's broad curve, their sum, drawn up to the current position" aria-describedby="figure-5-1"><figcaption id="figure-5-1"><p>Computed on model cells. Left: the bar has passed all five fields. Right: five overlapping bumps, one per simple cell, each covering a narrow range of positions, and the complex cell's broad curve covering all five with small dips between them: tolerance to position, with the orientation preference of its inputs.</p><a href="../images/L11/pooling_frame6.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>Five simple cells of one orientation feed one complex cell. Bar left of the fields: almost nothing fires</li>
+<li>Five simple cells of one orientation feed one complex cell. Bar just left: only cell 1 fires a little</li>
 <li>Bar on cell 3's field: it fires, and so does the complex cell; one field over, another simple cell takes over</li>
-<li>Any position across the five fields drives the complex cell: <mark>tolerant to position, selective for orientation</mark>. That is pooling (a sum here; networks take the max, a few slides on)</li>
+<li>Any position across the five fields drives the complex cell: <mark>tolerant to position, selective for orientation</mark>. That is pooling (a sum here; networks take the max, later today)</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1113/jphysiol.1962.sp006837" rel="noopener">Hubel &amp; Wiesel <b>J Physiol 1962</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-class="prov-air" data-marpit-pagination="6" data-marpit-pagination-total="65" aria-labelledby="heading-6"><p class="page">Slide 6</p>
 <h2 id="heading-6">Reminder: a convolutional layer slides one filter</h2>
 <div class="capfig">
-<figure><img src="../images/L11/conv_frame1.png" alt="The tiger photograph in grey levels, 224 by 224, an arrow to one 11 by 11 vertical Gabor filter, an arrow to the feature map, 224 by 224, bright where the image has vertical stripes" aria-describedby="figure-6-1"><figcaption id="figure-6-1"><p>The tiger photograph in grey levels, 224 by 224, an arrow to one 11 by 11 vertical Gabor filter, an arrow to the feature map, 224 by 224, bright where the image has vertical stripes. One set of weights is reused at every position, so shifting the image shifts the map.</p><a href="../images/L11/conv_frame1.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L12/conv_frame1_tight.png" alt="The tiger photograph in grey levels, 224 by 224, an arrow to one 11 by 11 vertical Gabor filter, an arrow to the feature map, 224 by 224, bright where the image has vertical stripes" aria-describedby="figure-6-1"><figcaption id="figure-6-1"><p>The tiger photograph in grey levels, 224 by 224, an arrow to one 11 by 11 vertical Gabor filter, an arrow to the feature map, 224 by 224, bright where the image has vertical stripes. One set of weights is reused at every position, so shifting the image shifts the map.</p><a href="../images/L12/conv_frame1_tight.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li>A <strong>filter</strong>, a small grid of weights, a template like a simple cell's receptive field, is slid over the image; at each position the dot product, then ReLU: a <strong>feature map</strong></li>
@@ -48,9 +48,9 @@
 </div>
 <div class="col">
 <ul>
-<li>Hubel and Wiesel's <strong>ice-cube model</strong>: a small block of V1 holds every orientation for both eyes; the block is repeated across the whole visual field</li>
-<li>Nothing slides in cortex. Every position has its own cells with their own synapses, each learned on its own: <strong>replication</strong>, where the network has <strong>sharing</strong></li>
-<li><mark>Same result, different means</mark>: a template at every position. The network pays for one filter; cortex pays for a copy per position, and how the copies end up alike is an open question</li>
+<li>A <strong>column</strong>: a stack of cells through the six layers of cortex that prefer one orientation. Hubel and Wiesel's <strong>ice-cube model</strong>: a 1 mm block of V1 holds a column for every orientation, for each eye; the block repeats across the visual field</li>
+<li>Nothing slides in cortex. Every position has its own cells with their own synapses (connections, each with a weight), wired up separately: <strong>replication</strong>, where the network has <strong>sharing</strong></li>
+<li><mark>A template at every position, reached two ways</mark>: the network pays for one filter; cortex pays for a copy per position, and how the copies end up alike is an open question</li>
 </ul>
 </div>
 </div>
@@ -64,8 +64,8 @@
 <div class="col">
 <ul>
 <li>Within V1, Hubel and Wiesel found a hierarchy: centre–surround → simple → complex, <mark>selectivity, then tolerance</mark></li>
-<li>The <strong>ventral stream</strong>, V1 → V2 → V4 → IT: the assumption is that the same two steps repeat, area after area</li>
-<li>Three kinds of evidence: cells prefer more complex, more tolerant things, over larger receptive fields (next slides); anatomy orders the areas (next slide); responses start later at each stage, about 40 ms at the LGN to 100 ms in IT (left)</li>
+<li>The <strong>ventral stream</strong>: V1 → V2 → V4 → IT (inferotemporal cortex), the chain that ends in object recognition. The assumption: the same two steps repeat, area after area</li>
+<li>Three kinds of evidence: cells prefer more complex things at each stage (next slides); anatomy orders the areas (next slide); responses start later at each stage, about 40 ms at the LGN (the relay between eye and V1) to 100 ms in IT</li>
 </ul>
 </div>
 </div>
@@ -79,8 +79,8 @@
 <div class="col">
 <ul>
 <li><strong>Felleman &amp; Van Essen (1991)</strong> collected the known connections between 32 visual areas, about 300 of them</li>
-<li>Each connection has a direction written in its anatomy: <strong>feedforward</strong> connections leave the superficial layers and end in layer 4, <strong>feedback</strong> ones avoid layer 4</li>
-<li>Ordering the areas so that every feedforward connection points up gives <mark>about ten levels, V1 at the bottom, IT and the frontal areas at the top</mark>: a hierarchy, with many paths through it</li>
+<li>Cortex has six layers, and a connection's direction is written in them: <strong>feedforward</strong> axons (away from the eye) end in layer 4 of the next area; <strong>feedback</strong> axons (back toward V1) avoid layer 4</li>
+<li>Ordering the areas so that every feedforward connection points up gives <mark>about ten levels, V1 at the bottom, IT and the frontal areas at the top</mark>: a hierarchy with many paths through it</li>
 </ul>
 </div>
 </div>
@@ -91,7 +91,7 @@
 <figure><img src="../images/L11/pub_kobatake_tanaka1994_critical_features.png" alt="Kobatake and Tanaka's 1994 table of critical features by area, four columns: V2, a triangle and a bullseye; V4, stars, a cross, textured and curved shapes; posterior IT, a leaf shape, a cross, concentric rings, a half disc; anterior IT, striped bars, a dark blob, a face, a circle on a stem, a flask" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>Kobatake and Tanaka's 1994 table of critical features by cortical area, four columns. V2: a triangle and a bullseye. V4: a star, a circle with a dot, a textured bar, a cross, a dark square with a corner, concentric rings. Posterior IT: a leaf shape, a cross, concentric rings, a star, a half disc, a dotted bar, a striped half circle. Anterior IT: a striped block, a dark blob, concentric rings, a cartoon face, a square with a dark bar, a circle on a stem, a flask shape, a blob, a striped bar with a ball. Preferred stimuli grow from simple patterns to object parts and faces.</p><a href="../images/L11/pub_kobatake_tanaka1994_critical_features.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>Kobatake and Tanaka recorded in V2, V4, posterior and anterior IT and reduced each cell's best object to the simplest picture that still drove it: <mark>bars and spots in V2, curves and textured shapes in V4, parts in posterior IT, faces and hands in anterior IT</mark></li>
+<li>Kobatake &amp; Tanaka (1994) reduced each cell's best object to the simplest picture that still drove it. Most V2 cells settle for a bar or a spot; the table shows the cells that needed more, a share that grows up the stream: <mark>curves and textured shapes in V4, parts in posterior IT, faces and hands in anterior IT</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1152/jn.1994.71.3.856" rel="noopener">Kobatake &amp; Tanaka <b>J Neurophysiol 1994</b></a> · <a href="https://doi.org/10.1523/JNEUROSCI.04-08-02051.1984" rel="noopener">Desimone, Albright, Gross &amp; Bruce <b>J Neurosci 1984</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-class="prov-air" data-marpit-pagination="11" data-marpit-pagination-total="65" aria-labelledby="heading-11"><p class="page">Slide 11</p>
@@ -115,7 +115,7 @@
 <ul>
 <li><strong>Gallant, Braun &amp; Van Essen (1993)</strong> showed V4 cells three families of gratings: the usual Cartesian stripes, <strong>polar</strong> ones (rings, spokes, spirals) and <strong>hyperbolic</strong> ones (saddles)</li>
 <li>Many V4 cells responded best to a polar or hyperbolic grating, <mark>a pattern no single oriented bar detector prefers</mark>: V4 computes something beyond V1's templates</li>
-<li>Later, with the same cells: curvature (previous slide), colour and texture</li>
+<li>Later studies of V4 found tuning for curvature (previous slide), colour and texture</li>
 </ul>
 </div>
 </div>
@@ -126,7 +126,7 @@
 <figure><img src="../images/L12/pub_freeman2013_textures.png" alt="Freeman et al. 2013, Figure 1: three original texture photographs (honeycomb, grains, a mesh); the same images turned into noise that matches only what V1-like filters see; and naturalistic textures that also match the correlations between the filters, which look like the originals" aria-describedby="figure-13-1"><figcaption id="figure-13-1"><p>Freeman and colleagues 2013, Figure 1, panels a to c. Panel a: three photographs of textures, honeycomb, grains and a mesh. Panel b: each turned into noise that matches only the responses of V1-like oriented filters, labelled spectrally matched noise; the noise looks blotchy. Panel c: textures that also match the correlations between the filters, labelled naturalistic texture; these look like the originals. V2 cells, unlike V1 cells, respond more to panel c than to panel b.</p><a href="../images/L12/pub_freeman2013_textures.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li><strong>Freeman et al. (2013)</strong>: take a texture photograph, keep only the statistics V1-like filters see (<strong>spectrally matched noise</strong>), or also the correlations between the filters (<strong>naturalistic texture</strong>). V1 cells respond alike to both; <mark>V2 cells respond more to the naturalistic texture</mark>, and so do people</li>
+<li><strong>Freeman et al. (2013)</strong>: take a texture photograph, keep only the statistics V1-like filters see (<strong>spectrally matched noise</strong>), or also the correlations between pairs of those filters (<strong>naturalistic texture</strong>). V1 cells respond alike to both; <mark>V2 cells respond more to the naturalistic texture</mark>, and so do people, in proportion to the V2 difference</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1038/nn.3402" rel="noopener">Freeman, Ziemba, Heeger, Simoncelli &amp; Movshon <b>Nat Neurosci 2013</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-class="prov-air" data-marpit-pagination="14" data-marpit-pagination-total="65" aria-labelledby="heading-14"><p class="page">Slide 14</p>
@@ -135,8 +135,8 @@
 <figure><img src="../images/L11/tvsd_montage_4col.png" alt="A montage of THINGS photographs of everyday objects, eight of the test images of the THINGS Ventral Stream Spiking Dataset" aria-describedby="figure-14-1"><figcaption id="figure-14-1"><p>A montage of eight THINGS photographs of everyday objects from the test set of the THINGS Ventral Stream Spiking Dataset, in two rows of four, on natural or plain backgrounds.</p><a href="../images/L11/tvsd_montage_4col.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>A linear readout of a few hundred IT sites names the category of a cut-out on grey (Hung et al. 2005, in the reading); today's sets are photographs. <strong>THINGS</strong>: 1,854 object concepts. <strong>TVSD</strong> (Papale et al. 2025): 22,248 of them, two monkeys, <strong>Utah arrays</strong> in V1, V4 and IT at once. <strong>Triple-N</strong> (Li et al. 2026): <strong>Neuropixels</strong> probes through IT, its face and body patches included, during scene photographs. <strong>NSD</strong> (Allen et al. 2022): 7 T fMRI, eight people, 73,000 photographs</li>
-<li>The tools changed too: <mark>one microelectrode, one cell at a time</mark> → Utah arrays, a 10 × 10 grid left in for months → Neuropixels, hundreds of sites on one shank → fMRI voxels</li>
+<li>The stimuli changed, from bars and shapes to photographs. <strong>THINGS</strong>: 1,854 object concepts, 26,000 photographs. <strong>TVSD</strong> (Papale et al. 2025): 22,248 of those photographs shown to two monkeys while <strong>Utah arrays</strong> (a 10 × 10 grid of electrodes left in cortex) recorded V1, V4 and IT at once; a <strong>site</strong> is one electrode and the few neurons nearest it. <strong>Triple-N</strong> (Li et al. 2026): <strong>Neuropixels</strong> probes through IT. <strong>NSD</strong> (Allen et al. 2022): 7 T fMRI, eight people</li>
+<li>The tools changed too: <mark>one microelectrode, one cell at a time</mark> → Utah arrays → Neuropixels, hundreds of sites on one shank → fMRI voxels. Next lecture: a network scored against TVSD</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1016/j.neuron.2024.12.003" rel="noopener">Papale et al. <b>Neuron 2025</b></a> · <a href="https://doi.org/10.1371/journal.pone.0223792" rel="noopener">Hebart et al. <b>PLOS ONE 2019</b></a> · <a href="https://doi.org/10.1038/s41593-026-02322-z" rel="noopener">Li et al. <b>Nat Neurosci 2026</b></a> · <a href="https://doi.org/10.1038/s41593-021-00962-x" rel="noopener">Allen et al. <b>Nat Neurosci 2022</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-class="split" data-marpit-pagination="15" data-marpit-pagination-total="65" aria-labelledby="heading-15"><p class="page">Slide 15</p>
@@ -147,7 +147,7 @@
 </div>
 <div class="col">
 <ul>
-<li><strong>S-cells</strong>: simple cells, one template per plane, at every position. <strong>C-cells</strong>: pool nearby S-cells of one plane</li>
+<li><strong>S-cells</strong>: simple cells, one template per plane (a plane is one feature map), at every position. <strong>C-cells</strong>: pool nearby S-cells of one plane</li>
 <li>Repeat S then C; the top responds to a whole digit <mark>wherever it sits</mark>. Trained without labels, layer by layer</li>
 </ul>
 </div>
@@ -163,8 +163,8 @@
 <ul>
 <li>The wiring of the visual system, left; the model, right</li>
 <li>S and C alternate, V1 to IT; pooling by the <strong>max</strong>, over position and over <strong>scale</strong> (next slide)</li>
-<li>Receptive-field sizes, tuning widths and pooling ranges from physiology</li>
-<li><mark>No backprop</mark>: S2 templates sampled from natural images, labels only at the readout</li>
+<li>Receptive-field sizes (0.2° at S1 to 7° at the top, the table), how sharply each unit is tuned and how far each C unit pools: read off recordings, not fit to the task</li>
+<li><mark>No backprop</mark>: each S2 template is a patch of C1 responses to a natural image, stored as is; only the readout sees labels</li>
 </ul>
 </div>
 </div>
@@ -179,7 +179,7 @@
 <ul>
 <li>HMAX's S1 bank: one Gabor filter per orientation at each of several <strong>sizes</strong>; a C1 unit takes the max over nearby positions <em>and</em> over two adjacent sizes, a <strong>scale band</strong></li>
 <li>So an object seen once at one size drives nearly the same C1 units at another size: <mark>tolerance to scale, built in</mark></li>
-<li>A network trained at one scale has no such tolerance; it gets it from <strong>data augmentation</strong>, the rescaled copies of last lecture, and only within the range it saw</li>
+<li>A network has no built-in scale pooling: its size tolerance comes from the sizes in its training photographs and from <strong>data augmentation</strong>, the rescaled copies of last lecture, and it fades outside the range it saw</li>
 </ul>
 </div>
 </div>
@@ -206,7 +206,7 @@
 </div>
 <ul>
 <li>A map says <em>where</em> a feature is, to the pixel; recognition needs <em>whether</em>, roughly where. <strong>Max-pooling</strong> keeps the largest value in each window, so a small shift of the feature gives the same answer: <mark>tolerance to position, the complex cell's job</mark>, as convolution is the simple cell's: selectivity. HMAX's C stages do the same</li>
-<li><strong>Global average pooling</strong> averages each map over all positions: one number per channel; together they form the image's <strong>feature vector</strong>, the readout's input</li>
+<li><strong>Global average pooling</strong> averages each map over all positions: one number per <strong>channel</strong> (one channel = one filter's feature map); together they form the image's <strong>feature vector</strong>, the readout's input</li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/1312.4400" rel="noopener">Lin, Chen &amp; Yan <b>ICLR 2014</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-class="split" data-marpit-pagination="20" data-marpit-pagination-total="65" aria-labelledby="heading-20"><p class="page">Slide 20</p>
@@ -217,9 +217,9 @@
 </div>
 <div class="col">
 <ul>
-<li>One model, one set of parameters, tested from V1 to behaviour</li>
+<li>One model, one set of parameters, tested from V1 to behaviour: rows are behaviour (Psych., psychophysics), a human fMRI area (LOC), prefrontal cortex (PFC), then IT, V4, V1</li>
 <li><span><b>Black</b></span>: data used to set the parameters. <span><b>Red</b></span>: data the model agrees with. <span><b>Blue</b></span>: <mark>predictions made before the data</mark>, such as the MAX in V4 and in some V1 complex cells</li>
-<li>V4 tuning for curved boundaries (Pasupathy &amp; Connor) was matched by fitting model units to each cell; the IT read-out of category (Hung et al.) came out of the same units</li>
+<li>V4 tuning for curved boundaries (Pasupathy &amp; Connor) was matched by fitting model units to each cell; a linear readout of the same model units named the category as Hung et al.'s IT readout did</li>
 </ul>
 </div>
 </div>
@@ -233,8 +233,8 @@
 </div>
 <div class="col">
 <ul>
-<li>Serre, Oliva &amp; Poggio (2007): the animal / non-animal task of the vision lecture's opening movie. Photographs flashed for 20 ms, then a noise <strong>mask</strong> 50 ms after onset, assumed to interrupt <strong>feedback</strong> from higher areas</li>
-<li>The model's accuracy (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>d</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">d'</annotation></semantics></math>) matched people's at every viewing distance, and it was <mark>wrong on the same images</mark> more often than chance</li>
+<li>Serre, Oliva &amp; Poggio (2007): the animal / non-animal task of the vision lecture's opening movie. Photographs flashed for 20 ms, then a noise <strong>mask</strong> (a second image that overwrites the first) 50 ms after onset: too soon for <strong>feedback</strong> from higher areas to return</li>
+<li><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>d</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">d'</annotation></semantics></math></strong>: sensitivity, hits against false alarms, 0 = guessing. The model matched people at every viewing distance and <mark>was wrong on the same images</mark> more often than two equally good observers would be</li>
 <li>The claim: under masking, one feedforward sweep is enough</li>
 </ul>
 </div>
@@ -248,18 +248,18 @@
 </div>
 <div class="col">
 <ul>
-<li>CNNs existed, LeCun's <strong>LeNet</strong> (1998), with every filter learned <strong>end to end by backprop</strong>; through the 2000s they and HMAX were about equally good, and neither scaled</li>
-<li>What changed in 2012: GPUs, and <strong>1.2 million labelled photographs</strong> (ImageNet). <strong>AlexNet</strong>, then 8 → 152 layers in three years, better every year</li>
-<li><mark>The biology was kept as architecture; the hand-set constraints were dropped</mark>: no fixed tuning widths or pooling sizes, whatever fits the labels</li>
+<li>CNNs existed, LeCun's <strong>LeNet</strong> (1998), with every filter learned <strong>end to end by backprop</strong>; through the 2000s they and HMAX were about equally good, and neither got much better with more data</li>
+<li>What changed in 2012: GPUs, and <strong>1.2 million labelled photographs</strong> (ImageNet). <strong>AlexNet</strong>, then 8 → 152 layers in three years, better every year (top-5: the right label among the five best guesses)</li>
+<li>AlexNet kept the stack, a weighted sum then a max, and <mark>dropped the hand-set numbers</mark>: whatever fits the labels</li>
 </ul>
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1109/5.726791" rel="noopener">LeCun, Bottou, Bengio &amp; Haffner <b>Proc IEEE 1998</b></a> · <a href="https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html" rel="noopener">Krizhevsky, Sutskever &amp; Hinton <b>NeurIPS 2012</b></a> · <a href="https://doi.org/10.1109/CVPR.2016.90" rel="noopener">He, Zhang, Ren &amp; Sun <b>CVPR 2016</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-class="prov-air" data-marpit-pagination="23" data-marpit-pagination-total="65" aria-labelledby="heading-23"><p class="page">Slide 23</p>
-<h2 id="heading-23">Same operations, a different recipe</h2>
+<h2 id="heading-23">Same operations, different settings and learning</h2>
 <ul>
 <li><strong>Operations:</strong> the same. A weighted sum, then a pooling, stacked. HMAX's S and C; a network's convolution and max-pooling</li>
-<li><strong>Settings:</strong> HMAX took every filter size, pooling range and tuning width from physiology. A deep network sets them by an engineering criterion, <mark>whatever maximizes accuracy on held-out images</mark>, searched by hand</li>
+<li><strong>Settings:</strong> HMAX took every filter size, pooling range and tuning width from physiology. A deep network sets them by an engineering criterion, <mark>whatever maximizes accuracy on held-out images</mark>, with filter sizes, strides and depth tried by hand</li>
 <li><strong>Learning:</strong> HMAX learned its S2 templates without labels and trained only a readout on top, animal or not. A network learns every weight by <strong>backpropagation</strong> from 1.2 million labels, 1,000 classes, <strong>supervised</strong> end to end</li>
 <li><strong>Scale tolerance:</strong> built into HMAX's C1; learned from augmentation in a network</li>
 </ul>
@@ -289,10 +289,10 @@
         hidden = <span class="hljs-variable language_">self</span>.c1(hidden)                           <span class="hljs-comment"># (batch, 16, 56, 56)</span>
         hidden = <span class="hljs-variable language_">self</span>.s2b(hidden)                          <span class="hljs-comment"># (batch, 64, 56, 56)</span>
         pooled = <span class="hljs-variable language_">self</span>.c2b(hidden).flatten(<span class="hljs-number">1</span>)               <span class="hljs-comment"># (batch, 64)</span>
-        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.readout(pooled)                        <span class="hljs-comment"># class logits</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.readout(pooled)                        <span class="hljs-comment"># class scores (logits)</span>
 </code></marp-pre>
 <ul>
-<li>S: template matching (convolution, ReLU); C: a maximum over positions. HMAX's <strong>bypass route</strong>, S1 → C1 → S2b → C2b: the network you will train with Adam, keeping the epoch with the best validation accuracy</li>
+<li>S: template matching (convolution, ReLU); C: a maximum over positions. HMAX's <strong>bypass route</strong> (the short path that skips the middle layers), S1 → C1 → S2b → C2b: the network you will train with Adam (the training lecture's optimizer), keeping the epoch with the best validation accuracy</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-class="prov-air" data-marpit-pagination="26" data-marpit-pagination-total="65" aria-labelledby="heading-26"><p class="page">Slide 26</p>
 <h2 id="heading-26">ResNet-50: four block groups</h2>
@@ -300,9 +300,9 @@
 <figure><img src="../images/L11/resnet50_stages_f1.svg" alt="ResNet-50 from left to right: a 224 by 224 tiger image; conv1, a 7 by 7 convolution at stride 2, 112 by 112; max-pool, 56 by 56; layer1, 3 blocks, 56 by 56; layer2, 4 blocks, 28 by 28; layer3, 6 blocks, 14 by 14; layer4, 3 blocks, 7 by 7; global average, 1 by 1; readout" aria-describedby="figure-26-1"><figcaption id="figure-26-1"><p>ResNet-50 drawn left to right as a chain of squares joined by arrows, each labelled with its map size. A 224 by 224 photograph of a tiger (the image), then conv1, a 7 by 7 convolution at stride 2, 112 by 112; max-pool, 56 by 56; layer1, 3 blocks, 56 by 56; layer2, 4 blocks, 28 by 28; layer3, 6 blocks, 14 by 14; layer4, 3 blocks, 7 by 7; global average, 1 by 1; and a readout box. The four block groups are outlined in magenta and the squares shrink from left to right. The point: 16 residual blocks in four groups, each group after the first halving the maps' height and width.</p><a href="../images/L11/resnet50_stages_f1.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>ResNet-50 stacks 16 <strong>residual blocks</strong> in four <strong>block groups</strong>, named <code>layer1</code> to <code>layer4</code> in PyTorch. Each group after the first starts by halving the maps' height and width</li>
+<li>ResNet-50 stacks 16 <strong>residual blocks</strong> (a few convolutions whose input is added back to their output) in four <strong>block groups</strong>, named <code>layer1</code> to <code>layer4</code> in PyTorch. Each group after the first starts by halving the maps' height and width</li>
 <li><code>layer4</code> is the last group: its 7 × 7 maps are averaged (global average pooling) into the image's feature vector, then a readout names the category</li>
-<li>The ResNet-18 you recorded earlier uses the same names: <code>layer1</code>, <code>layer3</code>, <code>layer4</code> were its early, middle and late stages</li>
+<li>The ResNet-18 you recorded earlier uses the same names</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-class="prov-air" data-marpit-pagination="27" data-marpit-pagination-total="65" aria-labelledby="heading-27"><p class="page">Slide 27</p>
 <h2 id="heading-27">Freeze the encoder, or fine-tune the last block group</h2>
@@ -311,8 +311,8 @@
 </div>
 <ul>
 <li>The <strong>encoder</strong> is every layer before the readout. <strong>Frozen</strong>: its weights stay fixed. <strong>Fine-tuning</strong>: keep training some pretrained weights on the new task</li>
-<li>A middle road between a new readout on frozen features and backprop into every layer: freeze <code>conv1</code> to <code>layer3</code>; fine-tune <code>layer4</code> and the readout</li>
-<li>One warning: <strong>BatchNorm</strong> behaves differently in training and evaluation mode. <mark>Call <code>model.eval()</code> on new images; keep frozen layers in eval mode while fine-tuning</mark>, every time (mechanism in the reading)</li>
+<li>Middle road: freeze <code>conv1</code> to <code>layer3</code>, fine-tune <code>layer4</code> and the readout</li>
+<li><strong>BatchNorm</strong> rescales each channel by the current minibatch's mean and variance in training mode, by stored averages in evaluation mode; freezing weights does not freeze those averages. <mark><code>model.eval()</code> on new images; frozen layers back in eval mode while fine-tuning</mark></li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/2202.10054" rel="noopener">Kumar, Raghunathan, Jones, Ma &amp; Liang <b>ICLR 2022</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-class="prov-air" data-marpit-pagination="28" data-marpit-pagination-total="65" aria-labelledby="heading-28"><p class="page">Slide 28</p>
@@ -324,9 +324,9 @@
 <div class="col">
 <ul>
 <li><strong>Supervised</strong>: ImageNet's 1.2 million labelled photographs; the network of the previous slides</li>
-<li><strong>DINO</strong> (self-supervised): no labels; two augmented views of one photograph must give the same output</li>
-<li><strong>Robust</strong> (adversarially trained): trained on photographs with <strong>adversarial</strong> changes, too small to see, chosen by the gradient to flip the answer</li>
-<li><mark>Same architecture, three sets of weights</mark>; you will compare all three as frozen encoders</li>
+<li><strong>DINO</strong> (self-supervised): no labels; two augmented views of one photograph must agree</li>
+<li><strong>Robust</strong> (adversarially trained): <strong>adversarial</strong> changes added, too small to see, chosen by the gradient to flip the answer</li>
+<li><mark>Same architecture, three sets of weights</mark>: three guesses about what a visual system is trained on</li>
 </ul>
 </div>
 </div>
@@ -336,6 +336,7 @@
 <blockquote>
 <p>Accuracy tells you <em>that</em> a network works, not <strong>how</strong>. Two networks with the same score can rely on completely different evidence.</p>
 </blockquote>
+<p>The rest of today: which parts of the image did the answer depend on, and how would you test that claim? Change the stimulus, measure the response, run a control.</p>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-class="prov-air" data-marpit-pagination="30" data-marpit-pagination-total="65" aria-labelledby="heading-30"><p class="page">Slide 30</p>
 <h2 id="heading-30">Occlusion: cover a region and watch the score</h2>
 <div class="capfig">
@@ -344,17 +345,17 @@
 <ul>
 <li>An accuracy score cannot say which part of an image drove a decision. To find out, change the image and watch the answer</li>
 <li>Cover part of the image with a grey square, run the network again, and repeat at every position: an <strong>occlusion map</strong> of the correct class's probability (blue: covering here hurts)</li>
-<li>A drop can also come from the grey square itself. Compare with a <strong>control</strong>: a square of the same size where it should not matter</li>
+<li>A drop can also come from the grey square itself. Compare with a <strong>control</strong>: a square of the same size placed off the bright region of the map; if the score drops there too, the square itself is doing the work</li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1007/978-3-319-10590-1_53" rel="noopener">Zeiler &amp; Fergus <b>ECCV 2014</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-class="prov-air" data-marpit-pagination="31" data-marpit-pagination-total="65" aria-labelledby="heading-31"><p class="page">Slide 31</p>
 <h2 id="heading-31">Ways to ask which pixels mattered</h2>
-<p>An <strong>attribution map</strong> (or heat map): each image region's contribution to <em>one</em> class's <strong>score</strong>: its <strong>logit</strong> (the class's score before the softmax) or its probability.</p>
+<p>An <strong>attribution map</strong> (or heat map): each image region's contribution to <em>one</em> class's <strong>score</strong>: its <strong>logit</strong> (the class's score before the softmax) or its probability. The class can be the network's answer or any class you name.</p>
 <ul>
-<li><strong>Local</strong> methods, one decision, one image. Today: saliency and SmoothGrad in full, Grad-CAM briefly; the other tests after the recap, as reading</li>
+<li>All are <strong>local</strong>: they explain one decision on one image (what a unit does across all images is the next lecture). Today: occlusion, saliency, SmoothGrad; Grad-CAM briefly</li>
 <li><strong>Perturb and rerun:</strong> cover a region, measure the drop in the score: <strong>occlusion</strong> (previous slide)</li>
 <li><strong>Gradient at the pixels:</strong> how fast the score changes as each pixel changes: <strong>saliency</strong>; averaged over many gradients to steady it: <strong>integrated gradients</strong>, <strong>SmoothGrad</strong></li>
-<li><strong>Gradient at the last feature maps:</strong> weight each coarse top-layer map by its average gradient and add them: <strong>Grad-CAM</strong></li>
+<li><strong>Gradient at the last feature maps:</strong> ask the last layer's coarse maps which of them push the score up, and where they fire: <strong>Grad-CAM</strong></li>
 </ul>
 <p><mark>Occlusion asks what the decision loses without a region; saliency and Grad-CAM ask how the score would move if the pixels, or the top maps, changed a little.</mark></p>
 <div class="ref"><a href="https://doi.org/10.1007/978-3-319-10590-1_53" rel="noopener">Zeiler &amp; Fergus <b>ECCV 2014</b></a> · <a href="https://arxiv.org/abs/1312.6034" rel="noopener">Simonyan, Vedaldi &amp; Zisserman <b>ICLR Workshop 2014</b></a> · <a href="https://arxiv.org/abs/1610.02391" rel="noopener">Selvaraju et al. <b>ICCV 2017</b></a></div>
@@ -363,9 +364,9 @@
 <div class="capfig">
 <figure><img src="../images/L12/flower_four_methods.png" alt="A petunia photograph, then four maps over it for the class morning glory: saliency, a speckle spread over the whole flower; integrated gradients, credit concentrated on the dark centre and along the petal veins and edges, with less speckle; Grad-CAM, one smooth blob on the dark centre; occlusion, a coarse grid of squares also peaking on the centre" aria-describedby="figure-32-1"><figcaption id="figure-32-1"><p>Five panels in a row, each 224 by 224 pixels. First, the petunia photograph: a pink flower with a dark centre, a second flower in the lower right corner. Then four attribution maps for the class morning glory drawn in the inferno colour scale over a greyed copy of the photograph, each scaled to its own 99.5th percentile. Saliency: fine bright speckle spread over the whole flower. Integrated gradients: credit concentrated on the dark centre and along the petal veins and edges, with less speckle. Grad-CAM: one smooth bright blob on the dark centre. Occlusion: a coarse grid of 32-pixel squares, brightest on the centre. The maps agree on the centre and differ in how fine they are.</p><a href="../images/L12/flower_four_methods.png">Open full-size figure</a></figcaption></figure>
 </div>
-<p class="provenance">Computed: the course's flower network (ResNet-50 + a linear readout for 102 flower species) · a test petunia it calls morning glory, p = 0.63</p>
+<p class="provenance">Computed: the course's flower network (ResNet-50 + a linear readout for 102 flower species) · a test petunia it calls morning glory, probability 0.63</p>
 <ul>
-<li>All four maps are for the class <strong>morning glory</strong>, the network's answer (p = 0.63). Saliency is speckled over the whole flower; integrated gradients concentrates on the centre and the petal edges; Grad-CAM is one smooth blob on the dark centre; occlusion is as coarse as its square, and agrees</li>
+<li>All four maps are for <strong>morning glory</strong>, the network's answer (probability 0.63), which is wrong: the flower is a petunia. A map explains the decision made, not the right one. Saliency is speckled over the whole flower; integrated gradients concentrates on the centre and the petal edges; Grad-CAM is one smooth blob on the dark centre; occlusion is as coarse as its square, and agrees</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-class="prov-air" data-marpit-pagination="33" data-marpit-pagination-total="65" aria-labelledby="heading-33"><p class="page">Slide 33</p>
 <h2 id="heading-33">Saliency: the gradient at the pixels</h2>
@@ -382,12 +383,12 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-class="prov-air" data-marpit-pagination="34" data-marpit-pagination-total="65" aria-labelledby="heading-34"><p class="page">Slide 34</p>
 <h2 id="heading-34">SmoothGrad, and integrated gradients</h2>
 <div class="capfig">
-<figure><img src="../images/L12/flower_ig_only.png" alt="The petunia photograph and, beside it, its integrated-gradients map for the class morning glory: credit concentrated on the flower's dark centre and along the petal edges, with less speckle than the saliency map" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Two panels. Left, the petunia photograph. Right, its integrated-gradients map for the class morning glory, computed with a blurred copy of the photograph as the baseline: bright credit on the flower's dark centre and along the petal veins and edges, much less speckle than the saliency map, and almost nothing on the background.</p><a href="../images/L12/flower_ig_only.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L12/flower_saliency_smoothgrad.png" alt="The petunia's saliency map beside its SmoothGrad map, both for the class morning glory: the saliency map is a fine speckle over the whole flower; the SmoothGrad average is smoother, with the dark centre and the petal edges standing out" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>Two panels for the class morning glory on the petunia photograph: the saliency map, a fine speckle of bright pixels over the whole flower; and the SmoothGrad map, the average of fifty saliency maps of noisy copies of the photograph, smoother, with the flower's dark centre and the petal edges standing out.</p><a href="../images/L12/flower_saliency_smoothgrad.png">Open full-size figure</a></figcaption></figure>
 </div>
-<p class="provenance">Computed: integrated gradients, the same network and photograph · blurred baseline</p>
+<p class="provenance">Computed: saliency, then SmoothGrad (50 noisy copies) · same network and photograph</p>
 <ul>
-<li><strong>SmoothGrad</strong>: average the saliency maps of many noisy copies of the photograph. Not a blur of one map: the gradient is sampled all around the photograph, so the ReLU kinks average out; <mark>whether the smoother map says more about what the network uses is a question to test</mark></li>
-<li><strong>Integrated gradients</strong>: blend from a <strong>baseline</strong> (a blurred copy, or black) to the photograph and average the gradients along the way; credits add up to the whole change in the logit; mentioned for completeness, not needed for your maps</li>
+<li><strong>SmoothGrad</strong>: add a little noise to the photograph, 50 times; take the saliency map each time; average. Not a blur of one map: the gradient jumps wherever a ReLU switches, the jumps average out, the regions that always matter stay. <mark>Whether the smoother map says more about what the network uses is a question to test</mark></li>
+<li><strong>Integrated gradients</strong>: blend from a <strong>baseline</strong> (a blurred copy, or black) to the photograph and average the gradients along the way; not needed for your maps</li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/1703.01365" rel="noopener">Sundararajan, Taly &amp; Yan <b>ICML 2017</b></a> · <a href="https://arxiv.org/abs/1706.03825" rel="noopener">Smilkov et al. <b>ICML Workshop 2017</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-class="prov-air" data-marpit-pagination="35" data-marpit-pagination-total="65" aria-labelledby="heading-35"><p class="page">Slide 35</p>
@@ -406,7 +407,7 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-class="prov-air" data-marpit-pagination="36" data-marpit-pagination-total="65" aria-labelledby="heading-36"><p class="page">Slide 36</p>
 <h2 id="heading-36">Testing a map, and more methods: pointers</h2>
 <ul>
-<li><strong>Change the image and look at the score</strong>: inpaint the map's region and compare with a same-shape control elsewhere (next slide, the one test to remember)</li>
+<li><strong>Change the image and look at the score</strong>: <strong>inpaint</strong> (fill in from the surroundings) the map's region and compare with a same-shape control elsewhere (next slide, the one test to remember)</li>
 <li>After the recap, as reading: <strong>deletion curves</strong> (remove pixels in the map's order; a good map makes the score fall fast), the <strong>randomization sanity check</strong> (a map that survives random weights did not come from learning), why a map shows <strong>where, not what</strong> (texture against shape), and how a map plus an edit catches a <strong>shortcut</strong></li>
 <li>A map is a hypothesis about one decision; <mark>an edit with a control is the test</mark></li>
 </ul>
@@ -419,40 +420,41 @@
 <p class="provenance">Computed: same network and photograph · map region: the top 6% of map values, largest patch, grown to 8%</p>
 <ul>
 <li><strong>Inpaint</strong> the map's region (fill it from its surroundings); <strong>control:</strong> the same shape elsewhere, 30 times</li>
-<li>p(morning glory) 0.63 → 0.00; controls 0.30 to 0.93. <mark>Here the decision depended on the map's region</mark></li>
+<li>Probability 0.63 → 0.00; controls 0.30 to 0.93. <mark>Here the decision depended on the map's region</mark></li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-class="prov-air" data-marpit-pagination="38" data-marpit-pagination-total="65" aria-labelledby="heading-38"><p class="page">Slide 38</p>
 <h2 id="heading-38">Recap</h2>
 <ul>
-<li><strong>Simple and complex cells</strong> became convolution and max-pooling; HMAX set them from physiology and predicted data it was not fit to; networks then learned them from labels at scale</li>
+<li><strong>Simple and complex cells</strong> became convolution and max-pooling. <strong>The ventral stream</strong>: anatomy orders V1 → V2 → V4 → IT, cells prefer more complex things at each stage, responses start later at each stage</li>
+<li>HMAX set the two operations from physiology and predicted data it was not fit to; networks then learned them from labels at scale</li>
 <li><strong>ResNet-50</strong>: residual blocks, BatchNorm (keep frozen layers in evaluation mode), fine-tune <code>layer4</code>; one architecture, three trainings (supervised, DINO, robust)</li>
-<li><strong>Attribution maps</strong> (occlusion, saliency, integrated gradients, SmoothGrad, Grad-CAM) say which pixels moved one class's score; any map can be made for any class</li>
-<li><strong>Interventions</strong> test a map: inpaint the region, compare with same-shape controls; deletion curves and sanity checks are the reading after the recap</li>
+<li><strong>Attribution maps</strong> (occlusion, saliency, integrated gradients, SmoothGrad, Grad-CAM) say which pixels moved one class's score, for the class the network chose or any class you name</li>
+<li><strong>Edits with a control</strong> test a map: inpaint the region, compare with same-shape controls; deletion curves and sanity checks are the reading after the recap</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-class="lead" data-marpit-pagination="39" data-marpit-pagination-total="65" aria-labelledby="heading-39"><p class="page">Slide 39</p>
 <h2 id="heading-39">Going further: more of the network</h2>
-<h2 id="optional-reading-stride-and-padding-residual-blocks-batchnorm-the-saliency-code-the-occlusion-demo">Optional reading: stride and padding, residual blocks, BatchNorm, the saliency code, the occlusion demo</h2>
+<h2 id="optional-reading-receptive-field-sizes-along-the-stream-and-hung-et-als-it-readout-then-stride-and-padding-residual-blocks-batchnorm-the-saliency-code-the-occlusion-demo">Optional reading: receptive-field sizes along the stream and Hung et al.'s IT readout; then stride and padding, residual blocks, BatchNorm, the saliency code, the occlusion demo</h2>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-class="prov-air" data-marpit-pagination="40" data-marpit-pagination-total="65" aria-labelledby="heading-40"><p class="page">Slide 40</p>
 <h2 id="heading-40">Up the hierarchy: larger fields, more complex selectivity</h2>
-<ul>
-<li>From V1 to IT, receptive fields grow from under a degree of visual angle (a thumbnail at arm's length) to tens of degrees in anterior IT, and <mark>the preferred stimulus changes from bars to objects</mark></li>
-</ul>
-<div></div>
 <div class="capfig">
 <figure><img src="../images/L11/pub_kobatake1994_rf_map.png" alt="Kobatake and Tanaka 1994: receptive fields recorded along the ventral stream of the macaque drawn on the visual field, with lines to their recording sites on an outline of the cortex; small squares near the fovea for early areas, growing to fields many times the ten-degree bar across for anterior IT" aria-describedby="figure-40-1"><figcaption id="figure-40-1"><p>Kobatake and Tanaka (1994): receptive fields recorded along the macaque ventral stream. In the centre, an outline of the cortex with dots marking recording sites, from posterior on the left to anterior on the right. A line runs from each dot to the receptive field of the cells recorded there, drawn as a square or rectangle on a small cross that marks the centre of gaze. Posterior sites, on the left, connect to small squares of a few degrees close to the cross; anterior sites in inferotemporal cortex (IT), on the right, connect to large squares, the largest several times the 10-degree scale bar in the top-right corner. The point: receptive fields grow along the hierarchy.</p><a href="../images/L11/pub_kobatake1994_rf_map.png">Open full-size figure</a></figcaption></figure>
 </div>
+<div></div>
+<ul>
+<li>From V1 to IT, receptive fields grow from under a degree of visual angle (a thumbnail at arm's length) to tens of degrees in anterior IT, and <mark>the preferred stimulus changes from bars to objects</mark></li>
+</ul>
 <div class="ref"><a href="https://doi.org/10.1152/jn.1994.71.3.856" rel="noopener">Kobatake &amp; Tanaka <b>J Neurophysiol 1994</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-class="prov-air" data-marpit-pagination="41" data-marpit-pagination-total="65" aria-labelledby="heading-41"><p class="page">Slide 41</p>
 <h2 id="heading-41">Reading the category from a few hundred IT sites</h2>
-<ul>
-<li>Hung, Kreiman, Poggio &amp; DiCarlo (2005): 77 pictures, 8 categories, about 300 IT sites (multi-unit recordings). A <strong>linear readout</strong> of the population names the category <mark>about 100 ms</mark> after the image appears (middle), and still does when the object moves or changes size (right: trained at one position and size, tested at five others)</li>
-</ul>
-<div></div>
 <div>
 <figure><img src="../images/L11/pub_hung2005_fig1a.png" alt="Hung et al. 2005, Figure 1A: five example objects, a curved shape, a vegetable, a monkey face, a cat and a car, with spike rasters from three IT sites" aria-describedby="figure-41-1"><figcaption id="figure-41-1"><p>Hung, Kreiman, Poggio and DiCarlo (2005), Figure 1A. Top: five grey-background example pictures from the stimulus set, a ring-like toy shape, a vegetable, a monkey face, a cat and a car. Below each picture, spike rasters from three recording sites in inferotemporal cortex, Site 1 in blue, Site 2 in green and Site 3 in orange, with dots below for further sites. Each row of dots is one presentation; each dot is a spike. A black bar under each column and the label '0 100 ms' give the time scale. The point: each site fires differently for different pictures within about 100 ms.</p><a href="../images/L11/pub_hung2005_fig1a.png">Open full-size figure</a></figcaption></figure>
 <figure><img src="../images/L11/pub_hung2005_fig1b.png" alt="Hung et al. 2005, Figure 1B: classification performance against the number of IT sites, rising from chance to about 94 percent for categorization and 70 percent for identification with 256 sites" aria-describedby="figure-41-2"><figcaption id="figure-41-2"><p>Hung, Kreiman, Poggio and DiCarlo (2005), Figure 1B: classification performance, in percent correct from 0 to 100, against the number of IT recording sites on a logarithmic axis, 1, 4, 16, 64 and 256. The red curve, categorization (which of 8 categories), rises from near its chance level of about 12 percent to about 94 percent at 256 sites. The blue curve, identification (which of 77 pictures), rises from near zero to about 70 percent. Dotted horizontal lines mark the two chance levels. The point: a linear readout of a few hundred IT sites names the category reliably.</p><a href="../images/L11/pub_hung2005_fig1b.png">Open full-size figure</a></figcaption></figure>
 <figure><img src="../images/L11/pub_hung2005_fig2.png" alt="Hung et al. 2005, Figure 2: bars of classification performance near 70 percent when the classifier is trained on one size and position of a monkey face and tested on other sizes and positions, against a chance line near 12 percent" aria-describedby="figure-41-3"><figcaption id="figure-41-3"><p>Hung, Kreiman, Poggio and DiCarlo (2005), Figure 2 top: six bars of classification performance, percent correct, with a dashed chance line near 12 percent. Below each bar, the TRAIN row shows the monkey face at the size and position used to train the readout: 3.4 degrees at the centre; 3.4 degrees at the centre; 1.7 degrees at the centre; 6.8 degrees at the centre; 3.4 degrees shifted 2 degrees; 3.4 degrees shifted 4 degrees. The TEST rows show the other sizes and positions it was tested on. The first bar, tested at the training size and position, is about 77 percent; the five bars tested on new sizes and positions are all near 70 percent. The point: a readout trained at one size and position still works at others.</p><a href="../images/L11/pub_hung2005_fig2.png">Open full-size figure</a></figcaption></figure>
 </div>
+<div></div>
+<ul>
+<li>Hung, Kreiman, Poggio &amp; DiCarlo (2005): 77 pictures, 8 categories, about 300 IT sites (multi-unit recordings). A <strong>linear readout</strong> of the population names the category <mark>about 100 ms</mark> after the image appears (middle), and still does when the object moves or changes size (right: trained at one position and size, tested at five others)</li>
+</ul>
 <div class="ref"><a href="https://doi.org/10.1126/science.1117593" rel="noopener">Hung, Kreiman, Poggio &amp; DiCarlo <b>Science 2005</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-class="prov-air" data-marpit-pagination="42" data-marpit-pagination-total="65" aria-labelledby="heading-42"><p class="page">Slide 42</p>
 <h2 id="heading-42">Stride and padding set the size of a map</h2>
@@ -639,7 +641,7 @@ saliency = x.grad.<span class="hljs-built_in">abs</span>().amax(dim=<span class=
 </div>
 <ul>
 <li>A <strong>feature</strong>: one thing the network detects (an eye, text, a cone). <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> units give <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> perpendicular directions; nearly perpendicular ones number <strong>far more</strong>, so features must share units</li>
-<li><strong>Superposition</strong>: more features than units, most of them directions across units. The result: <strong>polysemantic</strong> units, responding to several unrelated things, like unit 179</li>
+<li><strong>Superposition</strong>: more features than units, most of them directions across units. The result: <strong>polysemantic</strong> units, responding to several unrelated things (next lecture shows one)</li>
 </ul>
 <div class="ref"><a href="https://transformer-circuits.pub/2022/toy_model/index.html" rel="noopener">Elhage et al. <b>Transformer Circuits Thread 2022</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-61" data-paginate="true" data-class="prov-air" data-marpit-pagination="61" data-marpit-pagination-total="65" aria-labelledby="heading-61"><p class="page">Slide 61</p>
@@ -677,7 +679,7 @@ saliency = x.grad.<span class="hljs-built_in">abs</span>().amax(dim=<span class=
 <li><a href="https://doi.org/10.1038/s42256-021-00338-7" rel="noopener">DeGrave, Janizek &amp; Lee <b>Nat Mach Intell 2021</b></a>: COVID-19 classifiers that used hospital marks</li>
 <li><a href="https://arxiv.org/abs/2307.05471" rel="noopener">Zimmermann, Klein &amp; Brendel <b>NeurIPS 2023</b></a>: larger networks are not easier to interpret</li>
 <li><a href="https://arxiv.org/abs/2502.16681" rel="noopener">Kantamneni et al. <b>ICML 2025</b></a>: sparse autoencoder features rarely beat a linear readout</li>
-<li><a href="https://arxiv.org/abs/2306.06805" rel="noopener">Fel et al. <b>NeurIPS 2023</b></a>: MaCo, the feature visualizations shown today</li>
+<li><a href="https://arxiv.org/abs/2306.06805" rel="noopener">Fel et al. <b>NeurIPS 2023</b></a>: MaCo, the feature-visualization method of the next lecture</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-65" data-paginate="true" data-class="prov-air" data-marpit-pagination="65" data-marpit-pagination-total="65" aria-labelledby="heading-65"><p class="page">Slide 65</p>
 <h2 id="heading-65">Minute paper</h2>
