@@ -18,8 +18,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-o
 input[type=range]{width:100%;accent-color:var(--mag);margin:4px 0 0}
 .ticks{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);padding:0 6px;font-variant-numeric:tabular-nums}
 .row{display:flex;align-items:center;gap:14px}
-.panel{display:flex;flex-direction:column;gap:6px;align-items:center}
-.panel h2{font-size:19px;font-weight:500;margin:0;color:var(--body);white-space:nowrap;height:26px}
+.panel{display:flex;flex-direction:column;gap:6px;align-items:center;width:440px}
+.panel h2{font-size:19px;font-weight:500;margin:0;color:var(--body);white-space:nowrap;height:26px;text-align:center;font-variant-numeric:tabular-nums}
 .panel h2 small{font-size:16px;color:var(--muted);font-weight:400}
 .op{font-size:40px;color:var(--muted);padding-top:30px;width:28px;text-align:center}
 canvas{display:block;width:340px;height:340px;border:1px solid #d9d4cc;background:#fff;image-rendering:auto}
@@ -69,16 +69,18 @@ D.images.forEach((m,i)=>{const b=document.createElement('button');b.className='t
 NETS.forEach(n=>{const b=document.createElement('button');b.type='button';b.textContent=n==='standard'?'standard':'robust (adversarially trained)';b.dataset.n=n;b.onclick=()=>{net=n;render();};$('nets').appendChild(b);});
 const sl=$('eps');sl.max=E.length-1;sl.value=ei;sl.oninput=()=>{ei=+sl.value;render();};
 $('ticks').innerHTML=E.map(e=>`<span>${fmt(e)}</span>`).join('');
-async function draw(k,src){const i=await load(src);const g=cv[k].getContext('2d');g.setTransform(DPR,0,0,DPR,0,0);g.imageSmoothingEnabled=true;g.drawImage(i,0,0,340,340);}
+const AMP=16;
+async function draw(k,src,gain){const i=await load(src);const g=cv[k].getContext('2d');g.setTransform(DPR,0,0,DPR,0,0);g.imageSmoothingEnabled=true;g.drawImage(i,0,0,340,340);
+ if(gain!==undefined&&gain!==1){const W=cv[k].width,H=cv[k].height,d=g.getImageData(0,0,W,H),a=d.data;for(let j=0;j<a.length;j+=4){for(let c=0;c<3;c++)a[j+c]=Math.max(0,Math.min(255,128+gain*(a[j+c]-128)));}g.putImageData(d,0,0);}}
 let tok=0;
 function render(){
  const m=D.images[im],R=m.runs[net],r=R.eps[ei],e=E[ei],att=R.attacked,t1=r.top[0];
  document.querySelectorAll('#pics button').forEach((b,i)=>b.setAttribute('aria-pressed',i===im));
  document.querySelectorAll('#nets button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.n===net));
  sl.value=ei;$('epsv').textContent=fmt(e)+' / 255';sl.setAttribute('aria-valuetext',`${fmt(e)} out of 255`);
- $('amp').textContent=e?`(amplified ×${Math.round(255/(2*e))}; grey = no change)`:'(nothing changed)';
+ $('amp').textContent=`(×${AMP} at every size; grey = no change)`;
  $('linf').textContent=e?`(largest change ${fmt(r.linf255)}/255)`:'';
- const my=++tok;Promise.all([load(m.photo),load(r.delta),load(r.adv)]).then(()=>{if(my!==tok)return;draw(0,m.photo);draw(1,r.delta);draw(2,r.adv);});
+ const my=++tok;Promise.all([load(m.photo),load(r.delta),load(r.adv)]).then(()=>{if(my!==tok)return;draw(0,m.photo);draw(1,r.delta,e?AMP/(255/(2*e)):1);draw(2,r.adv);});
  // bars: top 5, attacked class always shown
  let idx=r.top.slice(0,5),pp=r.p.slice(0,5);
  if(!idx.includes(att)){idx[4]=att;pp[4]=r.p_att;}
@@ -89,7 +91,7 @@ function render(){
  const desc=`${C[m.true]} photograph, ${D.networks[net]}, attack size ${fmt(e)} of 255: top class ${C[t1]} p ${r.p[0].toFixed(3)}; p(${C[att]}) ${r.p_att.toFixed(3)}`;
  $('status').textContent=desc+(flipped?' (answer changed)':'');
  cv[0].setAttribute('aria-label',`original photograph of a ${C[m.true]}`);
- cv[1].setAttribute('aria-label',e?`perturbation amplified ${Math.round(255/(2*e))} times: fine coloured noise over the whole image`:'no perturbation: flat grey');
+ cv[1].setAttribute('aria-label',e?`perturbation amplified ${AMP} times, the same gain at every size: fine coloured noise over the whole image, fainter for smaller attacks`:'no perturbation: flat grey');
  cv[2].setAttribute('aria-label',`attacked image, visually the same as the original; network says ${C[t1]}`);
 }
 document.addEventListener('keydown',ev=>{
