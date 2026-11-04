@@ -1,0 +1,334 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Learning without labels · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Learning without labels</h1><p>Reader-friendly version of the 34 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L14_unsupervised-self-supervised.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-2">Learning without labels</a></li><li><a href="#slide-3">Where the last lecture left us</a></li><li><a href="#slide-4">Learning without a teacher</a></li><li><a href="#slide-5">What does a network learn from its inputs alone?</a></li><li><a href="#slide-6">The autoencoder</a></li><li><a href="#slide-7">The reconstruction loss</a></li><li><a href="#slide-8">Tied weights ⇒ PCA's subspace</a></li><li><a href="#slide-9">Nonlinear autoencoders go beyond PCA</a></li><li><a href="#slide-10">Sparse coding: an autoencoder with a prior</a></li><li><a href="#slide-11">Measured against V1</a></li><li><a href="#slide-12">Where do the labels come from?</a></li><li><a href="#slide-13">The label problem</a></li><li><a href="#slide-14">Make the data label itself</a></li><li><a href="#slide-15">Early pretext tasks</a></li><li><a href="#slide-16">Contrastive learning: the idea</a></li><li><a href="#slide-17">SimCLR</a></li><li><a href="#slide-18">The InfoNCE loss</a></li><li><a href="#slide-19">Without negatives: self-distillation (BYOL, DINO)</a></li><li><a href="#slide-20">What DINO learns with no labels</a></li><li><a href="#slide-21">Masked prediction: the other family</a></li><li><a href="#slide-22">One recipe: pretrain once, read out cheaply</a></li><li><a href="#slide-23">Does the brain need labels?</a></li><li><a href="#slide-24">Unsupervised networks predict V1, V4 and IT</a></li><li><a href="#slide-25">Category structure without category labels</a></li><li><a href="#slide-26">What is the brain's positive pair?</a></li><li><a href="#slide-27">Back to the cohort</a></li><li><a href="#slide-28">Generative models, in one slide</a></li><li><a href="#slide-29">Recap</a></li><li><a href="#slide-30">Looking ahead</a></li><li><a href="#slide-31">Further reading for the research trail</a></li><li><a href="#slide-32">Minute paper</a></li><li><a href="#slide-33">Going further</a></li><li><a href="#slide-34">PyTorch: the InfoNCE loss</a></li></ol></nav><section id="slide-2" data-paginate="true" data-class="lead" data-marpit-pagination="2" data-marpit-pagination-total="34" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<h2 id="heading-2">Learning without labels</h2>
+<p>Three ways a network learns with no labels: rebuild the input, manufacture the labels from the input, and the question of whether the brain needs labels at all</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-class="split" data-marpit-pagination="3" data-marpit-pagination-total="34" aria-labelledby="heading-3"><p class="page">Slide 3</p>
+<h2 id="heading-3">Where the last lecture left us</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L13/serre2026_annrev_fig4_ad.png" alt="Four scatter plots of alignment score against ImageNet multilabel accuracy for 363 classifiers, CNNs as blue dots, transformers orange, self-supervised and image-text models as open circles, adversarially trained models as triangles, each with a dashed noise ceiling. Arcaro IT: rank correlation plus 0.37 overall, minus 0.38 among the 84 models above 92.7 percent. Triple-N IT: minus 0.08 overall, plus 0.20 at the top. TVSD IT: plus 0.73 overall, plus 0.65 at the top. Human feature use: minus 0.77 overall, minus 0.37 at the top" aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>Four scatter plots of alignment score against ImageNet multilabel accuracy for 363 classifiers, CNNs as blue dots, transformers orange, self-supervised and image-text models as open circles, adversarially trained models as triangles, each with a dashed noise ceiling. Arcaro IT: rank correlation plus 0.37 overall, minus 0.38 among the 84 models above 92.7 percent. Triple-N IT: minus 0.08 overall, plus 0.20 at the top. TVSD IT: plus 0.73 overall, plus 0.65 at the top. Human feature use: minus 0.77 overall, minus 0.37 at the top</p><a href="../images/L13/serre2026_annrev_fig4_ad.png">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Reproduced from Serre (2026), Fig. 4 (draft)</p>
+</div>
+<div class="col">
+<ul>
+<li>363 networks scored against IT recordings and against human feature use. The open circles are networks trained <strong>without labels</strong> (self-supervised) or from image–caption pairs</li>
+<li>They sit among the best fits. <mark>Labels are not what made a network predict the brain</mark></li>
+<li>The brain gets no labels either. Today's question: how does a network learn anything from its inputs alone?</li>
+</ul>
+</div>
+</div>
+<div class="ref">Serre <b>Annu Rev Vis Sci 2026</b> · <a href="https://doi.org/10.1016/j.tics.2025.11.016" rel="noopener">Linsley, Feng &amp; Serre <b>Trends Cogn Sci 2026</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="34" aria-labelledby="heading-4"><p class="page">Slide 4</p>
+<h2 id="heading-4">Learning without a teacher</h2>
+<ul>
+<li>Most networks so far learned from labels: each input came with the right answer <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math>, and the weights followed the error <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>δ</mi><mo>=</mo><mi>y</mi><mo>−</mo><mover accent="true"><mi>y</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\delta = y - \hat y</annotation></semantics></math></li>
+<li><strong>Unsupervised</strong> learning: no labels. The network sees only its inputs</li>
+<li>A ferret kit or an infant sees millions of scenes and is told the name of almost none; whatever V1 learns, it learns this way</li>
+<li><mark>Today the input is its own teacher:</mark> what can a network learn from its inputs alone?</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-class="lead" data-marpit-pagination="5" data-marpit-pagination-total="34" aria-labelledby="heading-5"><p class="page">Slide 5</p>
+<h2 id="heading-5">What does a network learn from its inputs alone?</h2>
+<h2 id="pca-keeps-the-directions-that-rebuild-the-data-best-write-that-goal-as-a-loss-rebuild-the-input-through-a-narrow-layer-and-let-gradient-descent-find-the-weights">PCA keeps the directions that rebuild the data best. Write that goal as a loss, rebuild the input through a narrow layer, and let gradient descent find the weights</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-marpit-pagination="6" data-marpit-pagination-total="34" aria-labelledby="heading-6"><p class="page">Slide 6</p>
+<h2 id="heading-6">The autoencoder</h2>
+<div class="capfig">
+<figure><img src="../images/L10/ae_architecture.svg" alt="An hourglass autoencoder trained on handwritten digits. Left: an input digit 3, 784 pixels. A magenta trapezoid labeled encoder W1 narrows to a column of 32 code units h, shaded by how active each is. A second trapezoid labeled decoder W2 widens to the reconstruction, a blurrier but recognizable 3" aria-describedby="figure-6-1"><figcaption id="figure-6-1"><p>An hourglass autoencoder trained on handwritten digits. Left: an input digit 3, 784 pixels. A magenta trapezoid labeled encoder W1 narrows to a column of 32 code units h, shaded by how active each is. A second trapezoid labeled decoder W2 widens to the reconstruction, a blurrier but recognizable 3</p><a href="../images/L10/ae_architecture.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>The <strong>encoder</strong> maps <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math> numbers) to a <strong>code</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐡</mi></mrow><annotation encoding="application/x-tex">\mathbf{h}</annotation></semantics></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math> numbers); the <strong>decoder</strong> rebuilds <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\hat{\mathbf{x}}</annotation></semantics></math>. With <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>&lt;</mo><mi>D</mi></mrow><annotation encoding="application/x-tex">k&lt;D</annotation></semantics></math> (<strong>undercomplete</strong>), the <strong>bottleneck</strong> keeps only what rebuilds the input</li>
+<li>Uses: compress; flag inputs that rebuild badly (anomaly detection); a model of memory, store the code and rebuild the episode on recall (Spens &amp; Burgess 2024)</li>
+</ul>
+<p class="provenance">Computed: a 784–32–784 network trained on 60,000 MNIST digits; a test digit</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-marpit-pagination="7" data-marpit-pagination-total="34" aria-labelledby="heading-7"><p class="page">Slide 7</p>
+<h2 id="heading-7">The reconstruction loss</h2>
+<p>The target <strong>is the input</strong>: no labels needed. Like the two-views objective of the lecture on learning the weights, this is <strong>self-supervised</strong>: the input supplies its own target, a special case of unsupervised learning.</p>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">ℓ</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mtext> </mtext><mi mathvariant="normal">∥</mi><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>^</mo></mover><mo>−</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><msup><mi mathvariant="normal">∥</mi><mn>2</mn></msup><mo separator="true">,</mo><mspace width="2em"></mspace><mi mathvariant="script">L</mi><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munder><mo>∑</mo><mi>i</mi></munder><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mtext> </mtext><mi mathvariant="normal">∥</mi><msup><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>^</mo></mover><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup><mo>−</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup><msup><mi mathvariant="normal">∥</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\ell = \tfrac12\,\|\hat{\mathbf{x}} - \mathbf{x}\|^2, \qquad \mathcal{L} = \frac{1}{N}\sum_{i}\tfrac12\,\|\hat{\mathbf{x}}^{(i)} - \mathbf{x}^{(i)}\|^2
+</annotation></semantics></math></div></span></p><ul>
+<li>Train with backprop: the error <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>^</mo></mover><mo>−</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\hat{\mathbf{x}} - \mathbf{x}</annotation></semantics></math> goes back through the decoder, then the encoder</li>
+<li>PCA's directions also <strong>minimize</strong> the squared reconstruction error of a <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math>-dimensional projection, the other side of maximizing variance (PCA lecture)</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="34" aria-labelledby="heading-8"><p class="page">Slide 8</p>
+<h2 id="heading-8">Tied weights ⇒ PCA's subspace</h2>
+<p>Tie the decoder to the encoder: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>  </mtext><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mrow><mtext> ⁣</mtext><mn>2</mn></mrow></msub><mo>=</mo><msubsup><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mrow><mtext> ⁣</mtext><mn>1</mn></mrow><mi mathvariant="normal">⊤</mi></msubsup><mo>≡</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mi mathvariant="normal">⊤</mi></msup></mrow><annotation encoding="application/x-tex">\;\mathbf{W}_{\!2} = \mathbf{W}_{\!1}^\top \equiv \mathbf{W}^\top</annotation></semantics></math> (centered data, no biases, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math> the identity).</p>
+<p>A <strong>linear</strong> autoencoder then reconstructs</p>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>^</mo></mover><mo>=</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mtext> </mtext><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\hat{\mathbf{x}} = \mathbf{W}^\top\mathbf{W}\,\mathbf{x}
+</annotation></semantics></math></div></span></p><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{W}\mathbf{x}</annotation></semantics></math> gives the <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math> scores; <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mi mathvariant="normal">⊤</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf{W}^\top</annotation></semantics></math> adds the <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math> rows back, each weighted by its score: PCA's reconstruction formula with the rows of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi></mrow><annotation encoding="application/x-tex">\mathbf{W}</annotation></semantics></math> as the directions</li>
+<li>Minimizing <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mi>i</mi></msub><mi mathvariant="normal">∥</mi><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup><mo>−</mo><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mtext> </mtext><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msup><msup><mi mathvariant="normal">∥</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\sum_i \|\mathbf{x}^{(i)} - \mathbf{W}^\top\mathbf{W}\,\mathbf{x}^{(i)}\|^2</annotation></semantics></math> <mark>is the PCA objective</mark>: the rows end up spanning PC1 to PC<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math>, in any rotation (rotating a code keeps every distance; the units differ)</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="34" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<h2 id="heading-9">Nonlinear autoencoders go beyond PCA</h2>
+<div class="capfig">
+<figure><img src="../images/L10/ae_curve.svg" alt="Two panels of 300 points on a noisy half circle in two dimensions, each point joined by a faint line to its reconstruction. Left, linear autoencoder with a one-unit code: the reconstructions lie on a straight horizontal line, mean squared error 0.107. Right, nonlinear autoencoder with a one-unit code: the reconstructions follow the arc, mean squared error 0.002" aria-describedby="figure-9-1"><figcaption id="figure-9-1"><p>Two panels of 300 points on a noisy half circle in two dimensions, each point joined by a faint line to its reconstruction. Left, linear autoencoder with a one-unit code: the reconstructions lie on a straight horizontal line, mean squared error 0.107. Right, nonlinear autoencoder with a one-unit code: the reconstructions follow the arc, mean squared error 0.002</p><a href="../images/L10/ae_curve.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Same loss, same one-number code. The linear code keeps a <strong>flat</strong> line (PC1); the nonlinear code bends to follow the <strong>curved manifold</strong></li>
+</ul>
+<p class="provenance">Computed: toy data, 300 points on a noisy half circle</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="34" aria-labelledby="heading-10"><p class="page">Slide 10</p>
+<h2 id="heading-10">Sparse coding: an autoencoder with a prior</h2>
+<div class="capfig">
+<figure><img src="../images/L10/sc_patch_code.svg" alt="One 16 by 16 whitened image patch, shown to be approximately equal to the sum of three learned atoms, each an oriented stripe pattern multiplied by its coefficient, plus a few more atoms. Below, a stem plot of the patch's 256 code coefficients, almost all exactly zero" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>One 16 by 16 whitened image patch, shown to be approximately equal to the sum of three learned atoms, each an oriented stripe pattern multiplied by its coefficient, plus a few more atoms. Below, a stem plot of the patch's 256 code coefficients, almost all exactly zero</p><a href="../images/L10/sc_patch_code.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<p class="provenance">Computed: 16 × 16 patches of whitened natural photographs</p>
+<ul>
+<li><strong>Sparse coding</strong> (Olshausen &amp; Field 1996): rebuild each patch as a weighted sum of a <strong>few</strong> of 256 small images, the <span><b>atoms</b></span>; learn the atoms, no labels</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>min</mi><mo>⁡</mo><mtext>&nbsp;</mtext><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi mathvariant="normal">∥</mi><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>−</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi><mi mathvariant="normal" data-original-mathvariant="bold">𝐡</mi><msup><mi mathvariant="normal">∥</mi><mn>2</mn></msup><mo>+</mo><mi>λ</mi><mi mathvariant="normal">∥</mi><mi mathvariant="normal" data-original-mathvariant="bold">𝐡</mi><msub><mi mathvariant="normal">∥</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">\min\ \tfrac12\|\mathbf{x}-\mathbf{D}\mathbf{h}\|^2 + \lambda\|\mathbf{h}\|_1</annotation></semantics></math>: the reconstruction loss plus a penalty that keeps the code <mark>sparse</mark>: a decoder <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐃</mi></mrow><annotation encoding="application/x-tex">\mathbf{D}</annotation></semantics></math>, no encoder, and a <strong>prior</strong> (few atoms active) in place of the bottleneck</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1038/381607a0" rel="noopener">Olshausen &amp; Field <b>Nature 1996</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-class="split" data-marpit-pagination="11" data-marpit-pagination-total="34" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<h2 id="heading-11">Measured against V1</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L10/sc_ringach.svg" alt="Scatter of Gabor width nx against length ny, in cycles. Magenta squares: 93 macaque V1 simple cells, mostly below 0.6 on both axes. Open blue circles: the Gabor-fitted atoms of our sparse code, spread to larger values of ny, many above 0.8" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>Scatter of Gabor width nx against length ny, in cycles. Magenta squares: 93 macaque V1 simple cells, mostly below 0.6 on both axes. Open blue circles: the Gabor-fitted atoms of our sparse code, spread to larger values of ny, many above 0.8</p><a href="../images/L10/sc_ringach.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Fit a Gabor to each atom; compare with 93 macaque V1 simple cells (Ringach 2002). <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>x</mi></msub></mrow><annotation encoding="application/x-tex">n_x</annotation></semantics></math>: the window's width across the stripes, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>y</mi></msub></mrow><annotation encoding="application/x-tex">n_y</annotation></semantics></math>: its length along them, in stripe cycles</li>
+<li>Medians, atoms vs cells. Width <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>x</mi></msub></mrow><annotation encoding="application/x-tex">n_x</annotation></semantics></math> matches: 0.33 vs 0.32. Length <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>y</mi></msub></mrow><annotation encoding="application/x-tex">n_y</annotation></semantics></math> does not: 0.87 vs 0.41</li>
+<li><mark>A sparse code gets V1's width right and its length wrong</mark>: a prior and natural images give a first V1, and a testable one</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1152/jn.2002.88.1.455" rel="noopener">Ringach <b>J Neurophysiol 2002</b></a> · <a href="https://doi.org/10.1007/s10827-006-0003-9" rel="noopener">Rehn &amp; Sommer <b>J Comput Neurosci 2007</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-class="lead" data-marpit-pagination="12" data-marpit-pagination-total="34" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<h2 id="heading-12">Where do the labels come from?</h2>
+<h2 id="a-child-is-never-handed-a-million-labeled-pictures-can-a-network-manufacture-its-own-labels-from-the-input">A child is never handed a million labeled pictures. Can a network manufacture its own labels from the input?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="34" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<h2 id="heading-13">The label problem</h2>
+<ul>
+<li>ImageNet: about 14 million images labeled by hand. A child is never handed millions of <code>(image, category)</code> pairs, yet learns far more</li>
+<li>Supervision is the <strong>exception</strong> in nature. Most of what a brain learns comes from the <strong>structure of its own sensory stream</strong></li>
+<li>Two escapes:
+<ul>
+<li><strong>Unsupervised</strong> learning, the first half of today: the autoencoder and sparse coding find structure with no targets (PCA did too)</li>
+<li><strong>Self-supervised</strong> learning: <em>manufacture</em> a supervised problem from the data itself</li>
+</ul>
+</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="34" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<h2 id="heading-14">Make the data label itself</h2>
+<ul>
+<li><strong>Self-supervised learning (SSL):</strong> hide or transform part of the input; train the network to predict it from the rest</li>
+<li>Same move as the <strong>autoencoder</strong>: the target comes from the input</li>
+<li><strong>Pretext task:</strong> the made-up problem we train on (rotation, a hidden patch, the other view of an image); its answer is thrown away</li>
+<li><strong>Downstream task:</strong> the task we care about. Freeze the encoder, fit a <strong>readout</strong> on its features</li>
+<li><mark>The bet:</mark> a good pretext task forces the network to learn the structure the downstream task needs</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-marpit-pagination="15" data-marpit-pagination-total="34" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<h2 id="heading-15">Early pretext tasks</h2>
+<ul>
+<li>Predict an image's <strong>rotation</strong> (0, 90, 180 or 270°)</li>
+<li>Solve a <strong>jigsaw</strong> of shuffled patches; predict the <strong>relative position</strong> of two patches</li>
+<li><strong>Colorize</strong> a grayscale image</li>
+<li>Each is a heuristic: decent features, not great. <strong>Two families won:</strong> <em>contrastive learning</em> and <em>masked prediction</em></li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/1505.05192" rel="noopener">Doersch et al. <b>ICCV 2015</b></a> · <a href="https://arxiv.org/abs/1803.07728" rel="noopener">Gidaris et al. <b>ICLR 2018</b></a> · <a href="https://arxiv.org/abs/1603.08511" rel="noopener">Zhang et al. <b>ECCV 2016</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-marpit-pagination="16" data-marpit-pagination-total="34" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<h2 id="heading-16">Contrastive learning: the idea</h2>
+<div class="capfig">
+<figure><img src="../images/2026-10-08/mapping_3.svg" alt="Learning from two views: the input is one crop of a kitten photograph, the output is a response pattern, and the target is the network's response to a second crop of the same photograph" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>Learning from two views: the input is one crop of a kitten photograph, the output is a response pattern, and the target is the network's response to a second crop of the same photograph</p><a href="../images/2026-10-08/mapping_3.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Goal: a representation where <strong>two views of the same image are close</strong> and <strong>views of different images are far</strong></li>
+<li>Make a <strong>positive pair</strong> by changing one image two ways (crop, color jitter, blur): both are "the same dog". All <strong>other</strong> images in the batch are <strong>negatives</strong></li>
+<li>No labels: <mark>the identity of the source image is the supervisory signal</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="34" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<h2 id="heading-17">SimCLR</h2>
+<ul>
+<li>For each image <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math>: sample two augmented views <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>~</mo></mover><mi>a</mi></msub><mo separator="true">,</mo><msub><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>~</mo></mover><mi>b</mi></msub></mrow><annotation encoding="application/x-tex">\tilde{\mathbf{x}}_a, \tilde{\mathbf{x}}_b</annotation></semantics></math></li>
+<li>Encoder <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">E</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">c</mi></mrow><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathrm{Enc}(\cdot)</annotation></semantics></math> (a ResNet) gives the representation <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐡</mi></mrow><annotation encoding="application/x-tex">\mathbf{h}</annotation></semantics></math>: <em>what we keep for downstream tasks</em></li>
+<li>A small projection head <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">j</mi></mrow><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathrm{Proj}(\cdot)</annotation></semantics></math> gives the embedding <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐳</mi></mrow><annotation encoding="application/x-tex">\mathbf{z}</annotation></semantics></math>: <em>where the loss lives</em></li>
+<li><strong>Pull</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐳</mi><mi>a</mi></msub><mo separator="true">,</mo><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐳</mi><mi>b</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{z}_a,\mathbf{z}_b</annotation></semantics></math> together; <strong>push apart</strong> every other <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐳</mi></mrow><annotation encoding="application/x-tex">\mathbf{z}</annotation></semantics></math> in the batch</li>
+<li>A linear readout on the frozen features of a ResNet-50 reaches <strong>69.3%</strong> top-1 on ImageNet, with no label used to train the encoder; a ResNet-50 four times wider reaches <strong>76.5%</strong></li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2002.05709" rel="noopener">Chen, Kornblith, Norouzi &amp; Hinton <b>ICML 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="34" aria-labelledby="heading-18"><p class="page">Slide 18</p>
+<h2 id="heading-18">The InfoNCE loss</h2>
+<p>Cosine similarity <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo stretchy="false">(</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐮</mi><mo separator="true">,</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐮</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi></mrow><mrow><mi mathvariant="normal">∥</mi><mi mathvariant="normal" data-original-mathvariant="bold">𝐮</mi><mi mathvariant="normal">∥</mi><mtext> </mtext><mi mathvariant="normal">∥</mi><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mi mathvariant="normal">∥</mi></mrow></mfrac></mstyle></mrow><annotation encoding="application/x-tex">s(\mathbf{u},\mathbf{v}) = \dfrac{\mathbf{u}^\top\mathbf{v}}{\|\mathbf{u}\|\,\|\mathbf{v}\|}</annotation></semantics></math> and temperature <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>τ</mi></mrow><annotation encoding="application/x-tex">\tau</annotation></semantics></math>. For a positive pair <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(i,j)</annotation></semantics></math>:</p>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="normal">ℓ</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>j</mi></mrow></msub><mo>=</mo><mo>−</mo><mi>log</mi><mo>⁡</mo><mfrac><mrow><mi>exp</mi><mo>⁡</mo><mtext> ⁣</mtext><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>s</mi><mo stretchy="false">(</mo><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐳</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐳</mi><mi>j</mi></msub><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>τ</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow><mrow><munder><mo>∑</mo><mrow><mi>k</mi><mo mathvariant="normal">≠</mo><mi>i</mi></mrow></munder><mi>exp</mi><mo>⁡</mo><mtext> ⁣</mtext><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>s</mi><mo stretchy="false">(</mo><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐳</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐳</mi><mi>k</mi></msub><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>τ</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">\ell_{i,j} = -\log\frac{\exp\!\big(s(\mathbf{z}_i,\mathbf{z}_j)/\tau\big)}{\sum_{k\neq i}\exp\!\big(s(\mathbf{z}_i,\mathbf{z}_k)/\tau\big)}
+</annotation></semantics></math></div></span></p><ul>
+<li><strong>Softmax cross-entropy</strong> where the "correct class" is the matching view: a batch of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math> images gives <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>B</mi></mrow><annotation encoding="application/x-tex">2B</annotation></semantics></math> views, and each view does a <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>2</mn><mi>B</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(2B{-}1)</annotation></semantics></math>-way classification</li>
+<li><mark>Familiar machinery, new label source.</mark> The temperature <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>τ</mi></mrow><annotation encoding="application/x-tex">\tau</annotation></semantics></math> sets how hard the closest negatives push</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/1807.03748" rel="noopener">van den Oord, Li &amp; Vinyals <b>arXiv 2018</b></a> · <a href="https://arxiv.org/abs/2002.05709" rel="noopener">Chen et al. <b>ICML 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-class="split" data-marpit-pagination="19" data-marpit-pagination-total="34" aria-labelledby="heading-19"><p class="page">Slide 19</p>
+<h2 id="heading-19">Without negatives: self-distillation (BYOL, DINO)</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li><strong>BYOL</strong> needs no negatives: an <em>online</em> network predicts <mark>a slowly averaged <em>target</em> network, with a stop-gradient on the target</mark></li>
+<li><strong>DINO</strong> applies this to vision transformers (student and teacher in the figure); you met its ResNet-50 in the explainability lecture and the assignment</li>
+<li>The danger is <strong>collapse</strong>: every image mapped to the same vector</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/_papers/2104.14294/test.png" alt="The DINO setup: two crops of an image feed a student and a momentum-averaged teacher, with centering and a stop-gradient on the teacher side" aria-describedby="figure-19-1"><figcaption id="figure-19-1"><p>The DINO setup: two crops of an image feed a student and a momentum-averaged teacher, with centering and a stop-gradient on the teacher side</p><a href="../images/_papers/2104.14294/test.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/2104.14294" rel="noopener">Caron et al. <b>ICCV 2021</b></a> · <a href="https://arxiv.org/abs/2006.07733" rel="noopener">Grill et al. <b>NeurIPS 2020</b></a> · <a href="https://arxiv.org/abs/2011.10566" rel="noopener">Chen &amp; He <b>CVPR 2021</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="34" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<h2 id="heading-20">What DINO learns with no labels</h2>
+<div class="capfig">
+<figure><img src="../images/L14/pub_caron2021_fig1_attention.png" alt="Self-attention maps of a vision transformer trained with DINO and no labels, from Caron et al. (2021), Figure 1: for each of several photographs, the attention of the output token highlights the main object, separating it from the background" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>Self-attention maps of a vision transformer trained with DINO and no labels, from Caron et al. (2021), Figure 1: for each of several photographs, the attention of the output token highlights the main object, separating it from the background</p><a href="../images/L14/pub_caron2021_fig1_attention.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>The attention of the final token (where the network looks when it summarizes the image) <mark>outlines the object</mark>, though no label, mask or box was ever given</li>
+<li>The same network's units responded to textures and parts in the feature visualizations of the model–brain lecture</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2104.14294" rel="noopener">Caron et al. <b>ICCV 2021</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="34" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<h2 id="heading-21">Masked prediction: the other family</h2>
+<ul>
+<li>Hide part of the input and reconstruct it: no augmentations, no negatives, no giant batches</li>
+<li><strong>Vision:</strong> the masked autoencoder (MAE) hides 75% of the image patches and reconstructs their pixels</li>
+<li><mark>The autoencoder of the first half with a twist:</mark> reconstruct what was <em>removed</em>, not what was shown</li>
+<li><strong>Language:</strong> BERT blanks about 15% of the words and predicts them from both sides; predicting the next word is the same idea with the blank always at the end (a later lecture)</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2111.06377" rel="noopener">He et al. <b>CVPR 2022</b></a> · <a href="https://arxiv.org/abs/1810.04805" rel="noopener">Devlin et al. <b>NAACL 2019</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-class="split" data-marpit-pagination="22" data-marpit-pagination-total="34" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<h2 id="heading-22">One recipe: pretrain once, read out cheaply</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L14/linear_readout_resnet50.svg" alt="Horizontal bar chart of ImageNet top-1 accuracy for a linear readout on frozen ResNet-50 features. Supervised training with labels, 79.3 percent, in dark grey with a dashed guide line; self-supervised methods in blue: SwAV and DINO 75.3, DeepCluster v2 75.2, BYOL 74.4, OBoW 73.8, Barlow Twins 73.2, InfoMin 73.0, MoCo v2 71.1, SimCLR 69.1" aria-describedby="figure-22-1"><figcaption id="figure-22-1"><p>Horizontal bar chart of ImageNet top-1 accuracy for a linear readout on frozen ResNet-50 features. Supervised training with labels, 79.3 percent, in dark grey with a dashed guide line; self-supervised methods in blue: SwAV and DINO 75.3, DeepCluster v2 75.2, BYOL 74.4, OBoW 73.8, Barlow Twins 73.2, InfoMin 73.0, MoCo v2 71.1, SimCLR 69.1</p><a href="../images/L14/linear_readout_resnet50.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Same ResNet-50, same ImageNet photographs, <strong>no labels during training</strong>. A linear readout on the frozen features then names the thousand classes</li>
+<li>The best self-supervised recipes come within four points of a supervised ResNet-50 trained with the strongest recipe; the first one, SimCLR, within ten</li>
+<li><mark>Pretrain once without labels, read out cheaply:</mark> the recipe behind DINO, CLIP, MAE and the language models</li>
+</ul>
+</div>
+</div>
+<p class="provenance">Replotted from Caron et al. (2021), Table 2</p>
+<div class="ref"><a href="https://arxiv.org/abs/2104.14294" rel="noopener">Caron et al. <b>ICCV 2021</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-class="lead" data-marpit-pagination="23" data-marpit-pagination-total="34" aria-labelledby="heading-23"><p class="page">Slide 23</p>
+<h2 id="heading-23">Does the brain need labels?</h2>
+<h2 id="networks-trained-without-labels-predict-the-visual-cortex-as-well-as-networks-trained-with-them-what-then-is-the-brains-version-of-the-objective">Networks trained without labels predict the visual cortex as well as networks trained with them. What, then, is the brain's version of the objective?</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="34" aria-labelledby="heading-24"><p class="page">Slide 24</p>
+<h2 id="heading-24">Unsupervised networks predict V1, V4 and IT</h2>
+<div class="capfig">
+<figure><img src="../images/L14/pub_zhuang2021_fig2_predictivity.png" alt="Figure 2B of Zhuang et al. (2021): three bar plots of noise-corrected neural predictivity for V1, V4 and IT. Eleven unsupervised objectives, from autoencoder and PredNet through colorization and relative position to the contrastive methods, instance recognition, SimCLR and local aggregation, with an untrained network in white and the category-supervised network in black as controls. In IT the local aggregation bar reaches the supervised bar while the autoencoder stays near the untrained level" aria-describedby="figure-24-1"><figcaption id="figure-24-1"><p>Figure 2B of Zhuang et al. (2021): three bar plots of noise-corrected neural predictivity for V1, V4 and IT. Eleven unsupervised objectives, from autoencoder and PredNet through colorization and relative position to the contrastive methods, instance recognition, SimCLR and local aggregation, with an untrained network in white and the category-supervised network in black as controls. In IT the local aggregation bar reaches the supervised bar while the autoencoder stays near the untrained level</p><a href="../images/L14/pub_zhuang2021_fig2_predictivity.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Same architecture, trained on ImageNet with no labels under eleven objectives, then read out to macaque V1, V4 and IT (the Brain-Score procedure); untrained in white, trained with labels in black</li>
+<li>The autoencoder is no better than an untrained network in V4. <mark>The contrastive objectives (the red bars) match the label-trained network in V1, V4 and IT</mark>. Trained on head-camera video from children instead of ImageNet, the contrastive network still predicts IT well</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1073/pnas.2014196118" rel="noopener">Zhuang et al. <b>PNAS 2021</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-class="split" data-marpit-pagination="25" data-marpit-pagination-total="34" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<h2 id="heading-25">Category structure without category labels</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L14/pub_konkle2022_fig2_brainpredictivity.png" alt="Figure 2 of Konkle and Alvarez (2022): for three sectors of the human ventral stream, early visual cortex, posterior and anterior occipitotemporal cortex, the correlation between each network layer's RDM and the brain's RDM, for two image sets. The self-supervised network in blue tracks the category-supervised network in orange at every sector, both well above the untrained network in grey and near the noise ceiling" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>Figure 2 of Konkle and Alvarez (2022): for three sectors of the human ventral stream, early visual cortex, posterior and anterior occipitotemporal cortex, the correlation between each network layer's RDM and the brain's RDM, for two image sets. The self-supervised network in blue tracks the category-supervised network in orange at every sector, both well above the untrained network in grey and near the noise ceiling</p><a href="../images/L14/pub_konkle2022_fig2_brainpredictivity.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>A network trained only to tell every image apart from every other (instance-level contrastive learning), no categories at all</li>
+<li>Compared with human fMRI responses by RSA, sector by sector, it fits <mark>as well as the same network trained with category labels</mark>, in early visual cortex and along occipitotemporal cortex</li>
+<li>It names ImageNet classes far worse than the supervised network (37% against 59% with a nearest-neighbor readout), yet fits the brain as well: brain-like structure does not need labels, or accuracy</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1038/s41467-022-28091-4" rel="noopener">Konkle &amp; Alvarez <b>Nat Commun 2022</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-class="split" data-marpit-pagination="26" data-marpit-pagination-total="34" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<h2 id="heading-26">What is the brain's positive pair?</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L14/pub_lidicarlo2008_fig3.png" alt="Figure 3 of Li and DiCarlo (2008). A: mean change in object selectivity of 101 IT neurons at the non-swap position, the central position and the swap position; only the swap position shows a loss of selectivity. B: the change for the swapped objects against control objects. C: the change in selectivity against the number of swap exposures, 400 exposures being about one hour, for single neurons and multi-unit sites, with a fitted line falling by about 5.6 spikes per second per 400 exposures" aria-describedby="figure-26-1"><figcaption id="figure-26-1"><p>Figure 3 of Li and DiCarlo (2008). A: mean change in object selectivity of 101 IT neurons at the non-swap position, the central position and the swap position; only the swap position shows a loss of selectivity. B: the change for the swapped objects against control objects. C: the change in selectivity against the number of swap exposures, 400 exposures being about one hour, for single neurons and multi-unit sites, with a fitted line falling by about 5.6 spikes per second per 400 exposures</p><a href="../images/L14/pub_lidicarlo2008_fig3.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>In SimCLR the two views are two crops. <mark>The brain's two views are two moments in time:</mark> the same object before and after an eye movement</li>
+<li>Li and DiCarlo swapped the object during the monkey's saccade to one position, so two objects became "the same thing" there</li>
+<li>No task, no reward. IT neurons' preference between the two objects at that position fell by about 5 spikes/s per hour of exposure and began to reverse at two hours; the control position did not change. A rule that ties successive views together would do it (Hebbian learning, a later lecture)</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1126/science.1160028" rel="noopener">Li &amp; DiCarlo <b>Science 2008</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-class="split" data-marpit-pagination="27" data-marpit-pagination-total="34" aria-labelledby="heading-27"><p class="page">Slide 27</p>
+<h2 id="heading-27">Back to the cohort</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L13/serre2026_annrev_fig4_ad.png" alt="Four scatter plots of alignment score against ImageNet multilabel accuracy for 363 classifiers, CNNs as blue dots, transformers orange, self-supervised and image-text models as open circles, adversarially trained models as triangles, each with a dashed noise ceiling. Arcaro IT: rank correlation plus 0.37 overall, minus 0.38 among the 84 models above 92.7 percent. Triple-N IT: minus 0.08 overall, plus 0.20 at the top. TVSD IT: plus 0.73 overall, plus 0.65 at the top. Human feature use: minus 0.77 overall, minus 0.37 at the top" aria-describedby="figure-27-1"><figcaption id="figure-27-1"><p>Four scatter plots of alignment score against ImageNet multilabel accuracy for 363 classifiers, CNNs as blue dots, transformers orange, self-supervised and image-text models as open circles, adversarially trained models as triangles, each with a dashed noise ceiling. Arcaro IT: rank correlation plus 0.37 overall, minus 0.38 among the 84 models above 92.7 percent. Triple-N IT: minus 0.08 overall, plus 0.20 at the top. TVSD IT: plus 0.73 overall, plus 0.65 at the top. Human feature use: minus 0.77 overall, minus 0.37 at the top</p><a href="../images/L13/serre2026_annrev_fig4_ad.png">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Reproduced from Serre (2026), Fig. 4 (draft)</p>
+</div>
+<div class="col">
+<ul>
+<li>The open circles again: the networks trained without labels sit among the best fits to IT and to human feature use</li>
+<li>Three results agree: labels are not needed to predict the ventral stream (Zhuang, Konkle and Alvarez), temporal contiguity can shape IT in hours (Li and DiCarlo), and the brain gets no labels. <mark>Learning without labels is the default case, in brains and in the best models</mark></li>
+<li>What <em>does</em> matter is open: the images (Conwell et al. 2024), the objective, the architecture. A project question</li>
+</ul>
+</div>
+</div>
+<div class="ref">Serre <b>Annu Rev Vis Sci 2026</b> · <a href="https://doi.org/10.1038/s41467-024-53147-y" rel="noopener">Conwell et al. <b>Nat Commun 2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="34" aria-labelledby="heading-28"><p class="page">Slide 28</p>
+<h2 id="heading-28">Generative models, in one slide</h2>
+<ul>
+<li>A third route to learning without labels: learn to <strong>produce</strong> the data. The decoder of an autoencoder already turns a code into an image; make the code a distribution you can sample from and you have a generator</li>
+<li><strong>Variational autoencoder:</strong> an autoencoder whose code is a Gaussian; decode a random code to get a new image (Kingma &amp; Welling 2014)</li>
+<li><strong>Generative adversarial network:</strong> a generator trained to fool a second network that tells real from generated (Goodfellow et al. 2014)</li>
+<li><strong>Diffusion model:</strong> add noise to images step by step; train a network to remove it; generate by denoising pure noise (Ho et al. 2020). Behind today's image and video generators</li>
+<li>They return in the last lecture, as <strong>world models</strong> that simulate an environment</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/1312.6114" rel="noopener">Kingma &amp; Welling <b>ICLR 2014</b></a> · <a href="https://arxiv.org/abs/1406.2661" rel="noopener">Goodfellow et al. <b>NeurIPS 2014</b></a> · <a href="https://arxiv.org/abs/2006.11239" rel="noopener">Ho, Jain &amp; Abbeel <b>NeurIPS 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="34" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<h2 id="heading-29">Recap</h2>
+<ul>
+<li><strong>Autoencoder:</strong> rebuild the input through a narrow code; linear with tied weights, it finds PCA's subspace. <strong>Sparse coding</strong> adds a prior and, on natural images, learns V1-like atoms, right in width and wrong in length</li>
+<li><strong>Self-supervised learning:</strong> manufacture the labels from the input. <strong>Contrastive:</strong> two views of one image agree, other images differ (InfoNCE); <strong>masked prediction:</strong> hide most of the input, rebuild it. Pretrain once, read out cheaply: within a few points of supervised training with no labels</li>
+<li><strong>Brains:</strong> networks trained without labels predict V1, V4, IT and the human ventral stream as well as supervised ones; an hour of swapped views rewires IT's position tolerance. Labels are not what makes a network brain-like</li>
+<li>Three ways to get a representation close Theme 2: PCA, supervised backprop, and learning without labels</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="34" aria-labelledby="heading-30"><p class="page">Slide 30</p>
+<h2 id="heading-30">Looking ahead</h2>
+<ul>
+<li><strong>Next lecture, Tuesday: recurrent networks.</strong> Theme 3 opens with networks that keep a state over time, and a network that decides the way a monkey does</li>
+<li><strong>Mon 11/9:</strong> the third assignment is due. <strong>Tue 11/10:</strong> the fourth is released</li>
+<li><strong>Thu 11/19:</strong> project teams on Canvas. <strong>Tue 11/24:</strong> project proposal, one page per team. Today's question, does a network trained without labels predict your brain data as well as a supervised one, is a project</li>
+<li><strong>Tue 12/1:</strong> Exam 2, on the second half of the course, including today</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="34" aria-labelledby="heading-31"><p class="page">Slide 31</p>
+<h2 id="heading-31">Further reading for the research trail</h2>
+<p>Optional: a few research-trail entries over the semester. Any paper mentioned in any lecture qualifies, but papers from these lectures are preferred.</p>
+<ul>
+<li><a href="https://doi.org/10.1038/381607a0" rel="noopener">Olshausen &amp; Field <b>Nature 1996</b></a>: sparse coding of natural images gives V1-like receptive fields</li>
+<li><a href="https://arxiv.org/abs/2002.05709" rel="noopener">Chen et al. <b>ICML 2020</b></a>: SimCLR, the contrastive recipe and what each augmentation contributes</li>
+<li><a href="https://arxiv.org/abs/2104.14294" rel="noopener">Caron et al. <b>ICCV 2021</b></a>: DINO, objects appear in the attention of a network trained without labels</li>
+<li><a href="https://arxiv.org/abs/2111.06377" rel="noopener">He et al. <b>CVPR 2022</b></a>: masked autoencoders, hide 75% of the image and rebuild it</li>
+<li><a href="https://doi.org/10.1073/pnas.2014196118" rel="noopener">Zhuang et al. <b>PNAS 2021</b></a>: unsupervised networks predict V1, V4 and IT as well as supervised ones</li>
+<li><a href="https://doi.org/10.1038/s41467-022-28091-4" rel="noopener">Konkle &amp; Alvarez <b>Nat Commun 2022</b></a>: category structure in the ventral stream without category labels</li>
+<li><a href="https://arxiv.org/abs/2007.16189" rel="noopener">Orhan, Gupta &amp; Lake <b>NeurIPS 2020</b></a>: self-supervised learning on head-camera video from children</li>
+<li><a href="https://doi.org/10.1126/science.1160028" rel="noopener">Li &amp; DiCarlo <b>Science 2008</b></a>: an hour of swapped views changes IT neurons' position tolerance</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="34" aria-labelledby="heading-32"><p class="page">Slide 32</p>
+<h2 id="heading-32">Minute paper</h2>
+<p>Submit on <strong>Canvas → Minute papers → Minute Paper 15</strong> (access code read out in class).</p>
+<p>Write three brief points in your own words:</p>
+<ol>
+<li>A network trained with SimCLR never saw a label, yet a linear readout on its features names the ImageNet classes nearly as well as a supervised network. Where did the category information come from? Name the signal, and one choice made in training that decides what the representation ignores.</li>
+<li>Something you do not yet understand, or a question still open</li>
+<li>Another idea you found interesting, and why it matters for brains, behavior or AI</li>
+</ol>
+<p>Credit for a thoughtful attempt, not for being correct.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-class="lead" data-marpit-pagination="33" data-marpit-pagination-total="34" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<h2 id="heading-33">Going further</h2>
+<p>Contrastive learning in code</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-class="codeslide" data-marpit-pagination="34" data-marpit-pagination-total="34" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<h2 id="heading-34">PyTorch: the InfoNCE loss</h2>
+<marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">import</span> torch
+<span class="hljs-keyword">import</span> torch.nn.functional <span class="hljs-keyword">as</span> F
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">info_nce_loss</span>(<span class="hljs-params">z, tau=<span class="hljs-number">0.5</span></span>):
+    <span class="hljs-comment"># z: (2B, d), two augmented views stacked; rows 0..B-1 pair with B..2B-1</span>
+    z = F.normalize(z, dim=<span class="hljs-number">1</span>)                 <span class="hljs-comment"># cosine similarity = dot of unit vectors</span>
+    sim = z @ z.T / tau                       <span class="hljs-comment"># (2B, 2B) similarity matrix</span>
+    n = z.shape[<span class="hljs-number">0</span>]
+    sim.fill_diagonal_(<span class="hljs-built_in">float</span>(<span class="hljs-string">"-inf"</span>))         <span class="hljs-comment"># a view is never its own positive</span>
+    targets = (torch.arange(n) + n // <span class="hljs-number">2</span>) % n  <span class="hljs-comment"># the positive of row i is its partner view</span>
+    <span class="hljs-keyword">return</span> F.cross_entropy(sim, targets)      <span class="hljs-comment"># softmax cross-entropy: which row is my match?</span>
+</code></marp-pre>
+<ul>
+<li><strong>Cross-entropy</strong> over the batch: the positive view is the "correct class"</li>
+<li>The supervised toolkit, cross-entropy and backprop, unchanged; <mark>only the label source changed</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section></main></body></html>
