@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bottleneck and reconstruction · CPSY 1291</title>
+<style>
+:root{
+  --paper:#FAF9F5;--ink:#1E293B;--body:#334155;--slate:#64748B;--blue:#3E6D8E;
+  --magenta:#B5396B;--green:#3F7A6B;--red:#B23A2E;--gold:#FFC72C;--line:#E7E3DA;
+  --focus:#0969da;color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--body);
+  font:20px/1.35 Poppins,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:#80431c}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1680px;margin:0 auto;padding:12px 16px 14px}
+h1{margin:0 0 4px;font-size:28px;color:var(--ink)}
+.lede{margin:0 0 8px;font-size:17px;color:var(--slate)}
+.panel{display:grid;grid-template-columns:minmax(0,1fr) 520px;gap:14px;align-items:start}
+.left{min-width:0}
+.control-row{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:center;margin:0 0 8px}
+.control-row label{font-size:23px;color:var(--ink);font-weight:600}
+.control-row input[type=range]{width:100%;accent-color:var(--magenta);height:32px}
+.k-readout{font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
+.readouts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 18px;margin:0 0 8px}
+.readout{font-size:18px;line-height:1.25;color:var(--ink);font-variant-numeric:tabular-nums}
+.readout small{color:var(--slate);font-size:15px}
+.mode{display:flex;align-items:center;gap:10px;margin:0 0 8px}
+.mode button{
+  font:inherit;font-size:18px;color:var(--ink);background:var(--paper);
+  border:1px solid var(--slate);border-radius:4px;padding:6px 14px;min-height:40px;cursor:pointer
+}
+.mode button[aria-pressed=true]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.mode-note{font-size:15px;color:var(--slate)}
+.face-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+figure{margin:0}
+figcaption{font-size:17px;color:var(--ink);text-align:center;margin-top:6px}
+.face{display:block;width:100%;height:auto;border:1px solid var(--line);background:#ddd;
+  image-rendering:pixelated;image-rendering:crisp-edges}
+.picker{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.picker button{padding:2px;border:2px solid transparent;border-radius:4px;background:transparent;cursor:pointer;line-height:0}
+.picker button[aria-pressed=true]{border-color:var(--blue)}
+.picker canvas{display:block;width:66px;height:66px;image-rendering:pixelated;border:1px solid var(--line)}
+.chart-wrap{border:1px solid var(--line);padding:8px;background:rgba(255,255,255,0.25)}
+.chart-wrap h2{margin:0 0 4px;font-size:18px;color:var(--ink)}
+.chart{display:block;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:10px 14px;margin:6px 0 0;font-size:16px;color:var(--ink)}
+.sw{display:inline-block;width:16px;height:3px;vertical-align:middle;margin-right:6px}
+.right-col{display:grid;grid-template-rows:auto 1fr;gap:10px;min-height:0}
+.init-wrap{border:1px solid var(--line);padding:8px;background:rgba(255,255,255,0.25)}
+.init-wrap h2{margin:0 0 4px;font-size:18px;color:var(--ink)}
+.init-wrap p{margin:0 0 6px;font-size:15px;line-height:1.3;color:var(--body)}
+.seed-row{display:flex;align-items:center;gap:10px;margin:0 0 6px}
+.seed-row label{font-size:15px;color:var(--ink)}
+.seed-row select{
+  font:inherit;font-size:15px;padding:2px 6px;border:1px solid var(--slate);
+  border-radius:4px;background:var(--paper);color:var(--ink)
+}
+.basis-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.basis-col h3{margin:0 0 4px;font-size:15px;color:var(--ink)}
+.basis-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.basis-tiles canvas{
+  width:100%;height:auto;border:1px solid var(--line);
+  image-rendering:pixelated;image-rendering:crisp-edges
+}
+.basis-metrics{margin-top:6px;font-size:14px;line-height:1.25;color:var(--ink);font-variant-numeric:tabular-nums}
+.footer{margin-top:8px;font-size:14px;color:var(--slate)}
+.status{margin:6px 0 0;font-size:16px;color:var(--slate);min-height:1.4em}
+html.embed,html.embed body{overflow:hidden;height:100%}
+html.embed .wrap{max-width:none;width:100%;height:100vh;padding:6px 10px;display:flex;flex-direction:column}
+html.embed h1,html.embed .lede{display:none}
+html.embed .panel{grid-template-columns:minmax(0,1fr) 500px;gap:10px;flex:1;min-height:0}
+html.embed .left{display:flex;flex-direction:column;min-height:0}
+html.embed .control-row{margin-bottom:6px}
+html.embed .control-row label{font-size:22px}
+html.embed .readout{font-size:17px}
+html.embed .face-grid{gap:10px}
+html.embed figcaption{font-size:16px}
+html.embed .picker canvas{width:62px;height:62px}
+html.embed .chart-wrap h2{font-size:17px}
+html.embed .legend{font-size:15px;gap:8px 12px}
+html.embed .init-wrap h2{font-size:17px}
+html.embed .init-wrap p,.seed-row label,.seed-row select{font-size:14px}
+html.embed .basis-col h3{font-size:14px}
+html.embed .basis-metrics{font-size:13px}
+html.embed .footer{position:fixed;right:10px;bottom:6px;width:490px;margin:0}
+@media(max-width:1200px){
+  .panel{grid-template-columns:1fr}
+}
+</style>
+<script>if(new URLSearchParams(location.search).has('embed'))document.documentElement.classList.add('embed');</script>
+</head>
+<body>
+<div class="wrap">
+  <h1>Bottleneck size and reconstruction quality</h1>
+  <p class="lede">A narrower code forces stronger compression. With no nonlinearity, the autoencoder reduces to PCA.</p>
+
+  <div class="panel">
+    <section class="left" aria-label="Bottleneck controls and reconstructions">
+      <div class="control-row">
+        <div>
+          <label for="kSlider">Code size <i>k</i></label>
+          <input id="kSlider" type="range" min="0" max="7" step="1" value="5" aria-valuemin="1" aria-valuemax="128">
+        </div>
+        <div class="k-readout" id="kReadout"></div>
+      </div>
+
+      <div class="readouts">
+        <div class="readout" id="compressionReadout"></div>
+        <div class="readout" id="matchReadout"></div>
+        <div class="readout" id="pcaReadout"></div>
+        <div class="readout" id="aeReadout"></div>
+      </div>
+
+      <div class="mode" role="group" aria-label="Autoencoder nonlinearity">
+        <span style="font-size:18px;color:var(--ink)">Autoencoder:</span>
+        <button type="button" id="modeLinear" aria-pressed="false">Linear (no <i>g</i>)</button>
+        <button type="button" id="modeRelu" aria-pressed="true">ReLU, one layer</button>
+        <button type="button" id="modeDeep" aria-pressed="false">ReLU, hidden layers</button>
+        <span class="mode-note" id="layerReadout"></span>
+      </div>
+
+      <div class="face-grid">
+        <figure>
+          <canvas id="origCanvas" class="face" width="32" height="32" role="img" aria-label="Input face"></canvas>
+          <figcaption>Input face <b>x</b></figcaption>
+        </figure>
+        <figure>
+          <canvas id="pcaCanvas" class="face" width="32" height="32" role="img" aria-label="PCA reconstruction"></canvas>
+          <figcaption>PCA reconstruction</figcaption>
+        </figure>
+        <figure>
+          <canvas id="aeCanvas" class="face" width="32" height="32" role="img" aria-label="Autoencoder reconstruction"></canvas>
+          <figcaption>Autoencoder reconstruction</figcaption>
+        </figure>
+      </div>
+
+      <div class="picker" id="facePicker" role="listbox" aria-label="Choose one of six held-out faces"></div>
+      <p class="status" id="status"></p>
+    </section>
+
+    <aside class="right-col">
+      <div class="chart-wrap">
+        <h2>Median held-out R<sup>2</sup> across bottleneck sizes</h2>
+        <canvas id="chartCanvas" class="chart" width="500" height="210" role="img" aria-label="R squared against code size"></canvas>
+        <div class="legend">
+          <span><i class="sw" style="background:#3E6D8E"></i>PCA</span>
+          <span><i class="sw" style="background:#B23A2E"></i>Linear autoencoder</span>
+          <span><i class="sw" style="background:#3F7A6B"></i>Shallow ReLU</span>
+          <span><i class="sw" style="background:#B5396B"></i>Deep ReLU</span>
+        </div>
+      </div>
+      <div class="init-wrap">
+        <h2>Same subspace, different rows</h2>
+        <p>The loss fixes the subspace, not the rows: another random initialization gives other rows and the same reconstruction.</p>
+        <div class="seed-row">
+          <label for="seedSelect">Initialization seed</label>
+          <select id="seedSelect">
+            <option value="0">1</option>
+            <option value="1">2</option>
+            <option value="2">3</option>
+          </select>
+        </div>
+        <div class="basis-grid">
+          <div class="basis-col">
+            <h3>Linear AE rows (W1)</h3>
+            <div class="basis-tiles" id="seedTiles"></div>
+          </div>
+          <div class="basis-col">
+            <h3>PCA eigenvectors</h3>
+            <div class="basis-tiles" id="eigenTiles"></div>
+          </div>
+        </div>
+        <div class="basis-metrics" id="initReadout"></div>
+      </div>
+    </aside>
+  </div>
+
+  <p class="footer">Computed: 60,000 CelebA faces at 32 × 32, grayscale; R<sup>2</sup> on 2,000 held-out faces.</p>
+</div>
+
+<script src="l14_bottleneck_data.js"></script>
+<script>
+(function(){
+'use strict';
+const D=window.L14_BOTTLENECK;
+if(!D) throw new Error('l14_bottleneck_data.js did not load');
+
+const N=D.size*D.size;
+const state={kIndex:D.ks.indexOf(32),faceIndex:0,mode:'relu',seedIndex:0};
+
+function b64ToUint8(base64){
+  const raw=atob(base64);
+  const out=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++) out[i]=raw.charCodeAt(i);
+  return out;
+}
+function b64ToFloat32(base64){
+  const u8=b64ToUint8(base64);
+  const dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength);
+  const n=u8.byteLength/4;
+  const out=new Float32Array(n);
+  for(let i=0;i<n;i++) out[i]=dv.getFloat32(i*4,true);
+  return out;
+}
+
+function makeImageData(src){
+  const rgba=new Uint8ClampedArray(N*4);
+  for(let i=0;i<N;i++){
+    const g=src[i];
+    const j=i*4;
+    rgba[j]=g;
+    rgba[j+1]=g;
+    rgba[j+2]=g;
+    rgba[j+3]=255;
+  }
+  return new ImageData(rgba,D.size,D.size);
+}
+
+const originals=D.originals.map(s=>b64ToUint8(s));
+const pcaByK=new Map();
+const linearByK=new Map();
+const reluByK=new Map();
+const deepByK=new Map();
+for(const k of D.ks){
+  const key=String(k);
+  pcaByK.set(k,D.pca[key].map(s=>b64ToUint8(s)));
+  linearByK.set(k,D.linear[key].map(s=>b64ToUint8(s)));
+  reluByK.set(k,D.relu[key].map(s=>b64ToUint8(s)));
+  deepByK.set(k,D.deep[key].map(s=>b64ToUint8(s)));
+}
+
+const cOrig=document.getElementById('origCanvas');
+const cPca=document.getElementById('pcaCanvas');
+const cAe=document.getElementById('aeCanvas');
+for(const c of [cOrig,cPca,cAe]){c.width=D.size; c.height=D.size;}
+const ctxOrig=cOrig.getContext('2d');
+const ctxPca=cPca.getContext('2d');
+const ctxAe=cAe.getContext('2d');
+
+const thumbCanvases=[];
+const picker=document.getElementById('facePicker');
+for(let i=0;i<originals.length;i++){
+  const b=document.createElement('button');
+  b.type='button';
+  b.setAttribute('role','option');
+  b.setAttribute('aria-label','Face '+(i+1));
+  b.setAttribute('aria-pressed',i===0?'true':'false');
+  const cv=document.createElement('canvas');
+  cv.width=D.size; cv.height=D.size;
+  cv.className='face';
+  cv.getContext('2d').putImageData(makeImageData(originals[i]),0,0);
+  b.appendChild(cv);
+  b.addEventListener('click',()=>{state.faceIndex=i; render();});
+  picker.appendChild(b);
+  thumbCanvases.push(b);
+}
+
+const kSlider=document.getElementById('kSlider');
+const kReadout=document.getElementById('kReadout');
+const compressionReadout=document.getElementById('compressionReadout');
+const pcaReadout=document.getElementById('pcaReadout');
+const aeReadout=document.getElementById('aeReadout');
+const matchReadout=document.getElementById('matchReadout');
+const status=document.getElementById('status');
+const layerReadout=document.getElementById('layerReadout');
+kSlider.max=String(Math.max(0,D.ks.length-1));
+kSlider.setAttribute('aria-valuemax',String(D.ks[D.ks.length-1]||0));
+
+kSlider.addEventListener('input',()=>{
+  state.kIndex=Number(kSlider.value);
+  render();
+});
+
+const modeLinear=document.getElementById('modeLinear');
+const modeRelu=document.getElementById('modeRelu');
+const modeDeep=document.getElementById('modeDeep');
+modeLinear.addEventListener('click',()=>{state.mode='linear'; render();});
+modeRelu.addEventListener('click',()=>{state.mode='relu'; render();});
+modeDeep.addEventListener('click',()=>{state.mode='deep'; render();});
+const seedSelect=document.getElementById('seedSelect');
+seedSelect.addEventListener('change',()=>{
+  state.seedIndex=Number(seedSelect.value);
+  renderInit();
+});
+
+function fmtR2(v){return Number(v).toFixed(3);}
+function fmtRatio(v){
+  const rounded=Math.abs(v-Math.round(v))<1e-9?String(Math.round(v)):v.toFixed(1);
+  return rounded+' to 1';
+}
+
+function currentK(){return D.ks[state.kIndex];}
+function aeModeName(){
+  if(state.mode==='linear') return 'Linear autoencoder';
+  if(state.mode==='relu') return 'Shallow ReLU autoencoder';
+  return 'Deep ReLU autoencoder';
+}
+function layerSpec(){
+  const k=currentK();
+  if(state.mode==='deep') return '1024-512-'+k+'-512-1024';
+  return '1024-'+k+'-1024';
+}
+function currentAEArray(){
+  const k=currentK();
+  if(state.mode==='linear') return linearByK.get(k);
+  if(state.mode==='relu') return reluByK.get(k);
+  return deepByK.get(k);
+}
+
+function drawFace(ctx,arr){ctx.putImageData(makeImageData(arr),0,0);}
+
+function render(){
+  const k=currentK();
+  const faceIdx=state.faceIndex;
+  const pcaSet=pcaByK.get(k);
+  const aeSet=currentAEArray();
+  drawFace(ctxOrig,originals[faceIdx]);
+  drawFace(ctxPca,pcaSet[faceIdx]);
+  drawFace(ctxAe,aeSet[faceIdx]);
+
+  for(let i=0;i<thumbCanvases.length;i++){
+    thumbCanvases[i].setAttribute('aria-pressed',i===faceIdx?'true':'false');
+  }
+  modeLinear.setAttribute('aria-pressed',state.mode==='linear'?'true':'false');
+  modeRelu.setAttribute('aria-pressed',state.mode==='relu'?'true':'false');
+  modeDeep.setAttribute('aria-pressed',state.mode==='deep'?'true':'false');
+  layerReadout.textContent='layers: '+layerSpec();
+
+  const pcaR2=D.r2.pca[state.kIndex];
+  const linR2=D.r2.linear[state.kIndex];
+  const reluR2=D.r2.relu[state.kIndex];
+  const deepR2=D.r2.deep[state.kIndex];
+  const aeR2=state.mode==='linear'?linR2:(state.mode==='relu'?reluR2:deepR2);
+  const ratio=(D.size*D.size)/k;
+
+  kReadout.innerHTML='<b>k = '+k+'</b>';
+  compressionReadout.innerHTML=(D.size*D.size)+' pixels to '+k+(k===1?' number':' numbers')+': compression <b>'+fmtRatio(ratio)+'</b>';
+  pcaReadout.innerHTML='Median held-out R<sup>2</sup>, PCA: <b>'+fmtR2(pcaR2)+'</b>';
+  aeReadout.innerHTML='Median held-out R<sup>2</sup>, '+aeModeName()+': <b>'+fmtR2(aeR2)+'</b>';
+  matchReadout.innerHTML=state.mode==='linear'
+    ? '<small>PCA and the linear autoencoder match.</small>'
+    : '';
+
+  status.textContent='Face '+(faceIdx+1)+' of 6, code size k = '+k+', '+aeModeName()+'.';
+  drawChart();
+}
+
+function drawChart(){
+  const canvas=document.getElementById('chartCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const pad={l:56,r:16,t:16,b:34};
+  const w=W-pad.l-pad.r, h=H-pad.t-pad.b;
+  const xMin=Math.log2(D.ks[0]), xMax=Math.log2(D.ks[D.ks.length-1]);
+  const yValues=[...D.r2.pca,...D.r2.linear,...D.r2.relu,...D.r2.deep];
+  const yMin=Math.min(...yValues)-0.02, yMax=Math.max(...yValues)+0.02;
+  const sx=v=>pad.l+(Math.log2(v)-xMin)/(xMax-xMin)*w;
+  const sy=v=>pad.t+(1-(v-yMin)/(yMax-yMin))*h;
+
+  ctx.strokeStyle='#64748B';
+  ctx.lineWidth=1.4;
+  ctx.beginPath();
+  ctx.moveTo(pad.l,pad.t);
+  ctx.lineTo(pad.l,pad.t+h);
+  ctx.lineTo(pad.l+w,pad.t+h);
+  ctx.stroke();
+
+  ctx.font='15px Poppins, system-ui, sans-serif';
+  ctx.fillStyle='#1E293B';
+  ctx.textAlign='center';
+  for(const k of D.ks){
+    const x=sx(k);
+    ctx.strokeStyle='#E7E3DA';
+    ctx.beginPath();
+    ctx.moveTo(x,pad.t);
+    ctx.lineTo(x,pad.t+h);
+    ctx.stroke();
+    ctx.fillText(String(k),x,H-10);
+  }
+
+  ctx.textAlign='right';
+  for(let j=0;j<4;j++){
+    const t=j/3;
+    const y=yMin+t*(yMax-yMin);
+    const py=sy(y);
+    ctx.strokeStyle='#E7E3DA';
+    ctx.beginPath();
+    ctx.moveTo(pad.l,py);
+    ctx.lineTo(pad.l+w,py);
+    ctx.stroke();
+    ctx.fillStyle='#64748B';
+    ctx.fillText(y.toFixed(2),pad.l-8,py+4);
+  }
+
+  function drawSeries(values,color){
+    ctx.strokeStyle=color;
+    ctx.lineWidth=2.2;
+    ctx.beginPath();
+    for(let i=0;i<D.ks.length;i++){
+      const x=sx(D.ks[i]), y=sy(values[i]);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    for(let i=0;i<D.ks.length;i++){
+      const x=sx(D.ks[i]), y=sy(values[i]);
+      ctx.fillStyle=color;
+      ctx.beginPath();
+      ctx.arc(x,y,2.8,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  drawSeries(D.r2.pca,'#3E6D8E');
+  drawSeries(D.r2.linear,'#B23A2E');
+  drawSeries(D.r2.relu,'#3F7A6B');
+  drawSeries(D.r2.deep,'#B5396B');
+
+  const idx=state.kIndex;
+  const x=sx(D.ks[idx]);
+  const ys=[sy(D.r2.pca[idx]),sy(D.r2.linear[idx]),sy(D.r2.relu[idx]),sy(D.r2.deep[idx])];
+  for(const y of ys){
+    ctx.fillStyle='#FFC72C';
+    ctx.strokeStyle='#1E293B';
+    ctx.lineWidth=1.2;
+    ctx.beginPath();
+    ctx.arc(x,y,5,0,Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+  }
+}
+
+const eigenRows=(D.init&&D.init.pca?D.init.pca:[]).map(b64ToFloat32);
+const seeds=(D.init&&D.init.seeds?D.init.seeds:[]).map((s)=>({
+  rows:(s.rows||[]).map(b64ToFloat32),
+  largest:s.largestAngle,
+  median:s.medianAngle,
+  r2:s.r2,
+  cosine:s.meanBestCosine
+}));
+const seedTilesWrap=document.getElementById('seedTiles');
+const eigenTilesWrap=document.getElementById('eigenTiles');
+const initReadout=document.getElementById('initReadout');
+const seedCanvases=[];
+const eigenCanvases=[];
+
+function makeTile(parent,store){
+  const c=document.createElement('canvas');
+  c.width=D.size;
+  c.height=D.size;
+  parent.appendChild(c);
+  store.push(c.getContext('2d'));
+}
+for(let i=0;i<4;i++){
+  makeTile(seedTilesWrap,seedCanvases);
+  makeTile(eigenTilesWrap,eigenCanvases);
+}
+
+function colorSigned(t){
+  const white=[255,255,255];
+  const blue=[62,109,142];
+  const mag=[181,57,107];
+  const u=Math.abs(t);
+  if(t>=0){
+    return [
+      Math.round(white[0]*(1-u)+mag[0]*u),
+      Math.round(white[1]*(1-u)+mag[1]*u),
+      Math.round(white[2]*(1-u)+mag[2]*u)
+    ];
+  }
+  return [
+    Math.round(white[0]*(1-u)+blue[0]*u),
+    Math.round(white[1]*(1-u)+blue[1]*u),
+    Math.round(white[2]*(1-u)+blue[2]*u)
+  ];
+}
+
+function drawSignedVec(ctx,vec){
+  const rgba=new Uint8ClampedArray(N*4);
+  let maxAbs=0;
+  for(let i=0;i<N;i++){
+    const a=Math.abs(vec[i]||0);
+    if(a>maxAbs) maxAbs=a;
+  }
+  if(maxAbs<1e-12) maxAbs=1;
+  for(let i=0;i<N;i++){
+    const t=(vec[i]||0)/maxAbs;
+    const c=colorSigned(t);
+    const j=i*4;
+    rgba[j]=c[0];
+    rgba[j+1]=c[1];
+    rgba[j+2]=c[2];
+    rgba[j+3]=255;
+  }
+  ctx.putImageData(new ImageData(rgba,D.size,D.size),0,0);
+}
+
+function fmtMaybe(v,d){
+  return Number.isFinite(Number(v))?Number(v).toFixed(d):'n/a';
+}
+
+function cosineSummary(seedIdx){
+  if(!seeds.length) return 'Cosine to other seeds: n/a';
+  const c=seeds[seedIdx].cosine;
+  if(typeof c==='number') return 'Cosine to other seeds: '+c.toFixed(3);
+  if(Array.isArray(c)){
+    const bits=[];
+    for(let j=0;j<Math.min(3,c.length);j++){
+      if(j===seedIdx) continue;
+      if(Number.isFinite(c[j])) bits.push((j+1)+': '+Number(c[j]).toFixed(3));
+    }
+    return bits.length?'Cosine to other seeds ('+bits.join(', ')+')':'Cosine to other seeds: n/a';
+  }
+  if(c && typeof c==='object'){
+    const bits=[];
+    for(let j=0;j<3;j++){
+      if(j===seedIdx) continue;
+      const key=String(j);
+      const v=(key in c)?c[key]:c[j+1];
+      if(Number.isFinite(v)) bits.push((j+1)+': '+Number(v).toFixed(3));
+    }
+    return bits.length?'Cosine to other seeds ('+bits.join(', ')+')':'Cosine to other seeds: n/a';
+  }
+  return 'Cosine to other seeds: n/a';
+}
+
+function renderInit(){
+  const s=seeds[state.seedIndex]||{rows:[]};
+  for(let i=0;i<4;i++){
+    drawSignedVec(seedCanvases[i],s.rows[i]||new Float32Array(N));
+    drawSignedVec(eigenCanvases[i],eigenRows[i]||new Float32Array(N));
+  }
+  initReadout.innerHTML=
+    'Median principal angle to PCA: <b>'+fmtMaybe(s.median,2)+'°</b><br>'
+    +'Held-out R<sup>2</sup>: <b>'+fmtMaybe(s.r2,3)+'</b><br>'
+    +cosineSummary(state.seedIndex);
+}
+
+renderInit();
+render();
+})();
+</script>
+</body>
+</html>

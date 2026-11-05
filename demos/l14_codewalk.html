@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Code walk and random codes · CPSY 1291</title>
+<style>
+:root{
+  --paper:#FAF9F5;--ink:#1E293B;--body:#334155;--slate:#64748B;--blue:#3E6D8E;
+  --magenta:#B5396B;--green:#3F7A6B;--red:#B23A2E;--gold:#FFC72C;--line:#E7E3DA;
+  --focus:#0969da;color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--body);
+  font:20px/1.35 Poppins,system-ui,-apple-system,"Segoe UI",sans-serif}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1680px;margin:0 auto;padding:12px 16px 14px}
+h1{margin:0 0 4px;font-size:28px;color:var(--ink)}
+.lede{margin:0 0 8px;font-size:17px;color:var(--slate)}
+.panel{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:14px;align-items:start}
+.left{min-width:0}
+.switch{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
+.switch button,.btn{
+  font:inherit;font-size:18px;color:var(--ink);background:var(--paper);
+  border:1px solid var(--slate);border-radius:4px;padding:6px 12px;min-height:38px;cursor:pointer
+}
+.switch button[aria-pressed=true]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:12px;align-items:start}
+.sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px}
+.unit{border:1px solid var(--line);padding:6px 8px;background:rgba(255,255,255,0.2)}
+.unit label{display:block;font-size:16px;color:var(--ink);margin:0 0 4px}
+.unit input[type=range]{width:100%;accent-color:var(--magenta);margin:0}
+.uval{font-size:14px;color:var(--slate);font-variant-numeric:tabular-nums}
+.walk{margin-top:8px;border:1px solid var(--line);padding:8px;background:rgba(255,255,255,0.2)}
+.walk-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.walk select,.walk input[type=range]{font:inherit}
+.walk select{font-size:16px;padding:3px 6px;border:1px solid var(--slate);border-radius:4px;background:var(--paper);color:var(--ink)}
+.walk input[type=range]{width:100%;accent-color:var(--green)}
+.walk .small{font-size:15px;color:var(--slate)}
+.face-picker{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.face-picker button{padding:2px;border:2px solid transparent;border-radius:4px;background:transparent;cursor:pointer;line-height:0}
+.face-picker button[aria-pressed=true]{border-color:var(--blue)}
+.face-picker canvas{display:block;width:62px;height:62px;image-rendering:pixelated;border:1px solid var(--line)}
+.right figure{margin:0}
+.face{display:block;width:100%;height:auto;border:1px solid var(--line);background:#ddd;
+  image-rendering:pixelated;image-rendering:crisp-edges}
+figcaption{font-size:17px;color:var(--ink);text-align:center;margin-top:6px}
+.readout{margin:8px 0 0;font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.3}
+.status{margin:6px 0 0;font-size:16px;color:var(--slate);min-height:1.3em}
+.footer{margin-top:8px;font-size:14px;color:var(--slate)}
+html.embed,html.embed body{overflow:hidden;height:100%}
+html.embed .wrap{max-width:none;width:100%;height:100vh;padding:6px 10px;display:flex;flex-direction:column}
+html.embed h1,html.embed .lede{display:none}
+html.embed .panel{grid-template-columns:minmax(0,1fr) 410px;gap:10px;flex:1;min-height:0}
+html.embed .left{display:flex;flex-direction:column;min-height:0}
+html.embed .layout{grid-template-columns:minmax(0,1fr) 362px;gap:10px}
+html.embed .switch button,.btn{font-size:17px;min-height:36px;padding:5px 10px}
+html.embed .unit label{font-size:15px}
+html.embed .readout{font-size:17px}
+html.embed figcaption{font-size:16px}
+html.embed .face-picker canvas{width:58px;height:58px}
+@media(max-width:1260px){
+  .panel{grid-template-columns:1fr}
+}
+</style>
+<script>if(new URLSearchParams(location.search).has('embed'))document.documentElement.classList.add('embed');</script>
+</head>
+<body>
+<div class="wrap">
+  <h1>Latent code walk across autoencoder and VAE models</h1>
+  <p class="lede">Random codes often fail for a plain autoencoder, while VAE-style codes support interpolation and interpretable unit changes.</p>
+
+  <div class="panel">
+    <section class="left" aria-label="Code controls">
+      <div class="switch" id="modelSwitch" role="tablist" aria-label="Model choice"></div>
+
+      <div class="actions">
+        <button type="button" class="btn" id="randomBtn">Random code</button>
+      </div>
+
+      <div class="layout">
+        <div>
+          <div class="sliders" id="unitSliders"></div>
+
+          <div class="walk">
+            <div class="walk-head">
+              <strong style="font-size:17px;color:var(--ink)">Walk between faces</strong>
+              <span class="small">A:</span><select id="walkA"></select>
+              <span class="small">B:</span><select id="walkB"></select>
+            </div>
+            <input id="walkT" type="range" min="0" max="1" step="0.01" value="0">
+            <div class="small">z(t) = (1 − t) z_a + t z_b</div>
+            <div class="small" id="walkReadout"></div>
+          </div>
+
+          <div class="face-picker" id="facePicker" role="listbox" aria-label="Start from a face"></div>
+        </div>
+
+        <div class="right">
+          <figure>
+            <canvas id="faceCanvas" class="face" width="32" height="32" role="img" aria-label="Decoded face"></canvas>
+            <figcaption>Decoded face from latent code</figcaption>
+          </figure>
+          <p class="readout" id="metrics"></p>
+          <p class="status" id="status"></p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <p class="footer">Computed: 60,000 CelebA faces at 32 × 32, grayscale; 1024-512-32-512-1024; six of 32 code units shown.</p>
+</div>
+
+<script src="l14_codewalk_data.js"></script>
+<script>
+(function(){
+'use strict';
+const D=window.L14_CODEWALK;
+if(!D) throw new Error('l14_codewalk_data.js did not load');
+
+const PIX=D.size*D.size;
+const K=32;
+const H=512;
+
+function b64ToUint8(base64){
+  const raw=atob(base64);
+  const out=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++) out[i]=raw.charCodeAt(i);
+  return out;
+}
+function b64ToInt8(base64){
+  const u8=b64ToUint8(base64);
+  return new Int8Array(u8.buffer,u8.byteOffset,u8.byteLength);
+}
+function b64ToFloat32(base64){
+  const u8=b64ToUint8(base64);
+  const dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength);
+  const n=u8.byteLength/4;
+  const out=new Float32Array(n);
+  for(let i=0;i<n;i++) out[i]=dv.getFloat32(i*4,true);
+  return out;
+}
+function decodeQ(q){
+  const i8=b64ToInt8(q.b);
+  const total=q.shape[0]*q.shape[1];
+  const out=new Float32Array(total);
+  for(let i=0;i<total;i++) out[i]=i8[i]*q.s;
+  return out;
+}
+
+const originals=D.originals.map(s=>b64ToUint8(s));
+
+const models=D.models.map((m)=>({
+  name:m.name,
+  top:m.top.slice(),
+  mean:toFloatArrayMaybe(m.mean),
+  std:toFloatArrayMaybe(m.std),
+  faces:m.faces.map(v=>Float32Array.from(v)),
+  r2:m.r2,
+  randomNearestL2:m.randomNearestL2,
+  activeUnits:m.activeUnits,
+  W1:decodeQ(m.W1),   // [512,32], row order
+  W2:decodeQ(m.W2),   // [1024,512], row order
+  b1:b64ToFloat32(m.b1),
+  b2:b64ToFloat32(m.b2),
+  pixelMean:decodePixelMean(m)
+}));
+if(models.length>0 && models[0].faces.length>0){
+  if(models[0].faces[0].length!==K) throw new Error('Expected latent code length 32');
+}
+
+function toFloatArrayMaybe(x){
+  if(Array.isArray(x)) return Float32Array.from(x);
+  if(typeof x==='string') return b64ToFloat32(x);
+  return new Float32Array(0);
+}
+function decodePixelMean(model){
+  if(typeof model.pixelMean==='string') return b64ToFloat32(model.pixelMean);
+  if(typeof D.mean==='string') return b64ToFloat32(D.mean);
+  if(typeof model.mean==='string'){
+    const arr=b64ToFloat32(model.mean);
+    if(arr.length===PIX) return arr;
+  }
+  if(Array.isArray(model.pixelMean)) return Float32Array.from(model.pixelMean);
+  return new Float32Array(PIX);
+}
+
+const state={
+  modelIndex:0,
+  mode:'face',           // face | random | walk | custom
+  faceIndex:0,
+  walkA:0,
+  walkB:1,
+  walkT:0,
+  z:new Float32Array(K),
+  randomCode:new Float32Array(K)
+};
+
+let rngState=0xC0FFEE13;
+let spareNormal=null;
+function randUniform(){
+  // mulberry32-style PRNG with explicit state for reproducibility
+  rngState=(rngState+0x6D2B79F5)|0;
+  let t=Math.imul(rngState^(rngState>>>15),1|rngState);
+  t^=t+Math.imul(t^(t>>>7),61|t);
+  return ((t^(t>>>14))>>>0)/4294967296;
+}
+function randNormal(){
+  if(spareNormal!==null){const v=spareNormal; spareNormal=null; return v;}
+  let u=0,v=0;
+  while(u<=1e-12) u=randUniform();
+  while(v<=1e-12) v=randUniform();
+  const mag=Math.sqrt(-2*Math.log(u));
+  const z0=mag*Math.cos(2*Math.PI*v);
+  spareNormal=mag*Math.sin(2*Math.PI*v);
+  return z0;
+}
+
+const hidden=new Float32Array(H);
+const pix=new Float32Array(PIX);
+const rgba=new Uint8ClampedArray(PIX*4);
+const imgData=new ImageData(rgba,D.size,D.size);
+
+const modelSwitch=document.getElementById('modelSwitch');
+const unitSliders=document.getElementById('unitSliders');
+const facePicker=document.getElementById('facePicker');
+const faceCanvas=document.getElementById('faceCanvas');
+faceCanvas.width=D.size;
+faceCanvas.height=D.size;
+const fctx=faceCanvas.getContext('2d');
+const metrics=document.getElementById('metrics');
+const status=document.getElementById('status');
+const walkA=document.getElementById('walkA');
+const walkB=document.getElementById('walkB');
+const walkT=document.getElementById('walkT');
+const walkReadout=document.getElementById('walkReadout');
+
+const unitControls=[];
+const faceButtons=[];
+const modelButtons=[];
+
+for(let m=0;m<models.length;m++){
+  const b=document.createElement('button');
+  b.type='button';
+  b.setAttribute('role','tab');
+  b.textContent=models[m].name;
+  b.setAttribute('aria-pressed',m===0?'true':'false');
+  b.addEventListener('click',()=>{state.modelIndex=m; refreshModelUI(); scheduleDecode();});
+  modelSwitch.appendChild(b);
+  modelButtons.push(b);
+}
+
+for(let i=0;i<6;i++){
+  const holder=document.createElement('div');
+  holder.className='unit';
+  const lab=document.createElement('label');
+  lab.id='unitLabel'+i;
+  lab.setAttribute('for','unitSlider'+i);
+  const slider=document.createElement('input');
+  slider.type='range';
+  slider.id='unitSlider'+i;
+  slider.step='0.01';
+  slider.addEventListener('input',()=>{
+    const idx=Number(slider.dataset.unitIndex);
+    state.mode='custom';
+    state.z[idx]=Number(slider.value);
+    scheduleDecode();
+  });
+  const val=document.createElement('div');
+  val.className='uval';
+  holder.appendChild(lab);
+  holder.appendChild(slider);
+  holder.appendChild(val);
+  unitSliders.appendChild(holder);
+  unitControls.push({lab,slider,val});
+}
+
+for(let i=0;i<originals.length;i++){
+  const btn=document.createElement('button');
+  btn.type='button';
+  btn.setAttribute('role','option');
+  btn.setAttribute('aria-label','Start from face '+(i+1));
+  btn.setAttribute('aria-pressed','false');
+  const cv=document.createElement('canvas');
+  cv.width=D.size; cv.height=D.size;
+  const cctx=cv.getContext('2d');
+  const thumbRgba=new Uint8ClampedArray(PIX*4);
+  for(let p=0;p<PIX;p++){
+    const g=originals[i][p];
+    const j=p*4;
+    thumbRgba[j]=g; thumbRgba[j+1]=g; thumbRgba[j+2]=g; thumbRgba[j+3]=255;
+  }
+  cctx.putImageData(new ImageData(thumbRgba,D.size,D.size),0,0);
+  btn.appendChild(cv);
+  btn.addEventListener('click',()=>{
+    state.mode='face';
+    state.faceIndex=i;
+    applyModeToCode();
+    scheduleDecode();
+  });
+  facePicker.appendChild(btn);
+  faceButtons.push(btn);
+}
+
+for(let i=0;i<6;i++){
+  const oa=document.createElement('option');
+  oa.value=String(i);
+  oa.textContent='Face '+(i+1);
+  walkA.appendChild(oa);
+  const ob=document.createElement('option');
+  ob.value=String(i);
+  ob.textContent='Face '+(i+1);
+  walkB.appendChild(ob);
+}
+walkA.value='0';
+walkB.value='1';
+
+document.getElementById('randomBtn').addEventListener('click',()=>{
+  state.mode='random';
+  for(let i=0;i<K;i++) state.randomCode[i]=randNormal();
+  applyModeToCode();
+  scheduleDecode();
+});
+
+walkA.addEventListener('change',()=>{
+  state.walkA=Number(walkA.value);
+  state.mode='walk';
+  applyModeToCode();
+  scheduleDecode();
+});
+walkB.addEventListener('change',()=>{
+  state.walkB=Number(walkB.value);
+  state.mode='walk';
+  applyModeToCode();
+  scheduleDecode();
+});
+walkT.addEventListener('input',()=>{
+  state.walkT=Number(walkT.value);
+  state.mode='walk';
+  applyModeToCode();
+  scheduleDecode();
+});
+
+function clamp(v,lo,hi){return v<lo?lo:(v>hi?hi:v);}
+
+function applyModeToCode(){
+  const M=models[state.modelIndex];
+  if(state.mode==='face'){
+    state.z.set(M.faces[state.faceIndex]);
+  }else if(state.mode==='random'){
+    state.z.set(state.randomCode);
+  }else if(state.mode==='walk'){
+    const a=M.faces[state.walkA];
+    const b=M.faces[state.walkB];
+    const t=state.walkT;
+    for(let i=0;i<K;i++) state.z[i]=(1-t)*a[i]+t*b[i];
+  }
+}
+
+function refreshModelUI(){
+  for(let i=0;i<modelButtons.length;i++){
+    modelButtons[i].setAttribute('aria-pressed',i===state.modelIndex?'true':'false');
+  }
+  walkA.value=String(state.walkA);
+  walkB.value=String(state.walkB);
+  walkT.value=String(state.walkT);
+  if(state.mode==='face' || state.mode==='walk'){
+    applyModeToCode();
+  }else if(state.mode==='random'){
+    state.z.set(state.randomCode);
+  }
+  const M=models[state.modelIndex];
+  for(let i=0;i<6;i++){
+    const unit=M.top[i];
+    const mu=Number.isFinite(M.mean[unit])?M.mean[unit]:0;
+    const sdRaw=Number.isFinite(M.std[unit])?M.std[unit]:1;
+    const sd=sdRaw>1e-6?sdRaw:1;
+    const lo=mu-3*sd;
+    const hi=mu+3*sd;
+    const ctl=unitControls[i];
+    ctl.lab.textContent='Unit '+unit;
+    ctl.slider.min=String(lo);
+    ctl.slider.max=String(hi);
+    ctl.slider.dataset.unitIndex=String(unit);
+    const shown=clamp(state.z[unit],lo,hi);
+    ctl.slider.value=String(shown);
+    ctl.val.textContent='Code '+state.z[unit].toFixed(2)+'   range ['+lo.toFixed(2)+', '+hi.toFixed(2)+']';
+  }
+  for(let i=0;i<faceButtons.length;i++){
+    const on=state.mode==='face' && i===state.faceIndex;
+    faceButtons[i].setAttribute('aria-pressed',on?'true':'false');
+  }
+  const t=state.walkT;
+  walkReadout.textContent='Walk position t = '+t.toFixed(2)+', line from face '+(state.walkA+1)+' to face '+(state.walkB+1)+'.';
+}
+
+function decodeCurrent(){
+  const M=models[state.modelIndex];
+  const W1=M.W1, W2=M.W2, b1=M.b1, b2=M.b2, meanPix=M.pixelMean;
+
+  // hidden = ReLU(z W1^T + b1), W1 shape [512,32] in row order
+  for(let j=0;j<H;j++){
+    let s=b1[j];
+    const row=j*K;
+    for(let i=0;i<K;i++) s+=state.z[i]*W1[row+i];
+    hidden[j]=s>0?s:0;
+  }
+
+  // pixels = hidden W2 + b2 + mean, W2 shape [1024,512] in row order
+  for(let p=0;p<PIX;p++){
+    let s=b2[p]+meanPix[p];
+    for(let j=0;j<H;j++) s+=hidden[j]*W2[p*H+j];
+    pix[p]=s;
+  }
+
+  for(let i=0;i<PIX;i++){
+    const v=clamp(pix[i],0,1);
+    const g=Math.round(v*255);
+    const j=i*4;
+    rgba[j]=g; rgba[j+1]=g; rgba[j+2]=g; rgba[j+3]=255;
+  }
+  fctx.putImageData(imgData,0,0);
+}
+
+let decodePending=false;
+let frameScheduled=false;
+function scheduleDecode(){
+  decodePending=true;
+  if(frameScheduled) return;
+  frameScheduled=true;
+  requestAnimationFrame(()=>{
+    frameScheduled=false;
+    if(!decodePending) return;
+    decodePending=false;
+    refreshModelUI();
+    decodeCurrent();
+    renderReadout();
+  });
+}
+
+function renderReadout(){
+  const M=models[state.modelIndex];
+  metrics.innerHTML='Median held-out R<sup>2</sup>: <b>'+M.r2.toFixed(3)+'</b><br>'
+    +'Random-code nearest-training-face distance: <b>'+M.randomNearestL2.toFixed(2)+'</b>';
+  let modeText='mode custom';
+  if(state.mode==='random') modeText='mode random code';
+  if(state.mode==='face') modeText='mode start from face '+(state.faceIndex+1);
+  if(state.mode==='walk') modeText='mode walk between faces';
+  status.textContent=modeText+', active units '+M.activeUnits+' of 32, model '+M.name+'.';
+}
+
+// Initial state
+applyModeToCode();
+refreshModelUI();
+scheduleDecode();
+})();
+</script>
+</body>
+</html>
