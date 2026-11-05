@@ -280,12 +280,11 @@
 <div class="col">
 <ul>
 <li><strong>False negatives:</strong> negatives are sampled at random, with no labels, so two images of one class, such as two dogs, get pushed apart. With 30 negatives on CIFAR-10: about 80% accuracy; 88% when sampled from different classes</li>
-<li><strong>Discarded information:</strong> if a task needs color, training with color jitter throws away what it needs</li>
 <li><strong>Batch size:</strong> the batch supplies the negatives, and <mark>a larger batch gives more of them, including harder ones</mark>. Default 4096 images; smaller batches can come close</li>
 </ul>
 </div>
 </div>
-<div class="ref"><a href="https://arxiv.org/abs/2002.05709" rel="noopener">Chen et al. <b>ICML 2020</b></a> · <a href="https://arxiv.org/abs/2007.00224" rel="noopener">Chuang et al. <b>NeurIPS 2020</b></a> · <a href="https://arxiv.org/abs/2008.05659" rel="noopener">Xiao et al. <b>ICLR 2021</b></a></div>
+<div class="ref"><a href="https://arxiv.org/abs/2002.05709" rel="noopener">Chen et al. <b>ICML 2020</b></a> · <a href="https://arxiv.org/abs/2007.00224" rel="noopener">Chuang et al. <b>NeurIPS 2020</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-class="lead" data-marpit-pagination="31" data-marpit-pagination-total="61" aria-labelledby="heading-31"><p class="page">Slide 31</p>
 <h2 id="heading-31">Second class: self-distillation</h2>
 <h2 id="dino-match-a-slowly-updated-copy-of-the-network-with-no-repulsion">DINO: match a slowly updated copy of the network, with no repulsion</h2>
