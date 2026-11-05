@@ -143,14 +143,10 @@ html.embed .footer{position:fixed;right:10px;bottom:6px;width:490px;margin:0}
 
     <aside class="right-col">
       <div class="chart-wrap">
-        <h2>Median held-out R<sup>2</sup> across bottleneck sizes</h2>
+        <h2>Reconstruction against code size (median held-out R<sup>2</sup>)</h2>
         <canvas id="chartCanvas" class="chart" width="500" height="210" role="img" aria-label="R squared against code size"></canvas>
-        <div class="legend">
-          <span><i class="sw" style="background:#3E6D8E"></i>PCA</span>
-          <span><i class="sw" style="background:#B23A2E"></i>Linear autoencoder</span>
-          <span><i class="sw" style="background:#3F7A6B"></i>Shallow ReLU</span>
-          <span><i class="sw" style="background:#B5396B"></i>Deep ReLU</span>
-        </div>
+        <div class="legend"><span style="color:#3E6D8E">&#9644; PCA</span><span style="color:#B5396B">&#9644; selected autoencoder</span></div>
+        <p style="margin:4px 0 0;font-size:15px;color:var(--slate)">What compression costs. On these faces the curves nearly overlap: nonlinearity adds little to reconstruction.</p>
       </div>
       <div class="init-wrap">
         <h2>Same subspace, different rows</h2>
@@ -414,10 +410,9 @@ function drawChart(){
     }
   }
 
+  // PCA and the autoencoder currently selected: more curves overlap and teach nothing.
   drawSeries(D.r2.pca,'#3E6D8E');
-  drawSeries(D.r2.linear,'#B23A2E');
-  drawSeries(D.r2.relu,'#3F7A6B');
-  drawSeries(D.r2.deep,'#B5396B');
+  drawSeries(D.r2[state.mode],'#B5396B');
 
   const idx=state.kIndex;
   const x=sx(D.ks[idx]);
