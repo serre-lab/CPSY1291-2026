@@ -285,9 +285,10 @@
 </div>
 <div class="col">
 <ul>
-<li>The last layer of a DINO ResNet-50, a 25 × 25 map: its strongest spatial pattern (first PC), and similarity to a marked point</li>
-<li>With no labels, <mark>the features carry coarse information about where objects are</mark>. Fine edges come from the photo underneath</li>
-<li>Not better than labels: the supervised network does at least as well. Bird: DINO's first PC goes to the blossom</li>
+<li>The last layer of a DINO ResNet-50 is a 25 × 25 map, with one feature vector at each location. Two ways to look at those vectors:</li>
+<li><strong>First PC:</strong> PCA over the locations of one image. It shows the largest contrast in features across the image</li>
+<li><strong>Cosine to a seed:</strong> pick one point and ask which locations have similar features. It shows what the network treats as alike</li>
+<li><mark>With no labels, locations with similar appearance, probably texture, group together</mark>, and this often follows objects, close to a supervised ResNet-50 trained on 1.3 million labeled images. A hard case, the bird: DINO's first PC goes to the blossom</li>
 </ul>
 </div>
 </div>
@@ -298,35 +299,27 @@
 <figure><img src="../images/L14/pub_caron2021_fig1_attention.png" alt="Figure 1 of Caron et al.: photographs with the self-attention map of a DINO vision transformer beneath each, outlining the object with no label, mask or box given" aria-describedby="figure-31-1"><figcaption id="figure-31-1"><p>Figure 1 of Caron et al.: photographs with the self-attention map of a DINO vision transformer beneath each, outlining the object with no label, mask or box given</p><a href="../images/L14/pub_caron2021_fig1_attention.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>The same DINO objective on a <strong>vision transformer</strong>, an architecture you meet in a later lecture. The map shows which patches the network weighs when it summarizes the image</li>
-<li><mark>No label, mask or box was given</mark>. Not a controlled comparison with the ResNet maps: other photographs, another kind of map</li>
+<li>The same DINO objective on a <strong>vision transformer</strong>, an architecture you meet in a later lecture. The map is the last layer's self-attention</li>
+<li><mark>These maps outline objects more sharply</mark>. Not a controlled comparison with the ResNet maps: other photographs, another kind of map</li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/2104.14294" rel="noopener">Caron et al. <b>ICCV 2021</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-class="split" data-marpit-pagination="32" data-marpit-pagination-total="56" aria-labelledby="heading-32"><p class="page">Slide 32</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="56" aria-labelledby="heading-32"><p class="page">Slide 32</p>
 <h2 id="heading-32">DINO's neighbors: success and failure</h2>
-<div class="row">
-<div class="col fig">
+<div class="capfig">
 <figure><img src="../images/L14/dino_rn50_retrieval.png" alt="For four query photographs, the four nearest neighbors under DINO and under a supervised ResNet-50. Chips retrieve other foods and kangaroo other mammals under both, checked in green. Footrest retrieves routers and modems and frame retrieves a notepad and a desk, marked as wrong in red" aria-describedby="figure-32-1"><figcaption id="figure-32-1"><p>For four query photographs, the four nearest neighbors under DINO and under a supervised ResNet-50. Chips retrieve other foods and kangaroo other mammals under both, checked in green. Footrest retrieves routers and modems and frame retrieves a notepad and a desk, marked as wrong in red</p><a href="../images/L14/dino_rn50_retrieval.png">Open full-size figure</a></figcaption></figure>
 </div>
-<div class="col">
 <ul>
-<li>Nearest neighbor in the same category: DINO <strong>60%</strong>, supervised <strong>64%</strong>, chance 11% (categories overlap and differ in size). <mark>Failures follow appearance</mark>: a dark ribbed footrest finds routers</li>
+<li>Same category at the nearest neighbor, with no labels: DINO <strong>60%</strong>, close to supervised <strong>64%</strong> (chance 11%). <mark>Failures follow appearance</mark>: a dark ribbed footrest finds routers</li>
 </ul>
-</div>
-</div>
 <div class="ref">Computed: DINO and supervised ResNet-50, 1,295 THINGSplus photographs in 27 categories</div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-class="split" data-marpit-pagination="33" data-marpit-pagination-total="56" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="56" aria-labelledby="heading-33"><p class="page">Slide 33</p>
 <h2 id="heading-33">Augmentations leave their mark</h2>
-<div class="row">
-<div class="col fig">
+<div class="capfig">
 <figure><img src="../images/L14/dino_rn50_invariance.png" alt="Bar chart of mean cosine similarity between an image and a transformed copy, for DINO and supervised ResNet-50. Random crop 0.92 and 0.93, color jitter 0.99 and 0.96, gray-level 0.95 and 0.90, blurring 0.94 and 0.88, rotation by 90 degrees, not in DINO's training, 0.85 and 0.88. Dashed lines show different images at 0.44 for DINO and 0.54 for supervised" aria-describedby="figure-33-1"><figcaption id="figure-33-1"><p>Bar chart of mean cosine similarity between an image and a transformed copy, for DINO and supervised ResNet-50. Random crop 0.92 and 0.93, color jitter 0.99 and 0.96, gray-level 0.95 and 0.90, blurring 0.94 and 0.88, rotation by 90 degrees, not in DINO's training, 0.85 and 0.88. Dashed lines show different images at 0.44 for DINO and 0.54 for supervised</p><a href="../images/L14/dino_rn50_invariance.png">Open full-size figure</a></figcaption></figure>
 </div>
-<div class="col">
 <ul>
 <li>DINO holds still under the color and blur changes it trained on, more than the supervised network. <mark>Rotation was not among its views, and it is DINO's lowest bar</mark></li>
 </ul>
-</div>
-</div>
 <div class="ref">Computed: 300 THINGSplus photographs</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-class="split" data-marpit-pagination="34" data-marpit-pagination-total="56" aria-labelledby="heading-34"><p class="page">Slide 34</p>
 <h2 id="heading-34">One recipe: pretrain once, read out cheaply</h2>
