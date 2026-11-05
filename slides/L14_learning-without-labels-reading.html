@@ -384,8 +384,9 @@
 </table></div>
 <ul>
 <li><mark>Mostly more data and larger models, plus fixes that keep training stable at that size</mark>. The one real change to the objective: masking, in DINOv2</li>
+<li>Closely related: <strong>JEPA</strong> (LeCun, also Meta) predicts a slow copy's features for hidden regions, with no crops to match</li>
 </ul>
-<div class="ref"><a href="https://arxiv.org/abs/2104.14294" rel="noopener">Caron et al. <b>ICCV 2021</b></a> · <a href="https://arxiv.org/abs/2304.07193" rel="noopener">Oquab et al. <b>TMLR 2024</b></a> · <a href="https://arxiv.org/abs/2508.10104" rel="noopener">Siméoni et al. <b>arXiv 2025</b></a></div>
+<div class="ref"><a href="https://arxiv.org/abs/2104.14294" rel="noopener">Caron et al. <b>ICCV 2021</b></a> · <a href="https://arxiv.org/abs/2304.07193" rel="noopener">Oquab et al. <b>TMLR 2024</b></a> · <a href="https://arxiv.org/abs/2508.10104" rel="noopener">Siméoni et al. <b>arXiv 2025</b></a> · <a href="https://arxiv.org/abs/2301.08243" rel="noopener">Assran et al. <b>CVPR 2023</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-class="lead" data-marpit-pagination="38" data-marpit-pagination-total="62" aria-labelledby="heading-38"><p class="page">Slide 38</p>
 <h2 id="heading-38">Third class: masked prediction</h2>
 <h2 id="mae-no-views-to-match-hide-most-of-an-image-and-fill-it-in">MAE: no views to match. Hide most of an image and fill it in</h2>
@@ -397,9 +398,8 @@
 <ul>
 <li><strong>MAE</strong> (Meta): hide 75% of the patches and reconstruct them, inferring what was not shown</li>
 <li>A constant output cannot reconstruct different images, so collapse is not the risk. <mark>What it adds: no paired views to match</mark></li>
-<li>Closely related: <strong>JEPA</strong> (LeCun), which predicts the features of hidden regions, not their pixels</li>
 </ul>
-<div class="ref"><a href="https://arxiv.org/abs/2111.06377" rel="noopener">He et al. <b>CVPR 2022</b></a> · <a href="https://arxiv.org/abs/2301.08243" rel="noopener">Assran et al. <b>CVPR 2023</b></a> · Serre <b>Annu Rev Vis Sci</b> (in submission), Fig. 2d</div>
+<div class="ref"><a href="https://arxiv.org/abs/2111.06377" rel="noopener">He et al. <b>CVPR 2022</b></a> · Serre <b>Annu Rev Vis Sci</b> (in submission), Fig. 2d</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-class="split" data-marpit-pagination="40" data-marpit-pagination-total="62" aria-labelledby="heading-40"><p class="page">Slide 40</p>
 <h2 id="heading-40">MAE: real reconstructions</h2>
 <div class="row">
