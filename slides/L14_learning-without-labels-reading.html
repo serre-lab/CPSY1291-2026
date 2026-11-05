@@ -7,7 +7,7 @@
 <figure><img src="../images/L14/serre2026_annrev_fig1_scaling.png" alt="Scatter plot of ImageNet multilabel accuracy, 60 to 97.5 percent, against training computation in floating-point operations from 10 to the 18 to 10 to the 24, for 40 image encoders released between 2012 and 2025. Accuracy rises from AlexNet near 62 percent to a cluster inside the gray band of trained human annotators, about 92 to 97 percent. Points are colored by objective: supervised black, self-supervised blue, image-text orange, video yellow; circles are CNNs, diamonds transformers, a square the MambaVision hybrid; gray markers are the 2012 to 2018 models. DINOv3, self-supervised, and several image-text transformers sit at the top right, inside the human band. Qwen3-VL is plotted separately at right because its training computation is unpublished." aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>Scatter plot of ImageNet multilabel accuracy, 60 to 97.5 percent, against training computation in floating-point operations from 10 to the 18 to 10 to the 24, for 40 image encoders released between 2012 and 2025. Accuracy rises from AlexNet near 62 percent to a cluster inside the gray band of trained human annotators, about 92 to 97 percent. Points are colored by objective: supervised black, self-supervised blue, image-text orange, video yellow; circles are CNNs, diamonds transformers, a square the MambaVision hybrid; gray markers are the 2012 to 2018 models. DINOv3, self-supervised, and several image-text transformers sit at the top right, inside the human band. Qwen3-VL is plotted separately at right because its training computation is unpublished.</p><a href="../images/L14/serre2026_annrev_fig1_scaling.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>40 image encoders, AlexNet in 2012 to 2025, measured alike. Accuracy climbs from about 60% to the range of trained annotators (gray)</li>
+<li>40 image encoders, networks that turn an image into features, from AlexNet in 2012 to 2025, measured alike. Accuracy climbs from about 60% to the range of trained annotators (gray)</li>
 <li>DINOv3 took about 300,000 times the computation of AlexNet. <mark>At AlexNet's 2012 rate, that is about 4,500 years of training</mark></li>
 </ul>
 <div class="ref">Serre <b>Annu Rev Vis Sci</b> (in submission), Fig. 1 · <a href="https://proceedings.mlr.press/v119/shankar20c.html" rel="noopener">Shankar et al. <b>ICML 2020</b></a> · <a href="https://arxiv.org/abs/2508.10104" rel="noopener">Siméoni et al. <b>arXiv 2025</b></a></div>
@@ -53,7 +53,7 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="56" aria-labelledby="heading-9"><p class="page">Slide 9</p>
 <h2 id="heading-9">What the encoder does: a projection</h2>
 <div class="capfig figbox">
-<figure><img src="../images/L14/ae_faces_projection.svg" alt="The same held-out face and 32-unit code as the last slide. Between them, four rows of the trained encoder weights W1 drawn as 32 by 32 images, showing face structure, each with an arrow to its code unit and that unit's value. To the right, a schematic: a cloud of points, a tilted plane, and thin lines dropping each point onto the plane" aria-describedby="figure-9-1"><figcaption id="figure-9-1"><p>The same held-out face and 32-unit code as the last slide. Between them, four rows of the trained encoder weights W1 drawn as 32 by 32 images, showing face structure, each with an arrow to its code unit and that unit's value. To the right, a schematic: a cloud of points, a tilted plane, and thin lines dropping each point onto the plane</p><a href="../images/L14/ae_faces_projection.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L14/ae_faces_projection.svg" alt="The same held-out face, input units, weight fan and 32-unit code as the last slide. To the right, four rows of the trained encoder weights W1 drawn as 32 by 32 images showing face structure, in a two by two grid, each joined by a line to its code unit and labeled with that unit's value. Further right, a schematic: a cloud of points, a tilted plane, and thin lines dropping each point onto the plane" aria-describedby="figure-9-1"><figcaption id="figure-9-1"><p>The same held-out face, input units, weight fan and 32-unit code as the last slide. To the right, four rows of the trained encoder weights W1 drawn as 32 by 32 images showing face structure, in a two by two grid, each joined by a line to its code unit and labeled with that unit's value. Further right, a schematic: a cloud of points, a tilted plane, and thin lines dropping each point onto the plane</p><a href="../images/L14/ae_faces_projection.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
 <li>Each face is a point in 1024 dimensions. Each row of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">\mathbf{W}_1</annotation></semantics></math> is a <strong>direction</strong>; <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐡</mi></mrow><annotation encoding="application/x-tex">\mathbf{h}</annotation></semantics></math> gives the face's coordinates along 32 of them, then <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math>: <mark>a projection from 1024 to 32</mark></li>
@@ -176,7 +176,7 @@
 </div>
 <div class="col">
 <ul>
-<li><mark>Good reconstructions do not imply good features</mark>: two autoencoders with the same reconstruction loss score about 60% and 87% on a readout (left; the better one also got a supervised signal)</li>
+<li><mark>Good reconstructions do not imply good features</mark>: two autoencoders with the same reconstruction loss score about 60% and 87% on a linear readout (left; the better one also got a supervised signal)</li>
 <li>An autoencoder trained on ImageNet predicts macaque V4 no better than an untrained network (Zhuang et al. 2021, later today)</li>
 <li>So copying the input does not guarantee features useful for other tasks. What else could the target be, with no labels?</li>
 </ul>
@@ -187,7 +187,7 @@
 <h2 id="heading-22">Self-supervised learning</h2>
 <ul>
 <li><strong>Self-supervised learning:</strong> learning without human labels, for example by matching two views of one image or filling in hidden image regions</li>
-<li><strong>Pretext task:</strong> the training task used to learn the features, such as predicting an image's rotation. Its output layer is thrown away and the encoder is kept</li>
+<li><strong>Pretext task:</strong> the training task used to learn the features, such as predicting an image's rotation. Keep the <strong>encoder</strong>, the network that produces the features; throw away the <strong>training head</strong> on top of it</li>
 <li><strong>Pretraining:</strong> this initial learning, before adaptation to a particular task. The encoder can then serve new tasks in two ways:</li>
 <li><strong>Linear readout:</strong> freeze the encoder, so that its weights no longer change, and train a linear classifier on its features for the new task</li>
 <li><strong>Fine-tuning:</strong> keep adjusting the pretrained weights for the new task</li>
@@ -219,8 +219,8 @@
 <figure><img src="../images/L14/find_the_match.png" alt="One crop of a cat on the left, seven candidates on the right: a koala, a dog, a car, another crop of the same cat outlined in red, bananas, a chair and a teapot. Bars show a schematic probability for each, 0.86 for the other cat crop and at most 0.06 for the others" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>One crop of a cat on the left, seven candidates on the right: a koala, a dog, a car, another crop of the same cat outlined in red, bananas, a chair and a teapot. Bars show a schematic probability for each, 0.86 for the other cat crop and at most 0.06 for the others</p><a href="../images/L14/find_the_match.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>Each view must identify the other view of the same image among the rest of the batch. This is <strong>softmax classification</strong>, and the target class is that other view (probabilities in the figure are illustrative)</li>
-<li>Minimizing this loss pulls the two views together and pushes the other images apart. <mark>Repulsion is what prevents collapse</mark>. This is SimCLR; the loss is called <strong>InfoNCE</strong> (equation and code in "Going further")</li>
+<li><strong>Positives:</strong> two random views of one image. <strong>Negatives:</strong> the other images in the batch, sampled at random. Each view must identify its positive among them: <strong>softmax classification</strong></li>
+<li>The loss, <strong>InfoNCE</strong> ("Going further"), pulls positives together and pushes negatives apart. <mark>Repulsion prevents collapse</mark>. This is SimCLR. It applies the loss on a small <strong>training head</strong> after the encoder, thrown away after training</li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/2002.05709" rel="noopener">Chen et al. <b>ICML 2020</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-class="split" data-marpit-pagination="26" data-marpit-pagination-total="56" aria-labelledby="heading-26"><p class="page">Slide 26</p>
@@ -246,9 +246,9 @@
 </div>
 <div class="col">
 <ul>
-<li><strong>False negatives:</strong> two different dogs get pushed apart. With 30 negatives on CIFAR-10: about 80% accuracy, 88% if negatives truly differ in class</li>
-<li><strong>Lost information:</strong> learning to ignore a change means not being able to report it. On ImageNet, rotation is decoded at 68% from the encoder, 26% from the training head on top of it (chance 25%)</li>
-<li><strong>Batch size:</strong> <mark>repulsion benefits from many negatives</mark>: default 4096 images, though smaller batches can come close</li>
+<li><strong>False negatives:</strong> negatives are sampled at random, with no labels, so two images of one class, such as two dogs, get pushed apart. With 30 negatives on CIFAR-10: about 80% accuracy; 88% when sampled from different classes</li>
+<li><strong>Lost information:</strong> learning to ignore a change means not being able to report it. On ImageNet, rotation is decoded at 68% from the encoder, 26% from the training head (chance 25%)</li>
+<li><strong>Batch size:</strong> the batch supplies the negatives, and <mark>a larger batch gives more of them, including harder ones</mark>. Default 4096 images; smaller batches can come close</li>
 </ul>
 </div>
 </div>
@@ -260,7 +260,7 @@
 </div>
 <ul>
 <li>No negatives. One network sees a view and predicts the output, a probability distribution, of a <strong>copy of itself</strong> on another view. The copy's weights are a running average of the network's own, so it changes slowly</li>
-<li>Why no collapse? The slow copy, plus two small corrections to its output, centering and sharpening. <mark>What DINO adds: attraction alone can work, with no false negatives</mark>. You have used its ResNet-50</li>
+<li>Why no collapse? The slow copy, plus two corrections to its output: <strong>centering</strong> (subtract a running mean) and <strong>sharpening</strong> (a low temperature). <mark>Attraction alone can work, with no false negatives</mark></li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/2104.14294" rel="noopener">Caron et al. <b>ICCV 2021</b></a> · Serre <b>Annu Rev Vis Sci</b> (in submission), Fig. 2e</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-class="split" data-marpit-pagination="29" data-marpit-pagination-total="56" aria-labelledby="heading-29"><p class="page">Slide 29</p>
@@ -444,7 +444,7 @@
 </div>
 <ul>
 <li>DINOv3 pretrained on 1.7 billion images with no category labels. Others at the top use captions, or labels</li>
-<li>Few labels are needed afterwards: ten labeled images per ImageNet category, under 1% of the labels, give a linear readout of DINOv2 or DINOv3 about 87% multilabel accuracy. <mark>Most of the learning happens in pretraining, without category labels</mark></li>
+<li>Few labels are needed afterwards: ten labeled images per ImageNet category, under 1% of the labels, give a linear readout of DINOv2 or DINOv3 about 87% accuracy (any valid label counts). <mark>Most of the learning happens in pretraining, without category labels</mark></li>
 </ul>
 <div class="ref">Serre <b>Annu Rev Vis Sci</b> (in submission) · <a href="https://arxiv.org/abs/2508.10104" rel="noopener">Siméoni et al. <b>arXiv 2025</b></a> · <a href="https://doi.org/10.1038/s41467-024-53147-y" rel="noopener">Conwell et al. <b>Nat Commun 2024</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-class="lead" data-marpit-pagination="40" data-marpit-pagination-total="56" aria-labelledby="heading-40"><p class="page">Slide 40</p>
