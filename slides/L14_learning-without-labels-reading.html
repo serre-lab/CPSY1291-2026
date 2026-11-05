@@ -357,25 +357,25 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>Images, no labels</strong></td>
+<td><strong>Images</strong></td>
 <td>1.3 million</td>
-<td>142 million, curated</td>
-<td>1.7 billion, curated</td>
+<td>142 million</td>
+<td>1.7 billion</td>
 </tr>
 <tr>
-<td><strong>Largest model</strong></td>
-<td>85 million parameters</td>
+<td><strong>Parameters</strong></td>
+<td>85 million</td>
 <td>1.1 billion</td>
 <td>6.7 billion</td>
 </tr>
 <tr>
-<td><strong>What is added</strong></td>
-<td>slow copy, centering, sharpening; small and large crops</td>
-<td>masked patches: predict the copy's output there</td>
-<td>Gram anchoring: keeps patch features clean in long training</td>
+<td><strong>Added</strong></td>
+<td>slow copy, centering, sharpening</td>
+<td>masked patches</td>
+<td>Gram anchoring</td>
 </tr>
 <tr>
-<td><strong>Linear readout, ImageNet</strong></td>
+<td><strong>ImageNet readout</strong></td>
 <td>80%</td>
 <td>87%</td>
 <td>88%</td>
@@ -383,8 +383,8 @@
 </tbody>
 </table></div>
 <ul>
-<li><mark>Mostly more data and larger models, plus fixes that keep training stable at that size</mark>. The one real change to the objective: masking, in DINOv2</li>
-<li>Closely related: <strong>JEPA</strong> (LeCun, also Meta) predicts a slow copy's features for hidden regions, with no crops to match</li>
+<li>All with no labels. <mark>Mostly more data and larger models, plus fixes that keep training stable at that size</mark>. The one real change to the objective: masking, in DINOv2</li>
+<li>Closely related: <strong>JEPA</strong> (LeCun, also Meta) predicts a slow copy's features for hidden regions</li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/2104.14294" rel="noopener">Caron et al. <b>ICCV 2021</b></a> · <a href="https://arxiv.org/abs/2304.07193" rel="noopener">Oquab et al. <b>TMLR 2024</b></a> · <a href="https://arxiv.org/abs/2508.10104" rel="noopener">Siméoni et al. <b>arXiv 2025</b></a> · <a href="https://arxiv.org/abs/2301.08243" rel="noopener">Assran et al. <b>CVPR 2023</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-class="lead" data-marpit-pagination="38" data-marpit-pagination-total="62" aria-labelledby="heading-38"><p class="page">Slide 38</p>
