@@ -260,17 +260,17 @@
 <h2 id="heading-29">SimCLR: where it excels</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L14/pub_chen2020_simclr_fig5_augmentation.png" alt="Heat map from Chen et al. of linear readout accuracy for pairs of augmentations on ResNet-50. Crop with color stands out at 56.3 and 55.8; most single transforms are low, crop alone 33.1" aria-describedby="figure-29-1"><figcaption id="figure-29-1"><p>Heat map from Chen et al. of linear readout accuracy for pairs of augmentations on ResNet-50. Crop with color stands out at 56.3 and 55.8; most single transforms are low, crop alone 33.1</p><a href="../images/L14/pub_chen2020_simclr_fig5_augmentation.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L14/simclr_aug_bars.svg" alt="Horizontal bar chart of ImageNet accuracy of a linear readout when training uses one kind of augmentation: rotate 2.6 percent, blur 2.6, color 18.8, crop 33.1, and crop plus color together 56.3" aria-describedby="figure-29-1"><figcaption id="figure-29-1"><p>Horizontal bar chart of ImageNet accuracy of a linear readout when training uses one kind of augmentation: rotate 2.6 percent, blur 2.6, color 18.8, crop 33.1, and crop plus color together 56.3</p><a href="../images/L14/simclr_aug_bars.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
 <li><strong>Linear readout</strong> on a frozen ResNet-50: <strong>69%</strong> on ImageNet, against 60 to 64% for earlier methods</li>
 <li><strong>Fine-tuning</strong> with few labels: pretrain with no labels, then fine-tune on 1% of the labels. Top-5 accuracy <strong>75%</strong>, against 48% for supervised training on that same 1%</li>
-<li><strong>It depends on the views.</strong> Figure: readout accuracy for each pair of augmentations. Crop alone, <strong>33%</strong>. <mark>Crop plus color, 56%</mark></li>
+<li><strong>It depends on the views</strong> (figure). No single augmentation is enough. <mark>Crop plus color: 56%</mark></li>
 </ul>
 </div>
 </div>
-<div class="ref"><a href="https://arxiv.org/abs/2002.05709" rel="noopener">Chen et al. <b>ICML 2020</b></a></div>
+<div class="ref"><a href="https://arxiv.org/abs/2002.05709" rel="noopener">Chen et al. <b>ICML 2020</b></a> · Fig. 5, replotted</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-class="split" data-marpit-pagination="30" data-marpit-pagination-total="61" aria-labelledby="heading-30"><p class="page">Slide 30</p>
 <h2 id="heading-30">SimCLR: where it fails</h2>
 <div class="row">
