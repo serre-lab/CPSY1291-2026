@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Contrastive views demo — CPSY 1291</title>
+<style>
+ :root{--ink:#1E293B;--taupe:#8A7E70;--gold:#F2C14E;--bg:#FDFBF7}
+ *{box-sizing:border-box}
+ body{margin:0;font:15px/1.45 Lora,Georgia,serif;color:var(--ink);background:var(--bg)}
+ .page{display:flex;gap:14px;padding:12px;align-items:flex-start;max-width:1120px}
+ #map{width:600px;height:600px;flex:0 0 auto;background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.12)}
+ .col{width:480px;flex:0 0 auto;display:flex;flex-direction:column;gap:10px;min-width:0}
+ .panel{font-family:Poppins,system-ui,sans-serif;font-size:13px}
+ label{display:block;margin:8px 0 2px;color:var(--taupe)}
+ .panel .ctrl:first-child label{margin-top:0}
+ button{font:inherit;padding:6px 11px;margin:2px 6px 2px 0;border:0;border-radius:7px;background:#EDE7DE;color:var(--ink);cursor:pointer}
+ button.primary{background:var(--gold)}
+ input[type=range]{width:100%}
+ .grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px}
+ .actions{margin-top:8px}
+ .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+ .stat{padding:8px 10px;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+ .stat b{font-size:19px}
+ #note{margin-top:8px;min-height:3.2em;padding:8px 10px;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+ body.embed{overflow:hidden;height:100vh;margin:0}
+ body.embed .page{
+   max-width:none;height:100%;box-sizing:border-box;display:grid;
+   grid-template-columns:minmax(760px,1fr) minmax(520px,560px);gap:8px 14px;padding:8px
+ }
+ body.embed #map{height:660px;width:660px;max-height:660px;justify-self:center}
+ body.embed .panel{font-size:20px;line-height:1.25}
+ body.embed label{margin:0 0 1px;font-size:20px}
+ body.embed button{padding:8px 16px;font-size:20px;border-radius:9px;margin:2px 8px 2px 0}
+ body.embed .actions{margin-top:4px}
+ body.embed .stats{margin-top:4px}
+ body.embed .stat{padding:6px 12px}
+ body.embed .stat b{font-size:24px}
+ body.embed #note{min-height:2.4em;font-size:20px;padding:6px 12px}
+ body.embed input[type=range]{height:26px}
+</style>
+</head>
+<body>
+<div class="page">
+  <canvas id="map" width="600" height="600" aria-label="Each thumbnail is one image from the dataset at its current contrastive embedding location."></canvas>
+  <div class="col">
+    <div class="panel">
+      <div class="grid">
+        <div class="ctrl">
+          <label for="shift">Shift and crop views</label>
+          <input id="shift" type="checkbox" checked aria-label="Toggle shift and crop augmentation">
+        </div>
+        <div class="ctrl">
+          <label for="color">Color jitter views</label>
+          <input id="color" type="checkbox" checked aria-label="Toggle color jitter augmentation">
+        </div>
+        <div class="ctrl">
+          <label for="blur">Blur views</label>
+          <input id="blur" type="checkbox" aria-label="Toggle blur augmentation">
+        </div>
+        <div class="ctrl">
+          <label for="repulsion">Repulsion term</label>
+          <input id="repulsion" type="checkbox" checked aria-label="Toggle repulsion in contrastive objective">
+        </div>
+        <div class="ctrl" style="grid-column:1 / span 2">
+          <label for="temp">Temperature — <span id="tempv">0.20</span></label>
+          <input id="temp" type="range" min="0.05" max="0.60" step="0.01" value="0.20" aria-label="Set contrastive temperature">
+        </div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="train" type="button">Train</button>
+        <button id="pause" type="button">Pause</button>
+        <button id="reset" type="button">Reset</button>
+      </div>
+      <div class="stats">
+        <div class="stat">shape NN accuracy <b id="shape">–</b></div>
+        <div class="stat">color NN accuracy <b id="coloracc">–</b></div>
+        <div class="stat">spread <b id="spread">–</b></div>
+        <div class="stat">step <b id="step">0</b></div>
+      </div>
+      <div id="note" aria-live="polite"></div>
+    </div>
+  </div>
+</div>
+<script src="./contrastive_views_core.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+if (new URLSearchParams(location.search).has('embed')) document.body.classList.add('embed');
+
+const core = ContrastiveViewsCore.createContrastiveViewsCore({
+  seed: 7,
+  hiddenSize: 64,
+  batchSize: 24,
+  temperature: 0.20,
+  learningRate: 0.008,
+  augment: { shift: true, colorJitter: true, blur: false },
+  repulsion: true
+});
+
+const cv = $('map');
+let running = false;
+let raf = 0;
+let metrics = core.computeMetrics();
+const thumbs = [];
+const imgSize = core.dataset.imageSize;
+
+function imageToCanvas(img) {
+  const c = document.createElement('canvas');
+  c.width = imgSize;
+  c.height = imgSize;
+  const g = c.getContext('2d');
+  const id = g.createImageData(imgSize, imgSize);
+  // img is packed RGB, three values per pixel; ImageData is RGBA.
+  for (let k = 0; k < imgSize * imgSize; k++) {
+    for (let c = 0; c < 3; c++) id.data[4 * k + c] = Math.max(0, Math.min(255, Math.round(img[3 * k + c] * 255)));
+    // Dark background pixels become transparent so overlapping thumbnails stay legible.
+    const dark = img[3 * k] < 0.12 && img[3 * k + 1] < 0.12 && img[3 * k + 2] < 0.12;
+    id.data[4 * k + 3] = dark ? 0 : 255;
+  }
+  g.putImageData(id, 0, 0);
+  return c;
+}
+
+for (let i = 0; i < core.dataset.total; i++) thumbs.push(imageToCanvas(core.dataset.images[i]));
+
+function fit() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const targetW = cv.clientWidth || 600;
+  const targetH = cv.clientHeight || 600;
+  const bw = Math.max(1, Math.round(targetW * dpr));
+  const bh = Math.max(1, Math.round(targetH * dpr));
+  if (cv.width !== bw || cv.height !== bh) {
+    cv.width = bw;
+    cv.height = bh;
+  }
+  const g = cv.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  cv._w = targetW;
+  cv._h = targetH;
+}
+
+function fmtPct(v) {
+  return (100 * v).toFixed(1) + '%';
+}
+
+function updateReadouts() {
+  $('shape').textContent = fmtPct(metrics.shapeAccuracy);
+  $('coloracc').textContent = fmtPct(metrics.colorAccuracy);
+  $('spread').textContent = metrics.spread.toFixed(3);
+  $('step').textContent = String(metrics.step);
+  let text = '';
+  if (!running && metrics.step === 0) {
+    text = 'Start training, then compare which visual properties remain near each other under your chosen view transformations.';
+  } else if (!running) {
+    text = 'Training is paused; inspect whether local neighborhoods now align more with shape or with color.';
+  } else if (!$('repulsion').checked) {
+    text = 'Without repulsion, attraction alone can pull all images into a tight cluster and destroy useful structure.';
+  } else if ($('color').checked) {
+    text = 'Color jitter asks the model to treat color as unstable, so nearby points should increasingly preserve shape over hue.';
+  } else {
+    text = 'Without color jitter, color remains reliable across views, so the embedding often keeps hue information more strongly than shape.';
+  }
+  $('note').textContent = text;
+}
+
+function draw() {
+  const W = cv._w || 600;
+  const H = cv._h || 600;
+  const g = cv.getContext('2d');
+  g.clearRect(0, 0, W, H);
+  g.fillStyle = '#fff';
+  g.fillRect(0, 0, W, H);
+  g.strokeStyle = '#EDE7DE';
+  g.lineWidth = 1;
+  g.strokeRect(0.5, 0.5, W - 1, H - 1);
+  g.beginPath();
+  g.moveTo(W * 0.5, 0);
+  g.lineTo(W * 0.5, H);
+  g.moveTo(0, H * 0.5);
+  g.lineTo(W, H * 0.5);
+  g.stroke();
+
+  const emb = core.getEmbeddings();
+  const n = core.dataset.total;
+  const thumb = Math.max(16, Math.min(34, Math.floor(Math.min(W, H) / 20)));
+  g.imageSmoothingEnabled = false;
+  for (let i = 0; i < n; i++) {
+    const ex = emb[2 * i];
+    const ey = emb[2 * i + 1];
+    const px = (ex * 0.46 + 0.5) * W - thumb * 0.5;
+    const py = (0.5 - ey * 0.46) * H - thumb * 0.5;
+    g.drawImage(thumbs[i], px, py, thumb, thumb);
+  }
+}
+
+function applyControls() {
+  core.setAugmentations({
+    shift: $('shift').checked,
+    colorJitter: $('color').checked,
+    blur: $('blur').checked
+  });
+  core.setRepulsion($('repulsion').checked);
+  core.setTemperature(parseFloat($('temp').value));
+  $('tempv').textContent = parseFloat($('temp').value).toFixed(2);
+  metrics = core.computeMetrics();
+  updateReadouts();
+  draw();
+}
+
+function loop() {
+  if (!running) return;
+  for (let i = 0; i < 4; i++) core.trainStep();
+  metrics = core.computeMetrics();
+  updateReadouts();
+  draw();
+  raf = requestAnimationFrame(loop);
+}
+
+function startTraining() {
+  if (running) return;
+  running = true;
+  updateReadouts();
+  loop();
+}
+
+function pauseTraining() {
+  running = false;
+  if (raf) cancelAnimationFrame(raf);
+  raf = 0;
+  updateReadouts();
+}
+
+$('train').addEventListener('click', startTraining);
+$('pause').addEventListener('click', pauseTraining);
+$('reset').addEventListener('click', () => {
+  pauseTraining();
+  core.reset();
+  applyControls();
+});
+$('shift').addEventListener('change', applyControls);
+$('color').addEventListener('change', applyControls);
+$('blur').addEventListener('change', applyControls);
+$('repulsion').addEventListener('change', applyControls);
+$('temp').addEventListener('input', applyControls);
+window.addEventListener('resize', () => {
+  fit();
+  draw();
+});
+
+fit();
+applyControls();
+requestAnimationFrame(() => {
+  fit();
+  draw();
+});
+
+window.__demo = {
+  train(steps) {
+    core.trainSteps(steps || 1);
+    metrics = core.computeMetrics();
+    updateReadouts();
+    draw();
+    return metrics;
+  },
+  set(opts) {
+    if (opts && typeof opts === 'object') {
+      if (typeof opts.shift === 'boolean') $('shift').checked = opts.shift;
+      if (typeof opts.colorJitter === 'boolean') $('color').checked = opts.colorJitter;
+      if (typeof opts.blur === 'boolean') $('blur').checked = opts.blur;
+      if (typeof opts.repulsion === 'boolean') $('repulsion').checked = opts.repulsion;
+      if (typeof opts.temperature === 'number') $('temp').value = String(opts.temperature);
+      applyControls();
+    }
+  },
+  get metrics() {
+    return core.computeMetrics();
+  }
+};
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && window.parent !== window) {
+    window.parent.postMessage({ type: 'cpsy-exit-interactive' }, '*');
+    try { window.parent.focus(); } catch (_) {}
+  }
+});
+</script>
+</body>
+</html>

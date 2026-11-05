@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Diffusion playground — CPSY 1291</title>
+<style>
+ :root{--ink:#1E293B;--taupe:#8A7E70;--mag:#B5396B;--grn:#3F7A6B;--blue:#3E6D8E;--gold:#F2C14E;--bg:#FDFBF7;--slate:#64748B}
+ *{box-sizing:border-box}
+ body{margin:0;font:15px/1.45 Lora,Georgia,serif;color:var(--ink);background:var(--bg)}
+ .page{display:flex;gap:14px;padding:12px;align-items:flex-start;max-width:1280px}
+ #cv{width:760px;height:620px;flex:0 0 auto;background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.12);touch-action:none}
+ .col{width:480px;flex:0 0 auto;display:flex;flex-direction:column;gap:10px;min-width:0}
+ .panel{font-family:Poppins,system-ui,sans-serif;font-size:13px}
+ label{display:block;margin:8px 0 2px;color:var(--taupe)}
+ .panel .ctrl:first-child label{margin-top:0}
+ button{font:inherit;padding:6px 11px;margin:2px 6px 2px 0;border:0;border-radius:7px;background:#EDE7DE;color:var(--ink);cursor:pointer}
+ button.primary{background:var(--gold)}
+ select,input[type=range]{width:100%}
+ select{font:inherit;color:var(--ink);background:#fff;border:1px solid #E4DDD4;border-radius:7px;padding:4px 6px}
+ .grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px}
+ .actions{margin-top:8px}
+ .stats{display:flex;gap:8px;margin-top:8px}
+ .stat{flex:1;margin-top:0;padding:8px 10px;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+ .stat b{font-size:19px}
+ #note,#catch{margin-top:6px;min-height:2.8em}
+ #catch{min-height:1.8em;color:var(--taupe)}
+ body.embed{overflow:hidden;height:100vh;margin:0}
+ body.embed .page{max-width:none;height:100%;box-sizing:border-box;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);gap:8px 14px;padding:8px}
+ body.embed #cv{grid-column:1;grid-row:1 / span 3;align-self:center;justify-self:start}
+ body.embed .col{display:contents;width:auto}
+ body.embed .panel{grid-column:2;grid-row:1;width:auto;font-size:20px;line-height:1.25}
+ body.embed .grid{grid-template-columns:1fr 1fr;column-gap:18px;row-gap:2px}
+ body.embed label{margin:0 0 1px;font-size:20px}
+ body.embed select{font:20px/1.25 Poppins,system-ui,sans-serif;padding:4px 8px}
+ body.embed button{padding:8px 16px;font-size:20px;border-radius:9px;margin:2px 8px 2px 0}
+ body.embed .actions{margin-top:4px}
+ body.embed .stats{margin-top:4px}
+ body.embed .stat{margin-top:4px;padding:4px 12px}
+ body.embed .stat b{font-size:24px}
+ body.embed #note, body.embed #catch{font-size:20px;line-height:1.2;min-height:1.25em;margin-top:4px}
+ body.embed input[type=range]{height:26px}
+</style>
+</head>
+<body>
+<div class="page">
+  <canvas id="cv" width="760" height="620" aria-label="Interactive diffusion canvas. Draw points, inspect forward noising at step t, and generate by repeated denoising from pure noise."></canvas>
+  <div class="col">
+    <div class="panel">
+      <div class="grid">
+        <div class="ctrl">
+          <label for="preset">preset shape</label>
+          <select id="preset" aria-label="Choose a preset shape">
+            <option value="spiral" selected>Spiral</option>
+            <option value="moons">Two moons</option>
+            <option value="letter">Letter</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label for="particles">particles in generation — <span id="particlesv">500</span></label>
+          <input id="particles" type="range" min="200" max="800" step="50" value="500" aria-label="Number of particles for reverse generation">
+        </div>
+        <div class="ctrl">
+          <label for="tslider">diffusion step t — <span id="tv">0</span></label>
+          <input id="tslider" type="range" min="0" max="100" step="1" value="0" aria-label="Forward diffusion step">
+        </div>
+        <div class="ctrl">
+          <label for="seed">random seed — <span id="seedv">1</span></label>
+          <input id="seed" type="range" min="1" max="999" step="1" value="1" aria-label="Random seed">
+        </div>
+      </div>
+      <div class="actions">
+        <button id="loadPreset" type="button">load preset</button>
+        <button id="clear" type="button">clear</button>
+        <button class="primary" id="generate" type="button">generate</button>
+      </div>
+      <div class="stats">
+        <div class="stat">t <b id="tread">0 / 100</b></div>
+        <div class="stat">mean nearest distance <b id="dist">–</b></div>
+      </div>
+      <div id="note">Draw a shape or load a preset to define the empirical distribution used by the denoiser.</div>
+      <div id="catch">Catch: this ideal denoiser can only return points it has seen, so it memorizes; real models learn a denoiser, and useful new samples depend on what it learns beyond the examples.</div>
+    </div>
+  </div>
+</div>
+
+<script src="diffusion_playground_core.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const CORE = window.DiffusionPlaygroundCore;
+const INK="#1E293B", TAUPE="#8A7E70", BLUE="#3E6D8E", GREEN="#3F7A6B", GOLD="#F2C14E", MAG="#B5396B", SLATE="#64748B";
+if (new URLSearchParams(location.search).has("embed")) document.body.classList.add("embed");
+
+const cv = $("cv");
+const g = cv.getContext("2d");
+const WORLD = 1.45;
+let schedule = CORE.makeDdpmLinearSchedule(100);
+let dataPoints = [];
+let forwardNoise = [];
+let shownPoints = [];
+let generating = false;
+let drawing = false;
+let liveStroke = [];
+let genRng = CORE.createRng(1);
+let genInitial = [];
+let genTrajectory = [];
+let genFrame = 0;
+let raf = 0;
+
+function embed(){return document.body.classList.contains("embed")}
+function fitCanvas(){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let w = 760, h = 620;
+  if (embed()) {
+    const H = document.documentElement.clientHeight;
+    const W = document.documentElement.clientWidth;
+    h = Math.max(420, H - 16);
+    w = Math.max(840, Math.min(980, W - 560));
+  }
+  cv.style.width = w + "px";
+  cv.style.height = h + "px";
+  cv.width = Math.round(w * dpr);
+  cv.height = Math.round(h * dpr);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function toScreen(p){
+  const w = cv.clientWidth;
+  const h = cv.clientHeight;
+  return [((p[0] / WORLD) + 1) * 0.5 * w, (1 - (p[1] / WORLD)) * 0.5 * h];
+}
+function toWorld(x, y){
+  const r = cv.getBoundingClientRect();
+  const px = x - r.left;
+  const py = y - r.top;
+  return [((px / r.width) * 2 - 1) * WORLD, (1 - (py / r.height) * 2) * WORLD];
+}
+
+function initForwardNoise(){
+  const base = CORE.createRng(7000 + (+$("seed").value) * 11 + dataPoints.length * 13);
+  forwardNoise = dataPoints.map(() => [CORE.randn(base), CORE.randn(base)]);
+}
+
+function setData(points){
+  dataPoints = CORE.centerAndScale(CORE.resamplePolyline(points, 300), 1.2);
+  initForwardNoise();
+  applyForward(+$("tslider").value);
+}
+
+function presetPoints(kind){
+  if (kind === "moons") return CORE.makeTwoMoonsPreset(300);
+  if (kind === "letter") return CORE.makeLetterPreset(300);
+  return CORE.makeSpiralPreset(300);
+}
+
+function applyForward(t){
+  const ti = Math.max(0, Math.min(schedule.T, t|0));
+  $("tv").textContent = String(ti);
+  $("tread").textContent = ti + " / " + schedule.T;
+  if (!dataPoints.length) {
+    shownPoints = [];
+    $("dist").textContent = "–";
+    $("note").textContent = "Draw a shape or load a preset to define the empirical distribution used by the denoiser.";
+    draw();
+    return;
+  }
+  shownPoints = dataPoints.map((p, i) => CORE.forwardPoint(p, ti, schedule, forwardNoise[i]));
+  const md = CORE.meanNearestDistance(shownPoints, dataPoints);
+  $("dist").textContent = Number.isFinite(md) ? md.toFixed(3) : "–";
+  $("note").textContent = generating
+    ? "Generation begins from isotropic Gaussian noise and applies repeated denoising steps to recover the empirical structure."
+    : "Forward diffusion blends each point with Gaussian noise, progressively destroying information as t increases.";
+  draw();
+}
+
+function drawPointCloud(points, color, alpha, r){
+  g.globalAlpha = alpha;
+  g.fillStyle = color;
+  for (let i = 0; i < points.length; i++) {
+    const s = toScreen(points[i]);
+    g.beginPath();
+    g.arc(s[0], s[1], r, 0, Math.PI * 2);
+    g.fill();
+  }
+  g.globalAlpha = 1;
+}
+
+function draw(){
+  const w = cv.clientWidth;
+  const h = cv.clientHeight;
+  g.clearRect(0,0,w,h);
+  g.fillStyle = "#fff";
+  g.fillRect(0,0,w,h);
+
+  g.strokeStyle = "#EDE7DE";
+  g.lineWidth = 1;
+  g.beginPath();
+  g.moveTo(0, h/2); g.lineTo(w, h/2);
+  g.moveTo(w/2, 0); g.lineTo(w/2, h);
+  g.stroke();
+
+  if (dataPoints.length) drawPointCloud(dataPoints, SLATE, generating ? 0.18 : 0.08, embed() ? 3.1 : 2.4);
+  if (shownPoints.length) drawPointCloud(shownPoints, generating ? MAG : BLUE, 0.9, embed() ? 3.6 : 2.8);
+
+  if (drawing && liveStroke.length > 1) {
+    g.strokeStyle = GREEN;
+    g.lineWidth = embed() ? 3 : 2;
+    g.beginPath();
+    const p0 = toScreen(liveStroke[0]);
+    g.moveTo(p0[0], p0[1]);
+    for (let i = 1; i < liveStroke.length; i++) {
+      const s = toScreen(liveStroke[i]);
+      g.lineTo(s[0], s[1]);
+    }
+    g.stroke();
+  }
+
+  g.fillStyle = TAUPE;
+  g.font = (embed() ? 20 : 14) + "px Lora, Georgia, serif";
+  g.fillText("Draw with mouse or touch. Press Generate to sample by reverse diffusion.", 12, h - (embed() ? 16 : 10));
+}
+
+function stopGeneration(){
+  generating = false;
+  if (raf) cancelAnimationFrame(raf);
+  raf = 0;
+  $("generate").textContent = "generate";
+}
+
+function startGeneration(){
+  if (!dataPoints.length) return;
+  stopGeneration();
+  generating = true;
+  $("generate").textContent = "pause";
+  const n = +$("particles").value;
+  const seed = +$("seed").value;
+  genRng = CORE.createRng(9001 + seed * 41);
+  genInitial = CORE.makeInitialNoise(n, genRng);
+  genTrajectory = [genInitial.map(p => [p[0], p[1]])];
+  let particles = genInitial.map(p => [p[0], p[1]]);
+  for (let t = schedule.T; t >= 1; t--) {
+    particles = particles.map(p => CORE.reverseStepDdpm(p, t, dataPoints, schedule, genRng));
+    genTrajectory.push(particles.map(p => [p[0], p[1]]));
+  }
+  genFrame = 0;
+  shownPoints = genTrajectory[0];
+  animateGeneration(performance.now());
+}
+
+function animateGeneration(ts0){
+  const totalMs = 3000;
+  const totalFrames = genTrajectory.length - 1;
+  function frame(now){
+    if (!generating) return;
+    const u = Math.max(0, Math.min(1, (now - ts0) / totalMs));
+    genFrame = Math.min(totalFrames, Math.floor(u * totalFrames));
+    shownPoints = genTrajectory[genFrame];
+    const tShown = schedule.T - genFrame;
+    $("tread").textContent = tShown + " / " + schedule.T;
+    $("tv").textContent = String(Math.max(0, tShown));
+    const md = CORE.meanNearestDistance(shownPoints, dataPoints);
+    $("dist").textContent = Number.isFinite(md) ? md.toFixed(3) : "–";
+    $("note").textContent = "Generation begins from isotropic Gaussian noise and applies repeated denoising steps to recover the empirical structure.";
+    draw();
+    if (u >= 1) {
+      stopGeneration();
+      $("note").textContent = "After repeated denoising, particles settle near the empirical data manifold defined by your drawn points.";
+      return;
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame);
+}
+
+function pointerDown(e){
+  stopGeneration();
+  drawing = true;
+  liveStroke = [];
+  const p = toWorld(e.clientX, e.clientY);
+  liveStroke.push(p);
+  cv.setPointerCapture(e.pointerId);
+  draw();
+}
+function pointerMove(e){
+  if (!drawing) return;
+  const p = toWorld(e.clientX, e.clientY);
+  const prev = liveStroke[liveStroke.length - 1];
+  if (!prev || Math.hypot(p[0] - prev[0], p[1] - prev[1]) > 0.01) liveStroke.push(p);
+  draw();
+}
+function pointerUp(e){
+  if (!drawing) return;
+  drawing = false;
+  cv.releasePointerCapture(e.pointerId);
+  if (liveStroke.length > 3) setData(liveStroke);
+  liveStroke = [];
+  draw();
+}
+
+$("particles").oninput = () => {$("particlesv").textContent = $("particles").value;};
+$("seed").oninput = () => {
+  $("seedv").textContent = $("seed").value;
+  if (dataPoints.length) {
+    initForwardNoise();
+    applyForward(+$("tslider").value);
+  }
+};
+$("tslider").oninput = () => {
+  stopGeneration();
+  applyForward(+$("tslider").value);
+};
+$("loadPreset").onclick = () => {
+  stopGeneration();
+  setData(presetPoints($("preset").value));
+};
+$("clear").onclick = () => {
+  stopGeneration();
+  dataPoints = [];
+  forwardNoise = [];
+  shownPoints = [];
+  $("dist").textContent = "–";
+  $("note").textContent = "Draw a shape or load a preset to define the empirical distribution used by the denoiser.";
+  draw();
+};
+$("generate").onclick = () => {
+  if (generating) { stopGeneration(); applyForward(+$("tslider").value); return; }
+  startGeneration();
+};
+
+cv.addEventListener("pointerdown", pointerDown);
+cv.addEventListener("pointermove", pointerMove);
+cv.addEventListener("pointerup", pointerUp);
+cv.addEventListener("pointercancel", pointerUp);
+addEventListener("resize", () => {fitCanvas(); draw();});
+
+fitCanvas();
+setData(presetPoints("spiral"));
+applyForward(0);
+draw();
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && window.parent !== window) {
+    window.parent.postMessage({type:"cpsy-exit-interactive"}, "*");
+    try { window.parent.focus(); } catch (_err) {}
+  }
+});
+</script>
+</body>
+</html>
