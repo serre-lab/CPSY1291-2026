@@ -331,7 +331,7 @@
 <figure><img src="../images/L14/pub_oquab2024_fig1_pca.png" alt="Figure 1 of Oquab et al.: four columns of photographs with PCA maps of patch features beside them, colored by the first three components. Eagles and airplanes, elephants and a statue, horses and a drawing, vehicles: corresponding parts share colors" aria-describedby="figure-35-1"><figcaption id="figure-35-1"><p>Figure 1 of Oquab et al.: four columns of photographs with PCA maps of patch features beside them, colored by the first three components. Eagles and airplanes, elephants and a statue, horses and a drawing, vehicles: corresponding parts share colors</p><a href="../images/L14/pub_oquab2024_fig1_pca.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li><strong>DINOv2</strong> (Meta): the same idea plus predicting a copy's features for hidden patches, on 142 million curated images, with no labels</li>
+<li><strong>DINOv2</strong> (Meta): DINO with one addition. Some patches of the network's input are masked, and it must predict what the copy, which sees them, outputs there. 142 million curated images, no labels</li>
 <li>PCA on the patch features of each column's images, first three components as colors. <mark>The same parts get the same colors across poses, styles and even different objects</mark>: wings of an eagle and of a plane</li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/2304.07193" rel="noopener">Oquab et al. <b>TMLR 2024</b></a> · Fig. 1</div>
