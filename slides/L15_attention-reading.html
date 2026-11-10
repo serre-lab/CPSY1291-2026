@@ -478,8 +478,7 @@
 </div>
 <p class="provenance">Schematic: hand-set scores, softmax computed · every row sums to 1</p>
 <ul>
-<li>Every word computes its own row of weights, all at the same time</li>
-<li><strong>Left:</strong> row <em>sat</em> puts most of its weight on <em>cat</em>, the word that answers "who sat?"</li>
+<li>Row = query word, column = key word, cell = weight <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">a_{ij}</annotation></semantics></math>. <strong>No mask:</strong> every word reads every word; <em>sat</em> reads <em>cat</em> most</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-class="air" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="42" aria-labelledby="heading-35"><p class="page">Slide 35</p>
 <h2 id="heading-35">The causal mask: no peeking ahead</h2>
@@ -488,8 +487,7 @@
 </div>
 <p class="provenance">Schematic: hand-set scores, softmax computed · every row sums to 1</p>
 <ul>
-<li>Every word computes its own row of weights, all at the same time</li>
-<li><strong>Right:</strong> future scores set to <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math>, weight 0. <mark>Unmasked, position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math> could read what it must predict</mark></li>
+<li><strong>Right:</strong> the <strong>causal mask</strong> sets later words' scores to <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math> before the softmax. <mark>A next-token model uses only this one</mark></li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-class="air" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="42" aria-labelledby="heading-36"><p class="page">Slide 36</p>
 <h2 id="heading-36">Back to the bigram table</h2>
@@ -499,7 +497,7 @@
 <th scope="col">Model</th>
 <th scope="col">Context it uses</th>
 <th scope="col">Held-out loss (nats)</th>
-<th scope="col">Effective choices</th>
+<th scope="col">Effective choices, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>e</mi><mtext>loss</mtext></msup></mrow><annotation encoding="application/x-tex">e^{\text{loss}}</annotation></semantics></math></th>
 </tr>
 </thead>
 <tbody>
@@ -530,7 +528,7 @@
 </tbody>
 </table></div>
 <ul>
-<li>Same held-out TinyStories text for every model. <mark>Each step uses the context better, and the loss falls</mark></li>
+<li>Same held-out TinyStories text for every model. <strong>Effective choices</strong>: the number of equally likely characters that would give the same loss. <mark>Each step uses the context better, and the loss falls</mark></li>
 <li>The attention head is the one you build in Assignment 4, Part 1</li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-class="air" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="42" aria-labelledby="heading-37"><p class="page">Slide 37</p>
