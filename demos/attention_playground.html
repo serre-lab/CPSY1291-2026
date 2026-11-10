@@ -1,0 +1,180 @@
+<!doctype html><meta charset="utf-8">
+<title>Attention playground: one query, three keys — CPSY 1291</title>
+<style>
+ :root{--ink:#1E293B;--taupe:#8A7E70;--mag:#B5396B;--grn:#3F7A6B;--blue:#3E6D8E;--gold:#F2C14E;--bg:#FDFBF7;--mute:#C9C2B8}
+ body{margin:0;font:15px/1.45 Lora,Georgia,serif;color:var(--ink);background:var(--bg)}
+ .page{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;padding:12px}
+ canvas{background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.12);display:block}
+ #plane{width:420px;height:420px;cursor:crosshair;touch-action:none}
+ #out{width:200px;height:200px}
+ .panel{font-family:Poppins,system-ui,sans-serif;font-size:14px;min-width:0}
+ .controls{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin-bottom:8px}
+ .controls label{color:var(--taupe)}
+ button{font:inherit;padding:5px 10px;border:0;border-radius:7px;background:#EDE7DE;cursor:pointer}
+ button.on{background:var(--gold)}
+ table{border-collapse:collapse;width:100%;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+ th,td{padding:5px 8px;text-align:center;border-bottom:1px solid #EFEAE2}
+ th{color:var(--taupe);font-weight:500}
+ td.word{font-style:italic;font-family:Lora,Georgia,serif}
+ tr.masked td{color:var(--mute)}
+ .bar{height:12px;background:var(--blue);border-radius:3px;display:inline-block;vertical-align:middle}
+ .row2{display:flex;gap:14px;margin-top:10px;align-items:flex-start}
+ .note{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:8px 10px;flex:1}
+ .note b{color:var(--mag)} .k{color:var(--taupe)}
+ .q{color:var(--mag)} .key{color:var(--blue)} .val{color:var(--grn)}
+ ol{margin:4px 0 0 18px;padding:0}
+ body.embed{overflow:hidden;height:100vh}
+ body.embed .page{height:100%;box-sizing:border-box;padding:8px;gap:18px}
+ body.embed #plane{width:600px;height:600px}
+ body.embed #out{width:260px;height:260px}
+ body.embed .panel{font-size:22px}
+ body.embed button{font-size:22px;padding:8px 14px}
+ body.embed th,body.embed td{padding:6px 10px}
+ body.embed .bar{height:18px}
+</style>
+<div class="page">
+  <canvas id="plane" width="840" height="840" aria-label="A plane with the three keys as arrows and the query as a magenta arrow you can drag"></canvas>
+  <div class="panel">
+    <div class="controls">
+      <span><label>asking:</label>
+        <button data-ask="0">the</button><button data-ask="1">cat</button><button data-ask="2" class="on">sat</button></span>
+      <button id="scale" class="on">divide by √d<sub>k</sub></button>
+      <button id="mask" class="on">causal mask</button>
+      <button id="reset">reset</button>
+    </div>
+    <table>
+      <thead><tr><th></th><th>key <span class="key">k</span></th><th>score <span class="q">q</span>·<span class="key">k</span></th><th id="hscaled">÷√2</th><th>weight</th><th style="width:30%"></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="row2">
+      <canvas id="out" width="520" height="520" aria-label="The three values as green points and the output, their weighted average, as a magenta point"></canvas>
+      <div class="note">
+        <div>query <span class="q">q</span> = <b id="qtext"></b></div>
+        <div>output = <b id="otext"></b> <span class="k">(weighted average of the values)</span></div>
+        <div class="k" style="margin-top:6px">Thicker key arrow: more weight. Gray key: a later word, hidden by the causal mask. "asking" picks whose query is used.</div>
+        <div class="k" style="margin-top:6px">Drag the magenta arrow. Try:</div>
+        <ol>
+          <li>Make <i>sat</i> read mostly <i>the</i>.</li>
+          <li>Keep the direction, double the length. What happens to the weights?</li>
+          <li>Ask from <i>cat</i> with the mask on, then off.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// The worked example of the lecture: keys and values of the three words, query of "sat".
+const WORDS = ['the', 'cat', 'sat'];
+const KEYS = [[0, 1], [2, 0], [1, 1]];
+const VALUES = [[1, 0], [0, 1], [0.5, 0.5]];
+// Each word's own query, as in the step-by-step demo (rows of X W_Q): the, cat, sat.
+const QUERIES = [[0, 1], [1, 1], [1, 0]];
+const START = QUERIES[2];
+const D = 2;
+const C = {ink: '#1E293B', taupe: '#8A7E70', mag: '#B5396B', grn: '#3F7A6B', blue: '#3E6D8E', grid: '#EFEAE2', mute: '#C9C2B8'};
+let q = START.slice(), asking = 2, useScale = true, useMask = true;
+
+if (new URLSearchParams(location.search).get('embed') === '1') document.body.classList.add('embed');
+
+const plane = document.getElementById('plane'), pc = plane.getContext('2d');
+const out = document.getElementById('out'), oc = out.getContext('2d');
+// Each canvas shows the square [lo, hi] on both axes: the query plane -3..3, the values 0..1.
+const R = 3;
+const RANGE = new Map([[plane, [-R, R]], [out, [-0.25, 1.25]]]);
+function toPx(v, cv) {
+  const [lo, hi] = RANGE.get(cv), span = cv.width - 60;
+  return [30 + (v[0] - lo) / (hi - lo) * span, cv.height - 30 - (v[1] - lo) / (hi - lo) * span];
+}
+function fromPx(x, y, cv) {
+  const [lo, hi] = RANGE.get(cv), span = cv.width - 60;
+  return [lo + (x - 30) / span * (hi - lo), lo + (cv.height - 30 - y) / span * (hi - lo)];
+}
+
+function attention() {
+  const scores = KEYS.map(k => q[0] * k[0] + q[1] * k[1]);
+  const scaled = scores.map(s => useScale ? s / Math.sqrt(D) : s);
+  const allowed = WORDS.map((_, j) => !useMask || j <= asking);
+  const top = Math.max(...scaled.filter((_, j) => allowed[j]));
+  const ex = scaled.map((s, j) => allowed[j] ? Math.exp(s - top) : 0);
+  const total = ex.reduce((a, b) => a + b, 0);
+  const weights = ex.map(e => e / total);
+  const output = [0, 1].map(i => weights.reduce((acc, w, j) => acc + w * VALUES[j][i], 0));
+  return {scores, scaled, allowed, weights, output};
+}
+
+function arrow(ctx, from, to, color, width, label) {
+  ctx.strokeStyle = ctx.fillStyle = color; ctx.lineWidth = width;
+  const a = Math.atan2(to[1] - from[1], to[0] - from[0]), h = 16 + width * 1.6, spread = 0.45;
+  const base = [to[0] - 0.8 * h * Math.cos(a), to[1] - 0.8 * h * Math.sin(a)];
+  ctx.beginPath(); ctx.moveTo(...from); ctx.lineTo(...base); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(...to);
+  ctx.lineTo(to[0] - h * Math.cos(a - spread), to[1] - h * Math.sin(a - spread));
+  ctx.lineTo(to[0] - h * Math.cos(a + spread), to[1] - h * Math.sin(a + spread)); ctx.fill();
+  if (label) { ctx.font = 'italic 30px Lora, Georgia, serif'; ctx.fillText(label, to[0] + 10, to[1] - 10); }
+}
+
+function grid(ctx, cv) {
+  ctx.clearRect(0, 0, cv.width, cv.height); ctx.strokeStyle = C.grid; ctx.lineWidth = 2;
+  const [lo, hi] = RANGE.get(cv), step = hi - lo > 2 ? 1 : 0.25;
+  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) {
+    const [x] = toPx([v, 0], cv), [, y] = toPx([0, v], cv);
+    ctx.beginPath(); ctx.moveTo(x, 20); ctx.lineTo(x, cv.height - 20); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(20, y); ctx.lineTo(cv.width - 20, y); ctx.stroke();
+  }
+  ctx.strokeStyle = C.taupe; ctx.lineWidth = 2.5; const o = toPx([0, 0], cv);
+  ctx.beginPath(); ctx.moveTo(20, o[1]); ctx.lineTo(cv.width - 20, o[1]); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(o[0], 20); ctx.lineTo(o[0], cv.height - 20); ctx.stroke();
+}
+
+function draw() {
+  const r = attention(), o = toPx([0, 0], plane);
+  grid(pc, plane);
+  KEYS.forEach((k, j) => arrow(pc, o, toPx(k, plane), r.allowed[j] ? C.blue : C.mute, 2 + 10 * r.weights[j], 'k (' + WORDS[j] + ')'));
+  arrow(pc, o, toPx(q, plane), C.mag, 6, 'q (' + WORDS[asking] + ')');
+  const qp = toPx(q, plane); pc.fillStyle = C.mag; pc.beginPath(); pc.arc(qp[0], qp[1], 14, 0, 7); pc.fill();
+
+  const oc0 = toPx([0, 0], out); grid(oc, out);
+  VALUES.forEach((v, j) => {
+    const p = toPx(v, out); oc.fillStyle = r.allowed[j] ? C.grn : C.mute;
+    oc.beginPath(); oc.arc(p[0], p[1], 8 + 22 * r.weights[j], 0, 7); oc.fill();
+    oc.font = 'italic 34px Lora, Georgia, serif';
+    const label = 'v (' + WORDS[j] + ')', w = oc.measureText(label).width;
+    oc.fillText(label, p[0] + 12 + w > out.width - 8 ? p[0] - 12 - w : p[0] + 12, p[1] - 14);
+  });
+  const op = toPx(r.output, out); oc.fillStyle = C.mag; oc.beginPath(); oc.arc(op[0], op[1], 14, 0, 7); oc.fill();
+  oc.strokeStyle = C.mag; oc.lineWidth = 3; oc.setLineDash([8, 6]); oc.beginPath(); oc.moveTo(...oc0); oc.lineTo(...op); oc.stroke(); oc.setLineDash([]);
+
+  document.getElementById('hscaled').textContent = useScale ? '÷√2' : '(not scaled)';
+  document.getElementById('rows').innerHTML = WORDS.map((w, j) => `<tr class="${r.allowed[j] ? '' : 'masked'}">
+    <td class="word">${w}</td><td>(${KEYS[j].join(', ')})</td><td>${r.scores[j].toFixed(2)}</td>
+    <td>${r.allowed[j] ? r.scaled[j].toFixed(2) : '−∞'}</td><td><b>${r.weights[j].toFixed(2)}</b></td>
+    <td style="text-align:left"><span class="bar" style="width:${(100 * r.weights[j]).toFixed(1)}%"></span></td></tr>`).join('');
+  document.getElementById('qtext').textContent = `(${q[0].toFixed(2)}, ${q[1].toFixed(2)})`;
+  document.getElementById('otext').textContent = `(${r.output[0].toFixed(2)}, ${r.output[1].toFixed(2)})`;
+}
+
+let dragging = false;
+function move(e) {
+  const rect = plane.getBoundingClientRect();
+  const x = (e.clientX - rect.left) * plane.width / rect.width, y = (e.clientY - rect.top) * plane.height / rect.height;
+  q = fromPx(x, y, plane).map(v => Math.max(-R, Math.min(R, Math.round(v * 20) / 20)));
+  draw();
+}
+plane.addEventListener('pointerdown', e => { dragging = true; plane.setPointerCapture(e.pointerId); move(e); });
+plane.addEventListener('pointermove', e => { if (dragging) move(e); });
+plane.addEventListener('pointerup', () => { dragging = false; });
+
+document.querySelectorAll('[data-ask]').forEach(b => b.onclick = () => {
+  asking = +b.dataset.ask;
+  q = QUERIES[asking].slice();   // the asking word brings its own query
+  document.querySelectorAll('[data-ask]').forEach(x => x.classList.toggle('on', x === b)); draw();
+});
+document.getElementById('scale').onclick = e => { useScale = !useScale; e.target.classList.toggle('on', useScale); draw(); };
+document.getElementById('mask').onclick = e => { useMask = !useMask; e.target.classList.toggle('on', useMask); draw(); };
+document.getElementById('reset').onclick = () => {
+  q = START.slice(); asking = 2; useScale = useMask = true;
+  document.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.ask === '2' || b.id === 'scale' || b.id === 'mask'));
+  draw();
+};
+draw();
+</script>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Can attention find it? · CPSY 1291</title><link rel="stylesheet" href="attention_retrieval.css"></head>
+<body><main>
+<header><b>Can attention find it?</b><span>A cue, competing sources, and a returned memory</span><a href="attention_steps.html">Inside the arithmetic ↗</a></header>
+<nav id="cases" aria-label="Experiment"></nav>
+<div class="intro"><div><p class="eyebrow" id="case-label"></p><h1 id="question"></h1></div><p id="setup"></p></div>
+<div class="workbench">
+ <section class="experiment" aria-label="Retrieval diagram"><div class="scroll-scene"><svg id="scene" viewBox="0 0 1080 440" role="img" aria-labelledby="scene-title scene-desc"></svg></div><p class="scope">Illustrative memory slots, not words or a trained model. Keys describe objects; values encode locations.</p></section>
+ <aside>
+  <div id="challenge"><h2>Predict the returned content</h2><p>Which location will have the largest share?</p><div id="predictions" role="group" aria-label="Prediction"><button data-guess="desk">Desk</button><button data-guess="shelf">Shelf</button><button data-guess="drawer">Drawer</button><button data-guess="tie">A tie</button></div></div>
+  <button id="reveal" class="primary">Reveal computation →</button>
+  <div id="result" aria-live="polite" hidden></div>
+  <fieldset><legend>Try to change the outcome</legend>
+   <label for="sharpness">Scores multiplied by <output id="sharpness-value"></output></label><input id="sharpness" type="range" min="0" max="12" step="0.5" value="6"><div class="ends"><span>0: all objects equal</span><span>best match dominates</span></div>
+   <div id="clutter-control" hidden><label for="distractors">Similar distractors <output id="distractor-value"></output></label><input id="distractors" type="range" min="1" max="40" value="24"></div>
+   <label class="check" id="shape-control" hidden><input id="shape-cue" type="checkbox"> Include shape in the query</label>
+   <label class="check" id="restore-control" hidden><input id="restore" type="checkbox"> Restore the matching source</label>
+  </fieldset>
+  <div class="actions"><button id="shuffle">Reorder sources</button><button id="numbers">Show the math</button></div>
+ </aside>
+</div>
+<footer><p id="takeaway">Make a prediction, then reveal. The bars are shares of retrieved content—not probabilities of being correct.</p><button id="reset">Reset experiment</button></footer>
+</main>
+<dialog id="math"><div class="dialog-heading"><h2>The same attention calculation</h2><button id="close-math">Close ×</button></div><div id="math-content"></div></dialog>
+<script src="attention_retrieval.js"></script></body></html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inside attention · CPSY 1291</title>
+  <link rel="stylesheet" href="attention_steps.css">
+</head>
+<body>
+<main class="app">
+  <header>
+    <div class="brand"><span class="brand-mark" aria-hidden="true">↗</span> Inside attention <span class="course">CPSY 1291</span></div>
+    <nav class="views" aria-label="Demo view">
+      <button id="attention-view" aria-pressed="true">Attention, step by step</button>
+      <button id="transformer-view" aria-pressed="false">Transformer overview</button>
+    </nav>
+  </header>
+  <nav id="steps" class="steps" aria-label="Walkthrough steps"></nav>
+  <div class="stage-heading"><div><span id="eyebrow" class="eyebrow"></span><h1 id="stage-title"></h1></div><div id="legend" class="legend"><span class="q">● Query</span><span class="k">● Key</span><span class="v">● Value</span></div></div>
+  <div class="workspace">
+    <section class="visual" aria-label="Animated computation">
+      <div id="tokens" class="tokens" aria-label="Choose the position being updated"></div>
+      <svg id="scene" viewBox="0 0 1040 360" role="img" aria-labelledby="scene-title scene-description"></svg>
+      <p id="visual-note" class="visual-note"></p>
+    </section>
+    <aside class="explanation">
+      <div id="explanation" aria-live="polite"></div>
+      <fieldset id="experiments"><legend>Change one thing</legend>
+        <label><input id="mask" type="checkbox" checked> Causal mask <span>exclude future positions</span></label>
+        <label><input id="scale" type="checkbox" checked> Divide by √2 <span>query/key width = 2</span></label>
+        <label><input id="equal" type="checkbox"> Equal weights <span>set allowed scores to zero</span></label>
+        <label><input id="zero-value" type="checkbox"> Zero cat’s value <span>keep its key and query</span></label>
+      </fieldset>
+      <button id="inspect" class="text-button">Inspect the numbers ↗</button>
+    </aside>
+  </div>
+  <footer>
+    <div class="transport"><button id="previous" aria-label="Previous step">← Back</button><button id="play">▶ Play</button><button id="next" class="primary">Next →</button><button id="reset" class="quiet">Reset</button></div>
+    <p id="provenance">Hand-set teaching example · all attention calculations computed live</p>
+    <a id="original" href="attention_playground.html" target="_blank" rel="noopener">Query playground ↗</a>
+  </footer>
+</main>
+<dialog id="numbers">
+  <div class="dialog-top"><h2 id="numbers-title">Where the numbers come from</h2><button id="close-numbers" aria-label="Close numbers">Close ×</button></div>
+  <div id="number-content"></div>
+</dialog>
+<script src="attention_steps_core.js"></script>
+<script src="attention_steps.js"></script>
+</body>
+</html>

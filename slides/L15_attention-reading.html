@@ -1,0 +1,592 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Attention · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Attention</h1><p>Reader-friendly version of the 42 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L15_attention.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Attention</a></li><li><a href="#slide-2">Before 2017: one architecture per field</a></li><li><a href="#slide-3">Today: one architecture wins them all</a></li><li><a href="#slide-4">Step one: everything becomes tokens</a></li><li><a href="#slide-5">Inside a transformer</a></li><li><a href="#slide-7">Most of a transformer is not new</a></li><li><a href="#slide-8">Self-attention at work</a></li><li><a href="#slide-9">Why attention?</a></li><li><a href="#slide-10">Read this</a></li><li><a href="#slide-11">Answer this</a></li><li><a href="#slide-12">You read what you expect</a></li><li><a href="#slide-13">Predict what comes next</a></li><li><a href="#slide-14">One token at a time, or the whole window at once</a></li><li><a href="#slide-17">One character of context: a bigram table</a></li><li><a href="#slide-18">Scoring a model: the cross-entropy</a></li><li><a href="#slide-19">Why not count longer contexts?</a></li><li><a href="#slide-20">Symbols become vectors</a></li><li><a href="#slide-21">Position embeddings: where is each token?</a></li><li><a href="#slide-22">Look back at everything: average</a></li><li><a href="#slide-23">From the new vector to a prediction</a></li><li><a href="#slide-24">Choose what matters: weights from similarity</a></li><li><a href="#slide-25">Self-attention, step by step</a></li><li><a href="#slide-26">A memory you can search</a></li><li><a href="#slide-27">Try it: can attention find it?</a></li><li><a href="#slide-28">Each position plays three roles</a></li><li><a href="#slide-29">Queries, keys and values come from the same input</a></li><li><a href="#slide-30">Scaled dot-product attention</a></li><li><a href="#slide-31">Attention by hand: three words</a></li><li><a href="#slide-32">Try it: attention, step by step</a></li><li><a href="#slide-33">Try it: move the query</a></li><li><a href="#slide-34">One sentence, one matrix of weights</a></li><li><a href="#slide-35">The causal mask: no peeking ahead</a></li><li><a href="#slide-36">Back to the bigram table</a></li><li><a href="#slide-37">The same mechanism in vision</a></li><li><a href="#slide-38">Attention sinks in vision, and what they hide</a></li><li><a href="#slide-39">What the three panels show</a></li><li><a href="#slide-40">Recap</a></li><li><a href="#slide-41">Further reading for the research trail</a></li><li><a href="#slide-42">Minute paper</a></li></ol></nav><section id="slide-1" data-class="lectitle" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+  <img src="../images/brown-crest-color.png" alt="Brown University crest">
+  <div class="vrule"></div>
+  <div>
+    <span class="code">CPSY 1291</span>
+    <span class="name">Computational Methods for Mind, Brain &amp; Behavior</span>
+  </div>
+</div>
+<div class="eyebrow">Lecture 15 · Theme 3: Dynamics, sequences &amp; world models</div>
+<h2 id="heading-1">Attention</h2>
+<p class="meta">Tuesday, November 10 · Fall 2026</p>
+
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-class="air" data-paginate="true" data-marpit-pagination="2" data-marpit-pagination-total="42" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<h2 id="heading-2">Before 2017: one architecture per field</h2>
+<div class="capfig">
+<figure><img src="../images/L15/fields_before.svg" alt="Six tiles, one per field of AI before 2017, each with its own kind of network and a small drawing of it. Vision: convolutional networks, drawn as shrinking stacks of feature maps (AlexNet 2012, ResNet 2016). Language: recurrent networks, a chain of cells reading the, cat, sat, on one word at a time. Speech: deep belief nets with hidden Markov models, drawn as stacked layers. Translation: sequence-to-sequence networks, an encoder chain feeding a decoder chain. Decisions and robots: reinforcement learning, an agent and the world in a loop (DQN 2015). Proteins: hand-built pipelines of align, score and fold steps" aria-describedby="figure-2-1"><figcaption id="figure-2-1"><p>Six tiles, one per field of AI before 2017, each with its own kind of network and a small drawing of it. Vision: convolutional networks, drawn as shrinking stacks of feature maps (AlexNet 2012, ResNet 2016). Language: recurrent networks, a chain of cells reading the, cat, sat, on one word at a time. Speech: deep belief nets with hidden Markov models, drawn as stacked layers. Translation: sequence-to-sequence networks, an encoder chain feeding a decoder chain. Decisions and robots: reinforcement learning, an agent and the world in a loop (DQN 2015). Proteins: hand-built pipelines of align, score and fold steps</p><a href="../images/L15/fields_before.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="ref">Idea after Lucas Beyer's transformer lecture</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-class="air" data-paginate="true" data-marpit-pagination="3" data-marpit-pagination-total="42" aria-labelledby="heading-3"><p class="page">Slide 3</p>
+<h2 id="heading-3">Today: one architecture wins them all</h2>
+<div class="capfig">
+<figure><img src="../images/L15/fields_today.svg" alt="The same six tiles, now each with the same drawing: a transformer block, a small network above a highlighted attention step, repeated L times. Vision: DINOv2 and Segment Anything; images and video: Stable Diffusion 3 and Sora. Language: ChatGPT, Claude, Gemini. Speech: Whisper, speech recognition in about 100 languages. Translation: the first transformer, 2017, now done by chatbots too. Decisions and robots: Decision Transformer and RT-2, a robot's actions as tokens. Proteins: AlphaFold 2 and 3, structure from the amino-acid sequence" aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>The same six tiles, now each with the same drawing: a transformer block, a small network above a highlighted attention step, repeated L times. Vision: DINOv2 and Segment Anything; images and video: Stable Diffusion 3 and Sora. Language: ChatGPT, Claude, Gemini. Speech: Whisper, speech recognition in about 100 languages. Translation: the first transformer, 2017, now done by chatbots too. Decisions and robots: Decision Transformer and RT-2, a robot's actions as tokens. Proteins: AlphaFold 2 and 3, structure from the amino-acid sequence</p><a href="../images/L15/fields_today.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>All are <strong>transformers</strong>, from one paper: "Attention is all you need" (2017), cited about 200,000 times</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/1706.03762" rel="noopener">Vaswani et al. <b>NeurIPS 2017</b></a> · <a href="https://arxiv.org/abs/2304.07193" rel="noopener">Oquab et al. <b>TMLR 2023</b></a> · <a href="https://arxiv.org/abs/2304.02643" rel="noopener">Kirillov et al. <b>ICCV 2023</b></a> · <a href="https://doi.org/10.1038/s41586-024-07487-w" rel="noopener">Abramson et al. <b>Nature 2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-class="air" data-paginate="true" data-marpit-pagination="4" data-marpit-pagination-total="42" aria-labelledby="heading-4"><p class="page">Slide 4</p>
+<h2 id="heading-4">Step one: everything becomes tokens</h2>
+<div class="capfig">
+<figure><img src="../images/L15/tokens_any_input.svg" alt="Three rows, each read from left to right: input, tokens, one vector per token. Text: the cat sat on the mat is cut into word pieces, the first four shown: the, cat, sat, on. Image: a photograph of a tiger is cut into a 4 by 4 grid of patches, and four patches are shown as tokens. Sound: a waveform is cut into short slices, four of them shown as tokens. In every row, each token becomes a small vector drawn the same way" aria-describedby="figure-4-1"><figcaption id="figure-4-1"><p>Three rows, each read from left to right: input, tokens, one vector per token. Text: the cat sat on the mat is cut into word pieces, the first four shown: the, cat, sat, on. Image: a photograph of a tiger is cut into a 4 by 4 grid of patches, and four patches are shown as tokens. Sound: a waveform is cut into short slices, four of them shown as tokens. In every row, each token becomes a small vector drawn the same way</p><a href="../images/L15/tokens_any_input.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Each token becomes a vector. <mark>After that, the transformer does not care what a token stood for</mark></li>
+<li>Today our tokens are characters; the next lecture shows how pieces of words are chosen</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-class="air" data-paginate="true" data-marpit-pagination="5" data-marpit-pagination-total="42" aria-labelledby="heading-5"><p class="page">Slide 5</p>
+<h2 id="heading-5">Inside a transformer</h2>
+<div class="row">
+<div class="col fig">
+<div class="capfig">
+<figure><img src="../images/L15/transformer_schematic.svg" alt="Schematic of a transformer, read from the bottom up, with one column per token. At the bottom, six tokens, the characters t, h, e, a space drawn as an underscore, c and a. Each becomes a small blue vector, labelled embedding plus position. A grey line runs up from each vector, the token's residual stream. Inside a dashed frame marked times L blocks, a gold self-attention band spans all six columns: lines from every column fan in to the last one, so the last token reads itself and the five earlier tokens and none after it. Above it, each column has its own small box labelled MLP, the small network that works on each token alone. At the top, an output layer and softmax spans the columns and gives each column's predicted next token: h, e, space, c, a, t, the input shifted by one" aria-describedby="figure-5-1"><figcaption id="figure-5-1"><p>Schematic of a transformer, read from the bottom up, with one column per token. At the bottom, six tokens, the characters t, h, e, a space drawn as an underscore, c and a. Each becomes a small blue vector, labelled embedding plus position. A grey line runs up from each vector, the token's residual stream. Inside a dashed frame marked times L blocks, a gold self-attention band spans all six columns: lines from every column fan in to the last one, so the last token reads itself and the five earlier tokens and none after it. Above it, each column has its own small box labelled MLP, the small network that works on each token alone. At the top, an output layer and softmax spans the columns and gives each column's predicted next token: h, e, space, c, a, t, the input shifted by one</p><a href="../images/L15/transformer_schematic.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="col">
+<ul>
+<li>Here each token is one character, as in the model you train. Read the figure from the bottom: one column per token</li>
+<li>Each token becomes a vector: <strong>embedding</strong> + <strong>position embedding</strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math> <strong>blocks</strong>, each with its own weights, in two steps:
+<ul>
+<li><mark><strong>Causal self-attention</strong>: each token reads only itself and earlier tokens</mark></li>
+<li>A small network, the same for every token, works on each token alone</li>
+</ul>
+</li>
+<li>The <strong>output layer</strong> predicts the next token</li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-class="air" data-paginate="true" data-marpit-pagination="7" data-marpit-pagination-total="42" aria-labelledby="heading-7"><p class="page">Slide 7</p>
+<h2 id="heading-7">Most of a transformer is not new</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Most of a transformer is not new — table"><table><caption>Most of a transformer is not new — table</caption>
+<thead>
+<tr>
+<th scope="col">Part of a transformer</th>
+<th scope="col">Where it comes from</th>
+<th scope="col"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Embeddings: each token becomes a learned vector</td>
+<td>Language models, 2003</td>
+<td>old</td>
+</tr>
+<tr>
+<td>A small network at every position</td>
+<td>The multilayer perceptron</td>
+<td>old</td>
+</tr>
+<tr>
+<td>Residual connections</td>
+<td>ResNets, 2016</td>
+<td>old</td>
+</tr>
+<tr>
+<td>Layer normalization</td>
+<td>Ba, Kiros &amp; Hinton, 2016</td>
+<td>old</td>
+</tr>
+<tr>
+<td><strong>Self-attention</strong>: each token reads the earlier ones</td>
+<td><strong>The transformer, 2017</strong></td>
+<td><mark><strong>new</strong></mark></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Old pieces: embeddings come from language models of the 2000s; the rest from the networks we have already seen, mostly CNNs</li>
+<li><mark>The one new piece is self-attention</mark></li>
+</ul>
+<div class="ref"><a href="https://www.jmlr.org/papers/v3/bengio03a.html" rel="noopener">Bengio et al. <b>JMLR 2003</b></a> · <a href="https://arxiv.org/abs/1512.03385" rel="noopener">He et al. <b>CVPR 2016</b></a> · <a href="https://arxiv.org/abs/1607.06450" rel="noopener">Ba et al. <b>arXiv 2016</b></a> · <a href="https://arxiv.org/abs/1409.0473" rel="noopener">Bahdanau et al. <b>ICLR 2015</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-class="air" data-paginate="true" data-marpit-pagination="8" data-marpit-pagination-total="42" aria-labelledby="heading-8"><p class="page">Slide 8</p>
+<h2 id="heading-8">Self-attention at work</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L15/pub_vaswani2017_fig4_its_law.png" alt="Two columns of the same sentence, The Law will never be perfect, but its application should be just. A thick purple line runs from its in the right column to Law in the left column, which is shaded strongly; a thinner pink line runs to application, shaded more lightly. No other word receives a line." aria-describedby="figure-8-1"><figcaption id="figure-8-1"><p>Two columns of the same sentence, The Law will never be perfect, but its application should be just. A thick purple line runs from its in the right column to Law in the left column, which is shaded strongly; a thinner pink line runs to application, shaded more lightly. No other word receives a line.</p><a href="../images/L15/pub_vaswani2017_fig4_its_law.png">Open full-size figure</a></figcaption></figure>
+<p class="provenance">Published: both columns are the same sentence; <i>its</i> (right) reads the words on the left</p>
+</div>
+<div class="col">
+<ul>
+<li>The first transformer translated English into German. Both columns are the English sentence it reads first; its tokens are <strong>words</strong>, not characters</li>
+<li>An attention <strong>head</strong> is one way of weighting the other words. A model runs several heads side by side: this one has 8 in each of its 6 reading blocks. Each color here is one head</li>
+<li>Both heads put most of their weight on <em><strong>Law</strong></em>, the noun <em>its</em> refers to; one also reads <em>application</em></li>
+<li>Nobody told the model about grammar: <mark>it learned where to look</mark> from 4.5 million English–German sentence pairs</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/1706.03762" rel="noopener">Vaswani et al. <b>NeurIPS 2017</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-class="lead" data-paginate="true" data-marpit-pagination="9" data-marpit-pagination-total="42" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<h2 id="heading-9">Why attention?</h2>
+<p>Readers predict what comes next. A model that predicts needs the right part of what came before</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-class="air" data-paginate="true" data-marpit-pagination="10" data-marpit-pagination-total="42" aria-labelledby="heading-10"><p class="page">Slide 10</p>
+<h2 id="heading-10">Read this</h2>
+<p>PARIS<br>IN THE<br>THE SPRING</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-class="air" data-paginate="true" data-marpit-pagination="11" data-marpit-pagination-total="42" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<h2 id="heading-11">Answer this</h2>
+<p>How many animals of each kind<br>did Moses take on the ark?</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-class="air" data-paginate="true" data-marpit-pagination="12" data-marpit-pagination-total="42" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<h2 id="heading-12">You read what you expect</h2>
+<ul>
+<li>The triangle says <em>Paris in <strong>the the</strong> spring</em>. Most readers miss the second <em>the</em></li>
+<li>It was Noah, not Moses, who took the animals. Most people answer "two" without noticing (Erickson &amp; Mattson 1981)</li>
+<li><em>Raeding wrods with jubmled lettres</em> is still easy, though a little slower (Rayner et al. 2006)</li>
+<li><mark>Readers predict the next letters and words</mark>, and notice the surprises that break the prediction: <em>He spread the warm bread with <strong>socks</strong></em> (Kutas &amp; Hillyard 1980). A language model is trained to do the same</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1016/S0022-5371(81)90165-1" rel="noopener">Erickson &amp; Mattson <b>J Verbal Learn Verbal Behav 1981</b></a> · <a href="https://doi.org/10.1111/j.1467-9280.2006.01684.x" rel="noopener">Rayner et al. <b>Psychol Sci 2006</b></a> · <a href="https://doi.org/10.1126/science.7350657" rel="noopener">Kutas &amp; Hillyard <b>Science 1980</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-class="air" data-paginate="true" data-marpit-pagination="13" data-marpit-pagination-total="42" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<h2 id="heading-13">Predict what comes next</h2>
+<ul>
+<li>Machines can predict too. A <strong>language model</strong> assigns probabilities to text; the ones in this lecture, like the chatbots, predict the next token from the ones before</li>
+<li>Our running example: the next <strong>character</strong> of <strong>TinyStories</strong>, the stories of Assignment 4 (97 possible characters)</li>
+<li>At position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math> the model has read tokens <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">1,\dots,t</annotation></semantics></math>, its <strong>context</strong>, and predicts token <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">t+1</annotation></semantics></math>: the tokens and predicted next tokens of the transformer figure, bottom and top</li>
+</ul>
+<div class="capfig">
+<figure><img src="../images/L16/next_char_targets.svg" alt="Two rows of character boxes. The bottom row, in blue, is the input: t, h, e, underscore for a space, c, a, t, underscore, s, a. The top row, in green, is the target at each position: the next character, h, e, underscore, c, a, t, underscore, s, a, t. A gray arrow runs up from each input box to its target" aria-describedby="figure-13-1"><figcaption id="figure-13-1"><p>Two rows of character boxes. The bottom row, in blue, is the input: t, h, e, underscore for a space, c, a, t, underscore, s, a. The top row, in green, is the target at each position: the next character, h, e, underscore, c, a, t, underscore, s, a, t. A gray arrow runs up from each input box to its target</p><a href="../images/L16/next_char_targets.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><mark>Which of the tokens read so far should the prediction use?</mark></li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2305.07759" rel="noopener">Eldan &amp; Li <b>arXiv 2023</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-class="air" data-paginate="true" data-marpit-pagination="14" data-marpit-pagination-total="42" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<h2 id="heading-14">One token at a time, or the whole window at once</h2>
+<div class="row">
+<div class="col">
+<p><strong>One token at a time</strong></p>
+<ul>
+<li>People read one word after another</li>
+<li>So do <strong>recurrent networks</strong>, a later lecture: one memory vector is carried forward, and everything read so far must fit in it. For them <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math> is a time step</li>
+</ul>
+</div>
+<div class="col">
+<p><strong>The whole window at once</strong></p>
+<ul>
+<li>A transformer gets the whole window of text at once: its <strong>context</strong></li>
+<li>For a transformer, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math> is a position in the window. Position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math> can read every <strong>earlier</strong> position directly. A <strong>causal mask</strong>, later today, hides the later ones: they hold what it must predict</li>
+<li><mark>"Earlier" means earlier in the window</mark>: all of the context is there at the same time</li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-class="air" data-paginate="true" data-marpit-pagination="17" data-marpit-pagination-total="42" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<h2 id="heading-17">One character of context: a bigram table</h2>
+<div class="row">
+<div class="col fig">
+<div class="capfig">
+<figure><img src="../images/L15/bigram_frame3_probs.svg" alt="A five-by-five table for the made-up toy text that hat ate the tea, rows the current symbol and columns the next, for a, e, h, t and the space, drawn as an underscore, with a row-sum column: the smoothed counts divided by their row sum, so every row holds probabilities that add up to 1: for example P(t | a) = 1/2 and P(e | t) = 3/11" aria-describedby="figure-17-1"><figcaption id="figure-17-1"><p>A five-by-five table for the made-up toy text that hat ate the tea, rows the current symbol and columns the next, for a, e, h, t and the space, drawn as an underscore, with a row-sum column: the smoothed counts divided by their row sum, so every row holds probabilities that add up to 1: for example P(t | a) = 1/2 and P(e | t) = 3/11</p><a href="../images/L15/bigram_frame3_probs.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<p class="provenance">A made-up toy text with five symbols: "that hat ate the tea"</p>
+</div>
+<div class="col">
+<ul>
+<li>Long before transformers, the simplest model used one character of context: count how often each symbol follows each other one in the training text</li>
+<li>One character already says a lot: after <em>q</em> comes <em>u</em>; after a space, a new word starts</li>
+<li>Such tables were the standard language models for decades, in speech recognition and translation</li>
+<li>A pair never seen in training gets probability 0, and an infinite loss on new text. <strong>Smoothing</strong>: add 1 to every count</li>
+<li>Divide each row by its sum: each row now holds probabilities</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1002/j.1538-7305.1948.tb01338.x" rel="noopener">Shannon <b>Bell Syst Tech J 1948</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-class="air" data-paginate="true" data-marpit-pagination="18" data-marpit-pagination-total="42" aria-labelledby="heading-18"><p class="page">Slide 18</p>
+<h2 id="heading-18">Scoring a model: the cross-entropy</h2>
+<ul>
+<li>To compare models, score them on text they never saw: at each position, look up the probability <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math> the model gave to the character that came next, and take <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>ln</mi><mo>⁡</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">-\ln p</annotation></semantics></math></li>
+<li>Average over every position: the <strong>cross-entropy</strong>, in nats. <strong>Lower is better</strong></li>
+</ul>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Scoring a model: the cross-entropy — table"><table><caption>Scoring a model: the cross-entropy — table</caption>
+<thead>
+<tr>
+<th scope="col">Toy text <em>tea</em></th>
+<th scope="col">Next</th>
+<th scope="col"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math> from the table</th>
+<th scope="col"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>ln</mi><mo>⁡</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">-\ln p</annotation></semantics></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>after <em>t</em></td>
+<td><em>e</em></td>
+<td>3/11</td>
+<td>1.30</td>
+</tr>
+<tr>
+<td>after <em>e</em></td>
+<td><em>a</em></td>
+<td>1/4</td>
+<td>1.39</td>
+</tr>
+<tr>
+<td>average</td>
+<td></td>
+<td></td>
+<td><strong>1.34</strong></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><mark>The goal: predict the next token as well as possible.</mark> A model that uses more context than one character should beat the bigram table's score</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-class="air" data-paginate="true" data-marpit-pagination="19" data-marpit-pagination-total="42" aria-labelledby="heading-19"><p class="page">Slide 19</p>
+<h2 id="heading-19">Why not count longer contexts?</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Why not count longer contexts? — table"><table><caption>Why not count longer contexts? — table</caption>
+<thead>
+<tr>
+<th scope="col">Characters of context</th>
+<th scope="col">Possible contexts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>97</td>
+</tr>
+<tr>
+<td>2</td>
+<td>9,409</td>
+</tr>
+<tr>
+<td>3</td>
+<td>912,673</td>
+</tr>
+<tr>
+<td>4</td>
+<td>88,529,281</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Each extra character multiplies the number of contexts by 97, and each context needs 97 counts, one per possible next character. Most long contexts <strong>never occur</strong> in the training text</li>
+<li>We need a way to use <mark>long contexts without a separate count for every possible context</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-class="air" data-paginate="true" data-marpit-pagination="20" data-marpit-pagination-total="42" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<h2 id="heading-20">Symbols become vectors</h2>
+<ul>
+<li>Instead of a table of counts, give each token a vector that training adjusts</li>
+<li>The plain code is <strong>one-hot</strong>: 97 numbers, all 0 but one. Every character is then equally different from every other: the dot product of any two is 0</li>
+<li>An <strong>embedding table</strong> holds one learned vector per token, with <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mtext>model</mtext></msub></mrow><annotation encoding="application/x-tex">d_{\text{model}}</annotation></semantics></math> numbers: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐞</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{e}_i</annotation></semantics></math> for the token at position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math>. Tokens that behave alike can end up with similar vectors: vowels, or, when tokens are words, <em>cat</em> and <em>dog</em></li>
+<li>Multiplying a one-hot vector by the table picks out one row: the table is an ordinary weight matrix, and "looking up" a token is that product</li>
+<li>A window of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T</annotation></semantics></math> tokens becomes a matrix, one row per position: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi><mo>∈</mo><msup><mi mathvariant="normal" data-original-mathvariant="double-struck">ℝ</mi><mrow><mi>T</mi><mo>×</mo><msub><mi>d</mi><mtext>model</mtext></msub></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{X}\in\mathbb{R}^{T\times d_{\text{model}}}</annotation></semantics></math></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-class="air" data-paginate="true" data-marpit-pagination="21" data-marpit-pagination-total="42" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<h2 id="heading-21">Position embeddings: where is each token?</h2>
+<ul>
+<li>A token's embedding says what the token is, not where it sits</li>
+<li>Yet <em>dog bites man</em> and <em>man bites dog</em> mean different things, and the steps that come next treat their vectors the same whatever the order</li>
+<li><strong>Fix:</strong> a second table, the <strong>position embedding</strong>, with one learned vector per position, added to the token's vector:</li>
+</ul>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mi>i</mi></msub><mo>=</mo><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐞</mi><mi>i</mi></msub><mo>+</mo><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐩</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{x}_i=\mathbf{e}_i+\mathbf{p}_i
+</annotation></semantics></math></div></span></p><ul>
+<li>The original transformer used fixed sine waves of different frequencies instead of a learned table</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-class="air" data-paginate="true" data-marpit-pagination="22" data-marpit-pagination-total="42" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<h2 id="heading-22">Look back at everything: average</h2>
+<p><strong>Position</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math> is the <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math>-th token of the window, with vector <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{x}_i</annotation></semantics></math>. The simplest way to use the whole context: give position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math> a new vector <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{y}_i</annotation></semantics></math>, the average of positions 1 to <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></p>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mi>i</mi></msub><mo>=</mo><mfrac><mn>1</mn><mi>i</mi></mfrac><munder><mo>∑</mo><mrow><mi>j</mi><mo>≤</mo><mi>i</mi></mrow></munder><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{y}_i = \frac{1}{i}\sum_{j\le i} \mathbf{x}_j
+</annotation></semantics></math></div></span></p><div class="table-scroll" tabindex="0" role="region" aria-label="Look back at everything: average — table"><table><caption>Look back at everything: average — table</caption>
+<thead>
+<tr>
+<th scope="col"></th>
+<th scope="col"><em>the</em></th>
+<th scope="col"><em>cat</em></th>
+<th scope="col"><em>sat</em></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>vector <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{x}_j</annotation></semantics></math> (made up)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(1,0)</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(0,1)</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>0.5</mn><mo separator="true">,</mo><mn>0.5</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(0.5,0.5)</annotation></semantics></math></td>
+</tr>
+<tr>
+<td>weight (equal)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle></mrow><annotation encoding="application/x-tex">\tfrac13</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle></mrow><annotation encoding="application/x-tex">\tfrac13</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle></mrow><annotation encoding="application/x-tex">\tfrac13</annotation></semantics></math></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>For <em>sat</em>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">i = 3</annotation></semantics></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mn>3</mn></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>0.5</mn><mo separator="true">,</mo><mn>0.5</mn><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mn>0.5</mn><mo separator="true">,</mo><mtext> </mtext><mn>0.5</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathbf{y}_3 = \tfrac13(1,0)+\tfrac13(0,1)+\tfrac13(0.5,0.5)=(0.5,\,0.5)</annotation></semantics></math>. But <mark>every word counts the same</mark></li>
+<li>What is lost: <em>the</em> counts as much as <em>cat</em>, the word that says who sat. In a story of 500 tokens, a name read once gets a weight of 1/500</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-class="air" data-paginate="true" data-marpit-pagination="23" data-marpit-pagination-total="42" aria-labelledby="heading-23"><p class="page">Slide 23</p>
+<h2 id="heading-23">From the new vector to a prediction</h2>
+<div class="row">
+<div class="col fig">
+<div class="capfig">
+<figure><img src="../images/L15/mixing_pipeline.svg" alt="Schematic of the model so far, read from the bottom up, with one column per token: the characters t, h, e, a space drawn as an underscore, c and a. Each becomes a small blue vector x, embedding plus position. A gray line runs up each column. In a taupe band labelled mixing step y, lines of equal width run from every column to the last one: the average, equal weights; next, attention. Above it a bar labelled output layer W out plus softmax spans the columns. Above the last column, small green bars give the probabilities of the next character: t is the tallest, then n, r and the space" aria-describedby="figure-23-1"><figcaption id="figure-23-1"><p>Schematic of the model so far, read from the bottom up, with one column per token: the characters t, h, e, a space drawn as an underscore, c and a. Each becomes a small blue vector x, embedding plus position. A gray line runs up each column. In a taupe band labelled mixing step y, lines of equal width run from every column to the last one: the average, equal weights; next, attention. Above it a bar labelled output layer W out plus softmax spans the columns. Above the last column, small green bars give the probabilities of the next character: t is the tallest, then n, r and the space</p><a href="../images/L15/mixing_pipeline.svg">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="col">
+<ul>
+<li>At every position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math>, the <strong>output layer</strong>, a weight matrix <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mtext>out</mtext></msub></mrow><annotation encoding="application/x-tex">\mathbf{W}_{\text{out}}</annotation></semantics></math>, turns <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{y}_i</annotation></semantics></math> into 97 scores, one per possible next character</li>
+<li>A <strong>softmax</strong> turns the 97 scores into probabilities; the cross-entropy trains every weight, as in the backpropagation lecture</li>
+<li><mark>Only the <strong>mixing step</strong> looks at other positions.</mark> The average was one mixing step; attention, next, is a better one</li>
+</ul>
+</div>
+</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-class="air" data-paginate="true" data-marpit-pagination="24" data-marpit-pagination-total="42" aria-labelledby="heading-24"><p class="page">Slide 24</p>
+<h2 id="heading-24">Choose what matters: weights from similarity</h2>
+<ul>
+<li>Keep the weighted sum, but let the weights depend on the tokens: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mi>i</mi></msub><mo>=</mo><msub><mo>∑</mo><mrow><mi>j</mi><mo>≤</mo><mi>i</mi></mrow></msub><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mtext> </mtext><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{y}_i = \sum_{j\le i} a_{ij}\,\mathbf{x}_j</annotation></semantics></math></li>
+<li><strong>Score</strong> each earlier position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi></mrow><annotation encoding="application/x-tex">j</annotation></semantics></math> by how well it matches position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math>, a <strong>dot product</strong>: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mi>i</mi></msub><mo>⋅</mo><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">s_{ij} = \mathbf{x}_i\cdot\mathbf{x}_j</annotation></semantics></math>. Two vectors match when they point the same way: in <em>the queen said that she</em>, <em>she</em> and <em>queen</em> share directions (a person, female), so <em>she</em> scores <em>queen</em> high and <em>said</em> low</li>
+<li>A <strong>softmax</strong> over <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi></mrow><annotation encoding="application/x-tex">j</annotation></semantics></math> turns the scores into weights that sum to 1:</li>
+</ul>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mfrac><msup><mi>e</mi><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></msup><mrow><munder><mo>∑</mo><mrow><msup><mi>j</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>≤</mo><mi>i</mi></mrow></munder><msup><mi>e</mi><msub><mi>s</mi><mrow><mi>i</mi><msup><mi>j</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></msub></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">a_{ij}=\frac{e^{s_{ij}}}{\sum_{j'\le i} e^{s_{ij'}}}
+</annotation></semantics></math></div></span></p><ul>
+<li><mark>This is attention</mark>: positions that match count more</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-class="lead" data-paginate="true" data-marpit-pagination="25" data-marpit-pagination-total="42" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<h2 id="heading-25">Self-attention, step by step</h2>
+<p>How does one word decide which other words to read?</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-class="air" data-paginate="true" data-marpit-pagination="26" data-marpit-pagination-total="42" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<h2 id="heading-26">A memory you can search</h2>
+<ul>
+<li>First, attention on its own: one question, a few stored items, nothing trained</li>
+<li>Three objects were put away. Each has a <span><b>key</b></span>, its description, and a <span><b>value</b></span>, where it is:</li>
+</ul>
+<div class="table-scroll" tabindex="0" role="region" aria-label="A memory you can search — table"><table><caption>A memory you can search — table</caption>
+<thead>
+<tr>
+<th scope="col"><span>key</span></th>
+<th scope="col"><span>value</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>red triangle</td>
+<td>desk</td>
+</tr>
+<tr>
+<td>red circle</td>
+<td>shelf</td>
+</tr>
+<tr>
+<td>blue triangle</td>
+<td>drawer</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>The <span><b>query</b></span> is the question: <em>where is the red triangle?</em></li>
+<li>Attention scores the query against every key, turns the scores into weights with a softmax, and returns the weighted mix of the values. <mark>Which location comes back most?</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-class="air" data-paginate="true" data-marpit-pagination="27" data-marpit-pagination-total="42" aria-labelledby="heading-27"><p class="page">Slide 27</p>
+<h2 id="heading-27">Try it: can attention find it?</h2>
+<div class="interactive-figure interactive-wide">
+
+<div class="print-figure">
+<figure><img src="../images/L15/attention_retrieval_preview.png" alt="Retrieval experiment: the query red plus triangle is compared with three stored objects, a red triangle whose value is desk, a red circle whose value is shelf, and a blue triangle whose value is drawer; the returned vector is 90.9 percent desk and 4.5 percent each shelf and drawer" aria-describedby="figure-27-1"><figcaption id="figure-27-1"><p>Retrieval experiment: the query red plus triangle is compared with three stored objects, a red triangle whose value is desk, a red circle whose value is shelf, and a blue triangle whose value is drawer; the returned vector is 90.9 percent desk and 4.5 percent each shelf and drawer</p><a href="../images/L15/attention_retrieval_preview.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<p class="explorer-links"><a href="../demos/attention_retrieval.html">Retrieval experiment: a query describes an object, three or more stored objects each have a key (a description) and a value (a location), and bars show how much of each value the weighted average returns. Four cases: a useful cue, an incomplete cue, many similar distractors, and a missing correct source. Students predict the winning location, reveal the computation, and try controls that sharpen the match, add a feature to the query, add distractors or restore the source — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-class="air" data-paginate="true" data-marpit-pagination="28" data-marpit-pagination-total="42" aria-labelledby="heading-28"><p class="page">Slide 28</p>
+<h2 id="heading-28">Each position plays three roles</h2>
+<p>Each position makes three vectors from its own <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi></mrow><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math>, each with its own learned matrix:</p>
+<ul>
+<li><span><b>Query</b></span> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐪</mi><mi>i</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{q}_i}</annotation></semantics></math>: what position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math> is looking for</li>
+<li><span><b>Key</b></span> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3E6D8E"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐤</mi><mi>j</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3E6D8E}{\mathbf{k}_j}</annotation></semantics></math>: what position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi></mrow><annotation encoding="application/x-tex">j</annotation></semantics></math> offers to be matched on</li>
+<li><span><b>Value</b></span> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mi>j</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{\mathbf{v}_j}</annotation></semantics></math>: what position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi></mrow><annotation encoding="application/x-tex">j</annotation></semantics></math> passes on when it is read</li>
+</ul>
+<p>As in "Choose what matters", the new vector at position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math> is a weighted sum with softmax weights; now it sums the <strong>values</strong>, and the weights come from how well the <strong>query</strong> matches each <strong>key</strong>:</p>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mi>i</mi></msub><mo>=</mo><munder><mo>∑</mo><mrow><mi>j</mi><mo>≤</mo><mi>i</mi></mrow></munder><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mtext> </mtext><mstyle mathcolor="#3F7A6B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mi>j</mi></msub></mstyle><mo separator="true">,</mo><mspace width="2em"></mspace><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mfrac><msup><mi>e</mi><mrow><mtext> </mtext><mstyle mathcolor="#B5396B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐪</mi><mi>i</mi></msub></mstyle><mo>⋅</mo><mstyle mathcolor="#3E6D8E"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐤</mi><mi>j</mi></msub></mstyle><mi mathvariant="normal">/</mi><msqrt><msub><mi>d</mi><mi>k</mi></msub></msqrt></mrow></msup><mrow><munder><mo>∑</mo><mrow><msup><mi>j</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>≤</mo><mi>i</mi></mrow></munder><msup><mi>e</mi><mrow><mtext> </mtext><mstyle mathcolor="#B5396B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐪</mi><mi>i</mi></msub></mstyle><mo>⋅</mo><mstyle mathcolor="#3E6D8E"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐤</mi><msup><mi>j</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub></mstyle><mi mathvariant="normal">/</mi><msqrt><msub><mi>d</mi><mi>k</mi></msub></msqrt></mrow></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">\mathbf{y}_i=\sum_{j\le i} a_{ij}\,\textcolor{#3F7A6B}{\mathbf{v}_j},\qquad a_{ij}=\frac{e^{\,\textcolor{#B5396B}{\mathbf{q}_i}\cdot\textcolor{#3E6D8E}{\mathbf{k}_j}/\sqrt{d_k}}}{\sum_{j'\le i} e^{\,\textcolor{#B5396B}{\mathbf{q}_i}\cdot\textcolor{#3E6D8E}{\mathbf{k}_{j'}}/\sqrt{d_k}}}
+</annotation></semantics></math></div></span></p><p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">d_k</annotation></semantics></math>: the number of entries in each query and key (the next slides explain the division)</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-class="air" data-paginate="true" data-marpit-pagination="29" data-marpit-pagination-total="42" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<h2 id="heading-29">Queries, keys and values come from the same input</h2>
+<ul>
+<li>Each position's query, key and value come from its own vector, through three learned matrices. For all positions at once:</li>
+</ul>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐐</mi></mstyle><mo>=</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mi>Q</mi></msub><mo separator="true">,</mo><mspace width="2em"></mspace><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐊</mi></mstyle><mo>=</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mi>K</mi></msub><mo separator="true">,</mo><mspace width="2em"></mspace><mstyle mathcolor="#3F7A6B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐕</mi></mstyle><mo>=</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mi>V</mi></msub></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{Q}}=\mathbf{X}\mathbf{W}_Q,\qquad \textcolor{#3E6D8E}{\mathbf{K}}=\mathbf{X}\mathbf{W}_K,\qquad \textcolor{#3F7A6B}{\mathbf{V}}=\mathbf{X}\mathbf{W}_V
+</annotation></semantics></math></div></span></p><ul>
+<li>Row <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math> of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐐</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{Q}}</annotation></semantics></math> is position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math>'s query; the same holds for keys and values</li>
+<li>Why three matrices: what a token looks for, what it offers to be matched on, and what it passes on can then differ. A name can be matched because it is a name, and pass on its letters</li>
+<li>All three come from the <strong>same</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐗</mi></mrow><annotation encoding="application/x-tex">\mathbf{X}</annotation></semantics></math>, so this is <strong>self</strong>-attention. When the queries come from one sequence and the keys and values from another, it is <strong>cross-attention</strong>: German words reading the English sentence, or words reading the patches of an image</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-class="air" data-paginate="true" data-marpit-pagination="30" data-marpit-pagination-total="42" aria-labelledby="heading-30"><p class="page">Slide 30</p>
+<h2 id="heading-30">Scaled dot-product attention</h2>
+<ul>
+<li>The same attention, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mi>i</mi></msub><mo>=</mo><msub><mo>∑</mo><mrow><mi>j</mi><mo>≤</mo><mi>i</mi></mrow></msub><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mtext> </mtext><mstyle mathcolor="#3F7A6B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mi>j</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\mathbf{y}_i=\sum_{j\le i} a_{ij}\,\textcolor{#3F7A6B}{\mathbf{v}_j}</annotation></semantics></math>, for all positions at once, as matrix products: one step that a GPU computes fast</li>
+<li><strong>Scores</strong>, every query against every key: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐒</mi><mo>=</mo><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐐</mi></mstyle><msup><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐊</mi></mstyle><mi mathvariant="normal">⊤</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf{S}=\textcolor{#B5396B}{\mathbf{Q}}\textcolor{#3E6D8E}{\mathbf{K}}^\top</annotation></semantics></math>, a <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>×</mo><mi>T</mi></mrow><annotation encoding="application/x-tex">T\times T</annotation></semantics></math> table with <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mstyle mathcolor="#B5396B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐪</mi><mi>i</mi></msub></mstyle><mo>⋅</mo><mstyle mathcolor="#3E6D8E"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐤</mi><mi>j</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">s_{ij}=\textcolor{#B5396B}{\mathbf{q}_i}\cdot\textcolor{#3E6D8E}{\mathbf{k}_j}</annotation></semantics></math></li>
+<li><strong>Divide by</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><msub><mi>d</mi><mi>k</mi></msub></msqrt></mrow><annotation encoding="application/x-tex">\sqrt{d_k}</annotation></semantics></math>, where <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">d_k</annotation></semantics></math> is the number of entries in each query and key: dot products of long vectors are large, and a softmax of large scores puts all the weight on one position</li>
+<li><strong>Softmax</strong> along each row, then average the values with those weights:</li>
+</ul>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">A</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">n</mi></mrow><mo stretchy="false">(</mo><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐐</mi></mstyle><mo separator="true">,</mo><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐊</mi></mstyle><mo separator="true">,</mo><mstyle mathcolor="#3F7A6B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐕</mi></mstyle><mo stretchy="false">)</mo><mo>=</mo><munder><munder><mrow><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">f</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">m</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">x</mi></mrow><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><mfrac><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐐</mi></mstyle><msup><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐊</mi></mstyle><mi mathvariant="normal">⊤</mi></msup></mrow><msqrt><msub><mi>d</mi><mi>k</mi></msub></msqrt></mfrac><mo fence="true">)</mo></mrow></mrow><mo stretchy="true">⏟</mo></munder><mi mathvariant="normal" data-original-mathvariant="bold">𝐀</mi></munder><mtext> </mtext><mstyle mathcolor="#3F7A6B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐕</mi></mstyle></mrow><annotation encoding="application/x-tex">\mathrm{Attention}(\textcolor{#B5396B}{\mathbf{Q}},\textcolor{#3E6D8E}{\mathbf{K}},\textcolor{#3F7A6B}{\mathbf{V}})=\underbrace{\mathrm{softmax}\!\left(\frac{\textcolor{#B5396B}{\mathbf{Q}}\textcolor{#3E6D8E}{\mathbf{K}}^\top}{\sqrt{d_k}}\right)}_{\mathbf{A}}\,\textcolor{#3F7A6B}{\mathbf{V}}
+</annotation></semantics></math></div></span></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-class="air" data-paginate="true" data-marpit-pagination="31" data-marpit-pagination-total="42" aria-labelledby="heading-31"><p class="page">Slide 31</p>
+<h2 id="heading-31">Attention by hand: three words</h2>
+<p>Three tokens, here whole words: <em>the cat sat</em>. Update the last position, <em>sat</em> (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">i = 3</annotation></semantics></math>). Its query is <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐪</mi><mn>3</mn></msub></mstyle><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{q}_3}=(1,0)</annotation></semantics></math>; keys and values are made up, two numbers each, so <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>k</mi></msub><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">d_k = 2</annotation></semantics></math>:</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Attention by hand: three words — table"><table><caption>Attention by hand: three words — table</caption>
+<thead>
+<tr>
+<th scope="col"></th>
+<th scope="col"><em>the</em></th>
+<th scope="col"><em>cat</em></th>
+<th scope="col"><em>sat</em></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3E6D8E"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐤</mi><mi>j</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3E6D8E}{\mathbf{k}_j}</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(0,1)</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(2,0)</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(1,1)</annotation></semantics></math></td>
+</tr>
+<tr>
+<td>score <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐪</mi><mn>3</mn></msub></mstyle><mo>⋅</mo><mstyle mathcolor="#3E6D8E"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐤</mi><mi>j</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{q}_3}\cdot\textcolor{#3E6D8E}{\mathbf{k}_j}</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn></mrow><annotation encoding="application/x-tex">2</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math></td>
+</tr>
+<tr>
+<td>score <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>÷</mo><msqrt><mn>2</mn></msqrt></mrow><annotation encoding="application/x-tex">\div\sqrt{2}</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.41</mn></mrow><annotation encoding="application/x-tex">1.41</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.71</mn></mrow><annotation encoding="application/x-tex">0.71</annotation></semantics></math></td>
+</tr>
+<tr>
+<td>weight <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mrow><mn>3</mn><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">a_{3j}</annotation></semantics></math>, softmax</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.14</mn></mrow><annotation encoding="application/x-tex">0.14</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.58</mn></mrow><annotation encoding="application/x-tex">0.58</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.28</mn></mrow><annotation encoding="application/x-tex">0.28</annotation></semantics></math></td>
+</tr>
+<tr>
+<td>value <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐯</mi><mi>j</mi></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{\mathbf{v}_j}</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(1,0)</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(0,1)</annotation></semantics></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>0.5</mn><mo separator="true">,</mo><mn>0.5</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(0.5,0.5)</annotation></semantics></math></td>
+</tr>
+</tbody>
+</table></div>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐲</mi><mn>3</mn></msub><mo>=</mo><mn>0.14</mn><mtext> </mtext><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>+</mo><mn>0.58</mn><mtext> </mtext><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><mn>0.28</mn><mtext> </mtext><mo stretchy="false">(</mo><mn>0.5</mn><mo separator="true">,</mo><mn>0.5</mn><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mn>0.28</mn><mo separator="true">,</mo><mtext> </mtext><mn>0.72</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathbf{y}_3 = 0.14\,(1,0)+0.58\,(0,1)+0.28\,(0.5,0.5)=(0.28,\,0.72)</annotation></semantics></math>, <mark>mostly <em>cat</em>'s value</mark></p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-class="air" data-paginate="true" data-marpit-pagination="32" data-marpit-pagination-total="42" aria-labelledby="heading-32"><p class="page">Slide 32</p>
+<h2 id="heading-32">Try it: attention, step by step</h2>
+<div class="interactive-figure interactive-wide">
+
+<div class="print-figure">
+<figure><img src="../images/L15/attention_steps_preview.png" alt="Attention, step by step: the three words the, cat and sat with their queries, keys and values, and the stage of the computation shown, with the controls for the causal mask, the scaling, equal weights and cat's value" aria-describedby="figure-32-1"><figcaption id="figure-32-1"><p>Attention, step by step: the three words the, cat and sat with their queries, keys and values, and the stage of the computation shown, with the controls for the causal mask, the scaling, equal weights and cat's value</p><a href="../images/L15/attention_steps_preview.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<p class="explorer-links"><a href="../demos/attention_steps.html">Attention, step by step: the three-word example of the last slide, the, cat and sat, animated in seven stages from the vectors to the scores, the scaled scores, the causal mask, the softmax weights and the weighted average of the values. Back, Next and Play buttons move through the stages; checkboxes switch the causal mask and the division by the square root of 2, set equal weights, or zero cat's value; a button shows every number — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-class="air" data-paginate="true" data-marpit-pagination="33" data-marpit-pagination-total="42" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<h2 id="heading-33">Try it: move the query</h2>
+
+<ul>
+<li>The same three words as the last slide: drag the query of <em>sat</em> and watch the weights and the output follow</li>
+</ul>
+<p class="explorer-links"><a href="../demos/attention_playground.html">Attention playground: drag the query of a word on a plane with the three keys of the, cat and sat; a table shows the scores, the scaled scores and the softmax weights, and a second plane shows the three values and the output, their weighted average. Buttons choose which word asks, and switch the division by the square root of d_k and the causal mask — open interactive version</a></p><p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-class="air" data-paginate="true" data-marpit-pagination="34" data-marpit-pagination-total="42" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<h2 id="heading-34">One sentence, one matrix of weights</h2>
+<div class="capfig">
+<figure><img src="../images/L16/attention_weights_left.svg" alt="A six-by-six grid of attention weights for the sentence the cat sat on the mat, rows the word being updated, columns the word being read, where every word can read every word: sat reads cat most, on reads sat and mat. The space on the right, where the masked version appears on the next slide, is empty" aria-describedby="figure-34-1"><figcaption id="figure-34-1"><p>A six-by-six grid of attention weights for the sentence the cat sat on the mat, rows the word being updated, columns the word being read, where every word can read every word: sat reads cat most, on reads sat and mat. The space on the right, where the masked version appears on the next slide, is empty</p><a href="../images/L16/attention_weights_left.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<p class="provenance">Schematic: hand-set scores, softmax computed · every row sums to 1</p>
+<ul>
+<li>Every word computes its own row of weights, all at the same time</li>
+<li><strong>Left:</strong> row <em>sat</em> puts most of its weight on <em>cat</em>, the word that answers "who sat?"</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-class="air" data-paginate="true" data-marpit-pagination="35" data-marpit-pagination-total="42" aria-labelledby="heading-35"><p class="page">Slide 35</p>
+<h2 id="heading-35">The causal mask: no peeking ahead</h2>
+<div class="capfig">
+<figure><img src="../images/L16/attention_weights.svg" alt="Two six-by-six grids of attention weights for the sentence the cat sat on the mat, rows the word being updated, columns the word being read. Left, every word can read every word. Right, the causal mask: every cell above the diagonal is hatched and holds zero, so each word reads only itself and the words before it" aria-describedby="figure-35-1"><figcaption id="figure-35-1"><p>Two six-by-six grids of attention weights for the sentence the cat sat on the mat, rows the word being updated, columns the word being read. Left, every word can read every word. Right, the causal mask: every cell above the diagonal is hatched and holds zero, so each word reads only itself and the words before it</p><a href="../images/L16/attention_weights.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<p class="provenance">Schematic: hand-set scores, softmax computed · every row sums to 1</p>
+<ul>
+<li>Every word computes its own row of weights, all at the same time</li>
+<li><strong>Right:</strong> future scores set to <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math>, weight 0. <mark>Unmasked, position <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math> could read what it must predict</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-class="air" data-paginate="true" data-marpit-pagination="36" data-marpit-pagination-total="42" aria-labelledby="heading-36"><p class="page">Slide 36</p>
+<h2 id="heading-36">Back to the bigram table</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Back to the bigram table — table"><table><caption>Back to the bigram table — table</caption>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Context it uses</th>
+<th scope="col">Held-out loss (nats)</th>
+<th scope="col">Effective choices</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Uniform guess</td>
+<td>none</td>
+<td>4.57</td>
+<td>97</td>
+</tr>
+<tr>
+<td>Bigram table</td>
+<td>the current character</td>
+<td>2.28</td>
+<td>9.8</td>
+</tr>
+<tr>
+<td>Average</td>
+<td>every earlier character, equal weights</td>
+<td>2.03</td>
+<td>7.6</td>
+</tr>
+<tr>
+<td>One attention head</td>
+<td>every earlier character, chosen weights</td>
+<td><strong>1.23</strong></td>
+<td><strong>3.4</strong></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Same held-out TinyStories text for every model. <mark>Each step uses the context better, and the loss falls</mark></li>
+<li>The attention head is the one you build in Assignment 4, Part 1</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-class="air" data-paginate="true" data-marpit-pagination="37" data-marpit-pagination-total="42" aria-labelledby="heading-37"><p class="page">Slide 37</p>
+<h2 id="heading-37">The same mechanism in vision</h2>
+<div class="capfig figbox">
+<figure><img src="../images/L14/pub_caron2021_fig1_attention.png" alt="Figure 1 of Caron et al.: photographs with the self-attention map of a DINO vision transformer beneath each, outlining the object with no label, mask or box given" aria-describedby="figure-37-1"><figcaption id="figure-37-1"><p>Figure 1 of Caron et al.: photographs with the self-attention map of a DINO vision transformer beneath each, outlining the object with no label, mask or box given</p><a href="../images/L14/pub_caron2021_fig1_attention.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>DINO</strong>, a vision transformer trained without labels: each image patch is a token, and the heads are the same as for words. The attention of one summary token <mark>outlines the object</mark></li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2104.14294" rel="noopener">Caron et al. <b>ICCV 2021</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-class="air" data-paginate="true" data-marpit-pagination="38" data-marpit-pagination-total="42" aria-labelledby="heading-38"><p class="page">Slide 38</p>
+<h2 id="heading-38">Attention sinks in vision, and what they hide</h2>
+<div class="capfig figbox">
+<figure><img src="../images/L15/pub_jiang2025_fig1_shifted_registers.png" alt="Figure 1 of Jiang et al.: an eagle and a dog, then attention maps from OpenCLIP and DINOv2 in three versions each. Original: a few bright background patches and little else. Shifted: the bright patches rearranged into a smiley face or a heart. With a test-time register: the map outlines the bird and the dog" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>Figure 1 of Jiang et al.: an eagle and a dog, then attention maps from OpenCLIP and DINOv2 in three versions each. Original: a few bright background patches and little else. Shifted: the bright patches rearranged into a smiley face or a heart. With a test-time register: the map outlines the bird and the dog</p><a href="../images/L15/pub_jiang2025_fig1_shifted_registers.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Two large vision transformers, <strong>OpenCLIP</strong> and <strong>DINOv2</strong>, each shown three ways: <em>Original</em>, <em>Shifted</em> and <em>with a test-time register</em></li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2309.16588" rel="noopener">Darcet et al. <b>ICLR 2024</b></a> · <a href="https://arxiv.org/abs/2506.08010" rel="noopener">Jiang, Dravid, Efros &amp; Gandelsman <b>NeurIPS 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-class="air" data-paginate="true" data-marpit-pagination="39" data-marpit-pagination-total="42" aria-labelledby="heading-39"><p class="page">Slide 39</p>
+<h2 id="heading-39">What the three panels show</h2>
+<ul>
+<li><em>Original:</em> a few background patches get huge activations and soak up the attention. They are <strong>attention sinks</strong>, and the object is lost from the map</li>
+<li><em>Shifted:</em> the authors move those activations to patches they choose, and the artifacts follow: a smiley, a heart</li>
+<li><em>With a test-time register:</em> they move them to one extra, empty token added to the input, a <strong>register</strong>. <mark>The map now shows the object</mark>, with no retraining</li>
+<li>A diagnosis of which neurons cause the problem became a fix: the knockouts and patches of the assignment are the small version of this kind of work</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2309.16588" rel="noopener">Darcet et al. <b>ICLR 2024</b></a> · <a href="https://arxiv.org/abs/2506.08010" rel="noopener">Jiang, Dravid, Efros &amp; Gandelsman <b>NeurIPS 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-class="air" data-paginate="true" data-marpit-pagination="40" data-marpit-pagination-total="42" aria-labelledby="heading-40"><p class="page">Slide 40</p>
+<h2 id="heading-40">Recap</h2>
+<ul>
+<li>A <strong>language model</strong> predicts the next symbol from the ones before. A <strong>bigram table</strong> uses one symbol of context; longer tables explode</li>
+<li><strong>Averaging</strong> the past uses all of it but weighs everything the same; <strong>attention</strong> weighs each position read so far by how well it matches what the current one looks for</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">f</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">m</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">x</mi></mrow><mo stretchy="false">(</mo><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐐</mi></mstyle><msup><mstyle mathcolor="#3E6D8E"><mi mathvariant="normal" data-original-mathvariant="bold">𝐊</mi></mstyle><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal">/</mi><msqrt><msub><mi>d</mi><mi>k</mi></msub></msqrt><mo stretchy="false">)</mo><mtext> </mtext><mstyle mathcolor="#3F7A6B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐕</mi></mstyle></mrow><annotation encoding="application/x-tex">\mathrm{softmax}(\textcolor{#B5396B}{\mathbf{Q}}\textcolor{#3E6D8E}{\mathbf{K}}^\top/\sqrt{d_k})\,\textcolor{#3F7A6B}{\mathbf{V}}</annotation></semantics></math>: queries, keys and values are learned projections of the same input</li>
+<li>The <strong>causal mask</strong> hides the future; <strong>position embeddings</strong> give order</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-class="air" data-paginate="true" data-marpit-pagination="41" data-marpit-pagination-total="42" aria-labelledby="heading-41"><p class="page">Slide 41</p>
+<h2 id="heading-41">Further reading for the research trail</h2>
+<p>Optional: a few research-trail entries over the semester. Any paper mentioned in any lecture qualifies, but papers from these lectures are preferred.</p>
+<ul>
+<li><a href="https://doi.org/10.1007/978-3-032-37083-9_7" rel="noopener">Adeli et al. <b>2026</b></a>: vision transformers predict people's reaction times when judging whether two points lie on one object</li>
+<li><a href="https://doi.org/10.3389/fcomp.2023.1178450" rel="noopener">Mehrani &amp; Tsotsos <b>Front Comput Sci 2023</b></a>: self-attention in vision transformers is perceptual grouping, not attention</li>
+<li><a href="https://arxiv.org/abs/2606.17410" rel="noopener">Christian et al. <b>2026</b></a>: where vision–language models attend, against where people look</li>
+<li><a href="https://arxiv.org/abs/2504.02732" rel="noopener">Barbero et al. <b>2025</b></a>: why models attend to the first token</li>
+<li><a href="https://doi.org/10.1038/s41562-025-02105-9" rel="noopener">Goldstein et al. <b>Nat Hum Behav 2025</b></a>: a speech model's layers match the cortical hierarchy during conversation</li>
+<li><a href="https://doi.org/10.1038/s41586-026-10691-5" rel="noopener">Cai et al. <b>Nature 2026</b></a>: single human neurons during speech, read through a language model</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-class="air" data-paginate="true" data-marpit-pagination="42" data-marpit-pagination-total="42" aria-labelledby="heading-42"><p class="page">Slide 42</p>
+<h2 id="heading-42">Minute paper</h2>
+<p>Submit on <strong>Canvas → Minute papers → Minute Paper 15</strong> (access code read out in class).</p>
+<p>Write three brief points in your own words:</p>
+<ol>
+<li>The same operation, attention, now runs chatbots and image<br>models. In your own words, why might one way of choosing what to read work for such<br>different kinds of data?</li>
+<li>Something you do not yet understand, or a question still open</li>
+<li>Another idea you found interesting, and why it matters for brains, behavior or AI</li>
+</ol>
+<p>Credit for a thoughtful attempt, not for being correct.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section></main></body></html>

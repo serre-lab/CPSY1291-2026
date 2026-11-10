@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="684" viewBox="0 0 760 684" font-family="Poppins, Helvetica, Arial, sans-serif">
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8A7E70"/></marker><marker id="gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#B5862A"/></marker></defs>
+<line x1="276" y1="532" x2="276" y2="136" stroke="#B7BEC7" stroke-width="6"/>
+<line x1="362" y1="532" x2="362" y2="136" stroke="#B7BEC7" stroke-width="6"/>
+<line x1="448" y1="532" x2="448" y2="136" stroke="#B7BEC7" stroke-width="6"/>
+<line x1="534" y1="532" x2="534" y2="136" stroke="#B7BEC7" stroke-width="6"/>
+<line x1="620" y1="532" x2="620" y2="136" stroke="#B7BEC7" stroke-width="6"/>
+<line x1="706" y1="532" x2="706" y2="136" stroke="#B7BEC7" stroke-width="6"/>
+<rect x="226" y="158" width="530" height="342" rx="16" fill="none" stroke="#8A7E70" stroke-width="2.2" stroke-dasharray="9 6"/>
+<text x="210" y="488" text-anchor="end" font-size="22" font-weight="600" fill="#8A7E70">× L blocks</text>
+<rect x="238" y="288" width="506" height="168" rx="12" fill="#FBE9B7" stroke="#C9962B" stroke-width="2.5"/>
+<line x1="276" y1="432" x2="688.4" y2="335.7" stroke="#B5862A" stroke-width="2.6" stroke-linecap="round"/>
+<circle cx="276" cy="432" r="6" fill="#B5862A"/>
+<line x1="362" y1="432" x2="690.0" y2="340.3" stroke="#B5862A" stroke-width="2.6" stroke-linecap="round"/>
+<circle cx="362" cy="432" r="6" fill="#B5862A"/>
+<line x1="448" y1="432" x2="692.9" y2="344.3" stroke="#B5862A" stroke-width="2.6" stroke-linecap="round"/>
+<circle cx="448" cy="432" r="6" fill="#B5862A"/>
+<line x1="534" y1="432" x2="696.7" y2="347.4" stroke="#B5862A" stroke-width="2.6" stroke-linecap="round"/>
+<circle cx="534" cy="432" r="6" fill="#B5862A"/>
+<line x1="620" y1="432" x2="701.2" y2="349.3" stroke="#B5862A" stroke-width="2.6" stroke-linecap="round"/>
+<circle cx="620" cy="432" r="6" fill="#B5862A"/>
+<line x1="706" y1="432" x2="706.0" y2="350.0" stroke="#B5862A" stroke-width="2.6" stroke-linecap="round"/>
+<circle cx="706" cy="432" r="6" fill="#B5862A"/>
+<circle cx="706" cy="332" r="17" fill="white" stroke="#B5862A" stroke-width="3"/>
+<text x="210" y="334" text-anchor="end" font-size="22" font-weight="600" fill="#1E293B">Self-attention</text>
+<text x="210" y="360" text-anchor="end" font-size="20" font-weight="400" fill="#1E293B">each token reads</text>
+<text x="210" y="386" text-anchor="end" font-size="20" font-weight="400" fill="#1E293B">itself and the</text>
+<text x="210" y="412" text-anchor="end" font-size="20" font-weight="400" fill="#1E293B">earlier tokens</text>
+<rect x="242" y="190" width="68" height="58" rx="8" fill="#F3EFE8" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="276" y="226" text-anchor="middle" font-size="20" font-weight="600" fill="#1E293B">MLP</text>
+<rect x="328" y="190" width="68" height="58" rx="8" fill="#F3EFE8" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="362" y="226" text-anchor="middle" font-size="20" font-weight="600" fill="#1E293B">MLP</text>
+<rect x="414" y="190" width="68" height="58" rx="8" fill="#F3EFE8" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="448" y="226" text-anchor="middle" font-size="20" font-weight="600" fill="#1E293B">MLP</text>
+<rect x="500" y="190" width="68" height="58" rx="8" fill="#F3EFE8" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="534" y="226" text-anchor="middle" font-size="20" font-weight="600" fill="#1E293B">MLP</text>
+<rect x="586" y="190" width="68" height="58" rx="8" fill="#F3EFE8" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="620" y="226" text-anchor="middle" font-size="20" font-weight="600" fill="#1E293B">MLP</text>
+<rect x="672" y="190" width="68" height="58" rx="8" fill="#F3EFE8" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="706" y="226" text-anchor="middle" font-size="20" font-weight="600" fill="#1E293B">MLP</text>
+<text x="210" y="212" text-anchor="end" font-size="22" font-weight="600" fill="#1E293B">Small network</text>
+<text x="210" y="238" text-anchor="end" font-size="20" font-weight="400" fill="#1E293B">each token alone</text>
+<rect x="246" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="261" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="276" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="291" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="332" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="347" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="362" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="377" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="418" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="433" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="448" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="463" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="504" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="519" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="534" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="549" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="590" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="605" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="620" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="635" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="676" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="691" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="706" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<rect x="721" y="540" width="15" height="32" rx="2" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="1.6"/>
+<text x="210" y="552" text-anchor="end" font-size="22" font-weight="600" fill="#1E293B">Vectors</text>
+<text x="210" y="578" text-anchor="end" font-size="20" font-weight="400" fill="#1E293B">embedding</text>
+<text x="210" y="604" text-anchor="end" font-size="20" font-weight="400" fill="#1E293B">+ position</text>
+<rect x="250" y="632" width="52" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="276" y="663" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">t</text>
+<line x1="276" y1="630" x2="276" y2="576" stroke="#8A7E70" stroke-width="2.2" marker-end="url(#head)"/>
+<rect x="336" y="632" width="52" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="362" y="663" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">h</text>
+<line x1="362" y1="630" x2="362" y2="576" stroke="#8A7E70" stroke-width="2.2" marker-end="url(#head)"/>
+<rect x="422" y="632" width="52" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="448" y="663" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">e</text>
+<line x1="448" y1="630" x2="448" y2="576" stroke="#8A7E70" stroke-width="2.2" marker-end="url(#head)"/>
+<rect x="508" y="632" width="52" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="534" y="663" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">_</text>
+<line x1="534" y1="630" x2="534" y2="576" stroke="#8A7E70" stroke-width="2.2" marker-end="url(#head)"/>
+<rect x="594" y="632" width="52" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="620" y="663" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">c</text>
+<line x1="620" y1="630" x2="620" y2="576" stroke="#8A7E70" stroke-width="2.2" marker-end="url(#head)"/>
+<rect x="680" y="632" width="52" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="706" y="663" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">a</text>
+<line x1="706" y1="630" x2="706" y2="576" stroke="#8A7E70" stroke-width="2.2" marker-end="url(#head)"/>
+<text x="210" y="662" text-anchor="end" font-size="22" font-weight="600" fill="#1E293B">Tokens</text>
+<rect x="238" y="92" width="506" height="44" rx="10" fill="#F3EFE8" stroke="#8A7E70" stroke-width="2.5"/>
+<text x="491.0" y="122" text-anchor="middle" font-size="22" font-weight="600" fill="#1E293B">Output layer + softmax</text>
+<line x1="276" y1="90" x2="276" y2="62" stroke="#8A7E70" stroke-width="2.2" marker-end="url(#head)"/>
+<rect x="250" y="10" width="52" height="46" rx="8" fill="white" stroke="#3F7A6B" stroke-width="2.2"/>
+<text x="276" y="41" text-anchor="middle" font-size="22" font-weight="400" fill="#3F7A6B">h</text>
+<line x1="362" y1="90" x2="362" y2="62" stroke="#8A7E70" stroke-width="2.2" marker-end="url(#head)"/>
+<rect x="336" y="10" width="52" height="46" rx="8" fill="white" stroke="#3F7A6B" stroke-width="2.2"/>
+<text x="362" y="41" text-anchor="middle" font-size="22" font-weight="400" fill="#3F7A6B">e</text>
+<line x1="448" y1="90" x2="448" y2="62" stroke="#8A7E70" stroke-width="2.2" marker-end="url(#head)"/>
+<rect x="422" y="10" width="52" height="46" rx="8" fill="white" stroke="#3F7A6B" stroke-width="2.2"/>
+<text x="448" y="41" text-anchor="middle" font-size="22" font-weight="400" fill="#3F7A6B">_</text>
+<line x1="534" y1="90" x2="534" y2="62" stroke="#8A7E70" stroke-width="2.2" marker-end="url(#head)"/>
+<rect x="508" y="10" width="52" height="46" rx="8" fill="white" stroke="#3F7A6B" stroke-width="2.2"/>
+<text x="534" y="41" text-anchor="middle" font-size="22" font-weight="400" fill="#3F7A6B">c</text>
+<line x1="620" y1="90" x2="620" y2="62" stroke="#8A7E70" stroke-width="2.2" marker-end="url(#head)"/>
+<rect x="594" y="10" width="52" height="46" rx="8" fill="white" stroke="#3F7A6B" stroke-width="2.2"/>
+<text x="620" y="41" text-anchor="middle" font-size="22" font-weight="400" fill="#3F7A6B">a</text>
+<line x1="706" y1="90" x2="706" y2="62" stroke="#8A7E70" stroke-width="2.2" marker-end="url(#head)"/>
+<rect x="680" y="10" width="52" height="46" rx="8" fill="white" stroke="#3F7A6B" stroke-width="2.2"/>
+<text x="706" y="41" text-anchor="middle" font-size="22" font-weight="400" fill="#3F7A6B">t</text>
+<text x="210" y="30" text-anchor="end" font-size="22" font-weight="600" fill="#1E293B">Predicted</text>
+<text x="210" y="56" text-anchor="end" font-size="20" font-weight="400" fill="#1E293B">next token</text>
+</svg>
