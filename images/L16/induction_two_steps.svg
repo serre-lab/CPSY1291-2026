@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="520" viewBox="0 0 1600 520" font-family="Poppins, Helvetica, Arial, sans-serif" role="img" aria-labelledby="title desc">
+<title id="title">Two steps of an induction circuit</title>
+<desc id="desc">A previous-token head tags cat with previous: black; the final black queries that key, reads the cat value, and predicts cat. An identity-only lookup instead finds the earlier black and reads black.</desc>
+<defs>
+<marker id="gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#B5862A"/></marker>
+<marker id="grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#B7BEC7"/></marker>
+<marker id="green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3F7A6B"/></marker>
+<marker id="blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3E6D8E"/></marker>
+</defs>
+<text x="24" y="32" text-anchor="start" font-size="22" font-weight="600" fill="#1E293B">Block 1: previous-token head</text>
+<text x="1558" y="32" text-anchor="end" font-size="20" font-weight="400" fill="#1E293B">each position reads the one before</text>
+<rect x="53" y="66" width="94" height="48" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="100" y="97" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">The</text>
+<path d="M149,90 H182" fill="none" stroke="#B5862A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#gold)"/>
+<rect x="185" y="66" width="94" height="48" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="232" y="97" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">black</text>
+<path d="M281,90 H314" fill="none" stroke="#B5862A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#gold)"/>
+<rect x="317" y="66" width="94" height="48" rx="8" fill="#FBE9B7" stroke="#C9962B" stroke-width="3"/>
+<text x="364" y="97" text-anchor="middle" font-size="22" font-weight="600" fill="#1E293B">cat</text>
+<path d="M413,90 H446" fill="none" stroke="#B5862A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#gold)"/>
+<rect x="449" y="66" width="94" height="48" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="496" y="97" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">sat</text>
+<path d="M545,90 H578" fill="none" stroke="#B5862A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#gold)"/>
+<rect x="581" y="66" width="94" height="48" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="628" y="97" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">on</text>
+<path d="M677,90 H710" fill="none" stroke="#B5862A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#gold)"/>
+<rect x="713" y="66" width="94" height="48" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="760" y="97" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">the</text>
+<path d="M809,90 H842" fill="none" stroke="#B5862A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#gold)"/>
+<rect x="845" y="66" width="94" height="48" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="892" y="97" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">mat</text>
+<path d="M941,90 H974" fill="none" stroke="#B5862A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#gold)"/>
+<rect x="977" y="66" width="94" height="48" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="1024" y="97" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">.</text>
+<path d="M1073,90 H1106" fill="none" stroke="#B5862A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#gold)"/>
+<rect x="1109" y="66" width="94" height="48" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="1156" y="97" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">The</text>
+<path d="M1205,90 H1238" fill="none" stroke="#B5862A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#gold)"/>
+<rect x="1241" y="66" width="94" height="48" rx="8" fill="white" stroke="#B5396B" stroke-width="3"/>
+<text x="1288" y="97" text-anchor="middle" font-size="22" font-weight="600" fill="#1E293B">black</text>
+<path d="M364,114 V133" fill="none" stroke="#3E6D8E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#blue)"/>
+<rect x="256" y="137" width="216" height="38" rx="8" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="2.2"/>
+<text x="364" y="163" text-anchor="middle" font-size="20" font-weight="400" fill="#1E293B">previous: black</text>
+<text x="1288" y="148" text-anchor="middle" font-size="20" font-weight="400" fill="#1E293B">current position</text>
+<path d="M24,196 H1576" fill="none" stroke="#B7BEC7" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="24" y="228" text-anchor="start" font-size="22" font-weight="600" fill="#1E293B">Block 2: induction head</text>
+<text x="820" y="228" text-anchor="middle" font-size="20" font-weight="400" fill="#1E293B">one head alone: finds black, reads back black</text>
+<path d="M1288,281 C1288,235 232,235 232,281" fill="none" stroke="#B7BEC7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#grey)" stroke-dasharray="7 7"/>
+<path d="M364,175 V281" fill="none" stroke="#3E6D8E" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 6"/>
+<rect x="53" y="283" width="94" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="100" y="313" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">The</text>
+<rect x="185" y="283" width="94" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="232" y="313" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">black</text>
+<rect x="317" y="283" width="94" height="46" rx="8" fill="#FBE9B7" stroke="#C9962B" stroke-width="3"/>
+<text x="364" y="313" text-anchor="middle" font-size="22" font-weight="600" fill="#1E293B">cat</text>
+<rect x="449" y="283" width="94" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="496" y="313" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">sat</text>
+<rect x="581" y="283" width="94" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="628" y="313" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">on</text>
+<rect x="713" y="283" width="94" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="760" y="313" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">the</text>
+<rect x="845" y="283" width="94" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="892" y="313" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">mat</text>
+<rect x="977" y="283" width="94" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="1024" y="313" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">.</text>
+<rect x="1109" y="283" width="94" height="46" rx="8" fill="white" stroke="#8A7E70" stroke-width="2.2"/>
+<text x="1156" y="313" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">The</text>
+<rect x="1241" y="283" width="94" height="46" rx="8" fill="white" stroke="#B5396B" stroke-width="3"/>
+<text x="1288" y="313" text-anchor="middle" font-size="22" font-weight="600" fill="#1E293B">black</text>
+<path d="M364,330 V344" fill="none" stroke="#3E6D8E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="244" y="344" width="240" height="161" rx="12" fill="none" stroke="#B7BEC7" stroke-width="1.5"/>
+<rect x="254" y="354" width="220" height="65" rx="8" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="2.2"/>
+<text x="364" y="379" text-anchor="middle" font-size="22" font-weight="600" fill="#1E293B">KEY</text>
+<text x="364" y="405" text-anchor="middle" font-size="20" font-weight="400" fill="#1E293B">previous: black</text>
+<rect x="270" y="446" width="188" height="46" rx="8" fill="white" stroke="#3F7A6B" stroke-width="2.2"/>
+<text x="364" y="476" text-anchor="middle" font-size="22" font-weight="600" fill="#1E293B">VALUE: cat</text>
+<path d="M1288,330 V353" fill="none" stroke="#B5396B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="1125" y="354" width="326" height="65" rx="8" fill="white" stroke="#B5396B" stroke-width="2.2"/>
+<text x="1288" y="379" text-anchor="middle" font-size="22" font-weight="600" fill="#1E293B">QUERY</text>
+<text x="1288" y="405" text-anchor="middle" font-size="20" font-weight="400" fill="#1E293B">find: previous = black</text>
+<path d="M1123,386 C990,324 620,324 476,386" fill="none" stroke="#B5862A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#gold)"/>
+<text x="800" y="388" text-anchor="middle" font-size="20" font-weight="400" fill="#1E293B">match key</text>
+<path d="M460,469 H1376" fill="none" stroke="#3F7A6B" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#green)"/>
+<text x="920" y="497" text-anchor="middle" font-size="20" font-weight="400" fill="#1E293B">read value</text>
+<rect x="1380" y="446" width="196" height="46" rx="8" fill="#BFD6CE" stroke="#3F7A6B" stroke-width="2.2"/>
+<text x="1478" y="476" text-anchor="middle" font-size="22" font-weight="600" fill="#1E293B">predict: cat</text>
+</svg>

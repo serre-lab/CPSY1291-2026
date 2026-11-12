@@ -11,3 +11,31 @@ body.embed .workspace{height:360px;grid-template-columns:minmax(0,1fr) 370px}bod
 @media(max-width:760px){.visual{overflow-x:auto}.visual svg{min-width:780px;height:270px;flex:none}.tokens{min-width:780px;align-self:flex-start}.visual-note{min-width:780px}.visual::before{content:"Swipe the diagram to explore all positions →";font-size:12px;color:var(--muted);margin-bottom:8px}}
 @media(min-width:761px){body.embed .workspace{height:calc(100vh - 260px);min-height:360px}}
 @media(min-width:1060px) and (min-height:700px){body.embed .explanation{font-size:18px}body.embed .explanation h2{font-size:20px}body.embed .explanation .subtle{font-size:15px}body.embed .explanation .insight{font-size:16px}body.embed .explanation .formula{font-size:19px}body.embed fieldset label{font-size:16px}body.embed .text-button{font-size:16px}}
+/* embed mode (projected in a lecture slide): larger type, cream panels. Added 2026-11-12. */
+@media(min-width:1060px){
+body.embed .app{padding:8px 18px}
+body.embed .brand{font-size:24px}body.embed .course{font-size:16px}
+body.embed .views button{font-size:19px;padding:5px 12px}
+body.embed .steps button{font-size:18px;padding:4px 3px 6px}
+body.embed .eyebrow{font-size:16px;letter-spacing:1px}
+body.embed h1{font-size:32px}
+body.embed .stage-heading{margin:4px 0}
+body.embed .legend{font-size:18px}
+body.embed .tokens button{font-size:22px}
+body.embed .visual-note{font-size:16px}body.embed .tokens small{font-size:16px;line-height:1.2}
+body.embed .workspace{height:calc(100vh - 262px);min-height:360px;grid-template-columns:minmax(0,1fr) 480px}
+body.embed .explanation{font-size:22px;line-height:1.35}
+body.embed .explanation h2{font-size:24px}
+body.embed .explanation .formula{font-size:20px;background:transparent;border:1px solid var(--line)}
+body.embed .explanation .subtle{font-size:18px}
+body.embed .explanation .insight{font-size:20px}
+body.embed .explanation button.jump{font-size:18px}
+body.embed fieldset label{font-size:20px}
+body.embed .text-button{font-size:18px}
+body.embed .transport button{font-size:20px;padding:5px 12px}
+body.embed footer p{font-size:16px;max-width:520px}
+body.embed footer a{font-size:16px}
+body.embed svg text.tiny{font-size:17px}
+body.embed svg text.small{font-size:18px}
+body.embed svg text.label{font-size:20px}
+}

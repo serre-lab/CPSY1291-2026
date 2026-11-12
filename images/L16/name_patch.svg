@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="465" viewBox="0 0 1600 465" font-family="Poppins, Helvetica, Arial, sans-serif" role="img" aria-labelledby="title desc">
+<title id="title">Patch one head during name copying</title>
+<desc id="desc">Clean and corrupted stories introduce Zefam and Molly, respectively; both later supply the true text Zefam. Copy one head’s clean outputs at Z, e, f, a into the corrupted run (the recovery formula is on the slide) of loss on e, f, a, m.</desc>
+<defs><marker id="gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#B5862A"/></marker></defs>
+<text x="650" y="31" text-anchor="middle" font-size="20" font-weight="400" fill="#1E293B">Earlier name</text>
+<text x="1175" y="31" text-anchor="middle" font-size="20" font-weight="400" fill="#1E293B">Later mention: true text</text>
+<path d="M1079,109 Q1079,130 1103,130 L1103,320 Q1103,339 1079,339 L1079,351" fill="none" stroke="#B5862A" stroke-width="3" stroke-linecap="round" marker-end="url(#gold)"/>
+<circle cx="1079" cy="109" r="4" fill="#B5862A"/>
+<path d="M1127,109 Q1127,130 1151,130 L1151,320 Q1151,339 1127,339 L1127,351" fill="none" stroke="#B5862A" stroke-width="3" stroke-linecap="round" marker-end="url(#gold)"/>
+<circle cx="1127" cy="109" r="4" fill="#B5862A"/>
+<path d="M1175,109 Q1175,130 1199,130 L1199,320 Q1199,339 1175,339 L1175,351" fill="none" stroke="#B5862A" stroke-width="3" stroke-linecap="round" marker-end="url(#gold)"/>
+<circle cx="1175" cy="109" r="4" fill="#B5862A"/>
+<path d="M1223,109 Q1223,130 1247,130 L1247,320 Q1247,339 1223,339 L1223,351" fill="none" stroke="#B5862A" stroke-width="3" stroke-linecap="round" marker-end="url(#gold)"/>
+<circle cx="1223" cy="109" r="4" fill="#B5862A"/>
+<text x="24" y="94" text-anchor="start" font-size="22" font-weight="600" fill="#1E293B">Clean (donor)</text>
+<text x="268" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">…</text>
+<rect x="296" y="64" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="313.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">n</text>
+<rect x="334" y="64" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="351.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">a</text>
+<rect x="372" y="64" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="389.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">m</text>
+<rect x="410" y="64" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="427.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">e</text>
+<rect x="448" y="64" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="465.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">d</text>
+<rect x="504" y="64" width="34" height="44" rx="7" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="2.2"/><text x="521.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">Z</text>
+<rect x="542" y="64" width="34" height="44" rx="7" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="2.2"/><text x="559.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">e</text>
+<rect x="580" y="64" width="34" height="44" rx="7" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="2.2"/><text x="597.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">f</text>
+<rect x="618" y="64" width="34" height="44" rx="7" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="2.2"/><text x="635.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">a</text>
+<rect x="656" y="64" width="34" height="44" rx="7" fill="#DCE6EE" stroke="#3E6D8E" stroke-width="2.2"/><text x="673.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">m</text>
+<rect x="708" y="64" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="725.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">.</text>
+<text x="775" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">…</text>
+<rect x="810" y="64" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="827.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">L</text>
+<rect x="848" y="64" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="865.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">a</text>
+<rect x="886" y="64" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="903.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">t</text>
+<rect x="924" y="64" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="941.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">e</text>
+<rect x="962" y="64" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="979.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">r</text>
+<rect x="1000" y="64" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="1017.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">,</text>
+<rect x="1060" y="64" width="38" height="44" rx="7" fill="#FBE9B7" stroke="#C9962B" stroke-width="3"/><text x="1079.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">Z</text>
+<rect x="1108" y="64" width="38" height="44" rx="7" fill="#FBE9B7" stroke="#C9962B" stroke-width="3"/><text x="1127.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">e</text>
+<rect x="1156" y="64" width="38" height="44" rx="7" fill="#FBE9B7" stroke="#C9962B" stroke-width="3"/><text x="1175.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">f</text>
+<rect x="1204" y="64" width="38" height="44" rx="7" fill="#FBE9B7" stroke="#C9962B" stroke-width="3"/><text x="1223.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">a</text>
+<rect x="1252" y="64" width="38" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="1271.0" y="94" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">m</text>
+<text x="1350" y="94" text-anchor="start" font-size="22" font-weight="600" fill="#1E293B">loss on efam: low</text>
+<text x="24" y="254" text-anchor="start" font-size="22" font-weight="600" fill="#1E293B">Corrupted</text>
+<text x="268" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">…</text>
+<rect x="296" y="224" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="313.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">n</text>
+<rect x="334" y="224" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="351.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">a</text>
+<rect x="372" y="224" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="389.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">m</text>
+<rect x="410" y="224" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="427.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">e</text>
+<rect x="448" y="224" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="465.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">d</text>
+<rect x="504" y="224" width="34" height="44" rx="7" fill="white" stroke="#B5396B" stroke-width="2.2"/><text x="521.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">M</text>
+<rect x="542" y="224" width="34" height="44" rx="7" fill="white" stroke="#B5396B" stroke-width="2.2"/><text x="559.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">o</text>
+<rect x="580" y="224" width="34" height="44" rx="7" fill="white" stroke="#B5396B" stroke-width="2.2"/><text x="597.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">l</text>
+<rect x="618" y="224" width="34" height="44" rx="7" fill="white" stroke="#B5396B" stroke-width="2.2"/><text x="635.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">l</text>
+<rect x="656" y="224" width="34" height="44" rx="7" fill="white" stroke="#B5396B" stroke-width="2.2"/><text x="673.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">y</text>
+<rect x="708" y="224" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="725.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">.</text>
+<text x="775" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">…</text>
+<rect x="810" y="224" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="827.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">L</text>
+<rect x="848" y="224" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="865.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">a</text>
+<rect x="886" y="224" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="903.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">t</text>
+<rect x="924" y="224" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="941.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">e</text>
+<rect x="962" y="224" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="979.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">r</text>
+<rect x="1000" y="224" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="1017.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">,</text>
+<rect x="1060" y="224" width="38" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="1079.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">Z</text>
+<rect x="1108" y="224" width="38" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="1127.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">e</text>
+<rect x="1156" y="224" width="38" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="1175.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">f</text>
+<rect x="1204" y="224" width="38" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="1223.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">a</text>
+<rect x="1252" y="224" width="38" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="1271.0" y="254" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">m</text>
+<text x="1350" y="254" text-anchor="start" font-size="22" font-weight="600" fill="#1E293B">loss on efam: high</text>
+<text x="24" y="384" text-anchor="start" font-size="22" font-weight="600" fill="#1E293B">Patched</text>
+<text x="268" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">…</text>
+<rect x="296" y="354" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="313.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">n</text>
+<rect x="334" y="354" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="351.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">a</text>
+<rect x="372" y="354" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="389.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">m</text>
+<rect x="410" y="354" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="427.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">e</text>
+<rect x="448" y="354" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="465.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">d</text>
+<rect x="504" y="354" width="34" height="44" rx="7" fill="white" stroke="#B5396B" stroke-width="2.2"/><text x="521.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">M</text>
+<rect x="542" y="354" width="34" height="44" rx="7" fill="white" stroke="#B5396B" stroke-width="2.2"/><text x="559.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">o</text>
+<rect x="580" y="354" width="34" height="44" rx="7" fill="white" stroke="#B5396B" stroke-width="2.2"/><text x="597.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">l</text>
+<rect x="618" y="354" width="34" height="44" rx="7" fill="white" stroke="#B5396B" stroke-width="2.2"/><text x="635.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">l</text>
+<rect x="656" y="354" width="34" height="44" rx="7" fill="white" stroke="#B5396B" stroke-width="2.2"/><text x="673.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">y</text>
+<rect x="708" y="354" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="725.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">.</text>
+<text x="775" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">…</text>
+<rect x="810" y="354" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="827.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">L</text>
+<rect x="848" y="354" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="865.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">a</text>
+<rect x="886" y="354" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="903.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">t</text>
+<rect x="924" y="354" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="941.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">e</text>
+<rect x="962" y="354" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="979.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">r</text>
+<rect x="1000" y="354" width="34" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="1017.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">,</text>
+<rect x="1060" y="354" width="38" height="44" rx="7" fill="#FBE9B7" stroke="#C9962B" stroke-width="3"/><text x="1079.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">Z</text>
+<rect x="1108" y="354" width="38" height="44" rx="7" fill="#FBE9B7" stroke="#C9962B" stroke-width="3"/><text x="1127.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">e</text>
+<rect x="1156" y="354" width="38" height="44" rx="7" fill="#FBE9B7" stroke="#C9962B" stroke-width="3"/><text x="1175.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">f</text>
+<rect x="1204" y="354" width="38" height="44" rx="7" fill="#FBE9B7" stroke="#C9962B" stroke-width="3"/><text x="1223.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">a</text>
+<rect x="1252" y="354" width="38" height="44" rx="7" fill="white" stroke="#8A7E70" stroke-width="2.2"/><text x="1271.0" y="384" text-anchor="middle" font-size="22" font-weight="400" fill="#1E293B">m</text>
+<text x="1350" y="384" text-anchor="start" font-size="22" font-weight="600" fill="#1E293B">loss on efam: ?</text>
+<text x="1045" y="165" text-anchor="end" font-size="22" font-weight="400" fill="#1E293B">copy one head&#x27;s output</text>
+<text x="1045" y="194" text-anchor="end" font-size="22" font-weight="400" fill="#1E293B">at these 4 positions</text>
+<path d="M1057,181 H1101" stroke="#B5862A" stroke-width="2.2" fill="none"/>
+<text x="800" y="442" text-anchor="middle" font-size="20" font-weight="400" fill="#1E293B">earlier letters are the true text; the model is not writing the name freely</text>
+</svg>

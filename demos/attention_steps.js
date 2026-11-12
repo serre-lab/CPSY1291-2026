@@ -16,14 +16,15 @@
   const vec = (row, digits=2) => `[${row.map(v => f(v,digits)).join(', ')}]`;
   const txt = (x,y,value,cls='',anchor='middle') => `<text x="${x}" y="${y}" text-anchor="${anchor}" class="${cls}">${value}</text>`;
   const rect = (x,y,w,h,fill='none',stroke=colors.line,r=10,extra='') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${fill}" stroke="${stroke}" ${extra}/>`;
-  const path = (d,color=colors.line,width=2,arrow=false,extra='') => `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" ${arrow ? `marker-end="url(#arrow-${Object.keys(colors).find(k=>colors[k]===color)||'ink'})"` : ''} ${extra}/>`;
-  const line = (x,y,x2,y2,color=colors.line,width=2,arrow=false) => path(`M${x},${y} L${x2},${y2}`,color,width,arrow);
+  const W = 2.5; // one stroke width for every stream / flow arrow; arrowheads are fixed-size (userSpaceOnUse), tip exactly at the path end
+  const path = (d,color=colors.line,width=W,arrow=false,extra='') => `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" ${arrow ? `marker-end="url(#${arrow==='scaled'?'arrowW':'arrow'}-${Object.keys(colors).find(k=>colors[k]===color)||'ink'})"` : ''} ${extra}/>`;
+  const line = (x,y,x2,y2,color=colors.line,width=W,arrow=false) => path(`M${x},${y} L${x2},${y2}`,color,width,arrow);
   function packet(d,color=colors.v,delay=0,r=5) {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return '';
     return `<circle r="${r}" fill="${color}" opacity="0"><animateMotion path="${d}" dur="1.7s" begin="${delay}s" fill="freeze"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.08;0.88;1" dur="1.7s" begin="${delay}s" fill="freeze"/></circle>`;
   }
   const xs = [173,520,867];
-  const defs = () => `<defs>${Object.entries(colors).map(([k,c])=>`<marker id="arrow-${k}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1 L8,5 L0,9" fill="none" stroke="${c}" stroke-width="1.5"/></marker>`).join('')}<pattern id="masked" patternUnits="userSpaceOnUse" width="8" height="8"><path d="M0,8 L8,0" stroke="#dad7ce" stroke-width="1"/></pattern></defs>`;
+  const defs = () => `<defs>${Object.entries(colors).map(([k,c])=>`<marker id="arrow-${k}" viewBox="0 0 10 9" refX="10" refY="4.5" markerWidth="10" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4.5 L0,9 Z" fill="${c}" stroke="none"/></marker><marker id="arrowW-${k}" viewBox="0 0 3.4 3" refX="3.4" refY="1.5" markerWidth="3.4" markerHeight="3" markerUnits="strokeWidth" orient="auto"><path d="M0,0 L3.4,1.5 L0,3 Z" fill="${c}" stroke="none"/></marker>`).join('')}<pattern id="masked" patternUnits="userSpaceOnUse" width="8" height="8"><path d="M0,8 L8,0" stroke="#dad7ce" stroke-width="1"/></pattern></defs>`;
   const stepCount = () => state.view === 'attention' ? 7 : 6;
   function stop() { clearInterval(timer); timer = null; state.playing = false; $('play').textContent = '▶ Play'; }
   function go(step) { stop(); state.step = Math.max(0,Math.min(stepCount()-1,step)); render(); }
@@ -39,8 +40,8 @@
       s += rect(x-130,40,260,52,colors.paper) + txt(x,74,vec(C.E[j]),'math');
       s += txt(x-148,151,'+','large') + txt(x,121,'position embedding','small');
       s += rect(x-130,136,260,52,colors.paper) + txt(x,170,vec(C.P[j]),'math');
-      const d = `M${x},196 L${x},245`;
-      s += path(d,colors.ink,2,true) + packet(d,colors.ink,j*.16);
+      const d = `M${x},188 L${x},257`;
+      s += path(d,colors.ink,W,true) + packet(d,colors.ink,j*.16);
       s += rect(x-130,257,260,59,'#eeede6',colors.ink) + txt(x,294,vec(r.X[j]),'math');
       s += txt(x,342,`x${j+1} = embedding + position`,'small');
     });
@@ -52,10 +53,10 @@
       s += txt(x,29,`x${j+1} = ${vec(r.X[j])}`,'math');
       const triples = [['q',-106,'W<tspan baseline-shift="sub" font-size="72%">Q</tspan>',r.Q[j]],['k',0,'W<tspan baseline-shift="sub" font-size="72%">K</tspan>',r.K[j]],['v',106,'W<tspan baseline-shift="sub" font-size="72%">V</tspan>',r.V[j]]];
       triples.forEach(([name,dx,w,v],i) => {
-        const d=`M${x},47 C${x},90 ${x+dx},88 ${x+dx},124`;
-        s += path(d,colors[name],2,true) + packet(d,colors[name],i*.15);
+        const d=`M${x},47 C${x},92 ${x+dx},90 ${x+dx},137`;
+        s += path(d,colors[name],W,true) + packet(d,colors[name],i*.15);
         s += rect(x+dx-45,137,90,42,colors.paper,colors[name]) + txt(x+dx,165,w,`${name}text label vector`);
-        s += line(x+dx,182,x+dx,221,colors[name],2,true);
+        s += line(x+dx,179,x+dx,230,colors[name],W,true);
         s += txt(x+dx,254,name,`${name}text large vector`);
         s += txt(x+dx,285,vec(v),`${name}text math`);
       });
@@ -78,8 +79,8 @@
         s += rect(x-140,187,280,51,blocked?'url(#masked)':'#3e6d8e0c',blocked?colors.line:colors.k);
         s += txt(x,220,blocked?'−∞  ·  future':state.equal?'0  ·  equal-weight override':f(r.logits[i][j]),blocked?'label':'ktext label');
       }
-      const d = `M520,300 C520,270 ${x},${masked?285:235} ${x},${masked?247:151}`;
-      s += path(d,color,blocked?1:2,true,blocked?'stroke-dasharray="4 5"':'');
+      const yEnd=masked?238:136, d = `M520,305 C520,270 ${x},${yEnd+40} ${x},${yEnd}`;
+      s += path(d,color,blocked?1:W,true,blocked?'stroke-dasharray="4 5"':'');
       if(!blocked) s += packet(d,colors.q,j*.18);
     });
     s += rect(361,305,318,49,'#b5396b08',colors.q) + txt(520,337,`q(${C.words[i]}) = ${vec(q)}`,'qtext math');
@@ -90,10 +91,10 @@
     xs.forEach((x,j)=>{
       const blocked=state.mask && j>i;
       s += txt(x,28,`score = ${f(r.logits[i][j])}`,'math');
-      s += line(x,44,x,72,colors.ink,2,true);
+      s += line(x,44,x,72,colors.ink,W,true);
       s += txt(x,106,blocked?'exp(−∞) = 0':`exp(${f(r.logits[i][j])} − ${f(r.maxima[i])})`,'math');
       s += txt(x,143,`${r.exponents[i][j]===0||r.exponents[i][j]===1?'=':'≈'} ${f(r.exponents[i][j],3)}`,'math');
-      s += line(x,160,x,190,colors.ink,2,true);
+      s += line(x,160,x,190,colors.ink,W,true);
       s += txt(x,220,`${f(r.exponents[i][j],3)} ÷ ${f(r.sums[i],3)}`,'math');
       s += rect(x-132,240,264,38,colors.paper,colors.line,6);
       if(r.A[i][j]>0) s += rect(x-132,240,264*r.A[i][j],38,colors.k,'none',6,'class="bar-grow"');
@@ -108,13 +109,13 @@
       s += `<g ${a===0?'class="faded"':''}>`;
       s += txt(x,31,`v = ${vec(r.V[j])}`,'vtext math');
       s += txt(x,74,`× ${f(a,3)}`,'ktext large');
-      s += line(x,88,x,119,colors.v,2,true);
+      s += line(x,88,x,136,colors.v,W,true);
       s += rect(x-142,136,284,57,'#3f7a6b08',colors.v) + txt(x,172,vec(contribution,3),'vtext math');
       s += '</g>';
       // each value lands at its own point on the result box, so the arrowheads do not pile up
       const ex=410+110*j;
-      const d=`M${x},201 C${x},250 ${ex},248 ${ex},293`;
-      s += path(d,a===0?colors.line:colors.v,a===0?1:2+7*a,true,a===0?'stroke-dasharray="4 5"':'');
+      const d=`M${x},193 C${x},246 ${ex},247 ${ex},300`;
+      s += path(d,a===0?colors.line:colors.v,a===0?1:W+6*a,'scaled',a===0?'stroke-dasharray="4 5"':'');
       if(a>0) s += packet(d,colors.v,j*.3,4+5*a);
     });
     s += rect(340,300,360,56,'#b5396b08',colors.q) + txt(520,336,`z(${C.words[i]}) ≈ ${vec(r.Z[i],3)}`,'qtext math');
@@ -165,7 +166,7 @@
     s+=rect(15,77,250,211,'none',colors.line,12,'stroke-dasharray="5 5"');
     labels.forEach((label,j)=>{
       const y=29+j*51,active=j===step;
-      if(j>0)s+=line(140,y-13,140,y-2,active?colors.q:colors.line,2,true);
+      if(j>0)s+=line(140,y-15,140,y,active?colors.q:colors.line,W,true);
       s+=rect(26,y,228,36,active?'#b5396b10':colors.paper,active?colors.q:colors.line,7);
       s+=txt(140,y+24,label,active?'qtext tiny':'tiny');
     });
@@ -179,23 +180,23 @@
     if(step===0) {
       lanes.forEach((x,j)=>{
         s+=txt(x,41,C.words[j],'large');
-        s+=line(x,58,x,102,colors.ink,2,true);
+        s+=line(x,58,x,116,colors.ink,W,true);
         s+=rect(x-91,116,182,69,colors.paper,colors.k)+txt(x,145,'word + position','label')+txt(x,171,'embeddings','small');
-        const d=`M${x},193 L${x},279`;
-        s+=path(d,colors.ink,3,true)+packet(d,colors.k,j*.18);
+        const d=`M${x},185 L${x},294`;
+        s+=path(d,colors.ink,W,true)+packet(d,colors.k,j*.18);
         s+=rect(x-83,294,166,51,'#3e6d8e0a',colors.k)+txt(x,327,`x${j+1}`,'large vector');
       });
     } else if(step===1) {
       lanes.forEach((x,j)=>{
-        s+=txt(x,31,C.words[j],'large')+line(x,45,x,75,colors.ink,2,true);
+        s+=txt(x,31,C.words[j],'large')+line(x,45,x,84,colors.ink,W,true);
         s+=rect(x-72,84,144,40,colors.paper,colors.line)+txt(x,111,'Layer norm','label');
         s+=txt(x,163,'q, k, v','label');
       });
       for(let receiver=0;receiver<3;receiver++)for(let source=0;source<=receiver;source++) {
         // spread the starts (by receiver) and the ends (by source) so no two arrows share a point
         const sx=lanes[source]+22*(receiver-source), ex=lanes[receiver]-50+50*source;
-        const d=`M${sx},177 C${sx},226 ${ex},222 ${ex},275`;
-        s+=path(d,colors.v,2.5,true)+packet(d,colors.v,receiver*.22+source*.1);
+        const d=`M${sx},177 C${sx},228 ${ex},232 ${ex},287`;
+        s+=path(d,colors.v,W,true)+packet(d,colors.v,receiver*.22+source*.1);
       }
       lanes.forEach((x,j)=>s+=rect(x-83,287,166,50,'#3f7a6b08',colors.v)+txt(x,319,`z${j+1}`,'vtext large vector'));
       s+=txt(665,358,'Only attention mixes information across positions.','small');
@@ -203,40 +204,40 @@
       lanes.forEach((x,j)=>{
         const bypass=x-66, branch=x+28;
         s+=txt(x,30,step===2?`x${j+1}`:`h${j+1}`,'large vector');
-        s+=line(x,42,x,62,colors.ink,2);
-        const residual=`M${x},62 L${bypass},62 L${bypass},292 L${x-19},292`;
-        s+=path(residual,colors.ink,3,true)+packet(residual,colors.ink,j*.12);
-        s+=path(`M${x},62 L${branch},62 L${branch},93`,colors.ink,2,true);
+        s+=line(x,42,x,62,colors.ink,W);
+        const residual=`M${x},62 L${bypass},62 L${bypass},292 L${x-18},292`;
+        s+=path(residual,colors.ink,W,true)+packet(residual,colors.ink,j*.12);
+        s+=path(`M${x},62 L${branch},62 L${branch},${step===2?105:104}`,colors.ink,W,true);
         if(step===2) {
           s+=rect(branch-61,105,122,54,'#3f7a6b08',colors.v)+txt(branch,128,'attention','label')+txt(branch,150,'result z','small');
-          s+=line(branch,165,branch,183,colors.v,2,true);
+          s+=line(branch,159,branch,194,colors.v,W,true);
           s+=rect(branch-61,194,122,39,colors.paper,colors.v)+txt(branch,221,'Wₒ','vtext vector');
         } else {
           s+=rect(branch-63,104,126,38,colors.paper,colors.line)+txt(branch,130,'Layer norm','small');
-          s+=line(branch,146,branch,169,colors.k,2,true);
+          s+=line(branch,142,branch,180,colors.k,W,true);
           s+=rect(branch-63,180,126,57,'#3e6d8e08',colors.k)+txt(branch,204,'small','label')+txt(branch,227,'network','label');
         }
-        const d=`M${branch},242 L${branch},265 L${x},265 L${x},273`;
-        s+=path(d,step===2?colors.v:colors.k,2,true)+packet(d,step===2?colors.v:colors.k,j*.16);
+        const d=`M${branch},${step===2?233:237} L${branch},255 L${x},255 L${x},274`;
+        s+=path(d,step===2?colors.v:colors.k,W,true)+packet(d,step===2?colors.v:colors.k,j*.16);
         s+=`<circle cx="${x}" cy="292" r="18" stroke="${colors.ink}" fill="${colors.paper}" stroke-width="2"/>`+txt(x,299,'+','large');
-        s+=line(x,314,x,343,colors.ink,3,true);
+        s+=line(x,310,x,343,colors.ink,W,true);
       });
-      s+=txt(665,359,step===2?'h = x + Attention(LN(x)) Wₒ':step===3?'Shared network weights; separate computation at each position.':'Repeat these two additions with new weights in each block.','small');
+      s+=txt(665,368,step===2?'h = x + Attention(LN(x)) Wₒ':step===3?'Shared network weights; separate computation at each position.':'Repeat these two additions with new weights in each block.','small');
     } else {
       lanes.forEach((x,j)=>{
         s+=txt(x,26,`final h${j+1}`,'label');
-        s+=line(x,40,x,72,j===2?colors.q:colors.line,2,true);
+        s+=line(x,40,x,84,j===2?colors.q:colors.line,W,true);
         s+=rect(x-89,84,178,46,colors.paper,j===2?colors.q:colors.line)+txt(x,114,'Final layer norm','small');
         if(j<2)s+=txt(x,171,'earlier position','small');
       });
-      s+=line(900,139,900,170,colors.q,3,true);
+      s+=line(900,130,900,180,colors.q,W,true);
       s+=rect(794,180,212,51,'#b5396b08',colors.q)+txt(900,212,'Vocabulary readout','label');
-      s+=line(900,238,900,268,colors.q,3,true);
+      s+=line(900,231,900,278,colors.q,W,true);
       s+=rect(794,278,212,45,colors.paper,colors.q)+txt(900,308,'Softmax','label');
       s+=txt(900,356,'on · down · …','qtext large');
       s+=txt(533,239,'one score per','label')+txt(533,267,'possible next token','label');
       s+=txt(533,320,'Schematic candidates;','small')+txt(533,344,'no trained probabilities shown.','small');
-      s+=packet('M900,139 L900,170',colors.q)+packet('M900,238 L900,268',colors.q,.5);
+      s+=packet('M900,130 L900,180',colors.q)+packet('M900,231 L900,278',colors.q,.5);
     }
     return s;
   }

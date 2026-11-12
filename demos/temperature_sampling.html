@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Temperature and sampling · CPSY 1291</title>
+<link rel="stylesheet" href="temperature_sampling.css"></head>
+<body><main>
+<header><b>Temperature and sampling</b><span>GPT-2 small: the next word piece after a prompt. Logits ÷ T, then softmax.</span></header>
+<div class="layout">
+ <aside class="controls" aria-label="Controls">
+  <fieldset><legend>Prompt</legend><div id="prompts" role="group" aria-label="Prompt"></div></fieldset>
+  <div class="slider"><label for="temp">Temperature T <output id="temp-out" for="temp"></output></label>
+   <input id="temp" type="range" min="0.1" max="2" step="0.05" value="1">
+   <div class="ends"><span>0.1: sharp</span><span>2.0: flat</span></div></div>
+  <div class="slider"><label for="topp">Top-p (nucleus) <output id="topp-out" for="topp"></output></label>
+   <input id="topp" type="range" min="0.5" max="1" step="0.01" value="1">
+   <div class="ends"><span>0.5: top pieces only</span><span>1.0: keep all</span></div></div>
+  <div class="eff"><span class="k">Effective choices, e<sup>entropy</sup></span><b id="eff" aria-hidden="true"></b></div>
+  <div class="actions"><button id="draw" class="primary">Draw a piece</button><button id="seed">New seed</button></div>
+  <p id="drawn" class="drawn"></p>
+ </aside>
+ <section class="chart" aria-label="Next-piece probabilities">
+  <div class="chart-head"><span id="scale-note"></span></div>
+  <div id="bars" role="img" aria-labelledby="summary"></div>
+ </section>
+ <section class="cont" aria-label="Precomputed continuation">
+  <h2>What this setting writes</h2>
+  <p id="cont-label" class="k"></p>
+  <div id="cont-text" class="cont-text"></div>
+  <p class="k small">Precomputed with GPT-2, seed 0, 30 pieces. Nearest of T in {0, 0.5, 0.7, 1.0, 1.5} and top-p in {0.9, 1.0}; T = 0 is greedy.</p>
+ </section>
+</div>
+<p id="summary" class="summary" aria-live="polite"></p>
+<noscript>This demo needs JavaScript.</noscript>
+</main>
+<script src="temperature_sampling_data.js"></script>
+<script src="temperature_sampling.js"></script>
+</body></html>

@@ -1,0 +1,221 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>All 144 heads of GPT-2 — CPSY 1291</title>
+<style>
+ :root{--ink:#1E293B;--taupe:#6B6054;--mag:#B5396B;--grn:#2F6355;--blue:#3E6D8E;--gold:#F2C14E;--bg:#FDFBF7;--mute:#C9C2B8;--card:#fff}
+ *{box-sizing:border-box}
+ body{margin:0;font:16px/1.4 Lora,Georgia,serif;color:var(--ink);background:var(--bg)}
+ h1{font:600 20px Poppins,system-ui,sans-serif;margin:0 0 6px}
+ .page{display:flex;flex-wrap:wrap;gap:20px;padding:12px 16px;font-family:Poppins,system-ui,sans-serif}
+ .left{flex:0 0 700px;min-width:0}
+ .right{flex:1 1 640px;min-width:0}
+ .bar-row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-bottom:6px}
+ .lab{color:var(--taupe)}
+ button,select{font:inherit;font-size:16px;padding:5px 11px;border:1px solid #B9AE9F;border-radius:7px;background:#EDE7DE;color:var(--ink);cursor:pointer}
+ button[aria-pressed=true]{background:var(--gold);border-color:#8A6D1E;font-weight:600}
+ button:focus-visible,select:focus-visible,.cell:focus-visible{outline:3px solid var(--mag);outline-offset:2px}
+ .card{background:var(--card);border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.12);padding:8px}
+ svg text{font-family:Poppins,system-ui,sans-serif}
+ #describe{margin-top:6px;font-size:16px;color:var(--ink);min-height:44px}
+ .cols{display:flex;gap:20px;flex-wrap:wrap}
+ .gridwrap{flex:0 0 auto}
+ #grid{display:grid;grid-template-columns:28px repeat(12,28px);grid-auto-rows:28px;gap:2px;align-items:center;justify-items:center}
+ #grid .ax{font-size:16px;color:var(--taupe)}
+ .cell{width:28px;height:28px;padding:0;border:1px solid #fff;border-radius:3px;position:relative;font-size:16px;line-height:1;color:#000}
+ .cell[aria-pressed=true]{outline:3px solid var(--ink);outline-offset:0;z-index:2}
+ .info{flex:1 1 380px;min-width:0}
+ .score{margin-bottom:8px}
+ .sline{white-space:nowrap}
+ .rk{color:var(--taupe)}
+ #kcrank,#ktnote{white-space:nowrap}
+ .gtitle{font-weight:600;margin:2px 0 4px}
+ .gtitle .lab{font-weight:400}
+ .def.small{font-size:15px;margin-top:4px}
+ .score b{font-weight:600}
+ .meter{height:14px;background:#EFEAE2;border-radius:3px;margin:2px 0}
+ .meter i{display:block;height:100%;background:var(--blue);border-radius:3px}
+ .def{color:var(--taupe);font-size:16px;font-family:Lora,Georgia,serif}
+ .ko .meter i.k{background:var(--mag)}
+ .ko,.ko .def{font-size:18px}
+ .ko .meter{position:relative}
+ .legend{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:16px;color:var(--taupe)}
+ .legend span.sw{display:inline-block;width:120px;height:14px;background:linear-gradient(90deg,#fff,#3E6D8E);border:1px solid var(--mute)}
+ .bar-row.sel select{min-width:70px}
+ body.embed{overflow:hidden;height:100vh}
+ body.embed h1,body.embed .foot{display:none}
+ body.embed .page{padding:8px 12px;flex-wrap:nowrap}
+ body.embed{--bg:#FAF9F5;--card:#FAF9F5;font-size:22px}
+ body.embed .page{gap:24px;padding:10px 14px;font-size:22px}
+ body.embed .left{flex:0 0 590px}
+ body.embed [aria-label=Sentence] .lab,body.embed #hid{display:none}
+ body.embed .right{min-width:0}
+ body.embed .right{flex:1 1 0}
+ body.embed button,body.embed select{font-size:20px;padding:4px 11px}
+ body.embed .bar-row{margin-bottom:8px}
+ body.embed .card{box-shadow:none;border:1px solid #B9AE9F}
+ body.embed .cell{border-color:#FAF9F5;font-size:18px}
+ body.embed #grid{grid-template-columns:30px repeat(12,30px);grid-auto-rows:30px}
+ body.embed #grid .ax{font-size:18px}
+ body.embed .cell{width:30px;height:30px}
+ body.embed .def{font-size:22px}
+ body.embed .score .def{display:none}
+ body.embed .score{margin-bottom:6px}
+ body.embed .ko,body.embed .ko .def{font-size:22px}
+ body.embed .legend{font-size:18px}
+ body.embed .info .card{font-size:20px}
+ body.embed .def.small{font-size:16px}
+ body.embed .gtitle{font-size:20px}
+ body.embed .gtitle .lab{font-size:18px}
+ body.embed .legend span.sw{background:linear-gradient(90deg,#FAF9F5,#3E6D8E)}
+ body.embed .info{flex:1 1 400px}
+ body.embed #describe{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);padding:0;border:0;margin:0}
+ .foot{padding:0 16px 12px;color:var(--taupe);font-size:16px}
+</style>
+<body>
+<div class="page" id="page">
+ <div class="left">
+  <h1>All 144 heads of GPT-2 small</h1>
+  <div class="bar-row" role="group" aria-label="Sentence"><span class="lab">sentence:</span><span id="sbtns"></span></div>
+  <div class="bar-row sel">
+   <label class="lab" for="layer">block</label><select id="layer"></select>
+   <label class="lab" for="head">head</label><select id="head"></select>
+   <span class="def" id="hid"></span>
+  </div>
+  <div class="bar-row" role="group" aria-label="Jump to a head"><span class="lab">strongest:</span>
+   <button data-jump="prev">previous-token</button><button data-jump="induction">induction</button><button data-jump="sink">sink</button></div>
+  <div class="card"><svg id="mx" width="684" height="560" role="img" aria-labelledby="mxt"><title id="mxt">Attention weights</title></svg></div>
+ </div>
+ <div class="right">
+  <div class="cols">
+   <div class="gridwrap">
+    <div class="gtitle">All 144 heads, one cell per head<br><span class="lab">block 0–11 down · head 0–11 across · color:</span></div>
+    <div class="bar-row" id="gbtns" role="group" aria-label="Measure shown in the grid"></div>
+    <div class="card"><div id="grid" role="grid" aria-label="Overview of the 144 heads, one cell per head: rows are blocks 0 to 11, columns are heads 0 to 11. Arrow keys move, Enter selects."></div></div>
+    <div class="legend"><span id="gname">induction weight:</span><span>0</span><span class="sw" aria-hidden="true"></span><span id="gmax">1</span><span>&nbsp;★ = strongest</span></div>
+   </div>
+   <div class="info">
+    <div class="card">
+     <div class="score"><div class="sline"><b>Previous-token weight</b> <span id="v_prev"></span></div>
+      <div class="meter"><i id="m_prev"></i></div>
+      <div class="def">Mean weight on the token just before, over 20 ordinary sentences.</div></div>
+     <div class="score"><div class="sline"><b>Induction weight</b> <span id="v_induction"></span></div>
+      <div class="meter"><i id="m_induction"></i></div>
+      <div class="def">In a random sequence shown twice, mean weight on the token after the earlier copy of the current token.</div></div>
+     <div class="score"><div class="sline"><b>First-token weight</b> <span id="v_sink"></span></div>
+      <div class="meter"><i id="m_sink"></i></div>
+      <div class="def">Mean weight on the first token, over the same 20 sentences.</div></div>
+    </div>
+    <div class="card ko" style="margin-top:10px">
+     <div class="sline"><b>Knock this head out</b></div>
+     <div class="def">Its output set to 0; the loss measured again on two tests.</div>
+     <div class="sline" style="margin-top:4px">Copying loss: <b id="kc"></b> <span class="def">(intact <span id="kci"></span>)</span></div>
+     <div class="meter"><i class="k" id="mk_c"></i></div>
+     <div id="kcrank" class="def"></div>
+     <div class="sline" style="margin-top:4px">Ordinary-text loss: <b id="kt"></b> <span class="def">(intact <span id="kti"></span>)</span></div>
+     <div class="meter"><i class="k" id="mk_t"></i></div>
+     <div class="def" id="ktnote"></div>
+     <div class="def small">Losses in nats per token; bars show the increase, both on one scale (0 to <span id="sc"></span>).</div>
+    </div>
+   </div>
+  </div>
+  <div id="describe" class="card" style="margin-top:10px" aria-live="polite"></div>
+ </div>
+</div>
+<div class="foot">Real GPT-2 small (124M), computed offline; blocks and heads are numbered from 0. Attention weights are not next-word probabilities.</div>
+<script src="gpt2_heads_data.js"></script>
+<script>
+if (new URLSearchParams(location.search).get('embed') === '1') document.body.classList.add('embed');
+const D = window.GPT2_HEADS, L = 12, H = 12;
+const EMB = document.body.classList.contains('embed');
+const SHORT = ['black cat', 'Dursley', 'Mary & John', 'Paris & Rome'];
+const SC = {prev:'previous-token', induction:'induction', sink:'sink', koCopy:'copy loss increase'};
+const st = {s: 0, l: 5, h: 5, color: 'induction', ...(function(){try{const q=new URLSearchParams(location.search);return {l:+q.get('l')||5,h:q.get('h')===null?5:+q.get('h'),s:+q.get('s')||0}}catch(e){return {}}})()};
+const $ = id => document.getElementById(id);
+const mixc = t => { t = Math.max(0, Math.min(1, t)); const a = EMB ? [250,249,245] : [255,255,255], b = [62,109,142];
+  return 'rgb(' + a.map((x,i)=>Math.round(x+(b[i]-x)*t)).join(',') + ')'; };
+const lum = t => t > 0.55 ? '#fff' : '#000';
+const intactC = D.intactCopy, intactT = D.intactText;
+const inc = D.koCopy.map(r => r.map(x => x - intactC));
+const incMax = Math.max(...inc.flat());
+function vals(k) { return k === 'koCopy' ? inc : D[k]; }
+function best(k) { let b = [0,0], v = -9; vals(k).forEach((r,l)=>r.forEach((x,h)=>{ if (x > v) { v = x; b = [l,h]; } })); return b; }
+const B = {}; ['prev','induction','sink','koCopy'].forEach(k => B[k] = best(k));
+const ordInc = D.koText.map(r => r.map(x => x - intactT));
+
+for (let i = 0; i < 12; i++) { $('layer').add(new Option(i, i)); $('head').add(new Option(i, i)); }
+D.sentences.forEach((s, i) => { const b = document.createElement('button'); b.textContent = SHORT[i]; b.dataset.s = i;
+  b.setAttribute('aria-pressed', i === 0); b.title = s.text; b.onclick = () => { st.s = i; render(); }; $('sbtns').append(b); });
+Object.entries({induction:'induction',prev:'previous-token',sink:'sink',koCopy:'copy knockout'}).forEach(([k, n]) => {
+  const b = document.createElement('button'); b.textContent = n; b.dataset.c = k; b.onclick = () => { st.color = k; render(); }; $('gbtns').append(b); });
+$('layer').onchange = () => { st.l = +$('layer').value; render(); };
+$('head').onchange = () => { st.h = +$('head').value; render(); };
+document.querySelectorAll('[data-jump]').forEach(b => b.onclick = () => { const t = B[b.dataset.jump]; st.l = t[0]; st.h = t[1]; render(); });
+
+// overview grid
+const grid = $('grid'); const cells = [];
+grid.append(Object.assign(document.createElement('div'), {className: 'ax', textContent: ''}));
+for (let h = 0; h < 12; h++) grid.append(Object.assign(document.createElement('div'), {className: 'ax', textContent: h, ariaHidden: 'true'}));
+for (let l = 0; l < 12; l++) {
+  grid.append(Object.assign(document.createElement('div'), {className: 'ax', textContent: l}));
+  for (let h = 0; h < 12; h++) { const c = document.createElement('button'); c.className = 'cell'; c.dataset.l = l; c.dataset.h = h;
+    c.onclick = () => { st.l = l; st.h = h; render(); };
+    c.onkeydown = e => { const d = {ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]}[e.key]; if (!d) return;
+      e.preventDefault(); st.l = Math.max(0, Math.min(11, l + d[0])); st.h = Math.max(0, Math.min(11, h + d[1])); render(); cells[st.l*12+st.h].focus(); };
+    cells.push(c); grid.append(c); } }
+const fmt = x => x.toFixed(3);
+
+function drawMatrix() {
+  const s = D.sentences[st.s], T = s.tokens.length, svg = $('mx');
+  const FS = EMB ? 18 : 16, GAP = EMB ? '#FAF9F5' : '#fff';
+  const cell = Math.min(EMB ? 33 : 34, Math.floor((EMB ? 430 : 430) / T)), x0 = EMB ? 86 : 90, y0 = EMB ? 132 : 140;
+  const w = s.w[st.l * 12 + st.h]; const W = (i, j) => w[i * (i + 1) / 2 + j];
+  let o = '<title id="mxt">Attention weights of block ' + st.l + ' head ' + st.h + '</title><defs><pattern id="hat" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#EFEAE2"/><line x1="0" y1="0" x2="0" y2="8" stroke="#B9AE9F" stroke-width="2"/></pattern></defs>';
+  o += '<text x="6" y="18" font-size="' + FS + '" fill="#1E293B" font-weight="600">Attention weights <tspan font-style="italic">a</tspan><tspan dy="5" font-size="' + (FS-5) + '" font-style="italic">ij</tspan><tspan dy="-5"> of block ' + st.l + ', head ' + st.h + '</tspan></text><text x="6" y="' + (18 + FS + 6) + '" font-size="' + (FS-2) + '" fill="#6B6054">row i: token reading · column j: token read · each row sums to 1</text>';
+  for (let j = 0; j < T; j++) o += '<text transform="translate(' + (x0 + j*cell + cell/2 + 5) + ',' + (y0 - 5) + ') rotate(-90)" font-size="' + FS + '" fill="#1E293B">' + esc(s.tokens[j]) + '</text>';
+  for (let i = 0; i < T; i++) {
+    o += '<text x="' + (x0 - 6) + '" y="' + (y0 + i*cell + cell/2 + 6) + '" text-anchor="end" font-size="' + FS + '" fill="#1E293B">' + esc(s.tokens[i]) + '</text>';
+    let mj = 0; for (let j = 0; j <= i; j++) if (W(i,j) > W(i,mj)) mj = j;
+    for (let j = 0; j < T; j++) {
+      const x = x0 + j*cell, y = y0 + i*cell;
+      if (j > i) o += '<rect x="' + x + '" y="' + y + '" width="' + cell + '" height="' + cell + '" fill="url(#hat)" stroke="' + GAP + '"/>';
+      else { const v = W(i,j); o += '<rect x="' + x + '" y="' + y + '" width="' + cell + '" height="' + cell + '" fill="' + mixc(v) + '" stroke="' + GAP + '"><title>' + esc(s.tokens[i]) + ' reads ' + esc(s.tokens[j]) + ': ' + v.toFixed(3) + '</title></rect>';
+        if (j === mj) o += '<circle cx="' + (x + cell/2) + '" cy="' + (y + cell/2) + '" r="' + Math.max(3, cell/7) + '" fill="' + (v > .5 ? '#FDFBF7' : '#B5396B') + '" stroke="' + (v > .5 ? '#1E293B' : '#fff') + '"/>'; } } }
+  o += '<text x="' + (x0 + T*cell + 8) + '" y="' + (y0 + 14) + '" font-size="' + FS + '" fill="#6B6054"></text>';
+  if (EMB) svg.setAttribute('width', x0 + T*cell + 12);
+  svg.setAttribute('height', y0 + T*cell + 12); svg.innerHTML = o;
+  // describe
+  const parts = []; for (let i = 1; i < T; i++) { let mj = 0; for (let j = 0; j <= i; j++) if (W(i,j) > W(i,mj)) mj = j;
+    parts.push(s.tokens[i] + '→' + s.tokens[mj] + ' ' + Math.round(W(i,mj)*100) + '%'); }
+  $('describe').innerHTML = '<span class="lab">Text version. Each row\'s most-read token (the dot), row→read:</span> ' + parts.map(esc).join('; ') + '.';
+}
+function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function rank(arr, v) { return arr.flat().filter(x => x > v).length + 1; }
+
+function render() {
+  $('layer').value = st.l; $('head').value = st.h;
+  $('hid').textContent = 'block ' + st.l + ', head ' + st.h + ' (numbered from 0)';
+  document.querySelectorAll('#sbtns button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.s === st.s));
+  document.querySelectorAll('#gbtns button').forEach(b => b.setAttribute('aria-pressed', b.dataset.c === st.color));
+  drawMatrix();
+  const V = vals(st.color), mx = st.color === 'koCopy' ? incMax : 1; $('gmax').textContent = st.color === 'koCopy' ? mx.toFixed(2) + ' nats' : '1';
+  $('gname').textContent = {induction:'induction weight:', prev:'previous-token weight:', sink:'first-token weight:', koCopy:'copying loss increase:'}[st.color];
+  cells.forEach(c => { const l = +c.dataset.l, h = +c.dataset.h, v = V[l][h], t = v / mx, sel = l === st.l && h === st.h;
+    c.style.background = mixc(t); c.style.color = lum(t);
+    const star = B[st.color][0] === l && B[st.color][1] === h;
+    c.textContent = star ? '★' : '';
+    c.setAttribute('aria-pressed', sel); c.tabIndex = sel ? 0 : -1;
+    c.setAttribute('aria-label', 'block ' + l + ' head ' + h + ', ' + SC[st.color] + ' ' + (v).toFixed(3) + (star ? ', strongest' : '')); });
+  ['prev','induction','sink'].forEach(k => { const v = D[k][st.l][st.h]; $('v_' + k).innerHTML = fmt(v) + ' <span class="rk">· rank ' + rank(D[k], v) + '/144</span>'; $('m_' + k).style.width = (v*100) + '%'; });
+  const kc = D.koCopy[st.l][st.h], kt = D.koText[st.l][st.h];
+  $('kc').textContent = kc.toFixed(2); $('kci').textContent = intactC.toFixed(2);
+  $('kt').textContent = kt.toFixed(2); $('kti').textContent = intactT.toFixed(2);
+  const SC2 = Math.max(incMax, ...ordInc.flat());
+  $('mk_c').style.width = (Math.max(0, kc - intactC) / SC2 * 100) + '%'; $('mk_t').style.width = (Math.max(0, kt - intactT) / SC2 * 100) + '%';
+  $('sc').textContent = SC2.toFixed(2);
+  const d = kc - intactC;
+  const sgn = x => (Math.abs(x) < 0.005 ? '±' : x > 0 ? '+' : '−') + Math.abs(x).toFixed(2);
+  $('kcrank').textContent = sgn(d) + ' nats · rank ' + rank(inc, inc[st.l][st.h]) + '/144';
+  const dt = kt - intactT; $('ktnote').textContent = sgn(dt) + ' nats';
+}
+render();
+</script>
