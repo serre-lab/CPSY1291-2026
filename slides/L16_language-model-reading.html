@@ -317,13 +317,13 @@
 <p>Prompt: <em>The black cat sat on the mat. Then</em> · GPT-2 small, 40 new word pieces, same seed</p>
 <ul>
 <li><strong>Greedy</strong> (always the most likely piece): <em>he looked at the white cat. "You're not going to be able to see me," he said. "I'm not going to be able to see you," the white</em> …</li>
-<li><strong>Temperature 0.7</strong> (≈ 7 likely next pieces): <em>a bright flash of light shot through the night sky. A small man was squatting on the ground next to him. He had a long blond hair. His eyes were a large hematite.</em></li>
+<li><strong>Temperature 0.7</strong> (≈ 7 choices for the first piece): <em>a bright flash of light shot through the night sky. A small man was squatting on the ground next to him. He had a long blond hair. His eyes were a large hematite.</em></li>
 <li><strong>1.0</strong> (≈ 42): <em>a button seven came down and… A black cat the size of the Olympic flame moved out of the end of the arm she so enjoyed to sit on.</em></li>
 <li><strong>1.5</strong> (≈ 2,630): <em>along came seven more faces perched… Goldbacks Skooter bipartisan candidates spill radical words for CathP wrestler Sly Blastin</em> …</li>
 </ul>
 <p class="provenance">Real computation: GPT-2 small, pure sampling, torch seed 0; "≈ 7": like a choice among 7 equally likely pieces</p>
 <ul>
-<li>Greedy loops; the far tail is nonsense. <mark>Chat systems sample at temperatures near 0.7–1 and use top-p</mark>: keep the most likely pieces whose probabilities add up to p, rescale, draw</li>
+<li><mark>Same model, same probabilities: how you draw decides the text</mark>. Too low loops, too high is nonsense; chat systems use 0.7–1 and <strong>top-p</strong> (keep the likeliest pieces up to probability p, rescale, draw)</li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/1904.09751" rel="noopener">Holtzman et al. <b>ICLR 2020</b></a> · <a href="https://arxiv.org/abs/2503.21929" rel="noopener">Kempton &amp; Burrell <b>EMNLP 2025</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="23" data-marpit-pagination-total="42" aria-labelledby="heading-23"><p class="page">Slide 23</p>
