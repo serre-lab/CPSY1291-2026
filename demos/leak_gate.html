@@ -39,10 +39,10 @@ button:hover{background:#e4ddd2}:focus-visible{outline:3px solid var(--blue);out
 .weight-axis{display:flex;justify-content:space-between;font-size:16px}.weight-detail{color:var(--mag);font-variant-numeric:tabular-nums}
 .readout{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.readout h2{margin:0}.readout p{font-size:20px}.readout b{color:var(--mag);font-variant-numeric:tabular-nums}
 body.embed{height:100vh;overflow:hidden;font-size:20px;line-height:1.3}
-body.embed .page{height:100%;max-width:none;padding:10px;gap:8px;grid-template-rows:39px 108px minmax(0,1fr) 136px 57px}
+body.embed .page{height:100%;max-width:none;padding:10px;gap:8px;grid-template-rows:39px 108px minmax(0,1fr) 150px 57px}
 body.embed h1{font-size:30px}body.embed h2{font-size:22px;margin-bottom:5px}
 body.embed .panel{font-size:20px;padding:9px 12px}
-body.embed .middle{gap:8px;grid-template-columns:minmax(0,1fr) 302px;min-height:0}
+body.embed .middle{gap:8px;grid-template-columns:minmax(0,1fr) 340px;min-height:0}
 body.embed .plot-panel{min-height:0}body.embed .chart{min-height:0}
 body.embed .legend,body.embed .probe-note,body.embed .weight-axis,body.embed .weights-heading p{font-size:20px}
 body.embed .controls{gap:4px 20px}body.embed button{font-size:20px}
@@ -66,7 +66,7 @@ body.embed .readout h2{margin:0}body.embed .readout p{font-size:22px}
       <div class="legend"><span><i class="sample input"></i>input x⟨t⟩</span><span><i class="sample"></i>state h⟨t⟩</span><span><i class="sample cue-share"></i>share of the cue still left</span></div>
       <div class="chart"><svg id="chart" role="img" aria-labelledby="chart-title chart-description"><title id="chart-title">Input, state, and cue retention over 40 steps</title><desc id="chart-description"></desc></svg></div>
     </section>
-    <aside class="panel try"><h2>Try this</h2><ol><li>Set <span class="parameter">λ = 0.90</span>. Look at panel B.</li><li>Push <span class="parameter">λ</span> to <span class="parameter">1.00</span>. Watch distractors pile up.</li><li>Turn on the gate.</li><li>Raise <span class="parameter">ε</span>. What gets through?</li></ol><p class="probe-note" id="probe-note"></p></aside>
+    <aside class="panel try"><h2>Try this</h2><ol><li>Set <span class="parameter">λ = 0.90</span>; look at B.</li><li>Push <span class="parameter">λ</span> to <span class="parameter">1.00</span>; watch distractors pile up.</li><li>Turn on the gate.</li><li>Raise <span class="parameter">ε</span>.</li></ol><p class="probe-note" id="probe-note"></p></aside>
   </div>
   <section class="panel" aria-labelledby="weights-title">
     <div class="weights-heading"><h2 id="weights-title">B. Weights on the past</h2><p>Shade: weight from 0 to 1</p></div>
@@ -113,6 +113,18 @@ function computeModel(x = inputs, lambda = Number($('lambda').value), gated = $(
 }
 function format(value) { return value !== 0 && Math.abs(value) < 0.001 ? value.toExponential(2) : value.toFixed(3); }
 function kind(t) { return t === CUE ? 'cue' : t === PROBE ? 'probe' : 'distractor'; }
+// Bound every slider setting so the axis stays fixed and no trajectory is clipped.
+function plotLimit() {
+  let peak = 1.5;
+  for (let i = 0; i <= 50; i++) {
+    for (const gated of [false,true]) {
+      const model = computeModel(inputs, .5 + i / 100, gated, i / 100);
+      peak = Math.max(peak, ...model.states.map(Math.abs));
+    }
+  }
+  return Math.ceil(peak * 2) / 2;
+}
+let scaleLimit = plotLimit();
 const buttons = Array.from({length:T}, (_, t) => {
   const button = document.createElement('button');
   button.type = 'button'; button.className = 'cell ' + kind(t);
@@ -140,9 +152,7 @@ function drawChart() {
   const left = 58, right = width - 51, top = 32, bottom = height - 36;
   const step = (right - left) / T, px = t => left + (t + .5) * step;
   // A stable scale across sliders and modes makes accumulation directly comparable.
-  let running = 0;
-  const totals = inputs.map(x => running += x);
-  const limit = Math.ceil(Math.max(1.5, ...totals.map(Math.abs)) * 2) / 2;
+  const limit = scaleLimit;
   const py = value => bottom - (value + limit) / (2 * limit) * (bottom - top);
   const sy = value => bottom - value * (bottom - top);
   const text = (x,y,value,fill=colors.ink,anchor='middle') => `<text x="${x}" y="${y}" fill="${fill}" text-anchor="${anchor}" font-size="${font}">${value}</text>`;
@@ -172,7 +182,7 @@ function render() {
   $('lambda-value').value = Number($('lambda').value).toFixed(2);
   $('epsilon-value').value = Number($('epsilon').value).toFixed(2);
   $('equation').innerHTML = gated ? 'h⟨t⟩ = (1 − <span class="parameter">z⟨t⟩</span>) h⟨t−1⟩ + <span class="parameter">z⟨t⟩</span> x⟨t⟩' : 'h⟨t⟩ = <span class="parameter">λ</span> h⟨t−1⟩ + x⟨t⟩';
-  $('probe-note').innerHTML = gated ? 'Gate <span class="parameter">z = 1</span> writes the cue; <span class="parameter">z = ε</span> otherwise, including the zero-input probe.' : 'Start with state 0. The cue is 1 at step 3. At step 39, input is 0; update, then read the state.';
+  $('probe-note').innerHTML = gated ? '<span class="parameter">z = 1</span> at cue; <span class="parameter">z = ε</span> otherwise. Probe: x = 0, then update and read.' : 'Start with state 0. Cue: x = 1 at step 3. Probe: x = 0 at 39, then update and read.';
   $('weights-caption').textContent = gated ? 'a linear recurrence is attention whose weights are set by the input (selection)' : 'a linear recurrence is attention whose weights are set by distance';
   result = computeModel();
   buttons.forEach((button,t) => {
@@ -186,7 +196,7 @@ function render() {
   drawChart();
 }
 ['lambda','epsilon','gate'].forEach(id => $(id).addEventListener('input',render));
-$('reseed').addEventListener('click', () => {seed = (seed + 1) >>> 0; inputs = makeInputs(seed); render();});
+$('reseed').addEventListener('click', () => {seed = (seed + 1) >>> 0; inputs = makeInputs(seed); scaleLimit = plotLimit(); render();});
 new ResizeObserver(drawChart).observe($('chart').parentElement);
 render();
 </script>
