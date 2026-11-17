@@ -13,7 +13,7 @@
 <h2 id="heading-3">Finish the sentence</h2>
 <blockquote>He spread the warm bread with ___</blockquote>
 <ul>
-<li>Most of you thought <em>butter</em>. A language model makes the same guess: it gives a probability to every word that could come next</li>
+<li>Most of you thought <em>butter</em>: you predicted the next word, the job our language models have done for the last two lectures</li>
 <li>Kutas and Hillyard ended the sentence with <em>socks</em>. In the <strong>EEG</strong>, recorded from electrodes on the scalp, the unexpected word gives a larger response about 400 ms later: the <strong>N400</strong></li>
 <li>Today: what a next-word predictor learns when trained on trillions of words, and whether its predictions match how people read and how the brain responds</li>
 </ul>
@@ -24,20 +24,21 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="5" data-marpit-pagination-total="36" aria-labelledby="heading-5"><p class="page">Slide 5</p>
 <h2 id="heading-5">Where we left off</h2>
 <ul>
-<li>Last lecture: tokens → embeddings → <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math> <strong>blocks</strong> (attention + a small network) → logits → softmax → probabilities for the next symbol</li>
-<li>To generate text, sample a symbol from those probabilities, append it to the input, and run the model again</li>
-<li>To train, the target at each position is the next symbol of the text itself, so any text can be used without labels (<strong>self-supervised</strong>)</li>
-<li>Two things change today: the symbols (<strong>word pieces</strong> instead of characters) and the <strong>scale</strong>: billions of weights trained on trillions of tokens. Llama 3 read about 15 trillion tokens, more than a hundred million books</li>
-<li>What does that scale give the model, and what does it tell us about human language?</li>
+<li>Last lecture: a transformer that predicts the next symbol (tokens → embeddings → <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math> <strong>blocks</strong> → logits → probabilities). To generate text, sample a symbol, append it to the input, and run the model again</li>
+<li>What made this work is <strong>self-supervised</strong> training: the target at each position is simply the next symbol of the text, so no one has to label anything</li>
+<li><mark>Any text becomes training data</mark>, and there is far more text than labeled data: ImageNet has 1.3 million labeled images</li>
+<li>Llama 3 read about 15 trillion tokens, about 11 trillion words: roughly as many words as in every book ever published (about 130 million books). Frontier models now train on a large share of all public text, estimated at about 300 trillion tokens</li>
+<li>Today: the same objective with <strong>word pieces</strong> instead of characters, at that scale. What does the model gain, and what does it tell us about human language?</li>
 </ul>
+<div class="ref"><a href="https://arxiv.org/abs/2407.21783" rel="noopener">Grattafiori et al. <b>arXiv 2024</b></a> · <a href="https://arxiv.org/abs/2211.04325" rel="noopener">Villalobos et al. <b>ICML 2024</b></a></div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="6" data-marpit-pagination-total="36" aria-labelledby="heading-6"><p class="page">Slide 6</p>
 <h2 id="heading-6">Scaling laws: the loss falls smoothly with size</h2>
 <div class="capfig figbox">
 <figure><img src="../images/L16/pub_kaplan2020_fig1_scaling_laws.png" alt="Figure 1 of Kaplan et al.: three log-log panels of test loss against compute, dataset size and parameters, each a straight line, a power law, over several orders of magnitude; the fitted exponents are minus 0.050, minus 0.095 and minus 0.076" aria-describedby="figure-6-1"><figcaption id="figure-6-1"><p>Figure 1 of Kaplan et al.: three log-log panels of test loss against compute, dataset size and parameters, each a straight line, a power law, over several orders of magnitude; the fitted exponents are minus 0.050, minus 0.095 and minus 0.076</p><a href="../images/L16/pub_kaplan2020_fig1_scaling_laws.png">Open full-size figure</a></figcaption></figure>
 </div>
 <ul>
-<li>Test loss falls as a <strong>power law</strong> in compute, in data and in parameters: a straight line on log–log axes, over many orders of magnitude. At a fixed size, changing a model's depth or width barely changes the loss</li>
-<li>With a fixed compute budget, parameters and training tokens should grow <strong>together</strong>. Chinchilla (70 B parameters, 1.4 T tokens) beat Gopher (280 B parameters, 300 B tokens)</li>
+<li><strong>Test loss</strong>: the cross-entropy of the next-token predictions on text the model never trained on. It falls as a <strong>power law</strong> in compute, data and parameters: a straight line on log–log axes</li>
+<li>For a fixed compute budget, grow parameters and tokens <strong>together</strong>: Chinchilla (70 B, 1.4 T tokens) beat Gopher (280 B, 300 B tokens)</li>
 <li><mark>The law predicts the loss, not what the model can do</mark></li>
 </ul>
 <div class="ref"><a href="https://arxiv.org/abs/2001.08361" rel="noopener">Kaplan et al. <b>arXiv 2020</b></a> · <a href="https://arxiv.org/abs/2203.15556" rel="noopener">Hoffmann et al. <b>NeurIPS 2022</b></a> · <a href="https://arxiv.org/abs/2304.15004" rel="noopener">Schaeffer, Miranda &amp; Koyejo <b>NeurIPS 2023</b></a></div>
