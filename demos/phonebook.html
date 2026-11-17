@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Can it quote? A phone-book retrieval experiment</title>
+<style>
+  :root{--ink:#1E293B;--taupe:#8A7E70;--mag:#B5396B;--grn:#3F7A6B;--blue:#3E6D8E;--gold:#F2C14E;--bg:#FDFBF7;--mute:#C9C2B8}
+  *{box-sizing:border-box}
+  body{margin:0;font:20px/1.2 Lora,Georgia,serif;color:var(--ink);background:var(--bg)}
+  .page{max-width:1600px;margin:auto;padding:10px;display:grid;gap:8px;grid-template-rows:296px minmax(250px,1fr) auto auto}
+  h1,h2,p{margin:0} h2{font-size:22px;font-weight:600}
+  .panel,.controls,footer{font-family:Poppins,system-ui,sans-serif}
+  .charts{display:grid;grid-template-columns:1fr 1.12fr;gap:12px;min-width:0}
+  .panel{min-width:0;min-height:0;background:white;border-radius:10px;box-shadow:0 1px 6px #00000016;padding:8px 10px}
+  .chart-panel{display:flex;flex-direction:column;gap:4px}
+  svg{display:block;width:100%;overflow:visible;flex-shrink:0;font:20px Poppins,system-ui,sans-serif}
+  #accuracy{height:190px} #positions{height:129px}
+  .caption,.finding{font-family:Lora,Georgia,serif}
+  .finding{line-height:1.1}
+  .replay{display:flex;flex-direction:column;gap:6px}
+  .controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .controls h2{margin-right:auto}
+  #sizes{display:flex;gap:4px;align-items:center}
+  button{font:inherit;font-size:20px;line-height:1.1;padding:5px 9px;border:1px solid transparent;border-radius:7px;background:#EDE7DE;color:var(--ink);cursor:pointer}
+  button[aria-pressed="true"]{background:var(--gold);border-color:var(--ink)}
+  button:hover{border-color:var(--taupe)}
+  :focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  #trial-label{min-width:126px;text-align:center;font-variant-numeric:tabular-nums}
+  .question{font-family:Lora,Georgia,serif;font-size:22px}
+  .replay-body{display:grid;grid-template-columns:0.95fr 1.4fr;gap:12px;min-height:0;flex:1}
+  .book-column{display:flex;flex-direction:column;min-height:0;gap:4px}
+  .key{font-size:20px}
+  .gold{background:var(--gold);padding:0 3px}
+  #book{overflow:auto;min-height:0;flex:1;border:1px solid var(--mute);border-radius:6px;scrollbar-gutter:stable;padding:5px}
+  .entry{position:relative;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:7px;margin:3px 4px;padding:4px 9px;line-height:1.2;border-radius:3px;font-size:20px}
+  .entry.asked{background:var(--gold)}
+  .position{color:#63594E;font-variant-numeric:tabular-nums}
+  .number{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .answer-list{display:grid;grid-template-rows:repeat(3,1fr);gap:4px;min-width:0}
+  .answer{display:grid;grid-template-columns:170px minmax(0,1fr);gap:2px 8px;align-content:center;border-left:4px solid var(--model);padding:2px 8px;background:#FDFBF7;min-width:0}
+  .model{color:var(--model);font-weight:600;white-space:nowrap}
+  .verbatim{white-space:pre-wrap;overflow-wrap:anywhere;font-family:Lora,Georgia,serif}
+  .origin{grid-column:2;font-family:Lora,Georgia,serif}
+  .try{padding:0 3px;line-height:1.15}
+  footer{font-size:20px;line-height:1.1;color:#63594E;overflow-wrap:anywhere}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+  body.embed{overflow:hidden;height:100vh}
+  body.embed .page{height:100%;max-width:none;grid-template-rows:296px minmax(0,1fr) 23px 22px}
+  body.embed .replay-body{grid-template-rows:minmax(0,1fr)}
+  body.embed #book{flex-basis:0;height:0}
+  body.embed .try,body.embed footer{white-space:nowrap}
+  @media(max-width:900px){
+    body:not(.embed) .page{display:flex;flex-direction:column}
+    body:not(.embed) .charts{grid-template-columns:1fr}
+    body:not(.embed) .replay-body{grid-template-columns:1fr}
+    body:not(.embed) #book{height:220px;flex:auto}
+    body:not(.embed) .answer-list{gap:8px}
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <h1 class="sr-only">Can it quote? A phone-book retrieval experiment</h1>
+  <div class="charts">
+    <section class="panel chart-panel" aria-labelledby="accuracy-title">
+      <h2 id="accuracy-title">Accuracy vs list length</h2>
+      <svg id="accuracy" role="img" aria-label="Recorded fraction correct by phone-book length, on a logarithmic horizontal axis."></svg>
+      <p class="caption">Attention can look up the exact entry. Here, a few attention layers in the hybrid are enough.</p>
+    </section>
+    <section class="panel chart-panel" aria-labelledby="positions-title">
+      <h2 id="positions-title">Which entry did it give?</h2>
+      <p>Returned − asked position; bar height = trial count.</p>
+      <svg id="positions" role="img" aria-label="Histograms of returned minus asked position, with a separate count for answers not in the book."></svg>
+      <p class="finding">On short lists (5–20 entries), 29 of 34 recurrent errors give a real number belonging to someone <strong>later</strong> in the list: recent entries crowd out older ones. On long lists (100+), it mostly gives a number <strong>not in the book</strong>.</p>
+    </section>
+  </div>
+  <section class="panel replay" aria-labelledby="replay-title">
+    <div class="controls">
+      <h2 id="replay-title">One question, replayed</h2>
+      <div id="sizes" role="group" aria-label="Phone-book length"><span>N =</span></div>
+      <button id="previous" type="button" aria-label="Previous question">◀</button>
+      <span id="trial-label"></span>
+      <button id="next" type="button" aria-label="Next question">▶</button>
+    </div>
+    <p id="question" class="question" aria-live="polite"></p>
+    <div class="replay-body">
+      <div class="book-column">
+        <p class="key"><span class="gold">Gold = asked</span>; outlines = models’ returned entries.</p>
+        <div id="book" tabindex="0" role="region" aria-label="Phone book, scroll to inspect entries"></div>
+      </div>
+      <div id="answers" class="answer-list" aria-label="Recorded model answers"></div>
+    </div>
+  </section>
+  <p class="try"><strong>Try this:</strong> Start at N = 3, then 20, then 200. Look where the recurrent model’s wrong answers come from; compare the hybrid. Use ◀ ▶ to try another question.</p>
+  <footer id="provenance"></footer>
+</main>
+<script src="phonebook_runs.js"></script>
+<script>
+(() => {
+  'use strict';
+  if (new URLSearchParams(location.search).get('embed') === '1') document.body.classList.add('embed');
+  const data = window.PHONEBOOK;
+  const models = [
+    {key:'transformer', label:'Transformer', color:'#3E6D8E', shape:'circle'},
+    {key:'recurrent', label:'Recurrent', color:'#B5396B', shape:'square'},
+    {key:'hybrid', label:'Hybrid', color:'#3F7A6B', shape:'triangle'}
+  ];
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const groups = new Map(data.sizes.map(n => [n, data.items.flatMap((item,i) => item.n === n ? [i] : [])]));
+  let size = 20, trial = Math.max(0, groups.get(20).findIndex(i => !data.answers.recurrent[i].correct));
+  function svgNode(parent, tag, attrs, text) {
+    const node = document.createElementNS(NS, tag);
+    for (const [key,value] of Object.entries(attrs)) node.setAttribute(key,value);
+    if (text !== undefined) node.textContent = text;
+    parent.append(node); return node;
+  }
+  function line(parent,x1,y1,x2,y2,color,width=1,extra={}) {
+    return svgNode(parent,'line',{x1,y1,x2,y2,stroke:color,'stroke-width':width,...extra});
+  }
+  function label(parent,x,y,text,attrs={}) {
+    return svgNode(parent,'text',{x,y,fill:'#1E293B',...attrs},text);
+  }
+  function marker(parent,model,x,y,attrs={}) {
+    const common={fill:'#fff',stroke:model.color,'stroke-width':2,...attrs};
+    if (model.shape === 'circle') return svgNode(parent,'circle',{cx:x,cy:y,r:5,...common});
+    if (model.shape === 'square') return svgNode(parent,'rect',{x:x-5,y:y-5,width:10,height:10,...common});
+    return svgNode(parent,'path',{d:`M ${x} ${y-6} L ${x+6} ${y+5} L ${x-6} ${y+5} Z`,...common});
+  }
+  function prepare(id) {
+    const svg=$(id), width=svg.getBoundingClientRect().width, height=svg.getBoundingClientRect().height;
+    svg.replaceChildren(); svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
+    return {svg,width,height};
+  }
+  function drawAccuracy() {
+    const {svg,width,height}=prepare('accuracy');
+    const left=44,right=width-155,top=17,bottom=height-53;
+    const logMin=Math.log(data.sizes[0]),logMax=Math.log(data.sizes.at(-1));
+    const x=n=>left+(Math.log(n)-logMin)/(logMax-logMin)*(right-left);
+    const y=a=>bottom-a*(bottom-top);
+    [0,0.5,1].forEach(a=>{
+      line(svg,left,y(a),right,y(a),'#E6E0D7');
+      label(svg,left-9,y(a)+7,String(a),{'text-anchor':'end'});
+    });
+    line(svg,x(size),top-6,x(size),bottom,'#F2C14E',3);
+    data.sizes.forEach(n=>{
+      line(svg,x(n),bottom,x(n),bottom+5,'#8A7E70');
+      label(svg,x(n),bottom+26,String(n),{'text-anchor':'middle'});
+    });
+    label(svg,(left+right)/2,height-2,'List length N (log scale)',{'text-anchor':'middle'});
+    // Draw nested, differently shaped markers so coincident model scores remain visible.
+    [models[0],models[2],models[1]].forEach(model=>{
+      const points=data.sizes.map(n=>`${x(n)},${y(data.accuracy[model.key][n])}`).join(' ');
+      svgNode(svg,'polyline',{points,fill:'none',stroke:model.color,'stroke-width':2.5,
+        'stroke-dasharray':model.key==='hybrid'?'7 4':'none','data-model':model.key});
+      data.sizes.forEach(n=>{
+        const point=marker(svg,model,x(n),y(data.accuracy[model.key][n]),{
+          'data-model':model.key,'data-n':n,'data-accuracy':data.accuracy[model.key][n],
+          ...(model.key==='transformer'?{r:8}:{})
+        });
+        svgNode(point,'title',{},`${model.label}, N=${n}: ${data.accuracy[model.key][n]*100}% correct`);
+      });
+      const lastY=y(data.accuracy[model.key][data.sizes.at(-1)]);
+      const labelY=model.key==='transformer'?top+3:model.key==='hybrid'?top+35:bottom-3;
+      line(svg,right+9,lastY,right+22,labelY-5,model.color,1.5);
+      label(svg,right+26,labelY,model.label,{fill:model.color});
+    });
+    svg.setAttribute('aria-label','Fraction correct; logarithmic list length. '+models.map(m=>m.label+': '+data.sizes.map(n=>`N ${n}, ${Math.round(data.accuracy[m.key][n]*100)} percent`).join('; ')).join('. '));
+  }
+  function drawPositions() {
+    const {svg,width,height}=prepare('positions');
+    const left=143,right=width-125,mid=(left+right)/2,half=(right-left)/2;
+    const max=size-1, step=Math.max(1,Math.ceil(max/4));
+    const x=delta=>mid+delta/max*half;
+    const indices=groups.get(size), summaries=[];
+    label(svg,width-2,18,'Not in book',{'text-anchor':'end'});
+    models.forEach((model,m)=>{
+      const baseline=39+m*32, counts=new Map(); let outside=0;
+      indices.forEach(i=>{
+        const answer=data.answers[model.key][i];
+        if(answer.returned_pos<0){outside++;return;}
+        const delta=answer.returned_pos-data.items[i].pos;
+        const bin=delta===0?0:Math.sign(delta)*Math.ceil(Math.abs(delta)/step);
+        counts.set(bin,(counts.get(bin)||0)+1);
+      });
+      label(svg,0,baseline-2,model.label,{fill:model.color});
+      line(svg,left,baseline,right,baseline,'#C9C2B8');
+      line(svg,mid,baseline-27,mid,baseline+2,'#8A7E70',1,{'stroke-dasharray':'3 2'});
+      const binWidth=Math.min(24,half/(Math.ceil(max/step)+1));
+      for(const [bin,count] of counts){
+        const low=bin===0?0:(Math.abs(bin)-1)*step+1;
+        const high=bin===0?0:Math.min(Math.abs(bin)*step,max);
+        const delta=bin===0?0:Math.sign(bin)*(low+high)/2;
+        const bar=svgNode(svg,'rect',{x:x(delta)-binWidth/2,y:baseline-count/indices.length*26,
+          width:binWidth,height:count/indices.length*26,fill:model.color,'data-model':model.key,'data-bin':bin,'data-count':count});
+        svgNode(bar,'title',{},`${model.label}: ${count} trials, ${bin===0?'exact position':`${low}–${high} positions ${bin>0?'later':'earlier'}`}`);
+      }
+      label(svg,width-42,baseline-2,`${outside}/${indices.length}`,{'text-anchor':'middle',fill:model.color});
+      summaries.push(`${model.label}: ${outside} of ${indices.length} not in the book; `+Array.from(counts,([bin,count])=>`${count} at ${bin===0?'the asked position':`${(Math.abs(bin)-1)*step+1} to ${Math.min(Math.abs(bin)*step,max)} positions ${bin>0?'later':'earlier'}`}`).join(', '));
+    });
+    label(svg,left,height-4,`−${max}`,{'text-anchor':'middle'});
+    label(svg,mid,height-4,'0',{'text-anchor':'middle'});
+    label(svg,right,height-4,`+${max}`,{'text-anchor':'middle'});
+    svg.setAttribute('aria-label',`N=${size}. Histograms of returned minus asked position. Negative means earlier; positive means later. Each model uses the same count scale, from 0 to ${indices.length} trials. `+summaries.join('. '));
+  }
+  function replay() {
+    const indices=groups.get(size),index=indices[trial],item=data.items[index];
+    $('trial-label').textContent=`Trial ${trial+1} / ${indices.length}`;
+    $('question').textContent=`What is the phone number of ${item.name}?`;
+    $('book').replaceChildren(); $('answers').replaceChildren();
+    item.book.forEach(([name,number],pos)=>{
+      const row=document.createElement('div'); row.className='entry'+(pos===item.pos?' asked':'');row.dataset.pos=pos;
+      const returned=models.filter(m=>data.answers[m.key][index].returned_pos===pos);
+      row.style.boxShadow=returned.map((m,i)=>`0 0 0 ${(i+1)*2}px ${m.color}`).join(',');
+      row.setAttribute('aria-label',`Position ${pos}, ${name}, ${number}${pos===item.pos?', asked entry':''}${returned.length?', returned by '+returned.map(m=>m.label).join(', '):''}`);
+      for(const [value,cls] of [[pos,'position'],[name,'name'],[number,'number']]){
+        const span=document.createElement('span');span.className=cls;span.textContent=value;row.append(span);
+      }
+      $('book').append(row);
+    });
+    models.forEach(model=>{
+      const answer=data.answers[model.key][index],card=document.createElement('div');
+      card.className='answer';card.style.setProperty('--model',model.color);card.dataset.model=model.key;
+      const name=document.createElement('div');name.className='model';name.textContent=`${model.label} ${answer.correct?'✓':'✗'}`;
+      name.setAttribute('aria-label',`${model.label}: ${answer.correct?'correct':'incorrect'}`);
+      const verbatim=document.createElement('div');verbatim.className='verbatim';verbatim.textContent=answer.answer;
+      const origin=document.createElement('div');origin.className='origin';
+      origin.textContent=answer.returned_pos<0?'Not in the book':answer.returned_pos===item.pos?`Asked entry · position ${item.pos}`:`Position ${answer.returned_pos} · ${Math.abs(answer.returned_pos-item.pos)} ${answer.returned_pos>item.pos?'later':'earlier'}`;
+      card.append(name,verbatim,origin);$('answers').append(card);
+    });
+    document.querySelectorAll('[data-size]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.size)===size)));
+    const asked=$('book').querySelector('.asked');
+    $('book').scrollTop=asked.offsetTop-$('book').offsetTop-($('book').clientHeight-asked.offsetHeight)/2;
+    drawAccuracy(); drawPositions();
+  }
+  data.sizes.forEach(n=>{
+    const button=document.createElement('button');button.type='button';button.textContent=n;button.dataset.size=n;
+    button.setAttribute('aria-label',`${n} entries`);button.setAttribute('aria-pressed',String(n===size));
+    button.addEventListener('click',()=>{size=n;trial=0;replay();});$('sizes').append(button);
+  });
+  function changeTrial(delta){trial=(trial+delta+groups.get(size).length)%groups.get(size).length;replay();}
+  $('previous').addEventListener('click',()=>changeTrial(-1));
+  $('next').addEventListener('click',()=>changeTrial(1));
+  $('sizes').addEventListener('keydown',event=>{
+    if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+    event.preventDefault();const buttons=Array.from($('sizes').querySelectorAll('button'));
+    const current=buttons.indexOf(document.activeElement);if(current<0)return;
+    const next=event.key==='Home'?0:event.key==='End'?buttons.length-1:(current+(event.key==='ArrowRight'?1:-1)+buttons.length)%buttons.length;
+    buttons[next].focus();buttons[next].click();
+  });
+  const modelLine=document.createElement('div');
+  modelLine.textContent=`${data.models.transformer} (attention only) · Falcon3-Mamba-7B-Instruct (no attention) · ${data.models.hybrid} (hybrid)`;
+  modelLine.title=Object.values(data.models).join(' · ');
+  const runLine=document.createElement('div');runLine.textContent=`Greedy decoding · ${data.generated} · recorded on a laptop with Ollama;`;
+  const rerunLine=document.createElement('div');rerunLine.textContent='rerun with 2026/figures/run_L18_phonebook.py';
+  if (document.body.classList.contains('embed')) {
+    document.querySelector('.try').innerHTML='<strong>Try this:</strong> Compare N = 3, 20, 200. Where do recurrent errors come from? Compare the hybrid. Use ◀ ▶ for another question.';
+    $('provenance').textContent=`${data.models.transformer} · Falcon3-Mamba-7B-Instruct · ${data.models.hybrid} · greedy decoding · ${data.generated}`;
+    $('provenance').title=modelLine.title;
+  } else {
+    $('provenance').append(modelLine,runLine,rerunLine);
+  }
+  replay();
+  new ResizeObserver(()=>{drawAccuracy();drawPositions();}).observe(document.querySelector('.charts'));
+})();
+</script>
+</body>
+</html>
