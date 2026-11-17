@@ -1,0 +1,303 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Large language models and the brain · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Large language models and the brain</h1><p>Reader-friendly version of the 35 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L17_llms-language-brain.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Large language models and the brain</a></li><li><a href="#slide-2">Finish the sentence</a></li><li><a href="#slide-3">From a block to a model</a></li><li><a href="#slide-4">Where we left off</a></li><li><a href="#slide-5">What scale buys: a smooth law for the loss</a></li><li><a href="#slide-6">From characters to word pieces</a></li><li><a href="#slide-7">In-context learning</a></li><li><a href="#slide-8">The same thing in a model you can run</a></li><li><a href="#slide-9">In-context learning: a mechanism you have seen</a></li><li><a href="#slide-10">The same recipe in real systems</a></li><li><a href="#slide-11">Large language models, as of November 2026</a></li><li><a href="#slide-12">Alignment: from autocomplete to assistant</a></li><li><a href="#slide-13">Every prompt is in-context learning</a></li><li><a href="#slide-14">A model of the reader, and of the brain?</a></li><li><a href="#slide-15">Surprisal: a theory of reading, a quantity from the model</a></li><li><a href="#slide-16">Surprisal from a real model, token by token</a></li><li><a href="#slide-17">Against human readers: bigger is not better</a></li><li><a href="#slide-18">Better language model, better brain model?</a></li><li><a href="#slide-19">Using the model to control the brain</a></li><li><a href="#slide-20">Language models and the brain: current readings</a></li><li><a href="#slide-21">The assistant you may use on the project</a></li><li><a href="#slide-22">The brain as a prediction machine</a></li><li><a href="#slide-23">Predictive coding: the core claim</a></li><li><a href="#slide-24">Testing it with a language model</a></li><li><a href="#slide-25">Predictive coding and autoencoders</a></li><li><a href="#slide-26">Open questions</a></li><li><a href="#slide-27">Recap</a></li><li><a href="#slide-28">For your final project</a></li><li><a href="#slide-29">Going further</a></li><li><a href="#slide-30">Rao &amp; Ballard (1999)</a></li><li><a href="#slide-31">The predictive-coding equations</a></li><li><a href="#slide-32">Predictive coding as a deep net: PredNet</a></li><li><a href="#slide-33">Is backprop biologically plausible?</a></li><li><a href="#slide-34">Further reading for the research trail</a></li><li><a href="#slide-35">Minute paper</a></li></ol></nav><section id="slide-1" data-class="lectitle" data-lang="en" lang="en" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+  <img src="../images/brown-crest-color.png" alt="Brown University crest">
+  <div class="vrule"></div>
+  <div>
+    <span class="code">CPSY 1291</span>
+    <span class="name">Computational Methods for Mind, Brain &amp; Behavior</span>
+  </div>
+</div>
+<div class="eyebrow">Lecture 17 · Theme 3: Dynamics, sequences &amp; world models</div>
+<h2 id="heading-1">Large language models and the brain</h2>
+<p class="meta">Tuesday, November 17 · Fall 2026</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="2" data-marpit-pagination-total="35" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<h2 id="heading-2">Finish the sentence</h2>
+<blockquote>
+<p>He spread the warm bread with ___</p>
+</blockquote>
+<ul>
+<li>You predicted <strong>butter</strong> before you read the blank. A language model does the same: it gives a probability to every possible next word</li>
+<li>Had the word been <strong>socks</strong>, your brain would have responded about 400 ms later with the <strong>N400</strong>, a negative wave in the <strong>EEG</strong>, the electrical activity recorded from electrodes on the scalp</li>
+<li>Today: what next-word prediction at scale builds, and whether it describes how people read and how the brain predicts</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1126/science.7350657" rel="noopener">Kutas &amp; Hillyard <b>Science 1980</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="3" data-marpit-pagination-total="35" aria-labelledby="heading-3"><p class="page">Slide 3</p>
+<h2 id="heading-3">From a block to a model</h2>
+<p>The same transformer, trained on more text than anyone could read</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="4" data-marpit-pagination-total="35" aria-labelledby="heading-4"><p class="page">Slide 4</p>
+<h2 id="heading-4">Where we left off</h2>
+<ul>
+<li>Last lecture, the whole pipeline: tokens → embeddings → <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math> <strong>blocks</strong> (attention + a small network) → logits → softmax → next-symbol probabilities; to write, <strong>sample, append, repeat</strong>.</li>
+<li>The objective does not change: predict the next symbol, <strong>self-supervised</strong>, so <mark>every document is its own training signal</mark>; by the chain rule, a next-symbol predictor assigns a probability to a whole text</li>
+<li><strong>Scaling laws:</strong> the loss falls as a predictable <strong>power law</strong> in parameters, data and compute (a straight line on log–log axes). Llama 3 was trained on about 15 trillion tokens, about 11 trillion words: over a hundred million books</li>
+<li>Two things change today: the symbols (<strong>word pieces</strong> instead of characters) and the <strong>scale</strong> (billions of weights, trillions of tokens)</li>
+<li>What does scale buy, and what does the result tell us about human language?</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="5" data-marpit-pagination-total="35" aria-labelledby="heading-5"><p class="page">Slide 5</p>
+<h2 id="heading-5">What scale buys: a smooth law for the loss</h2>
+<div class="capfig figbox">
+<figure><img src="../images/L16/pub_kaplan2020_fig1_scaling_laws.png" alt="Figure 1 of Kaplan et al.: three log-log panels of test loss against compute, dataset size and parameters, each a straight line, a power law, over several orders of magnitude; the fitted exponents are minus 0.050, minus 0.095 and minus 0.076" aria-describedby="figure-5-1"><figcaption id="figure-5-1"><p>Figure 1 of Kaplan et al.: three log-log panels of test loss against compute, dataset size and parameters, each a straight line, a power law, over several orders of magnitude; the fitted exponents are minus 0.050, minus 0.095 and minus 0.076</p><a href="../images/L16/pub_kaplan2020_fig1_scaling_laws.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Test loss falls as a <strong>power law</strong> in compute, data and parameters, over seven orders of magnitude; at a fixed size, depth against width barely matters</li>
+<li>For a fixed budget, grow parameters and data <strong>together</strong>: Chinchilla, a 70 B model trained on 1.4 T tokens, beat the 280 B Gopher. <mark>The law predicts the loss, not what the model can do</mark></li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2001.08361" rel="noopener">Kaplan et al. <b>arXiv 2020</b></a> · <a href="https://arxiv.org/abs/2203.15556" rel="noopener">Hoffmann et al. <b>NeurIPS 2022</b></a> · <a href="https://arxiv.org/abs/2304.15004" rel="noopener">Schaeffer, Miranda &amp; Koyejo <b>NeurIPS 2023</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="6" data-marpit-pagination-total="35" aria-labelledby="heading-6"><p class="page">Slide 6</p>
+<h2 id="heading-6">From characters to word pieces</h2>
+<ul>
+<li>Large models read <strong>tokens</strong>: entries of a fixed vocabulary of <strong>word pieces</strong>, learned from text by <strong>byte-pair encoding</strong> (BPE)</li>
+<li>BPE starts from the 256 single bytes and repeatedly merges the most frequent adjacent pair into a new piece, until the vocabulary has the size asked for</li>
+<li>Common words become one piece; rare ones split. GPT-2's vocabulary (50,257 pieces): <code> neuroscience</code> is one piece · <code>unbelievable</code> → <code>un</code> + <code>bel</code> + <code>iev</code> + <code>able</code> · <code>Mulroney</code> → <code>Mul</code> + <code>r</code> + <code>oney</code> · the invented <code>Zorblat</code> → <code>Z</code> + <code>or</code> + <code>bl</code> + <code>at</code></li>
+<li>Vocabulary sizes: 50,257 pieces for GPT-2; about 128,000 for Llama 3. Rule of thumb for English: 1 token ≈ 0.75 words</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/1508.07909" rel="noopener">Sennrich, Haddow &amp; Birch <b>ACL 2016</b></a> · <a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf" rel="noopener">Radford et al. <b>OpenAI 2019</b></a> · <a href="https://arxiv.org/abs/2407.21783" rel="noopener">Grattafiori et al. <b>arXiv 2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="7" data-marpit-pagination-total="35" aria-labelledby="heading-7"><p class="page">Slide 7</p>
+<h2 id="heading-7">In-context learning</h2>
+<div class="capfig figbox">
+<figure><img src="../images/2026-11-24/s22_img01.png" alt="Accuracy against the number of examples in the prompt, from zero-shot through one-shot to few-shot, for three GPT-3 sizes. The 175-billion-parameter model climbs from under to about 67%; the 13-billion model reaches about and the 1.3-billion model stays below 5%. Solid lines add a natural-language description of the task, dashed lines do not" aria-describedby="figure-7-1"><figcaption id="figure-7-1"><p>Accuracy against the number of examples in the prompt, from zero-shot through one-shot to few-shot, for three GPT-3 sizes. The 175-billion-parameter model climbs from under to about 67%; the 13-billion model reaches about and the 1.3-billion model stays below 5%. Solid lines add a natural-language description of the task, dashed lines do not</p><a href="../images/2026-11-24/s22_img01.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Put a few input→output examples in the <strong>prompt</strong> and the model does the task: <strong>zero-shot</strong> (a description only), <strong>one-shot</strong> (one example), <strong>few-shot</strong> (a handful). More examples → better, all at inference; the model's <span class="pop">weights stay frozen</span></li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2005.14165" rel="noopener">Brown et al. <b>NeurIPS 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-class="prov-air" data-lang="en" lang="en" data-marpit-pagination="8" data-marpit-pagination-total="35" aria-labelledby="heading-8"><p class="page">Slide 8</p>
+<h2 id="heading-8">The same thing in a model you can run</h2>
+<div class="capfig figbox">
+<figure><img src="../images/L18/real_icl.svg" alt="Antonyms correct in percent against the number of solved examples in the prompt, 0, 1, 2, 4 and 8, for GPT-2 small, medium and large. Small stays below 10 percent at every count. Medium rises from 0 to 22, 64, 88 and 94 percent; large from 4 to 25, 81, 92 and 96 percent" aria-describedby="figure-8-1"><figcaption id="figure-8-1"><p>Antonyms correct in percent against the number of solved examples in the prompt, 0, 1, 2, 4 and 8, for GPT-2 small, medium and large. Small stays below 10 percent at every count. Medium rises from 0 to 22, 64, 88 and 94 percent; large from 4 to 25, 81, 92 and 96 percent</p><a href="../images/L18/real_icl.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<p class="provenance">Real computation: GPT-2 small, medium and large, weights as trained · 32 antonym pairs, 24 test words × 3 random orders per point</p>
+<ul>
+<li>Prompt: <code>hot -&gt; cold</code>, <code>big -&gt; small</code>, … then <code>wet -&gt;</code>. <mark>With eight examples, GPT-2 medium and large answer 94–96% of antonyms</mark>; GPT-2 small never gets the task. No weight changed</li>
+</ul>
+<div class="ref"><a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf" rel="noopener">Radford et al. <b>OpenAI 2019</b></a> · <a href="https://arxiv.org/abs/2005.14165" rel="noopener">Brown et al. <b>NeurIPS 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="9" data-marpit-pagination-total="35" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<h2 id="heading-9">In-context learning: a mechanism you have seen</h2>
+<ul>
+<li>Nobody trained for it: it appears from next-token prediction at scale</li>
+<li>One circuit behind it is the <strong>induction head</strong> from the lecture on building a language model: at a repeated word, read what followed that word last time, and copy it. Induction heads form abruptly during training, at the point where in-context learning improves</li>
+<li>A forward pass can run a <strong>learning algorithm</strong>: one attention layer can take a gradient step on the examples in its context, and transformers trained on regression tasks match gradient descent or ridge regression</li>
+<li><mark>Learning on a fast timescale without changing a weight</mark>: activity, not synapses, carries the new task</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2209.11895" rel="noopener">Olsson et al. <b>Transformer Circuits 2022</b></a> · <a href="https://arxiv.org/abs/2211.15661" rel="noopener">Akyürek et al. <b>ICLR 2023</b></a> · <a href="https://arxiv.org/abs/2212.07677" rel="noopener">von Oswald et al. <b>ICML 2023</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="10" data-marpit-pagination-total="35" aria-labelledby="heading-10"><p class="page">Slide 10</p>
+<h2 id="heading-10">The same recipe in real systems</h2>
+<p>What a 2026 model is, and what every prompt does</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="11" data-marpit-pagination-total="35" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<h2 id="heading-11">Large language models, as of November 2026</h2>
+<ul>
+<li><strong>GPT-2</strong> (2019, 1.5B parameters) → <strong>GPT-3</strong> (2020, 175B): prompting with a few examples works</li>
+<li><strong>ChatGPT</strong> (Nov 2022): a pretrained model fine-tuned to follow instructions</li>
+<li><strong>Reasoning models</strong> (OpenAI o1, 2024; DeepSeek-R1, 2025): trained by reinforcement learning to write long chains of steps before answering</li>
+<li>Many current models are <strong>mixtures of experts</strong>: each token is routed to a few of many MLPs, so only part of the weights run per token</li>
+<li>The same stack reads image patches, audio and video as tokens: <strong>multimodal</strong> models. Context windows grew from 2,048 tokens (GPT-3) to about a million</li>
+<li>Many long-context models are <strong>hybrids</strong>: mostly recurrent layers, a few attention layers (next lecture)</li>
+<li>Open weights: <strong>Llama</strong>, <strong>Qwen</strong>, <strong>Gemma</strong>; <strong>Pythia</strong>, <strong>OLMo</strong> also release data and checkpoints</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2005.14165" rel="noopener">Brown et al. <b>NeurIPS 2020</b></a> · <a href="https://doi.org/10.1038/s41586-025-09422-z" rel="noopener">Guo et al. <b>Nature 2025</b></a> · <a href="https://arxiv.org/abs/2403.05530" rel="noopener">Reid et al. <b>arXiv 2024</b></a> · <a href="https://arxiv.org/abs/2504.03624" rel="noopener">Blakeman et al. <b>arXiv 2025</b></a> · <a href="https://arxiv.org/abs/2304.01373" rel="noopener">Biderman et al. <b>ICML 2023</b></a> · <a href="https://arxiv.org/abs/2402.00838" rel="noopener">Groeneveld et al. <b>ACL 2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="12" data-marpit-pagination-total="35" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<h2 id="heading-12">Alignment: from autocomplete to assistant</h2>
+<p>Pretraining gives a next-token predictor, <strong>not</strong> an assistant. Then:</p>
+<ol>
+<li><strong>Supervised fine-tuning</strong> on human-written demonstrations of good answers</li>
+<li><strong>Learning from preferences.</strong> <strong>RLHF</strong> (reinforcement learning from human feedback) fits a reward model to human choices between two answers, then tunes the model by reinforcement learning to score high. <strong>DPO</strong> (direct preference optimization) learns from the same choices directly, with no reward model</li>
+<li><strong>Reinforcement learning from verifiable rewards:</strong> reward answers that a program can check, such as a math result or code that passes its tests. This is how <strong>reasoning models</strong> learn to write out intermediate steps before answering: extra tokens, not extra weights (<strong>test-time compute</strong>)</li>
+</ol>
+<div class="ref"><a href="https://arxiv.org/abs/2203.02155" rel="noopener">Ouyang et al. <b>NeurIPS 2022</b></a> · <a href="https://arxiv.org/abs/2305.18290" rel="noopener">Rafailov et al. <b>NeurIPS 2023</b></a> · <a href="https://arxiv.org/abs/2201.11903" rel="noopener">Wei et al. <b>NeurIPS 2022</b></a> · <a href="https://doi.org/10.1038/s41586-025-09422-z" rel="noopener">Guo et al. <b>Nature 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="13" data-marpit-pagination-total="35" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<h2 id="heading-13">Every prompt is in-context learning</h2>
+<ul>
+<li>What a deployed assistant reads before it answers is one long context: the provider's instructions, your earlier messages, the examples you give, and <strong>retrieved documents</strong>, web pages, files or tool results pasted into the context by the system (<strong>retrieval-augmented generation</strong>)</li>
+<li>Two kinds of knowledge: what the weights learned in pretraining, and what sits in the context right now. Only the second can change during a conversation</li>
+<li><mark>The assistant does not learn from your conversation</mark>: when the context is gone, so is everything in it</li>
+<li>The cost: the keys and values of every token in the context are kept while the model answers, which is why a million-token window is expensive</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2005.14165" rel="noopener">Brown et al. <b>NeurIPS 2020</b></a> · <a href="https://arxiv.org/abs/2005.11401" rel="noopener">Lewis et al. <b>NeurIPS 2020</b></a> · <a href="https://arxiv.org/abs/2403.05530" rel="noopener">Reid et al. <b>arXiv 2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="14" data-marpit-pagination-total="35" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<h2 id="heading-14">A model of the reader, and of the brain?</h2>
+<p>The same next-word probabilities, now compared with people</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="15" data-marpit-pagination-total="35" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<h2 id="heading-15">Surprisal: a theory of reading, a quantity from the model</h2>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">u</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">s</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">l</mi></mrow><mo stretchy="false">(</mo><msub><mi>w</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mi>p</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>w</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>w</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>w</mi><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mtext>&nbsp;bits</mtext></mrow><annotation encoding="application/x-tex">\mathrm{surprisal}(w_i)=-\log_2 p\big(w_i\mid w_1,\dots,w_{i-1}\big)\ \text{bits}
+</annotation></semantics></math></div></span></p><ul>
+<li><strong>Surprisal theory</strong> came first, from psycholinguistics: the <strong>reading time</strong> of a word (how long the eyes rest on it, or how long a reader waits before pressing a key for the next one) grows with its surprisal, linearly in the log of its probability, over several orders of magnitude</li>
+<li>It also predicts the <strong>N400</strong> of the opening sentence: the EEG wave about 400 ms after a word, larger when the word is unexpected</li>
+<li>A language model gives the surprisal of every word in any text, so the theory can be tested at scale</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.3115/1073336.1073357" rel="noopener">Hale <b>NAACL 2001</b></a> · <a href="https://doi.org/10.1016/j.cognition.2007.05.006" rel="noopener">Levy <b>Cognition 2008</b></a> · <a href="https://doi.org/10.1073/pnas.2307876121" rel="noopener">Shain et al. <b>PNAS 2024</b></a> · <a href="https://doi.org/10.1162/nol_a_00105" rel="noopener">Michaelov et al. <b>Neurobiol Lang 2023</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-class="prov-air" data-lang="en" lang="en" data-marpit-pagination="16" data-marpit-pagination-total="35" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<h2 id="heading-16">Surprisal from a real model, token by token</h2>
+<div class="capfig">
+<figure><img src="../images/L18/real_surprisal.svg" alt="Bar chart of surprisal in bits for each token of the sentence My grandmother's recipe calls for two cups of flour and a pinch of salt, three bars per token for GPT-2 small, medium and large. Grandmother is the most surprising token, 14.5 bits for the small model and about 8.5 for the larger two; recipe about 8 to 10 bits; for and the second of are near zero for every model; salt is near zero. Means 4.0, 3.5 and 3.3 bits" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>Bar chart of surprisal in bits for each token of the sentence My grandmother's recipe calls for two cups of flour and a pinch of salt, three bars per token for GPT-2 small, medium and large. Grandmother is the most surprising token, 14.5 bits for the small model and about 8.5 for the larger two; recipe about 8 to 10 bits; for and the second of are near zero for every model; salt is near zero. Means 4.0, 3.5 and 3.3 bits</p><a href="../images/L18/real_surprisal.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<p class="provenance">Real computation: GPT-2 small, medium and large, weights as trained · a dot marks a piece that begins with a space</p>
+<ul>
+<li>Each bar is <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">-\log_2</annotation></semantics></math> of the probability the model gave the token that actually came next. Function words after a verb cost nothing; the content word that opens the sentence costs 14.5 bits. <mark>Bigger model, fewer bits</mark>: 4.0 → 3.5 → 3.3 on average</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="17" data-marpit-pagination-total="35" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<h2 id="heading-17">Against human readers: bigger is not better</h2>
+<div class="capfig figbox">
+<figure><img src="../images/L18/pub_oh2023_fig1_natural_stories.png" alt="Scatter plot of regression log-likelihood gain against perplexity on Natural Stories self-paced reading, for GPT-2 small to XL, five GPT-Neo and eight OPT models with dashed least-squares lines per family. Every family slopes the same way: the smallest models, with the highest perplexity, give the largest gain near 600 to 640, and the largest models, 20 to 66 billion parameters, the smallest, near 380 to 400" aria-describedby="figure-17-1"><figcaption id="figure-17-1"><p>Scatter plot of regression log-likelihood gain against perplexity on Natural Stories self-paced reading, for GPT-2 small to XL, five GPT-Neo and eight OPT models with dashed least-squares lines per family. Every family slopes the same way: the smallest models, with the highest perplexity, give the largest gain near 600 to 640, and the largest models, 20 to 66 billion parameters, the smallest, near 380 to 400</p><a href="../images/L18/pub_oh2023_fig1_natural_stories.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>Natural Stories</strong> (Futrell et al. 2021): 181 readers, ten stories. Fit reading time by <strong>least squares</strong> on word length and frequency, add surprisal as a <strong>predictor</strong>, score the <strong>gain in log-likelihood</strong> (ΔLL)</li>
+<li><mark>Better at the text (lower perplexity, the average surprise), worse at the readers</mark>, in three families</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1162/tacl_a_00548" rel="noopener">Oh &amp; Schuler <b>TACL 2023</b></a> · <a href="https://doi.org/10.1007/s10579-020-09503-7" rel="noopener">Futrell et al. <b>Lang Resour Eval 2021</b></a> · <a href="https://doi.org/10.1016/j.tics.2026.05.008" rel="noopener">Oh &amp; Linzen <b>TICS 2026</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="18" data-marpit-pagination-total="35" aria-labelledby="heading-18"><p class="page">Slide 18</p>
+<h2 id="heading-18">Better language model, better brain model?</h2>
+<ul>
+<li><strong>Brain responses: yes, so far.</strong> Models that predict the next word better also predict brain responses to language better, in <strong>fMRI</strong> (blood oxygenation, whole brain, a few seconds' resolution) and <strong>ECoG</strong> (electrodes on the surface of the cortex, milliseconds), and the fit grows logarithmically with size up to 30-billion-parameter models</li>
+<li>Measured with an <strong>encoding model</strong>: a linear readout from the model's activations to each voxel or electrode, scored on held-out text</li>
+<li><strong>Reading times: no, past a point.</strong> Surprisal from larger models fits readers <em>worse</em> (previous slide)</li>
+<li><mark>Still open: brain and behavior disagree about which model is best</mark>. One reason: large models have read far more text than any person, so some words are easy for them and not for a reader</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1073/pnas.2105646118" rel="noopener">Schrimpf et al. <b>PNAS 2021</b></a> · <a href="https://doi.org/10.1038/s41593-022-01026-4" rel="noopener">Goldstein et al. <b>Nat Neurosci 2022</b></a> · <a href="https://arxiv.org/abs/2305.11863" rel="noopener">Antonello, Vaidya &amp; Huth <b>NeurIPS 2023</b></a> · <a href="https://doi.org/10.7554/eLife.101204" rel="noopener">Hong et al. <b>eLife 2026</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-19" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="19" data-marpit-pagination-total="35" aria-labelledby="heading-19"><p class="page">Slide 19</p>
+<h2 id="heading-19">Using the model to control the brain</h2>
+<div class="capfig figbox">
+<figure><img src="../images/L18/pub_tuckute2024_fig2_drive_suppress.png" alt="Figure 2 of Tuckute et al.: A, the left-hemisphere language network on an inflated brain; B and C, bar charts of the language network's fMRI response to drive, suppress and baseline sentences, in an event-related design with three participants and a blocked design with four. Drive sentences give the highest response and suppress sentences the lowest in both; D, example sentences: drive sentences are odd or ungrammatical, such as Jiffy Lube of, of therapies, yes; suppress sentences are plain, such as We were sitting on the couch" aria-describedby="figure-19-1"><figcaption id="figure-19-1"><p>Figure 2 of Tuckute et al.: A, the left-hemisphere language network on an inflated brain; B and C, bar charts of the language network's fMRI response to drive, suppress and baseline sentences, in an event-related design with three participants and a blocked design with four. Drive sentences give the highest response and suppress sentences the lowest in both; D, example sentences: drive sentences are odd or ungrammatical, such as Jiffy Lube of, of therapies, yes; suppress sentences are plain, such as We were sitting on the couch</p><a href="../images/L18/pub_tuckute2024_fig2_drive_suppress.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Fit an encoding model from GPT-2 XL to the <strong>language network's</strong> fMRI response to 1,000 sentences, then let it <mark>choose new sentences predicted to drive or silence the network</mark>. In new participants they did: unusual, barely grammatical sentences drive it, plain ones suppress it</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1038/s41562-023-01783-7" rel="noopener">Tuckute et al. <b>Nat Hum Behav 2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="20" data-marpit-pagination-total="35" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<h2 id="heading-20">Language models and the brain: current readings</h2>
+<ul>
+<li>Four more results, all with encoding models, now down to single neurons:</li>
+<li><strong>Hours of real conversation:</strong> one speech-to-text model's sound, speech and word embeddings each predict ECoG activity across 100 h of everyday conversation, and the model's levels line up with the cortical hierarchy (Goldstein et al. 2025)</li>
+<li><strong>Single neurons:</strong> the same readout, neuron by neuron, separates cells that track a word's part of speech and dependencies from cells that track phrase and sentence structure (Cai et al. 2026)</li>
+<li><strong>What the fit tracks:</strong> across 34 training checkpoints, it follows a model's grammatical knowledge, not its world knowledge or reasoning (AlKhamissi et al. 2025)</li>
+<li><mark>A caution from 2026:</mark> shuffled train–test splits, pooling choices and confounds such as word rate fully account for the brain fit of <em>untrained</em> models and inflate some influential results (Hadidi et al. 2026)</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1038/s41562-025-02105-9" rel="noopener">Goldstein et al. <b>Nat Hum Behav 2025</b></a> · <a href="https://doi.org/10.1038/s41586-026-10691-5" rel="noopener">Cai et al. <b>Nature 2026</b></a> · <a href="https://arxiv.org/abs/2503.01830" rel="noopener">AlKhamissi et al. <b>EMNLP 2025</b></a> · <a href="https://doi.org/10.1038/s41467-026-72253-7" rel="noopener">Hadidi et al. <b>Nat Commun 2026</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="21" data-marpit-pagination-total="35" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<h2 id="heading-21">The assistant you may use on the project</h2>
+<ul>
+<li>AI assistants are allowed on the final project, with disclosure. They are the models from today</li>
+<li>What follows from how they are built: trained to produce <strong>likely</strong> text, not true text, they <strong>hallucinate</strong> citations and results; and they are <strong>prompt-sensitive</strong>, so rephrase a question and the answer can change</li>
+<li>So check every claim and citation an assistant gives you against its source; the writer–critic workflow from recitation does this systematically</li>
+<li>As models of human cognition, LLMs are a live, contested research program</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1073/pnas.2218523120" rel="noopener">Binz &amp; Schulz <b>PNAS 2023</b></a> · <a href="https://doi.org/10.1038/s41586-025-09215-4" rel="noopener">Binz et al. <b>Nature 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="22" data-marpit-pagination-total="35" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<h2 id="heading-22">The brain as a prediction machine</h2>
+<p>From <em>predicting to learn</em> to <em>predicting to perceive</em></p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="23" data-marpit-pagination-total="35" aria-labelledby="heading-23"><p class="page">Slide 23</p>
+<h2 id="heading-23">Predictive coding: the core claim</h2>
+<ul>
+<li>Perception is <strong>not</strong> passive feedforward feature extraction</li>
+<li>The brain runs an internal <strong>generative model</strong> and constantly <strong>predicts</strong> its sensory input</li>
+<li>What flows <strong>up</strong> the hierarchy is not the raw signal but the <strong>prediction error</strong>: the part the model failed to predict. The brain spends its signals on what it did not expect</li>
+<li>Lineage: Helmholtz (unconscious inference) → <strong>Rao &amp; Ballard (1999)</strong> → Friston (free energy)</li>
+<li>A hypothesis, not a settled fact: language data support it (next slide), but recordings across cortical layers show feedback that enhances predicted activity rather than cancelling it (Westerberg &amp; Roelfsema 2026)</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1016/j.tics.2025.09.018" rel="noopener">Westerberg &amp; Roelfsema <b>TICS 2026</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="24" data-marpit-pagination-total="35" aria-labelledby="heading-24"><p class="page">Slide 24</p>
+<h2 id="heading-24">Testing it with a language model</h2>
+<div class="capfig">
+<figure><img src="../images/L18/pub_caucheteux2023_fig2_forecast.png" alt="Figure 2 of Caucheteux et al.: a, the brain score of GPT-2 activations on fMRI from 304 listeners, highest along the superior temporal sulcus; b and d, adding the model's representation of words d positions ahead improves the brain score, with a peak at about 8 words ahead; c, the regions where this forecast gain is significant, temporal, parietal and frontal; e to g, the best forecast distance grows from temporal regions (about 8 words) to frontal and parietal regions (about 9 to 10 words)" aria-describedby="figure-24-1"><figcaption id="figure-24-1"><p>Figure 2 of Caucheteux et al.: a, the brain score of GPT-2 activations on fMRI from 304 listeners, highest along the superior temporal sulcus; b and d, adding the model's representation of words d positions ahead improves the brain score, with a peak at about 8 words ahead; c, the regions where this forecast gain is significant, temporal, parietal and frontal; e to g, the best forecast distance grows from temporal regions (about 8 words) to frontal and parietal regions (about 9 to 10 words)</p><a href="../images/L18/pub_caucheteux2023_fig2_forecast.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>304 people listened to stories in the fMRI scanner. Adding GPT-2's representation of words <strong>up to 8 ahead</strong> improved the fit, and <mark>frontal areas predict further ahead than temporal ones</mark></li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1038/s41562-022-01516-2" rel="noopener">Caucheteux, Gramfort &amp; King <b>Nat Hum Behav 2023</b></a> · <a href="https://doi.org/10.1038/s42003-022-03036-1" rel="noopener">Caucheteux &amp; King <b>Commun Biol 2022</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="25" data-marpit-pagination-total="35" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<h2 id="heading-25">Predictive coding and autoencoders</h2>
+<ul>
+<li>An <strong>autoencoder</strong> also minimizes a reconstruction residual <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐞</mi><mo>=</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>−</mo><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\mathbf{e} = \mathbf{x} - \hat{\mathbf{x}}</annotation></semantics></math>, but updates its weights by <strong>backprop</strong>: one forward and one backward sweep</li>
+<li><strong>Predictive coding</strong> minimizes the <em>same</em> residual by <strong>iterative settling</strong>: a higher level's estimate <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐫</mi></mrow><annotation encoding="application/x-tex">\mathbf{r}</annotation></semantics></math> of the causes relaxes until its prediction explains the input (Rao &amp; Ballard 1999); the weights follow a local rule</li>
+<li>A shared goal, <em>don't be surprised by your input</em>, reached in two ways: an encoder trained by backprop, and a candidate biological one (an estimate that settles, with local error circuits)</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="26" data-marpit-pagination-total="35" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<h2 id="heading-26">Open questions</h2>
+<ul>
+<li><strong>Brain or behavior?</strong> Bigger models fit brain responses better and reading times worse. Which should a cognitive model answer to, and would a model trained on about as much text as a person reads fit both?</li>
+<li><strong>Prediction, or its appearance?</strong> A brain fit that improves with upcoming words shows the brain carries information about what comes next. It does not show that the brain sends prediction errors up, as predictive coding claims</li>
+<li><strong>In-context learning in a brain?</strong> A model learns a task from its prompt with frozen weights, in its activations. <mark>Is some fast human learning also held in activity rather than in changed synapses?</mark></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="27" data-marpit-pagination-total="35" aria-labelledby="heading-27"><p class="page">Slide 27</p>
+<h2 id="heading-27">Recap</h2>
+<ul>
+<li><strong>One objective</strong> (next token) + <strong>one architecture</strong> (decoder transformer) + <strong>scale</strong> = LLMs; <strong>word pieces</strong> from byte-pair encoding are the symbols</li>
+<li><strong>In-context learning</strong> appears without being trained for, in GPT-2 medium as in GPT-3; every prompt uses it, and nothing is learned into the weights</li>
+<li><strong>Surprisal</strong> in bits, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mi>p</mi></mrow><annotation encoding="application/x-tex">-\log_2 p</annotation></semantics></math>, from LLMs tracks brain responses and reading times, but larger models fit readers worse while fitting the brain better, and a brain fit needs its controls</li>
+<li><strong>Predictive coding:</strong> the brain may predict its input and send errors up; the evidence runs both ways</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="28" data-marpit-pagination-total="35" aria-labelledby="heading-28"><p class="page">Slide 28</p>
+<h2 id="heading-28">For your final project</h2>
+<ul>
+<li><strong>Dates:</strong> teams registered on Canvas Thu 11/19 · proposal, one page per team, Wed 12/2 at 11:59 PM · poster session and report Mon 12/21 at 9:00 AM</li>
+<li><strong>Data and models:</strong> anything from the lectures and assignments, or anything else you can get your hands on; GPT-2 or Pythia for surprisal run on the course Colab</li>
+<li><strong>AI tools</strong> are permitted on the project; at the poster we may ask either of you about any line of your code</li>
+<li>The brief, with dates and the proposal checklist: <a href="https://serre-lab.github.io/CPSY1291-2026/final-project/" rel="noopener">serre-lab.github.io/CPSY1291-2026/final-project</a></li>
+<li><strong>Questions from today:</strong> which model size fits readers best, and does the answer change with the reading-time corpus? Does a network trained without labels (the lecture on learning without labels) rival a supervised one on your brain data?</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="29" data-marpit-pagination-total="35" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<h2 id="heading-29">Going further</h2>
+<p>Predictive coding in detail</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="30" data-marpit-pagination-total="35" aria-labelledby="heading-30"><p class="page">Slide 30</p>
+<h2 id="heading-30">Rao &amp; Ballard (1999)</h2>
+<ul>
+<li>Each level <strong>predicts the level below</strong> through top-down connections; the residual, the <strong>prediction error</strong>, is sent <strong>bottom-up</strong></li>
+<li>A higher level holds an <strong>estimate</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐫</mi></mrow><annotation encoding="application/x-tex">\mathbf{r}</annotation></semantics></math> of the causes, predicts lower activity <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>^</mo></mover><mo>=</mo><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi></mstyle><mi mathvariant="normal" data-original-mathvariant="bold">𝐫</mi></mrow><annotation encoding="application/x-tex">\hat{\mathbf{x}} = \textcolor{#B5396B}{\mathbf{W}}\mathbf{r}</annotation></semantics></math>, and the <strong>error</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐞</mi><mo>=</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>−</mo><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\mathbf{e} = \mathbf{x} - \hat{\mathbf{x}}</annotation></semantics></math> drives the update</li>
+<li>Trained on natural-image patches, it develops <strong>oriented, Gabor-like receptive fields</strong>, as sparse coding did, and predicts <strong>surround suppression</strong></li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1038/4580" rel="noopener">Rao &amp; Ballard <b>Nat Neurosci 1999</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="31" data-marpit-pagination-total="35" aria-labelledby="heading-31"><p class="page">Slide 31</p>
+<h2 id="heading-31">The predictive-coding equations</h2>
+<p>At one level: prediction of the level below <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>^</mo></mover><mo>=</mo><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi></mstyle><mi mathvariant="normal" data-original-mathvariant="bold">𝐫</mi></mrow><annotation encoding="application/x-tex">\hat{\mathbf{x}} = \textcolor{#B5396B}{\mathbf{W}}\mathbf{r}</annotation></semantics></math>, error <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐞</mi><mo>=</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>−</mo><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐱</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\mathbf{e} = \mathbf{x} - \hat{\mathbf{x}}</annotation></semantics></math>.</p>
+<p><strong>Inference</strong> (fast, within one stimulus: settle <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐫</mi></mrow><annotation encoding="application/x-tex">\mathbf{r}</annotation></semantics></math> to reduce the error):</p>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐫</mi><mo>←</mo><mi mathvariant="normal" data-original-mathvariant="bold">𝐫</mi><mo>+</mo><msub><mi>η</mi><mi>r</mi></msub><mtext> </mtext><msup><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi></mstyle><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐞</mi></mrow><annotation encoding="application/x-tex">\mathbf{r} \leftarrow \mathbf{r} + \eta_r\,\textcolor{#B5396B}{\mathbf{W}}^\top\mathbf{e}
+</annotation></semantics></math></div></span></p><p><strong>Learning</strong> (slow, across stimuli: a local, Hebbian-like rule):</p>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi></mstyle><mo>←</mo><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi></mstyle><mo>+</mo><msub><mi>η</mi><mi>W</mi></msub><mtext> </mtext><mi mathvariant="normal" data-original-mathvariant="bold">𝐞</mi><mtext> </mtext><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐫</mi><mi mathvariant="normal">⊤</mi></msup></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{W}} \leftarrow \textcolor{#B5396B}{\mathbf{W}} + \eta_W\,\mathbf{e}\,\mathbf{r}^\top
+</annotation></semantics></math></div></span></p><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi></mstyle><mi mathvariant="normal" data-original-mathvariant="bold">𝐫</mi></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{W}}\mathbf{r}</annotation></semantics></math> is the <strong>top-down</strong> prediction; <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mstyle mathcolor="#B5396B"><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi></mstyle><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐞</mi></mrow><annotation encoding="application/x-tex">\textcolor{#B5396B}{\mathbf{W}}^\top\mathbf{e}</annotation></semantics></math> carries the error <strong>bottom-up</strong></li>
+<li>Both updates use only <strong>locally available</strong> quantities (error × activity): <strong>no global backward pass</strong></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="32" data-marpit-pagination-total="35" aria-labelledby="heading-32"><p class="page">Slide 32</p>
+<h2 id="heading-32">Predictive coding as a deep net: PredNet</h2>
+<div class="row">
+<div class="col">
+<ul>
+<li>Lotter, Kreiman &amp; Cox stacked <strong>Rao–Ballard-style</strong> modules: each layer <strong>predicts the layer below</strong> and passes the <strong>prediction error</strong> up, trained on video to predict the next frame</li>
+<li>The trained network reproduces perceptual effects nobody built in, such as the flash-lag illusion</li>
+<li>From brain to AI: a 1999 theory becomes a trainable architecture</li>
+</ul>
+</div>
+<div class="col fig">
+<figure><img src="../images/_papers/1605.08104/figure1_cropped.png" alt="The PredNet module: representation units emit a prediction of the layer below, the mismatch becomes an error signal, and errors propagate up the hierarchy" aria-describedby="figure-32-1"><figcaption id="figure-32-1"><p>The PredNet module: representation units emit a prediction of the layer below, the mismatch becomes an error signal, and errors propagate up the hierarchy</p><a href="../images/_papers/1605.08104/figure1_cropped.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/1605.08104" rel="noopener">Lotter, Kreiman &amp; Cox <b>ICLR 2017</b></a> · <a href="https://doi.org/10.1038/s42256-020-0170-9" rel="noopener">Lotter, Kreiman &amp; Cox <b>Nat Mach Intell 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="33" data-marpit-pagination-total="35" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<h2 id="heading-33">Is backprop biologically plausible?</h2>
+<ul>
+<li>Backprop's problems for biology: a separate <strong>backward pathway</strong>; <strong>weight transport</strong> (backward weights must equal the forward ones); a global <strong>two-phase</strong> schedule; <strong>non-local</strong> error signals</li>
+<li>Predictive coding offers <strong>local learning</strong>: errors computed in place by <strong>error units</strong>; updates use only the activity of the connected units</li>
+<li>Under some conditions predictive coding <span class="pop">approximates the backprop gradient</span></li>
+<li>Still a <strong>hypothesis</strong>: direct evidence for cortical error units is debated</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1162/NECO_a_00949" rel="noopener">Whittington &amp; Bogacz <b>Neural Comput 2017</b></a> · <a href="https://arxiv.org/abs/2006.04182" rel="noopener">Millidge, Tschantz &amp; Buckley <b>Neural Comput 2022</b></a> · <a href="https://doi.org/10.1038/s41583-020-0277-3" rel="noopener">Lillicrap et al. <b>Nat Rev Neurosci 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="34" data-marpit-pagination-total="35" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<h2 id="heading-34">Further reading for the research trail</h2>
+<p>Optional: a few research-trail entries over the semester. Any paper mentioned in any lecture qualifies, but papers from these lectures are preferred.</p>
+<ul>
+<li><a href="https://doi.org/10.1016/j.tics.2026.05.008" rel="noopener">Oh &amp; Linzen <b>TICS 2026</b></a>: to model human prediction, make language models less superhuman</li>
+<li><a href="https://doi.org/10.1038/s41467-026-72253-7" rel="noopener">Hadidi et al. <b>Nat Commun 2026</b></a>: how model–brain alignment can arise from confounds</li>
+<li><a href="https://doi.org/10.1038/s41586-026-10691-5" rel="noopener">Cai et al. <b>Nature 2026</b></a>: single human neurons during speech, read through a language model</li>
+<li><a href="https://doi.org/10.1038/s41562-025-02105-9" rel="noopener">Goldstein et al. <b>Nat Hum Behav 2025</b></a>: one speech model's levels match the cortical hierarchy during real conversation</li>
+<li><a href="https://arxiv.org/abs/2503.01830" rel="noopener">AlKhamissi et al. <b>EMNLP 2025</b></a>: brain alignment tracks a model's grammar, not its world knowledge</li>
+<li><a href="https://doi.org/10.1016/j.tics.2025.09.018" rel="noopener">Westerberg &amp; Roelfsema <b>TICS 2026</b></a>: cortical feedback during perception does not do what predictive coding predicts</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-lang="en" lang="en" data-marpit-pagination="35" data-marpit-pagination-total="35" aria-labelledby="heading-35"><p class="page">Slide 35</p>
+<h2 id="heading-35">Minute paper</h2>
+<p>Submit on <strong>Canvas → Minute papers → Minute Paper 18</strong> (access code read out in class).</p>
+<p>Write three brief points in your own words:</p>
+<ol>
+<li>A language model can learn a new task from a few examples written in its prompt.<br>Where does that learning live while the model does the task,<br>and what happens to it when the conversation ends?</li>
+<li>Something you do not yet understand, or a question still open</li>
+<li>Another idea you found interesting, and why it matters for brains, behavior or AI</li>
+</ol>
+<p>Credit for a thoughtful attempt, not for being correct.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section></main></body></html>
