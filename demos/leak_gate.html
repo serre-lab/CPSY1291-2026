@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leak and gate</title>
+<style>
+:root{--ink:#1E293B;--taupe:#8A7E70;--mag:#B5396B;--grn:#3F7A6B;--blue:#3E6D8E;--gold:#F2C14E;--bg:#FDFBF7;--mute:#C9C2B8}
+*{box-sizing:border-box}
+body{margin:0;font:17px/1.4 Lora,Georgia,serif;color:var(--ink);background:var(--bg)}
+.page{max-width:1440px;margin:auto;padding:18px;display:grid;gap:12px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+h1{font-size:30px;margin:0;font-weight:500}h2{font-size:20px;line-height:1.3;margin:0 0 8px;font-weight:600}
+p{margin:0}.panel,button,input,output,.math{font-family:Poppins,system-ui,sans-serif}
+.panel{min-width:0;background:white;border-radius:10px;padding:12px 14px;box-shadow:0 1px 6px #00000014}
+.controls{display:grid;grid-template-columns:1fr 1.45fr auto;gap:8px 22px;align-items:center}
+.mode{grid-column:1/-1;display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.mode label{display:flex;align-items:center;gap:9px}
+input[type=checkbox]{width:22px;height:22px;margin:0;accent-color:var(--mag)}
+.slider label{display:block}.slider-row{display:flex;align-items:center;gap:12px}
+input[type=range]{width:100%;min-width:70px;accent-color:var(--mag);cursor:pointer}
+output{font-weight:600;min-width:3.2em;color:var(--mag);font-variant-numeric:tabular-nums}
+.parameter,.weight{color:var(--mag)}.state{color:var(--grn)}
+.inactive{opacity:.55}button{font:inherit;background:#EDE7DE;border:1px solid var(--mute);padding:8px 12px;border-radius:7px;color:var(--ink);cursor:pointer}
+button:hover{background:#e4ddd2}:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.middle{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px}
+.plot-panel{display:flex;flex-direction:column;min-height:345px}
+.legend{display:flex;gap:8px 18px;flex-wrap:wrap;font-size:16px;margin-bottom:4px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sample{display:inline-block;width:23px;height:0;border-top:3px solid var(--grn)}
+.sample.cue-share{border-top:3px dashed var(--mag)}.sample.input{height:12px;width:13px;border:0;background:var(--taupe)}
+.chart{flex:1;min-height:220px;position:relative}svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;font-family:Poppins,system-ui,sans-serif}
+.try ol{padding-left:25px;margin:8px 0 12px}.try li{margin-bottom:10px}.probe-note{font-size:16px}
+.weights-heading{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.weights-heading p{font-size:16px}
+.cells{display:grid;grid-template-columns:repeat(40,minmax(0,1fr));gap:3px;margin:4px 0 5px}
+.cell{height:33px;border:1px solid #B5396B55;border-radius:3px;padding:0;position:relative;min-width:0}
+.cell.cue{outline:3px solid var(--gold);outline-offset:0}.cell.probe{border:2px dashed var(--ink)}
+.cell[aria-pressed=true]::after{content:"";position:absolute;left:25%;right:25%;bottom:3px;height:3px;background:var(--ink)}
+.weight-axis{display:flex;justify-content:space-between;font-size:16px}.weight-detail{color:var(--mag);font-variant-numeric:tabular-nums}
+.readout{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.readout h2{margin:0}.readout p{font-size:20px}.readout b{color:var(--mag);font-variant-numeric:tabular-nums}
+body.embed{height:100vh;overflow:hidden;font-size:20px;line-height:1.3}
+body.embed .page{height:100%;max-width:none;padding:10px;gap:8px;grid-template-rows:39px 108px minmax(0,1fr) 136px 57px}
+body.embed h1{font-size:30px}body.embed h2{font-size:22px;margin-bottom:5px}
+body.embed .panel{font-size:20px;padding:9px 12px}
+body.embed .middle{gap:8px;grid-template-columns:minmax(0,1fr) 302px;min-height:0}
+body.embed .plot-panel{min-height:0}body.embed .chart{min-height:0}
+body.embed .legend,body.embed .probe-note,body.embed .weight-axis,body.embed .weights-heading p{font-size:20px}
+body.embed .controls{gap:4px 20px}body.embed button{font-size:20px}
+body.embed .try ol{margin:6px 0 10px}body.embed .try li{margin-bottom:8px}
+body.embed .readout h2{margin:0}body.embed .readout p{font-size:22px}
+@media(max-width:800px){body:not(.embed) .middle{grid-template-columns:1fr}body:not(.embed) .controls{grid-template-columns:1fr}body:not(.embed) header{display:block}body:not(.embed) .weights-heading{display:block}body:not(.embed) .cells{gap:1px}body:not(.embed) .weight-axis{flex-wrap:wrap;gap:8px}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header><h1>Leak and gate</h1><p>One state. What survives until the probe?</p></header>
+  <section class="panel controls" aria-label="Model controls">
+    <div class="mode"><label for="gate"><input id="gate" type="checkbox">Let the input set the leak</label><p id="equation" class="math"></p></div>
+    <div class="slider" id="lambda-control"><label for="lambda">Decay <span class="parameter">λ</span></label><div class="slider-row"><input id="lambda" type="range" min="0.50" max="1.00" step="0.01" value="0.90"><output id="lambda-value" for="lambda">0.90</output></div></div>
+    <div class="slider inactive" id="epsilon-control"><label for="epsilon"><span class="parameter">ε</span>: how much a distractor gets in</label><div class="slider-row"><input id="epsilon" type="range" min="0" max="0.5" step="0.01" value="0.05" disabled><output id="epsilon-value" for="epsilon">0.05</output></div></div>
+    <button id="reseed" type="button">New distractors</button>
+  </section>
+  <div class="middle">
+    <section class="panel plot-panel" aria-labelledby="state-title">
+      <h2 id="state-title">A. State over time</h2>
+      <div class="legend"><span><i class="sample input"></i>input x⟨t⟩</span><span><i class="sample"></i>state h⟨t⟩</span><span><i class="sample cue-share"></i>share of the cue still left</span></div>
+      <div class="chart"><svg id="chart" role="img" aria-labelledby="chart-title chart-description"><title id="chart-title">Input, state, and cue retention over 40 steps</title><desc id="chart-description"></desc></svg></div>
+    </section>
+    <aside class="panel try"><h2>Try this</h2><ol><li>Set <span class="parameter">λ = 0.90</span>. Look at panel B.</li><li>Push <span class="parameter">λ</span> to <span class="parameter">1.00</span>. Watch distractors pile up.</li><li>Turn on the gate.</li><li>Raise <span class="parameter">ε</span>. What gets through?</li></ol><p class="probe-note" id="probe-note"></p></aside>
+  </div>
+  <section class="panel" aria-labelledby="weights-title">
+    <div class="weights-heading"><h2 id="weights-title">B. Weights on the past</h2><p>Shade: weight from 0 to 1</p></div>
+    <p id="weights-caption"></p>
+    <div id="cells" class="cells" role="group" aria-label="Input weights at probe; use left and right arrow keys to inspect"></div>
+    <div class="weight-axis"><span>0 · past → 39 · probe</span><span id="weight-detail" class="weight-detail" aria-live="polite"></span></div>
+  </section>
+  <section class="panel readout" aria-labelledby="readout-title"><h2 id="readout-title">C. Readout</h2><p aria-live="polite">cue still in the state: <b id="cue-value"></b> · gradient back to the cue: <b id="gradient-value"></b> (the same factor)</p></section>
+</main>
+<script>
+'use strict';
+if (new URLSearchParams(location.search).get('embed') === '1') document.body.classList.add('embed');
+const T = 40, CUE = 3, PROBE = T - 1;
+const $ = id => document.getElementById(id);
+const colors = {ink:'#1E293B',taupe:'#8A7E70',mag:'#B5396B',grn:'#3F7A6B',gold:'#F2C14E',grid:'#EFEAE2'};
+let seed = 1291, selected = CUE, result;
+// A deterministic generator keeps the same distractors across mode/slider changes.
+function makeInputs(s) {
+  let n = s >>> 0;
+  return Array.from({length:T}, (_, t) => {
+    n = (Math.imul(1664525, n) + 1013904223) >>> 0;
+    return t === CUE ? 1 : t === PROBE ? 0 : n / 4294967296 - 0.5;
+  });
+}
+let inputs = makeInputs(seed);
+// The probe has zero input but still executes one update (z = epsilon in gate mode).
+// Gate values are set by cue/distractor identity, independently of cue amplitude.
+function computeModel(x = inputs, lambda = Number($('lambda').value), gated = $('gate').checked, epsilon = Number($('epsilon').value)) {
+  const z = x.map((_, t) => t === CUE ? 1 : epsilon);
+  const retain = x.map((_, t) => gated ? 1 - z[t] : lambda);
+  const write = x.map((_, t) => gated ? z[t] : 1);
+  const states = [], shares = [], weights = Array(T);
+  let h = 0, share = 0, future = 1;
+  for (let t = 0; t < T; t++) {
+    h = retain[t] * h + write[t] * x[t];
+    share = t === CUE ? write[t] : retain[t] * share;
+    states.push(h); shares.push(share);
+  }
+  for (let j = PROBE; j >= 0; j--) {
+    weights[j] = write[j] * future;
+    future *= retain[j];
+  }
+  return {inputs:x.slice(),states,shares,weights,z,retain,write,cueWeight:weights[CUE]};
+}
+function format(value) { return value !== 0 && Math.abs(value) < 0.001 ? value.toExponential(2) : value.toFixed(3); }
+function kind(t) { return t === CUE ? 'cue' : t === PROBE ? 'probe' : 'distractor'; }
+const buttons = Array.from({length:T}, (_, t) => {
+  const button = document.createElement('button');
+  button.type = 'button'; button.className = 'cell ' + kind(t);
+  button.addEventListener('click', () => select(t));
+  button.addEventListener('focus', () => select(t));
+  button.addEventListener('keydown', event => {
+    let next;
+    if (event.key === 'ArrowRight') next = Math.min(PROBE, t + 1);
+    if (event.key === 'ArrowLeft') next = Math.max(0, t - 1);
+    if (event.key === 'Home') next = 0;
+    if (event.key === 'End') next = PROBE;
+    if (next !== undefined) { event.preventDefault(); buttons[next].focus(); }
+  });
+  $('cells').append(button); return button;
+});
+function select(t) {
+  selected = t;
+  buttons.forEach((button,j) => {button.tabIndex = j === t ? 0 : -1; button.setAttribute('aria-pressed', String(j === t));});
+  $('weight-detail').textContent = `${kind(t)} at ${t}: weight ${format(result.weights[t])}`;
+}
+function drawChart() {
+  const svg = $('chart'), width = svg.clientWidth, height = svg.clientHeight;
+  if (!width || !height) return;
+  const font = document.body.classList.contains('embed') ? 20 : 16;
+  const left = 58, right = width - 51, top = 32, bottom = height - 36;
+  const step = (right - left) / T, px = t => left + (t + .5) * step;
+  // A stable scale across sliders and modes makes accumulation directly comparable.
+  let running = 0;
+  const totals = inputs.map(x => running += x);
+  const limit = Math.ceil(Math.max(1.5, ...totals.map(Math.abs)) * 2) / 2;
+  const py = value => bottom - (value + limit) / (2 * limit) * (bottom - top);
+  const sy = value => bottom - value * (bottom - top);
+  const text = (x,y,value,fill=colors.ink,anchor='middle') => `<text x="${x}" y="${y}" fill="${fill}" text-anchor="${anchor}" font-size="${font}">${value}</text>`;
+  let markup = '';
+  [-limit,0,limit].forEach(v => { markup += `<path d="M${left},${py(v)}H${right}" stroke="${colors.grid}"/>` + text(left-8,py(v)+6,String(v),colors.ink,'end'); });
+  [0,.5,1].forEach(v => {markup += text(right+8,sy(v)+6,String(v),colors.mag,'start');});
+  markup += text(left,21,'x, h',colors.ink,'start') + text(right,21,'cue share',colors.mag,'end');
+  inputs.forEach((x,t) => {
+    markup += `<rect x="${px(t)-step*.32}" y="${Math.min(py(x),py(0))}" width="${step*.64}" height="${Math.max(1,Math.abs(py(x)-py(0)))}" fill="${t===CUE?colors.gold:colors.taupe}"/>`;
+  });
+  markup += `<path d="M${px(PROBE)},${top}V${bottom}" stroke="${colors.ink}" stroke-dasharray="3 5"/>`;
+  const path = (values, y, start=0) => values.slice(start).map((v,i) => `${i?'L':'M'}${px(i+start)},${y(v)}`).join(' ');
+  markup += `<path d="${path(result.states,py)}" fill="none" stroke="${colors.grn}" stroke-width="3"/>`;
+  markup += `<path d="${path(result.shares,sy,CUE)}" fill="none" stroke="${colors.mag}" stroke-width="3" stroke-dasharray="8 5"/>`;
+  markup += `<circle cx="${px(CUE)}" cy="${sy(1)}" r="4" fill="${colors.mag}"/><circle cx="${px(PROBE)}" cy="${py(result.states[PROBE])}" r="4" fill="${colors.grn}"/>`;
+  [0,10,20,30].forEach(t => {markup += text(px(t),height-7,String(t));});
+  markup += text(px(CUE),height-7,'3 cue') + text(right,height-7,'39 probe',colors.ink,'end');
+  let group = svg.querySelector('g');
+  if (!group) {group = document.createElementNS('http://www.w3.org/2000/svg','g');svg.append(group);}
+  group.innerHTML = markup;
+  $('chart-description').textContent = `Cue at step 3 is a gold bar of height 1. Other bars are distractors. Probe at step 39 has zero input. Solid green state ends at ${format(result.states[PROBE])}, on the left axis. Dashed magenta cue share ends at ${format(result.cueWeight)}, on its own right axis from 0 to 1.`;
+}
+function render() {
+  const gated = $('gate').checked;
+  $('lambda').disabled = gated; $('epsilon').disabled = !gated;
+  $('lambda-control').classList.toggle('inactive', gated); $('epsilon-control').classList.toggle('inactive', !gated);
+  $('lambda-value').value = Number($('lambda').value).toFixed(2);
+  $('epsilon-value').value = Number($('epsilon').value).toFixed(2);
+  $('equation').innerHTML = gated ? 'h⟨t⟩ = (1 − <span class="parameter">z⟨t⟩</span>) h⟨t−1⟩ + <span class="parameter">z⟨t⟩</span> x⟨t⟩' : 'h⟨t⟩ = <span class="parameter">λ</span> h⟨t−1⟩ + x⟨t⟩';
+  $('probe-note').innerHTML = gated ? 'Gate <span class="parameter">z = 1</span> writes the cue; <span class="parameter">z = ε</span> otherwise, including the zero-input probe.' : 'Start with state 0. The cue is 1 at step 3. At step 39, input is 0; update, then read the state.';
+  $('weights-caption').textContent = gated ? 'a linear recurrence is attention whose weights are set by the input (selection)' : 'a linear recurrence is attention whose weights are set by distance';
+  result = computeModel();
+  buttons.forEach((button,t) => {
+    const w = result.weights[t];
+    button.style.backgroundColor = `rgba(181,57,107,${w})`;
+    const label = `Step ${t}, ${kind(t)}; input ${format(inputs[t])}; weight ${w.toPrecision(6)}`;
+    button.title = label; button.setAttribute('aria-label',label);
+  });
+  select(selected);
+  $('cue-value').textContent = $('gradient-value').textContent = format(result.cueWeight);
+  drawChart();
+}
+['lambda','epsilon','gate'].forEach(id => $(id).addEventListener('input',render));
+$('reseed').addEventListener('click', () => {seed = (seed + 1) >>> 0; inputs = makeInputs(seed); render();});
+new ResizeObserver(drawChart).observe($('chart').parentElement);
+render();
+</script>
+</body>
+</html>
