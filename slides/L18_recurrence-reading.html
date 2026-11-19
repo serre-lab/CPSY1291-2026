@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Carrying a state: RNNs &amp; GRUs · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Carrying a state: RNNs &amp; GRUs</h1><p>Reader-friendly version of the 47 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L18_recurrence.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Carrying a state: RNNs &amp; GRUs</a></li><li><a href="#slide-2">Carrying a state</a></li><li><a href="#slide-3">Tasks that depend on the past</a></li><li><a href="#slide-5">Using the past in a model: pass it in, or carry a state</a></li><li><a href="#slide-6">Input vs. state: examples</a></li><li><a href="#slide-7">A state is a lossy summary</a></li><li><a href="#slide-8">A state in cortex: the delayed-response task</a></li><li><a href="#slide-9">A state in cortex: delay activity</a></li><li><a href="#slide-10">Building a recurrent unit</a></li><li><a href="#slide-11">A first state: an integrator</a></li><li><a href="#slide-12">A leaky integrator</a></li><li><a href="#slide-13">From one unit to a network: the input</a></li><li><a href="#slide-14">From one unit to a network: the state</a></li><li><a href="#slide-15">From one unit to a network: recurrent connections</a></li><li><a href="#slide-16">From one unit to a network: the readout</a></li><li><a href="#slide-17">The state over time: activity outlasts the input</a></li><li><a href="#slide-20">To train a recurrent network, unroll it in time</a></li><li><a href="#slide-21">Training: backprop through time</a></li><li><a href="#slide-22">Code: an RNN in PyTorch</a></li><li><a href="#slide-23">Why long memories are hard to learn</a></li><li><a href="#slide-24">Gating, step 1: the vanilla RNN</a></li><li><a href="#slide-25">Gating, step 2: an update gate</a></li><li><a href="#slide-26">Gating, step 3: a reset gate → the GRU</a></li><li><a href="#slide-27">Where recurrent networks have been used</a></li><li><a href="#slide-28">Recurrence in visual cortex</a></li><li><a href="#slide-29">A feedforward sweep recognizes a flashed image</a></li><li><a href="#slide-32">Cortex is not a single sweep</a></li><li><a href="#slide-33">From the recurrent unit to visual cortex</a></li><li><a href="#slide-34">Horizontal connections link distant parts of the image</a></li><li><a href="#slide-35">One circuit explains contextual illusions</a></li><li><a href="#slide-36">Curve tracing in monkey V1: the task</a></li><li><a href="#slide-37">Grouping spreads along a curve in V1</a></li><li><a href="#slide-38">Pathfinder: curve tracing for networks</a></li><li><a href="#slide-39">Recurrence vs. depth on Pathfinder</a></li><li><a href="#slide-40">Horizontal vs. top-down connections</a></li><li><a href="#slide-41">Grouping fills in an object over steps</a></li><li><a href="#slide-42">Grouping time follows human reaction times</a></li><li><a href="#slide-43">Our recurrent model on Pathfinder</a></li><li><a href="#slide-44">PathTracker: Pathfinder in time</a></li><li><a href="#slide-45">Recap</a></li><li><a href="#slide-46">Further reading</a></li><li><a href="#slide-47">Minute paper</a></li></ol></nav><section id="slide-1" data-class="lectitle" data-lang="en" lang="en" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Carrying a state: RNNs &amp; GRUs · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>Carrying a state: RNNs &amp; GRUs</h1><p>Reader-friendly version of the 38 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L18_recurrence.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">Carrying a state: RNNs &amp; GRUs</a></li><li><a href="#slide-2">Carrying a state</a></li><li><a href="#slide-3">Tasks that depend on the past</a></li><li><a href="#slide-5">Using the past in a model: pass it in, or carry a state</a></li><li><a href="#slide-6">Input vs. state: examples</a></li><li><a href="#slide-7">A state is a lossy summary</a></li><li><a href="#slide-8">A state in cortex: the delayed-response task</a></li><li><a href="#slide-9">A state in cortex: delay activity</a></li><li><a href="#slide-10">Building a recurrent unit</a></li><li><a href="#slide-11">A first state: an integrator</a></li><li><a href="#slide-12">A leaky integrator</a></li><li><a href="#slide-13">From one unit to a network: the input</a></li><li><a href="#slide-14">From one unit to a network: the state</a></li><li><a href="#slide-15">From one unit to a network: recurrent connections</a></li><li><a href="#slide-16">From one unit to a network: the readout</a></li><li><a href="#slide-17">The state over time: activity outlasts the input</a></li><li><a href="#slide-20">To train a recurrent network, unroll it in time</a></li><li><a href="#slide-21">Training: backprop through time</a></li><li><a href="#slide-22">Code: an RNN in PyTorch</a></li><li><a href="#slide-23">Why long memories are hard to learn</a></li><li><a href="#slide-24">Gating, step 1: the vanilla RNN</a></li><li><a href="#slide-25">Gating, step 2: an update gate</a></li><li><a href="#slide-26">Gating, step 3: a reset gate → the GRU</a></li><li><a href="#slide-27">Where recurrent networks have been used</a></li><li><a href="#slide-28">Recurrence in visual cortex</a></li><li><a href="#slide-29">A feedforward sweep recognizes a flashed image</a></li><li><a href="#slide-32">Cortex is not a single sweep</a></li><li><a href="#slide-33">From the recurrent unit to visual cortex</a></li><li><a href="#slide-34">Horizontal connections link distant parts of the image</a></li><li><a href="#slide-35">One circuit explains contextual illusions</a></li><li><a href="#slide-36">Recap</a></li><li><a href="#slide-37">Further reading</a></li><li><a href="#slide-38">Minute paper</a></li></ol></nav><section id="slide-1" data-class="lectitle" data-lang="en" lang="en" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
   <img src="../images/brown-crest-color.png" alt="Brown University crest">
   <div class="vrule"></div>
   <div>
@@ -10,10 +10,10 @@
 <h2 id="heading-1">Carrying a state: RNNs &amp; GRUs</h2>
 <p class="meta">Thursday, November 19 · Fall 2026</p>
 
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="2" data-marpit-pagination-total="47" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="2" data-marpit-pagination-total="38" aria-labelledby="heading-2"><p class="page">Slide 2</p>
 <h2 id="heading-2">Carrying a state</h2>
 <p>A transformer keeps every token it has read: its memory grows with the context. What does a brain keep?</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="3" data-marpit-pagination-total="47" aria-labelledby="heading-3"><p class="page">Slide 3</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="3" data-marpit-pagination-total="38" aria-labelledby="heading-3"><p class="page">Slide 3</p>
 <h2 id="heading-3">Tasks that depend on the past</h2>
 <div class="capfig">
 <figure><img src="../images/L18/state_tasks_need_past.svg" alt="Three tasks in which the current item does not determine the answer. Language: the word bank means the edge of the water in &quot;the river bank&quot; and a financial institution in &quot;the money in the bank&quot;. Vision: three frames over time, a ball to the left of a screen, the screen alone with nothing visible, the ball reappearing on the right. Arithmetic: 478 plus 256 equals 734, with carries of 1 above the tens and hundreds columns" aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>Diagram drawn for this lecture, in three columns titled Language, Vision and Arithmetic. Language: the word bank is marked in red in two phrases, the river bank, which means the edge of the water, and the money in the bank, which means a financial institution. Vision: three frames in time order along an arrow labeled time. A blue ball sits to the left of a gray screen, then the screen stands alone with the label nothing visible, then the ball appears to the right of the screen. Arithmetic: 478 plus 256 equals 734, with a red carry of 1 above the tens and the hundreds columns. In each column the current item (a word, an empty frame, a pair of digits) does not fix the answer, and the earlier items do. The slide uses the three cases to show that a network needs the past in its input or in a state.</p><a href="../images/L18/state_tasks_need_past.svg">Open full-size figure</a></figcaption></figure>
@@ -22,7 +22,7 @@
 <li>In each task, the current item (gold) does not determine the answer</li>
 <li>People hold the rest in <strong>working memory</strong>: what the sentence is about, where the ball went, the carry</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="5" data-marpit-pagination-total="47" aria-labelledby="heading-5"><p class="page">Slide 5</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="5" data-marpit-pagination-total="38" aria-labelledby="heading-5"><p class="page">Slide 5</p>
 <h2 id="heading-5">Using the past in a model: pass it in, or carry a state</h2>
 <div class="capfig">
 <figure><img src="../images/L18/state_look_back_vs_carry.svg" alt="Two panels with the same task: read the words the, cat, sat, on, the, and predict the next word, mat, in a box above the last word. Left, look back, attention: each earlier word keeps a stored key and value; the current word, the, sends a query whose arrows reach back to all four stored entries, labeled reads every earlier entry; the query leads up to the prediction. Stored: one entry per word, grows with the text. Right, carry forward, recurrence: a chain of states h1 to h5, each fed by its word and by the previous state, labeled updates one state, word by word; only the last state, h5, is solid and leads up to the prediction. Stored: one state h, fixed size" aria-describedby="figure-5-1"><figcaption id="figure-5-1"><p>Diagram drawn for this lecture, in two panels over the same six words, the cat sat on the mat. Left panel, look back (attention): every earlier word keeps a stored key and value, and arrows from all five stored entries converge on the output for the current word, mat. The caption says one entry is stored per token and the store grows with T, the number of tokens. Right panel, carry forward (recurrence): a chain of states h1 to h6, each fed by its word and by the previous state. Only the current state h6 is drawn solid, and the caption says one state h of fixed size is stored. The slide contrasts the two ways of using the past: keep every earlier token and read them all, or keep one state that each new input updates.</p><a href="../images/L18/state_look_back_vs_carry.svg">Open full-size figure</a></figcaption></figure>
@@ -37,7 +37,7 @@
 <p>Cost is fixed, but the past is compressed</p>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="6" data-marpit-pagination-total="47" aria-labelledby="heading-6"><p class="page">Slide 6</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="6" data-marpit-pagination-total="38" aria-labelledby="heading-6"><p class="page">Slide 6</p>
 <h2 id="heading-6">Input vs. state: examples</h2>
 <ul>
 <li><strong>State</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐡</mi><mrow><mo stretchy="false">⟨</mo><mi>t</mi><mo stretchy="false">⟩</mo></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{h}^{\langle t\rangle}</annotation></semantics></math>: what a system carries from one step to the next (in a recurrent network, its units' activities)</li>
@@ -79,7 +79,7 @@
 </tr>
 </tbody>
 </table></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="7" data-marpit-pagination-total="47" aria-labelledby="heading-7"><p class="page">Slide 7</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="7" data-marpit-pagination-total="38" aria-labelledby="heading-7"><p class="page">Slide 7</p>
 <h2 id="heading-7">A state is a lossy summary</h2>
 <ul>
 <li>Fixed size, a past of any length → a state cannot keep everything</li>
@@ -92,7 +92,7 @@
 <li>People hold a compact summary of the past, not a copy: <mark>meaning is kept, wording is lost</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.3758/BF03208784" rel="noopener">Sachs <b>Percept Psychophys 1967</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="8" data-marpit-pagination-total="47" aria-labelledby="heading-8"><p class="page">Slide 8</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="8" data-marpit-pagination-total="38" aria-labelledby="heading-8"><p class="page">Slide 8</p>
 <h2 id="heading-8">A state in cortex: the delayed-response task</h2>
 <div class="row">
 <div class="col fig">
@@ -107,7 +107,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1152/jn.1989.61.2.331" rel="noopener">Funahashi, Bruce &amp; Goldman-Rakic <b>J Neurophysiol 1989</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="9" data-marpit-pagination-total="47" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="9" data-marpit-pagination-total="38" aria-labelledby="heading-9"><p class="page">Slide 9</p>
 <h2 id="heading-9">A state in cortex: delay activity</h2>
 <div class="row">
 <div class="col fig">
@@ -123,10 +123,10 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1152/jn.1989.61.2.331" rel="noopener">Funahashi, Bruce &amp; Goldman-Rakic <b>J Neurophysiol 1989</b></a> · <a href="https://doi.org/10.1162/neco.1991.3.2.179" rel="noopener">Zipser <b>Neural Comput 1991</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="10" data-marpit-pagination-total="47" aria-labelledby="heading-10"><p class="page">Slide 10</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="10" data-marpit-pagination-total="38" aria-labelledby="heading-10"><p class="page">Slide 10</p>
 <h2 id="heading-10">Building a recurrent unit</h2>
 <p>Goal: extend the model neuron of earlier lectures so it can hold a state</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="11" data-marpit-pagination-total="47" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="11" data-marpit-pagination-total="38" aria-labelledby="heading-11"><p class="page">Slide 11</p>
 <h2 id="heading-11">A first state: an integrator</h2>
 <div class="row">
 <div class="col fig">
@@ -140,7 +140,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="12" data-marpit-pagination-total="47" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="12" data-marpit-pagination-total="38" aria-labelledby="heading-12"><p class="page">Slide 12</p>
 <h2 id="heading-12">A leaky integrator</h2>
 <div class="row">
 <div class="col fig">
@@ -154,7 +154,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="13" data-marpit-pagination-total="47" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="13" data-marpit-pagination-total="38" aria-labelledby="heading-13"><p class="page">Slide 13</p>
 <h2 id="heading-13">From one unit to a network: the input</h2>
 <div class="row">
 <div class="col fig">
@@ -168,7 +168,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="14" data-marpit-pagination-total="47" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="14" data-marpit-pagination-total="38" aria-labelledby="heading-14"><p class="page">Slide 14</p>
 <h2 id="heading-14">From one unit to a network: the state</h2>
 <div class="row">
 <div class="col fig">
@@ -183,7 +183,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="15" data-marpit-pagination-total="47" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="15" data-marpit-pagination-total="38" aria-labelledby="heading-15"><p class="page">Slide 15</p>
 <h2 id="heading-15">From one unit to a network: recurrent connections</h2>
 <div class="row">
 <div class="col fig">
@@ -198,7 +198,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="16" data-marpit-pagination-total="47" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="16" data-marpit-pagination-total="38" aria-labelledby="heading-16"><p class="page">Slide 16</p>
 <h2 id="heading-16">From one unit to a network: the readout</h2>
 <div class="row">
 <div class="col fig">
@@ -214,7 +214,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="17" data-marpit-pagination-total="47" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="17" data-marpit-pagination-total="38" aria-labelledby="heading-17"><p class="page">Slide 17</p>
 <h2 id="heading-17">The state over time: activity outlasts the input</h2>
 <div class="row">
 <div class="col fig">
@@ -228,7 +228,7 @@
 </ul>
 </div>
 </div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="20" data-marpit-pagination-total="47" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="20" data-marpit-pagination-total="38" aria-labelledby="heading-20"><p class="page">Slide 20</p>
 <h2 id="heading-20">To train a recurrent network, unroll it in time</h2>
 <div><figure><img src="../images/L18/rnn_unrolled.svg" alt="The recurrent network unrolled over three time steps, t = 1, 2, 3. At each step, an input column x1 to xD at the bottom feeds, through magenta weights W_hx, a column of hidden units h1 to hD, which feeds an output column y-hat 1 and 2 through W_yh. Magenta arrows W_hh link each hidden column to the next one, starting from h at step 0 on the left. Caption: same W_hx, W_hh, W_yh at every step" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>The recurrent network unrolled over three time steps, t = 1, 2, 3. At each step, an input column x1 to xD at the bottom feeds, through magenta weights W_hx, a column of hidden units h1 to hD, which feeds an output column y-hat 1 and 2 through W_yh. Magenta arrows W_hh link each hidden column to the next one, starting from h at step 0 on the left. Caption: same W_hx, W_hh, W_yh at every step</p><a href="../images/L18/rnn_unrolled.svg">Open full-size figure</a></figcaption></figure></div>
 <ul>
@@ -236,7 +236,7 @@
 <li>The <strong>same</strong> weights at <strong>every</strong> step, as a CNN reuses one filter at every position</li>
 <li>Unrolled, an RNN is a <mark><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T</annotation></semantics></math>-deep network with shared weights</mark></li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="21" data-marpit-pagination-total="47" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="21" data-marpit-pagination-total="38" aria-labelledby="heading-21"><p class="page">Slide 21</p>
 <h2 id="heading-21">Training: backprop through time</h2>
 <ul>
 <li>Score the output at every step with a loss <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">ℓ</mi></mrow><annotation encoding="application/x-tex">\ell</annotation></semantics></math> (e.g., cross-entropy against the target), and sum over time:</li>
@@ -247,7 +247,7 @@
 <li>Each step uses a copy of the shared weights, so <mark>their gradient is the sum of the gradients of all the copies</mark></li>
 </ul>
 <div class="ref"><a href="https://doi.org/10.1109/5.58337" rel="noopener">Werbos <b>Proc IEEE 1990</b></a> · <a href="https://doi.org/10.1207/s15516709cog1402_1" rel="noopener">Elman <b>Cognitive Science 1990</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-class="codeslide" data-lang="en" lang="en" data-marpit-pagination="22" data-marpit-pagination-total="47" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-class="codeslide" data-lang="en" lang="en" data-marpit-pagination="22" data-marpit-pagination-total="38" aria-labelledby="heading-22"><p class="page">Slide 22</p>
 <h2 id="heading-22">Code: an RNN in PyTorch</h2>
 <marp-pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">import</span> torch, torch.nn <span class="hljs-keyword">as</span> nn
 
@@ -266,7 +266,7 @@
         <span class="hljs-keyword">return</span> torch.stack(H)                 <span class="hljs-comment"># (T, d_hidden)</span>
 </code></marp-pre>
 <p>The <code>for</code> loop over time is the unrolled network; <code>loss.backward()</code> runs BPTT.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="23" data-marpit-pagination-total="47" aria-labelledby="heading-23"><p class="page">Slide 23</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="23" data-marpit-pagination-total="38" aria-labelledby="heading-23"><p class="page">Slide 23</p>
 <h2 id="heading-23">Why long memories are hard to learn</h2>
 <div class="row">
 <div class="col">
@@ -287,7 +287,7 @@
 </div>
 </div>
 <div class="ref">Hochreiter <b>Diploma thesis, TU Munich 1991</b> · <a href="https://doi.org/10.1109/72.279181" rel="noopener">Bengio, Simard &amp; Frasconi <b>IEEE TNN 1994</b></a> · <a href="https://arxiv.org/abs/1211.5063" rel="noopener">Pascanu et al. <b>ICML 2013</b></a> · <a href="https://arxiv.org/abs/2405.21064" rel="noopener">Zucchet &amp; Orvieto <b>NeurIPS 2024</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="24" data-marpit-pagination-total="47" aria-labelledby="heading-24"><p class="page">Slide 24</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="24" data-marpit-pagination-total="38" aria-labelledby="heading-24"><p class="page">Slide 24</p>
 <h2 id="heading-24">Gating, step 1: the vanilla RNN</h2>
 <div class="row">
 <div class="col fig">
@@ -302,7 +302,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://arxiv.org/abs/1406.1078" rel="noopener">Cho et al. <b>EMNLP 2014</b></a> · <a href="https://doi.org/10.1162/neco.1997.9.8.1735" rel="noopener">Hochreiter &amp; Schmidhuber <b>Neural Computation 1997</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="25" data-marpit-pagination-total="47" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="25" data-marpit-pagination-total="38" aria-labelledby="heading-25"><p class="page">Slide 25</p>
 <h2 id="heading-25">Gating, step 2: an update gate</h2>
 <div class="row">
 <div class="col fig">
@@ -318,7 +318,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://arxiv.org/abs/1406.1078" rel="noopener">Cho et al. <b>EMNLP 2014</b></a> · <a href="https://doi.org/10.1162/neco.1997.9.8.1735" rel="noopener">Hochreiter &amp; Schmidhuber <b>Neural Computation 1997</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="26" data-marpit-pagination-total="47" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="26" data-marpit-pagination-total="38" aria-labelledby="heading-26"><p class="page">Slide 26</p>
 <h2 id="heading-26">Gating, step 3: a reset gate → the GRU</h2>
 <div class="row">
 <div class="col fig">
@@ -333,7 +333,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://arxiv.org/abs/1406.1078" rel="noopener">Cho et al. <b>EMNLP 2014</b></a> · <a href="https://doi.org/10.1162/neco.1997.9.8.1735" rel="noopener">Hochreiter &amp; Schmidhuber <b>Neural Computation 1997</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="27" data-marpit-pagination-total="47" aria-labelledby="heading-27"><p class="page">Slide 27</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="27" data-marpit-pagination-total="38" aria-labelledby="heading-27"><p class="page">Slide 27</p>
 <h2 id="heading-27">Where recurrent networks have been used</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Where recurrent networks have been used — table"><table><caption>Where recurrent networks have been used — table</caption>
 <thead>
@@ -377,10 +377,10 @@
 </tbody>
 </table></div>
 <div class="ref"><a href="https://doi.org/10.21437/Interspeech.2010-343" rel="noopener">Mikolov <b>2010</b></a> · <a href="https://arxiv.org/abs/1409.3215" rel="noopener">Sutskever <b>2014</b></a> · <a href="https://arxiv.org/abs/1303.5778" rel="noopener">Graves <b>2013</b></a> · <a href="https://arxiv.org/abs/1411.4555" rel="noopener">Vinyals <b>2015</b></a> · <a href="https://doi.org/10.3389/fpsyg.2017.01551" rel="noopener">Spoerer <b>2017</b></a> · <a href="https://arxiv.org/abs/1909.06161" rel="noopener">Kubilius <b>2019</b></a> · <a href="https://doi.org/10.1037/0033-295X.111.2.395" rel="noopener">Botvinick <b>2004</b></a> · <a href="https://doi.org/10.1038/nature12742" rel="noopener">Mante <b>2013</b></a> · <a href="https://doi.org/10.1038/s41593-018-0310-2" rel="noopener">Yang <b>2019</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="28" data-marpit-pagination-total="47" aria-labelledby="heading-28"><p class="page">Slide 28</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="28" data-marpit-pagination-total="38" aria-labelledby="heading-28"><p class="page">Slide 28</p>
 <h2 id="heading-28">Recurrence in visual cortex</h2>
 <p>One image, held fixed: the state changes over processing steps and links distant parts of the image.</p>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="29" data-marpit-pagination-total="47" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="29" data-marpit-pagination-total="38" aria-labelledby="heading-29"><p class="page">Slide 29</p>
 <h2 id="heading-29">A feedforward sweep recognizes a flashed image</h2>
 <div class="row">
 <div class="col fig">
@@ -395,7 +395,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1038/381520a0" rel="noopener">Thorpe, Fize &amp; Marlot <b>Nature 1996</b></a> · <a href="https://doi.org/10.1073/pnas.0700622104" rel="noopener">Serre, Oliva &amp; Poggio <b>PNAS 2007</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="32" data-marpit-pagination-total="47" aria-labelledby="heading-32"><p class="page">Slide 32</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="32" data-marpit-pagination-total="38" aria-labelledby="heading-32"><p class="page">Slide 32</p>
 <h2 id="heading-32">Cortex is not a single sweep</h2>
 <div class="row">
 <div class="col fig">
@@ -412,7 +412,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1111/nyas.14320" rel="noopener">Kreiman &amp; Serre <b>Ann NY Acad Sci 2020</b></a> · Retzius <b>1906</b></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="33" data-marpit-pagination-total="47" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="33" data-marpit-pagination-total="38" aria-labelledby="heading-33"><p class="page">Slide 33</p>
 <h2 id="heading-33">From the recurrent unit to visual cortex</h2>
 <div class="row">
 <div class="col fig">
@@ -427,7 +427,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1037/rev0000109" rel="noopener">Mély, Linsley &amp; Serre <b>Psychol Rev 2018</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="34" data-marpit-pagination-total="47" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="34" data-marpit-pagination-total="38" aria-labelledby="heading-34"><p class="page">Slide 34</p>
 <h2 id="heading-34">Horizontal connections link distant parts of the image</h2>
 <div class="row">
 <div class="col fig">
@@ -444,7 +444,7 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1037/rev0000109" rel="noopener">Mély, Linsley &amp; Serre <b>Psychol Rev 2018</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="35" data-marpit-pagination-total="47" aria-labelledby="heading-35"><p class="page">Slide 35</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="35" data-marpit-pagination-total="38" aria-labelledby="heading-35"><p class="page">Slide 35</p>
 <h2 id="heading-35">One circuit explains contextual illusions</h2>
 <div class="row">
 <div class="col fig">
@@ -461,135 +461,17 @@
 </div>
 </div>
 <div class="ref"><a href="https://doi.org/10.1037/rev0000109" rel="noopener">Mély, Linsley &amp; Serre <b>Psychol Rev 2018</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="36" data-marpit-pagination-total="47" aria-labelledby="heading-36"><p class="page">Slide 36</p>
-<h2 id="heading-36">Curve tracing in monkey V1: the task</h2>
-<div class="capfig">
-<figure><img src="../images/L18/curve_task.svg" alt="Reproduced from Pooresmaeili and Roelfsema 2014, Fig. 2A: the trial of the monkey curve-tracing task in three screens. Fixation, 300 ms, a single red fixation point. Stimulus, 600 ms: two black curves cross, a target curve running from the fixation point to a red dot at the lower left and a distractor curve ending in a red dot at the lower right. Saccade: the monkey makes an eye movement, drawn as a dashed arrow, to the end dot of the target curve" aria-describedby="figure-36-1"><figcaption id="figure-36-1"><p>Reproduced from Pooresmaeili and Roelfsema 2014, Fig. 2A: the trial of the monkey curve-tracing task in three screens. Fixation, 300 ms, a single red fixation point. Stimulus, 600 ms: two black curves cross, a target curve running from the fixation point to a red dot at the lower left and a distractor curve ending in a red dot at the lower right. Saccade: the monkey makes an eye movement, drawn as a dashed arrow, to the end dot of the target curve</p><a href="../images/L18/curve_task.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li><strong>Monkey V1 (electrophysiology).</strong> <strong>Curve tracing:</strong> two curves; the monkey makes an eye movement to the end of the curve that starts at the fixation point</li>
-<li>Two curves cross or pass close; only one is connected to fixation</li>
-<li>Does a V1 neuron respond differently on the target curve and on the distractor?</li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.1016/j.cub.2014.10.007" rel="noopener">Pooresmaeili &amp; Roelfsema <b>Curr Biol 2014</b></a> · <a href="https://doi.org/10.1146/annurev.neuro.29.051605.112939" rel="noopener">Roelfsema <b>Annu Rev Neurosci 2006</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="37" data-marpit-pagination-total="47" aria-labelledby="heading-37"><p class="page">Slide 37</p>
-<h2 id="heading-37">Grouping spreads along a curve in V1</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L18/pub_pooresmaeili2014_fig4a_gap.png" alt="Reproduced from Pooresmaeili and Roelfsema 2014, Fig. 4A, two panels. Above each, two small displays with the same curves and the same receptive field (a square) far along a curve: in one display that curve is connected to the fixation point (attention in RF, red), in the other it is not (attention outside RF, blue). Below, the average V1 response over time (N = 34 recording sites): both traces share the first peak, then the red trace stays higher. The difference starts at 164 ms when the distractor is far (large gap, left) and at 240 ms when it passes close (small gap, right)" aria-describedby="figure-37-1"><figcaption id="figure-37-1"><p>Reproduced from Pooresmaeili and Roelfsema 2014, Fig. 4A, two panels. Above each, two small displays with the same curves and the same receptive field (a square) far along a curve: in one display that curve is connected to the fixation point (attention in RF, red), in the other it is not (attention outside RF, blue). Below, the average V1 response over time (N = 34 recording sites): both traces share the first peak, then the red trace stays higher. The difference starts at 164 ms when the distractor is far (large gap, left) and at 240 ms when it passes close (small gap, right)</p><a href="../images/L18/pub_pooresmaeili2014_fig4a_gap.png">Open full-size figure</a></figcaption></figure>
-</div>
-<div class="col">
-<ul>
-<li><strong>Monkey V1 (electrophysiology):</strong> the same curve in the receptive field (square); only its link to the fixation point changes</li>
-<li>On the target curve (red) neurons fire more than on the distractor (blue): an <strong>enhancement</strong>, after the first response</li>
-<li>Far along the curve it starts at 164 ms; <mark>when the distractor passes close, at 240 ms</mark></li>
-<li>It spreads ~50 ms per step; a step shrinks where the distractor is close (the paper's growth-cone model)</li>
-</ul>
-</div>
-</div>
-<div class="ref"><a href="https://doi.org/10.1016/j.cub.2014.10.007" rel="noopener">Pooresmaeili &amp; Roelfsema <b>Curr Biol 2014</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="38" data-marpit-pagination-total="47" aria-labelledby="heading-38"><p class="page">Slide 38</p>
-<h2 id="heading-38">Pathfinder: curve tracing for networks</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L17/pub_linsley2018_fig1b_pathfinder.png" alt="Reproduced from Linsley et al. 2018, Fig. 1b: two Pathfinder images, white dashed curves on black, each with two white dots. In the left image one long dashed path joins the two dots; in the right image the dots sit on different paths" aria-describedby="figure-38-1"><figcaption id="figure-38-1"><p>Published figure: Fig. 1b of Linsley et al. (2018), two Pathfinder images. Each shows white dashed curves on a black background and two white dots. In the left image one long dashed path joins the two dots. In the right image the dots sit on different paths. The task is to answer whether the two dots are joined by one dashed path. The slide notes that people solve it quickly and accurately, and that the answer depends on every dash along a path that can wander anywhere in the image.</p><a href="../images/L17/pub_linsley2018_fig1b_pathfinder.png">Open full-size figure</a></figcaption></figure>
-</div>
-<div class="col">
-<ul>
-<li><strong>Task for people and models.</strong> <strong>Pathfinder:</strong> are the two dots joined by one dashed path? People answer quickly and accurately</li>
-<li>Each unit sees only a small patch of the image (its receptive field), while the path can wander anywhere</li>
-<li><strong>hGRU</strong> (our lab): horizontal connections pass activity from dash to dash, as in curve tracing in V1</li>
-<li>Transformers fail to learn its longest versions (shown later)</li>
-</ul>
-</div>
-</div>
-<div class="ref"><a href="https://arxiv.org/abs/1805.08315" rel="noopener">Linsley et al. <b>NeurIPS 2018</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-39" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="39" data-marpit-pagination-total="47" aria-labelledby="heading-39"><p class="page">Slide 39</p>
-<h2 id="heading-39">Recurrence vs. depth on Pathfinder</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L18/pub_linsley2018_fig3c_params_v2.png" alt="Reproduced from Linsley et al. 2018, Fig. 3c: accuracy on the longest Pathfinder paths, 0.5 to 1, against the number of free parameters relative to the hGRU, log axis 1 to 1000. The hGRU reaches 0.99 at 1 times. Feedforward networks with 1, 3 or 5 layers stay between 0.5 and 0.93 at 1.4 to 9.5 times. Only large networks such as FCN, U-Net, SegNet and ResNet-152 reach 0.98 to 0.99, at about 230 to 900 times the parameters; ResNet-50 and ResNet-18 stay near chance" aria-describedby="figure-39-1"><figcaption id="figure-39-1"><p>Published figure: Fig. 3c of Linsley et al. (2018), replotted for this lecture. Each dot is one network. The horizontal axis is the number of free parameters relative to the hGRU, on a logarithmic scale from 1 to 1000. The vertical axis is accuracy on the longest Pathfinder paths, from 0.5 to 1. The hGRU reaches 0.99 at 1 times the parameters. Feedforward networks with 1, 3 or 5 layers stay between 0.5 and 0.93, at 1.4 to 9.5 times the parameters. Only large networks such as FCN, U-Net, SegNet and ResNet-152 reach 0.98 to 0.99, at about 230 to 900 times the parameters. ResNet-50 and ResNet-18 stay near chance. The slide concludes that one recurrent layer matches feedforward networks with 200 to 900 times more parameters.</p><a href="../images/L18/pub_linsley2018_fig3c_params_v2.png">Open full-size figure</a></figcaption></figure>
-</div>
-<div class="col">
-<ul>
-<li><strong>Model.</strong> <strong>hGRU</strong> (horizontal GRU): a recurrent circuit with GRU-like gates; <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\mathbf{W}_{hh}</annotation></semantics></math> is a convolution (each unit connected to its neighbors in space). One layer: ~99% on the longest paths</li>
-<li>Feedforward CNNs match it only with <mark>200 to 900 times more parameters</mark>; ResNet-18 and ResNet-50 stay at chance</li>
-<li>Activity propagates from dash to dash, one step at a time</li>
-</ul>
-</div>
-</div>
-<div class="ref"><a href="https://arxiv.org/abs/1805.08315" rel="noopener">Linsley et al. <b>NeurIPS 2018</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-40" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="40" data-marpit-pagination-total="47" aria-labelledby="heading-40"><p class="page">Slide 40</p>
-<h2 id="heading-40">Horizontal vs. top-down connections</h2>
-<div class="row">
-<div class="col fig">
-<figure><img src="../images/L18/kim2020_tasks_bars.svg" alt="Reproduced from Kim et al. 2020, Figs. 4a and 5a. Top, Pathfinder: example images with a yes and a no answer, and accuracy for four circuits against human accuracy near 96 percent. Horizontal plus top-down and horizontal only reach about 96 percent, top-down only about 63 percent, no recurrence 50 percent. Bottom, cABC, where the two marked points are on the same letter or not: horizontal plus top-down about 88 percent, top-down only about 87 percent, horizontal only about 54 percent, no recurrence 50 percent, human accuracy about 84 percent" aria-describedby="figure-40-1"><figcaption id="figure-40-1"><p>Reproduced from Kim et al. 2020, Figs. 4a and 5a. Top, Pathfinder: example images with a yes and a no answer, and accuracy for four circuits against human accuracy near 96 percent. Horizontal plus top-down and horizontal only reach about 96 percent, top-down only about 63 percent, no recurrence 50 percent. Bottom, cABC, where the two marked points are on the same letter or not: horizontal plus top-down about 88 percent, top-down only about 87 percent, horizontal only about 54 percent, no recurrence 50 percent, human accuracy about 84 percent</p><a href="../images/L18/kim2020_tasks_bars.svg">Open full-size figure</a></figcaption></figure>
-</div>
-<div class="col">
-<ul>
-<li><strong>Models</strong> (human accuracy as reference). <strong>cABC</strong> (cluttered ABC): are the two marked points on the same letter? The letters overlap, so local continuation of a line is no longer enough</li>
-<li><strong>Horizontal</strong> alone: Pathfinder, not cABC; <strong>top-down</strong> alone: the reverse → <mark>line continuation needs horizontal links, letter shape needs top-down links</mark></li>
-<li>Both together reach human accuracy on both tasks; without recurrence, accuracy stays at chance</li>
-</ul>
-</div>
-</div>
-<div class="ref"><a href="https://arxiv.org/abs/1906.01558" rel="noopener">Kim et al. <b>ICLR 2020</b></a> · Serre <b>Annu Rev Vis Sci 2027</b></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-41" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="41" data-marpit-pagination-total="47" aria-labelledby="heading-41"><p class="page">Slide 41</p>
-<h2 id="heading-41">Grouping fills in an object over steps</h2>
-<div>
-<figure><img src="../images/L18/seminar_panoptic_baby-laptop.gif" alt="Animation, photograph of a baby at a laptop: colored object masks start in a few places and spread over the recurrent steps until each object is filled" aria-describedby="figure-41-1"><figcaption id="figure-41-1"><p>Animation from Linsley et al. (2020), a photograph of a baby at a laptop. Colored object masks start in a few places and spread over the model's successive recurrent steps until each object is filled. Each color marks one object that the network separates.</p><a href="../images/L18/seminar_panoptic_baby-laptop.gif">Open full-size figure</a></figcaption></figure>
-<figure><img src="../images/L18/seminar_panoptic_soccer.gif" alt="Animation, photograph of soccer players on a field: colored object masks start in a few places and spread over the recurrent steps until each object is filled" aria-describedby="figure-41-2"><figcaption id="figure-41-2"><p>Animation from Linsley et al. (2020), a photograph of soccer players on a field. Colored object masks start in a few places and spread over the model's successive recurrent steps until each object is filled. Each color marks one object that the network separates.</p><a href="../images/L18/seminar_panoptic_soccer.gif">Open full-size figure</a></figcaption></figure>
-<figure><img src="../images/L18/seminar_panoptic_dancers.gif" alt="Animation, photograph of two dancers: colored object masks start in a few places and spread over the recurrent steps until each object is filled" aria-describedby="figure-41-3"><figcaption id="figure-41-3"><p>Animation from Linsley et al. (2020), a photograph of two dancers. Colored object masks start in a few places and spread over the model's successive recurrent steps until each object is filled. Each color marks one object that the network separates.</p><a href="../images/L18/seminar_panoptic_dancers.gif">Open full-size figure</a></figcaption></figure>
-<figure><img src="../images/L18/seminar_panoptic_dogs.gif" alt="Animation, photograph of two dogs: colored object masks start in a few places and spread over the recurrent steps until each object is filled" aria-describedby="figure-41-4"><figcaption id="figure-41-4"><p>Animation from Linsley et al. (2020), a photograph of two dogs. Colored object masks start in a few places and spread over the model's successive recurrent steps until each object is filled. Each color marks one object that the network separates. The four animations illustrate panoptic segmentation, which labels every pixel by category and separates individual objects, by a feedforward network with a horizontal recurrent circuit added.</p><a href="../images/L18/seminar_panoptic_dogs.gif">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li><strong>Model:</strong> a horizontal recurrent circuit added to a feedforward network improves <strong>panoptic segmentation</strong> (label every pixel by category and separate individual objects), with fewer parameters</li>
-<li>Activity starts in a few places and <mark>spreads until each object is filled</mark>; learned from the task, not built in</li>
-</ul>
-<div class="ref"><a href="https://arxiv.org/abs/2005.11362" rel="noopener">Linsley et al. <b>NeurIPS 2020</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-42" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="42" data-marpit-pagination-total="47" aria-labelledby="heading-42"><p class="page">Slide 42</p>
-<h2 id="heading-42">Grouping time follows human reaction times</h2>
-<div class="capfig">
-<figure><img src="../images/L18/seminar_grouping_time_humans_vs_circuit.png" alt="Left: a black and white outline of two animals, one fixation dot labeled Fix, and probe dots A, B and C on the fixated animal at increasing distance along its body, and three probe dots D on the other animal. Middle, humans: reaction time in milliseconds rises from about 708 at A to 741 at B, 761 at C and 767 at D. Right, recurrent circuit: model reaction time in recurrent steps rises in the same order, from about 2.5 at A to 5.5 at B, 10 at C and 17 at D" aria-describedby="figure-42-1"><figcaption id="figure-42-1"><p>Figure replotted for this lecture. Left: a black and white outline of two animals, with a fixation dot labeled Fix and probe dots A, B and C on the fixated animal at increasing distance along its body, and three probe dots D on the other animal. Middle, humans: reaction time in milliseconds rises from about 708 at A to 741 at B, 761 at C and 767 at D, after Jeurissen, Self and Roelfsema (2016). Right, recurrent circuit: the model's reaction time, in recurrent steps, rises in the same order, from about 2.5 at A to 5.5 at B, 10 at C and 17 at D, from the circuit of Goetschalckx et al. (2023). The model was never fit to these data. The two vertical axes are scaled independently and the model times are in steps, not milliseconds.</p><a href="../images/L18/seminar_grouping_time_humans_vs_circuit.png">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li><strong>Human behavior:</strong> reaction time rises from A to C, <mark>longest on the other object (D)</mark></li>
-<li><strong>Model:</strong> a circuit trained to group (never fit to these data) needs more steps in the same order</li>
-</ul>
-<div class="ref"><a href="https://doi.org/10.7554/eLife.14320" rel="noopener">Jeurissen, Self &amp; Roelfsema <b>eLife 2016</b></a> · <a href="https://arxiv.org/abs/2306.11582" rel="noopener">Goetschalckx et al. <b>NeurIPS 2023</b></a></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-43" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="43" data-marpit-pagination-total="47" aria-labelledby="heading-43"><p class="page">Slide 43</p>
-<h2 id="heading-43">Our recurrent model on Pathfinder</h2>
-<div>
-<figure><img src="../images/L18/pathfinder14_pos_example.png" alt="A Pathfinder image, path length 14: white dashed curves on black; two white dots joined by one long dashed path" aria-describedby="figure-43-1"><figcaption id="figure-43-1"><p>A Pathfinder image, path length 14: white dashed curves on black; two white dots joined by one long dashed path</p><a href="../images/L18/pathfinder14_pos_example.png">Open full-size figure</a></figcaption></figure>
-<figure><img src="../images/L18/seminar_scssm_pathfinder_efficiency.png" alt="Two scatter plots of Pathfinder accuracy, 50 to 90 percent, with human accuracy marked at about 89 percent. Left, against training step time in milliseconds, log scale; right, against number of parameters, log scale. The sCSSM models (blue) form an upper front reaching about 91 percent, at or above human accuracy; Mamba-2 reaches about 84 percent; transformers stay near 50 to 55 percent, close to chance, as do sCSSM versions without the recurrence over steps or without spatial kernels" aria-describedby="figure-43-2"><figcaption id="figure-43-2"><p>Two scatter plots of Pathfinder accuracy, 50 to 90 percent, with human accuracy marked at about 89 percent. Left, against training step time in milliseconds, log scale; right, against number of parameters, log scale. The sCSSM models (blue) form an upper front reaching about 91 percent, at or above human accuracy; Mamba-2 reaches about 84 percent; transformers stay near 50 to 55 percent, close to chance, as do sCSSM versions without the recurrence over steps or without spatial kernels</p><a href="../images/L18/seminar_scssm_pathfinder_efficiency.png">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li><strong>Task:</strong> are the two dots joined by one dashed path? (longest paths, 14 dashes)</li>
-<li><strong>Models:</strong> our lab's recurrent model with a 2-D state (sCSSM) reaches human accuracy; <mark>transformers stay near chance</mark></li>
-</ul>
-<div class="ref"><a href="https://arxiv.org/abs/2011.04006" rel="noopener">Tay et al. <b>ICLR 2021</b></a> · Linsley, Dhimoïla, Karkada Ashok, Kim &amp; Serre <b>in submission</b></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-44" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="44" data-marpit-pagination-total="47" aria-labelledby="heading-44"><p class="page">Slide 44</p>
-<h2 id="heading-44">PathTracker: Pathfinder in time</h2>
-<div>
-<figure><img src="../images/L18/seminar_pathtracker-demo.gif" alt="Animation of the PathTracker task: a dot moves among identical distractor dots on a black background, from a red start marker; the question is whether it ends on the blue goal marker" aria-describedby="figure-44-1"><figcaption id="figure-44-1"><p>Animation of the PathTracker task from Linsley et al. (2021): a dot moves among identical distractor dots on a black background, starting from a red marker. The question is whether the dot ends on the blue goal marker. The slide says the task uses 15 identical dots over 32 frames, so the answer has to be carried in the state.</p><a href="../images/L18/seminar_pathtracker-demo.gif">Open full-size figure</a></figcaption></figure>
-<figure><img src="../images/L18/seminar_scssm_pathtracker_efficiency.png" alt="Two scatter plots of PathTracker accuracy, 50 to 100 percent, with human accuracy marked at 90 percent. Left, against training step time in milliseconds, log scale; right, against number of parameters, log scale. The sCSSM models form an upper front near 80 to 85 percent; Mamba-2, Gated DeltaNet and ConvS5 reach about 70 percent; transformers and S4ND stay near 50 percent, as do sCSSM versions without the temporal recurrence or without spatial kernels" aria-describedby="figure-44-2"><figcaption id="figure-44-2"><p>Figure from the Serre lab (Linsley, Dhimoïla, Karkada Ashok, Kim and Serre, in submission): two scatter plots of PathTracker accuracy, 50 to 100 percent, with human accuracy marked at 90 percent by a dashed line. Left, compute efficiency: accuracy against training step time in milliseconds, on a logarithmic scale. Right, parameter efficiency: accuracy against the number of parameters, on a logarithmic scale. The sCSSM models, in blue, form an upper front near 80 to 85 percent. Mamba-2, Gated DeltaNet and ConvS5 reach about 70 percent, and transformers and S4ND stay near 50 percent, as do sCSSM versions without the temporal recurrence or without spatial kernels. Each dot is one trained model and the lines are the best models at each budget.</p><a href="../images/L18/seminar_scssm_pathtracker_efficiency.png">Open full-size figure</a></figcaption></figure>
-</div>
-<ul>
-<li><strong>Task:</strong> a dot moves among 15 identical ones along an invisible contour. Does it end on the blue marker?</li>
-<li><strong>Models:</strong> our lab's recurrent model with a 2-D state (sCSSM) beats Mamba; <mark>transformers stay at chance</mark>, as on the longest Pathfinder</li>
-</ul>
-<div class="ref"><a href="https://arxiv.org/abs/2105.13351" rel="noopener">Linsley et al. <b>NeurIPS 2021</b></a> · Linsley, Dhimoïla, Karkada Ashok, Kim &amp; Serre <b>in submission</b></div>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-45" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="45" data-marpit-pagination-total="47" aria-labelledby="heading-45"><p class="page">Slide 45</p>
-<h2 id="heading-45">Recap</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="36" data-marpit-pagination-total="38" aria-labelledby="heading-36"><p class="page">Slide 36</p>
+<h2 id="heading-36">Recap</h2>
 <ul>
 <li>Two ways to keep the past: pass it in with the input (attention), or <strong>carry</strong> a fixed-size <strong>state</strong> forward (recurrence)</li>
 <li>A state is a lossy summary of the past; prefrontal neurons hold one in their delay activity</li>
 <li>Build-up: integrator → <strong>leak</strong> → network with <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{\mathbf{W}_{hh}}</annotation></semantics></math> (vanilla RNN) → <strong>BPTT</strong> → <strong>gates</strong> (GRU, a simpler LSTM): the input sets the leak</li>
-<li>Long memories are hard to learn: the gradient carries <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mstyle mathcolor="#3F7A6B"><msub><mi>w</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub></mstyle><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{w_{hh}}^{T}</annotation></semantics></math></li>
-<li>Visual cortex is recurrent: local horizontal connections spread <strong>grouping</strong> step by step along a curve (V1), in <strong>Pathfinder</strong> and in <strong>PathTracker</strong>, where transformers fail</li>
+<li>Long memories are hard to learn: the gradient carries <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mstyle mathcolor="#3F7A6B"><msub><mi>w</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub></mstyle><msup><mo stretchy="false">)</mo><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">(\textcolor{#3F7A6B}{w_{hh}})^{T}</annotation></semantics></math></li>
+<li>Visual cortex is recurrent: local <strong>horizontal connections</strong> link distant parts of the image step by step, and one such circuit explains contextual <strong>illusions</strong> (continued next lecture)</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-46" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="46" data-marpit-pagination-total="47" aria-labelledby="heading-46"><p class="page">Slide 46</p>
-<h2 id="heading-46">Further reading</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-37" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="37" data-marpit-pagination-total="38" aria-labelledby="heading-37"><p class="page">Slide 37</p>
+<h2 id="heading-37">Further reading</h2>
 <p>Optional: for going deeper, or as a starting point for the final project.</p>
 <ul>
 <li><a href="https://arxiv.org/abs/2405.21060" rel="noopener">Dao &amp; Gu <b>ICML 2024</b></a>: state-space models and attention as two ways to compute one family of models</li>
@@ -597,8 +479,8 @@
 <li><a href="https://arxiv.org/abs/2410.01201" rel="noopener">Feng et al. <b>arXiv 2024</b></a>: simplified GRUs and LSTMs that train in parallel and match Mamba</li>
 <li><a href="https://arxiv.org/abs/2602.11374" rel="noopener">Bick, Xing &amp; Gu <b>arXiv 2026</b></a>: keep 2% of attention heads, make the rest recurrent</li>
 </ul>
-<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-47" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="47" data-marpit-pagination-total="47" aria-labelledby="heading-47"><p class="page">Slide 47</p>
-<h2 id="heading-47">Minute paper</h2>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-38" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="38" data-marpit-pagination-total="38" aria-labelledby="heading-38"><p class="page">Slide 38</p>
+<h2 id="heading-38">Minute paper</h2>
 <p>Submit on <strong>Canvas → Minute papers → Minute Paper 19</strong> (access code read out in class).</p>
 <p>Write three brief points in your own words:</p>
 <ol>
