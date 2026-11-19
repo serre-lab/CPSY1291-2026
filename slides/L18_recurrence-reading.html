@@ -313,7 +313,7 @@
 </annotation></semantics></math></div></span></p><ul>
 <li><strong>Update gate</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#7A4FA3"><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐮</mi><mrow><mo stretchy="false">⟨</mo><mi>t</mi><mo stretchy="false">⟩</mo></mrow></msup></mstyle><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\textcolor{#7A4FA3}{\mathbf{u}^{\langle t\rangle}}=\sigma(\cdot)</annotation></semantics></math>, between 0 and 1, from the input and the state: <mark>an input-dependent leak</mark></li>
 <li>The old state is used twice: read (bottom) to compute the gate and the candidate; carried (top), scaled by <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mstyle mathcolor="#7A4FA3"><mi mathvariant="normal" data-original-mathvariant="bold">𝐮</mi></mstyle></mrow><annotation encoding="application/x-tex">1-\textcolor{#7A4FA3}{\mathbf{u}}</annotation></semantics></math></li>
-<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#7A4FA3"><mi mathvariant="normal" data-original-mathvariant="bold">𝐮</mi></mstyle><mo>≈</mo><mn mathvariant="normal" data-original-mathvariant="bold">𝟎</mn></mrow><annotation encoding="application/x-tex">\textcolor{#7A4FA3}{\mathbf{u}}\approx\mathbf{0}</annotation></semantics></math> → state and gradient pass through nearly unchanged</li>
+<li>In plain words: each unit learns when to keep its old value and when to overwrite it; in practice <mark>gradients survive many more steps</mark></li>
 </ul>
 </div>
 </div>
@@ -439,7 +439,7 @@
 <li>Visual cortex is <strong>retinotopic</strong>: a <strong>cortical column</strong> (gray) sees one location; neighboring columns see neighboring locations</li>
 <li><strong>Horizontal connections</strong> are local and the same everywhere (<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="#3F7A6B"><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{\mathbf{W}_{hh}}</annotation></semantics></math> becomes a convolution)</li>
 <li><strong>Center</strong> (red) drives the neuron; the <strong>surround</strong> (green, blue) modulates it</li>
-<li>Context crosses the map one neighborhood per step: <mark>linking distant parts takes many steps</mark></li>
+<li>Activity spreads across the map one neighborhood per step: <mark>linking distant parts takes many steps</mark></li>
 </ul>
 </div>
 </div>
