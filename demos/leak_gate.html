@@ -181,8 +181,8 @@ function render() {
   $('lambda-control').classList.toggle('inactive', gated); $('epsilon-control').classList.toggle('inactive', !gated);
   $('lambda-value').value = Number($('lambda').value).toFixed(2);
   $('epsilon-value').value = Number($('epsilon').value).toFixed(2);
-  $('equation').innerHTML = gated ? 'h⟨t⟩ = (1 − <span class="parameter">z⟨t⟩</span>) h⟨t−1⟩ + <span class="parameter">z⟨t⟩</span> x⟨t⟩' : 'h⟨t⟩ = <span class="parameter">λ</span> h⟨t−1⟩ + x⟨t⟩';
-  $('probe-note').innerHTML = gated ? '<span class="parameter">z = 1</span> at cue; <span class="parameter">z = ε</span> otherwise. Probe: x = 0, then update and read.' : 'Start with state 0. Cue: x = 1 at step 3. Probe: x = 0 at 39, then update and read.';
+  $('equation').innerHTML = gated ? 'h⟨t⟩ = (1 − <span class="parameter">u⟨t⟩</span>) h⟨t−1⟩ + <span class="parameter">u⟨t⟩</span> x⟨t⟩' : 'h⟨t⟩ = <span class="parameter">λ</span> h⟨t−1⟩ + x⟨t⟩';
+  $('probe-note').innerHTML = gated ? '<span class="parameter">u = 1</span> at cue; <span class="parameter">u = ε</span> otherwise. Probe: x = 0, then update and read.' : 'Start with state 0. Cue: x = 1 at step 3. Probe: x = 0 at 39, then update and read.';
   $('weights-caption').textContent = gated ? 'a linear recurrence is attention whose weights are set by the input (selection)' : 'a linear recurrence is attention whose weights are set by distance';
   result = computeModel();
   buttons.forEach((button,t) => {
