@@ -98,7 +98,7 @@
 <div class="row">
 <div class="col fig">
 <div class="capfig">
-<figure><img src="../images/L04/08_bao_objects.png" alt="A grid of renderings, one row per category (animal, vehicle, face, vegetable or fruit, house, man-made object). Each row shows two different objects of that category, for example a cat and a duck, an airliner and a bicycle, each seen from three of its 24 viewpoints" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>A grid of renderings, one row per category (animal, vehicle, face, vegetable or fruit, house, man-made object). Each row shows two different objects of that category, for example a cat and a duck, an airliner and a bicycle, each seen from three of its 24 viewpoints</p><a href="../images/L04/08_bao_objects.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L04/08_bao_objects.png" alt="A grid of gray-level renderings, one row per category (animal, vehicle, face, vegetable or fruit, house, man-made object). Each row shows two different objects of that category, for example a cat and a duck, an airliner and a bicycle, each seen from three of its 24 viewpoints" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>A grid of gray-level renderings, one row per category (animal, vehicle, face, vegetable or fruit, house, man-made object). Each row shows two different objects of that category, for example a cat and a duck, an airliner and a bicycle, each seen from three of its 24 viewpoints</p><a href="../images/L04/08_bao_objects.png">Open full-size figure</a></figcaption></figure>
 </div>
 </div>
 <div class="col">
@@ -107,7 +107,7 @@
 <li>Bao, She, McGill &amp; Tsao showed these images to monkeys while recording from <strong>IT cortex</strong>, the late stage of the visual system where neurons respond to whole objects. You also use them in Assignment 1.</li>
 <li>Here each image is a point in the <strong>late layer</strong> of ResNet-18, the trained image network of Assignment 1: 4,096 numbers per image.</li>
 <li>Two levels of grouping: views of the <strong>same object</strong>, and objects of the <strong>same category</strong>.</li>
-<li><strong>The question:</strong> pixels scatter an object's views. Does the network keep them <strong>together</strong>, and keep different objects <strong>apart</strong>?</li>
+<li>Pixels scatter an object's views. Does the network keep them <strong>together</strong>, and keep different objects <strong>apart</strong>?</li>
 </ul>
 </div>
 </div>
@@ -136,7 +136,7 @@
 <ul>
 <li>Now one PCA of all <strong>72 responses</strong> together. Each object keeps to its own small patch, and the patches are <strong>far apart</strong>.</li>
 <li>Viewpoint moves a response <strong>within</strong> a patch; identity moves it <strong>between</strong> patches.</li>
-<li><strong>And the brain?</strong> Bao et al. recorded monkey IT cortex with these same images: do its neurons also keep each object together? That question drives the recognition lectures.</li>
+<li><strong>And the brain?</strong> Bao et al. recorded monkey IT cortex with these same images: do its neurons also keep each object together? Later lectures take up that question.</li>
 </ul>
 </div>
 </div>
@@ -214,7 +214,7 @@
 <ul>
 <li>A crane is folded from <strong>one flat square</strong>: nothing is cut or glued.</li>
 <li>It <strong>sits in 3-D</strong>, yet it is still a <strong>2-D sheet</strong>: unfold it and you get the square back.</li>
-<li>If the square had text printed on it, the crane would hide it. To read it, you must <strong>unfold</strong>, not just look from a better angle.</li>
+<li>If the square had text printed on it, the crane would hide it. To read it, you must <strong>unfold</strong> it; looking from a better angle does not help.</li>
 </ul>
 </div>
 </div>
@@ -311,7 +311,7 @@
 <h2 id="heading-28">What t-SNE is trying to do</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L04/01_tsne_setup.svg" alt="Top, 24 points in three tight groups in a plane (blue, red, green), labelled N points in D dimensions. Bottom, the 1-D t-SNE map of the same points: a single line on which each group occupies its own stretch, red, then green, then blue" aria-describedby="figure-28-1"><figcaption id="figure-28-1"><p>Top, 24 points in three tight groups in a plane (blue, red, green), labelled N points in D dimensions. Bottom, the 1-D t-SNE map of the same points: a single line on which each group occupies its own stretch, red, then green, then blue</p><a href="../images/L04/01_tsne_setup.svg">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L04/01_tsne_setup.svg" alt="Top, 24 points in three tight groups in a plane (blue, red, green), labeled N points in D dimensions. Bottom, the 1-D t-SNE map of the same points: a single line on which each group occupies its own stretch, red, then green, then blue" aria-describedby="figure-28-1"><figcaption id="figure-28-1"><p>Top, 24 points in three tight groups in a plane (blue, red, green), labeled N points in D dimensions. Bottom, the 1-D t-SNE map of the same points: a single line on which each group occupies its own stretch, red, then green, then blue</p><a href="../images/L04/01_tsne_setup.svg">Open full-size figure</a></figcaption></figure>
 </div>
 <div class="col">
 <ul>
@@ -407,7 +407,7 @@
 <li>Connect each point to nearby points in the original space, giving stronger connections to closer neighbors.</li>
 <li>Lay out the map to favor those connections, while keeping unrelated points from collapsing together.</li>
 <li><strong><code>n_neighbors</code></strong> sets the neighborhood scale; <strong><code>min_dist</code></strong> how tightly points pack.</li>
-<li>Same data, same lesson: both maps keep local neighbors and <strong>tear the sheet</strong> in places.</li>
+<li>Same data, same result: both maps keep local neighbors and <strong>tear the sheet</strong> in places.</li>
 </ul>
 </div>
 <div class="col fig">
@@ -472,9 +472,9 @@
 <h2 id="heading-39">Which one should I use?</h2>
 <ul>
 <li><strong>Start with PCA:</strong> linear, fast, applies to new data, and tells you how much variance the 2-D view keeps.</li>
-<li>To look at <strong>neighborhoods and clusters</strong>, use <strong>t-SNE or UMAP</strong>. They are close cousins; Assignment 1 uses t-SNE only to keep it short, and UMAP would teach the same lessons.</li>
+<li>To look at <strong>neighborhoods and clusters</strong>, use <strong>t-SNE or UMAP</strong>. They are close cousins; Assignment 1 uses t-SNE only to keep it short, and UMAP would show the same things.</li>
 <li>Whichever you use: <strong>PCA initialization</strong>, <strong>sweep</strong> <code>perplexity</code> (t-SNE) or <code>n_neighbors</code> (UMAP) and the random seed, and keep <strong>what holds across the sweep</strong>.</li>
-<li><strong>Never pick the prettiest run.</strong> If a map shows two groups, check that the images really group that way in the network's own responses, not just in the picture.</li>
+<li><strong>Never pick the prettiest run.</strong> If a map shows two groups, check that the images really group that way in the network's own responses as well as in the picture.</li>
 </ul>
 <p>Next: back to our own data. Which features of a map can you believe?</p>
 <div class="ref"><a href="https://doi.org/10.1038/s41587-020-00809-z" rel="noopener">Kobak &amp; Linderman <b>2021</b></a> · <i>Nature Biotechnology</i></div>
@@ -617,15 +617,15 @@
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-52" data-paginate="true" data-marpit-pagination="52" data-marpit-pagination-total="59" aria-labelledby="heading-52"><p class="page">Slide 52</p>
 <h2 id="heading-52">In the wild: Isomap</h2>
 <div>
-<figure><figure><img src="../images/2026-illustrations/gallery/isomap-viejo2020-head-direction-ring_clean.png" alt="Head-direction population activity embedded with Isomap: a ring colored by heading, with activity during sleep travelling around it" aria-describedby="figure-52-1"><figcaption id="figure-52-1"><p>Head-direction population activity embedded with Isomap: a ring colored by heading, with activity during sleep travelling around it</p><a href="../images/2026-illustrations/gallery/isomap-viejo2020-head-direction-ring_clean.png">Open full-size figure</a></figcaption></figure><figcaption><b>Mice</b>, head-direction cells (anterodorsal thalamus), electrode recordings: a ring, travelled during sleep too</figcaption></figure>
+<figure><figure><img src="../images/2026-illustrations/gallery/isomap-viejo2020-head-direction-ring_clean.png" alt="Head-direction population activity embedded with Isomap: a ring colored by heading, with activity during sleep traveling around it" aria-describedby="figure-52-1"><figcaption id="figure-52-1"><p>Head-direction population activity embedded with Isomap: a ring colored by heading, with activity during sleep traveling around it</p><a href="../images/2026-illustrations/gallery/isomap-viejo2020-head-direction-ring_clean.png">Open full-size figure</a></figcaption></figure><figcaption><b>Mice</b>, head-direction cells (anterodorsal thalamus), electrode recordings: a ring, traveled during sleep too</figcaption></figure>
 <figure><figure><img src="../images/2026-illustrations/gallery/isomap-asumbisa2022-head-direction-ring_clean.png" alt="Isomap rings of head-direction activity in a blind control mouse and after olfactory ablation" aria-describedby="figure-52-2"><figcaption id="figure-52-2"><p>Isomap rings of head-direction activity in a blind control mouse and after olfactory ablation</p><a href="../images/2026-illustrations/gallery/isomap-asumbisa2022-head-direction-ring_clean.png">Open full-size figure</a></figcaption></figure><figcaption><b>Blind mice</b>, head-direction cells: the ring survives; without smell it drifts from the true heading</figcaption></figure>
 </div>
 <div class="ref">Viejo &amp; Peyrache 2020 · Asumbisa et al. 2022 · <i>Nat Commun</i> · CC BY 4.0</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-53" data-paginate="true" data-marpit-pagination="53" data-marpit-pagination-total="59" aria-labelledby="heading-53"><p class="page">Slide 53</p>
 <h2 id="heading-53">In the wild: t-SNE</h2>
 <div>
-<figure><figure><img src="../images/2026-illustrations/gallery/tsne-kobak2019-cortical-cell-types_clean.png" alt="t-SNE of 23,822 mouse cortical cells by gene expression, forming labelled islands of cell types" aria-describedby="figure-53-1"><figcaption id="figure-53-1"><p>t-SNE of 23,822 mouse cortical cells by gene expression, forming labelled islands of cell types</p><a href="../images/2026-illustrations/gallery/tsne-kobak2019-cortical-cell-types_clean.png">Open full-size figure</a></figcaption></figure><figcaption><b>Mouse cortex</b>, gene expression of 23,822 single cells: islands of cell types</figcaption></figure>
-<figure><figure><img src="../images/2026-illustrations/gallery/tsne-berman2014-fly-behaviour_clean.png" alt="A t-SNE map of fruit-fly postures and movements divided into behavioural regions such as walking, grooming and wing movements" aria-describedby="figure-53-2"><figcaption id="figure-53-2"><p>A t-SNE map of fruit-fly postures and movements divided into behavioural regions such as walking, grooming and wing movements</p><a href="../images/2026-illustrations/gallery/tsne-berman2014-fly-behaviour_clean.png">Open full-size figure</a></figcaption></figure><figcaption><b>Fruit flies</b>, video of freely moving animals: a map of behaviours</figcaption></figure>
+<figure><figure><img src="../images/2026-illustrations/gallery/tsne-kobak2019-cortical-cell-types_clean.png" alt="t-SNE of 23,822 mouse cortical cells by gene expression, forming labeled islands of cell types" aria-describedby="figure-53-1"><figcaption id="figure-53-1"><p>t-SNE of 23,822 mouse cortical cells by gene expression, forming labeled islands of cell types</p><a href="../images/2026-illustrations/gallery/tsne-kobak2019-cortical-cell-types_clean.png">Open full-size figure</a></figcaption></figure><figcaption><b>Mouse cortex</b>, gene expression of 23,822 single cells: islands of cell types</figcaption></figure>
+<figure><figure><img src="../images/2026-illustrations/gallery/tsne-berman2014-fly-behaviour_clean.png" alt="A t-SNE map of fruit-fly postures and movements divided into behavioral regions such as walking, grooming and wing movements" aria-describedby="figure-53-2"><figcaption id="figure-53-2"><p>A t-SNE map of fruit-fly postures and movements divided into behavioral regions such as walking, grooming and wing movements</p><a href="../images/2026-illustrations/gallery/tsne-berman2014-fly-behaviour_clean.png">Open full-size figure</a></figcaption></figure><figcaption><b>Fruit flies</b>, video of freely moving animals: a map of behaviors</figcaption></figure>
 </div>
 <div class="ref">Kobak &amp; Berens 2019 · <i>Nat Commun</i> · Berman et al. 2014 · <i>J R Soc Interface</i> · CC BY 4.0</div>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-54" data-paginate="true" data-marpit-pagination="54" data-marpit-pagination-total="59" aria-labelledby="heading-54"><p class="page">Slide 54</p>
