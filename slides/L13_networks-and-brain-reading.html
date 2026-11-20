@@ -17,7 +17,7 @@
 <h2 id="heading-3">A network is a function of its weights and of its input</h2>
 <div class="row">
 <div class="col fig">
-<figure><img src="../images/L13/loss_w_and_x.png" alt="Contour map of the logistic loss of a one-weight network over the weight w (horizontal) and the input x (vertical). A magenta training path moves right along w at fixed x, from w = 0.15 to w = 2.62, loss 0.64 to 0.12. From the trained point a blue attack path moves down along x at fixed w, crosses the dashed decision boundary at x = 0, and the loss rises to 1.98" aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>Contour map of the logistic loss of a one-weight network over the weight w (horizontal) and the input x (vertical). A magenta training path moves right along w at fixed x, from w = 0.15 to w = 2.62, loss 0.64 to 0.12. From the trained point a blue attack path moves down along x at fixed w, crosses the dashed decision boundary at x = 0, and the loss rises to 1.98</p><a href="../images/L13/loss_w_and_x.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L13/loss_w_and_x.png" alt="Contour map of the logistic loss of a one-weight network over the weight w (horizontal) and the input x (vertical). A magenta training path moves right along w at fixed x, from w = 0.15 to w = 2.62, loss 0.63 to 0.12. From the trained point a blue attack path moves down along x at fixed w, crosses the dashed decision boundary at x = 0, and the loss rises to 1.98" aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>Contour map of the logistic loss of a one-weight network over the weight w (horizontal) and the input x (vertical). A magenta training path moves right along w at fixed x, from w = 0.15 to w = 2.62, loss 0.63 to 0.12. From the trained point a blue attack path moves down along x at fixed w, crosses the dashed decision boundary at x = 0, and the loss rises to 1.98</p><a href="../images/L13/loss_w_and_x.png">Open full-size figure</a></figcaption></figure>
 <p class="provenance">Computed · the smallest network: one weight, one input, logistic loss</p>
 </div>
 <div class="col">
@@ -75,8 +75,7 @@
 </table></div>
 </div>
 <ul>
-<li>A <strong>step</strong> is one gradient update: against the gradient to lower the quantity, along it to raise it</li>
-<li>The <strong>logit</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mi>c</mi></msub></mrow><annotation encoding="application/x-tex">z_c</annotation></semantics></math> is the score of class <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math> before the softmax. <mark>In the last three rows, the trained weights never change</mark></li>
+<li><strong>Step</strong>: one gradient update. <strong>Logit</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mi>c</mi></msub></mrow><annotation encoding="application/x-tex">z_c</annotation></semantics></math>: class <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math>'s score before the softmax. <mark>In the last three rows, the weights never change</mark></li>
 </ul>
 <p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-class="prov-air" data-marpit-pagination="5" data-marpit-pagination-total="47" aria-labelledby="heading-5"><p class="page">Slide 5</p>
 <h2 id="heading-5">Training: the gradient flows back to the weights</h2>
