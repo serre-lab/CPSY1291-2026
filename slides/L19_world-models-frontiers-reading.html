@@ -1,0 +1,493 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>World models in brains and machines · reader-friendly version · CPSY 1291</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#faf9f5;color:#334155;font:1.125rem/1.65 system-ui,sans-serif}main{max-width:65rem;margin:auto;padding:2rem}h1,h2,h3{color:#1e293b;line-height:1.25}h1{font-size:2.2rem}h2{font-size:1.8rem}h3{font-size:1.3rem}a{color:#80431c;text-underline-offset:.16em;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #0969da;outline-offset:4px}.skip{display:block;padding:.5rem 2rem}section{padding:1.5rem 0 2.5rem;border-bottom:2px solid #64748b;scroll-margin-top:1rem}section>.page{font-size:1rem}.row,.col{display:block}.lockup img{width:4rem}.vrule{display:none}.eyebrow,.meta{font-size:1rem}.ref{margin-top:1rem;color:#334155;font-size:1rem}img{max-width:100%;height:auto}figure{margin:1.5rem 0}figcaption{padding:.7rem 0}figcaption p{margin:.5rem 0}details{border:1px solid #64748b;padding:.8rem;margin:1rem 0}summary{cursor:pointer;font-weight:600}.table-scroll,.math-scroll{max-width:100%;overflow:auto}.table-scroll:focus{outline:3px solid #0969da}table{border-collapse:collapse;width:100%;font-size:1rem}caption{text-align:left;font-weight:600;padding:.7rem 0}th,td{padding:.5rem;border:1px solid #64748b;text-align:left}thead th{background:#e9edf0}code,pre{font-size:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#e9edf0;padding:1rem}.katex-display{display:block;margin:1.5rem 0}math{font-size:1.1em}.toc{columns:2;column-gap:2rem}.toc li{break-inside:avoid;margin:.3rem 0}.back{font-size:1rem}@media(max-width:600px){main{padding:1rem}.toc{columns:1}h1{font-size:1.8rem}h2{font-size:1.5rem}}@media print{details{break-inside:avoid}.skip,.back{display:none}}</style></head><body><a class="skip" href="#content">Skip to lecture content</a><main id="content"><h1>World models in brains and machines</h1><p>Reader-friendly version of the 36 lecture slides: the lecture content in normal flow, with figure descriptions and data tables where the figure carries data. <a href="L19_world-models-frontiers.html">Open the presentation</a>.</p><nav aria-label="Lecture contents" id="contents"><h2>Contents</h2><ol class="toc"><li><a href="#slide-1">World models in brains and machines</a></li><li><a href="#slide-2">The circuit: near excitation, far inhibition</a></li><li><a href="#slide-3">One circuit explains contextual illusions</a></li><li><a href="#slide-4">Pathfinder: curve tracing for networks</a></li><li><a href="#slide-5">Recurrence vs. depth on Pathfinder</a></li><li><a href="#slide-6">Grouping time follows human reaction times</a></li><li><a href="#slide-7">Grouping spreads along a curve in V1</a></li><li><a href="#slide-8">Horizontal vs. top-down connections</a></li><li><a href="#slide-9">Grouping fills in an object over steps</a></li><li><a href="#slide-10">Why transformers replaced RNNs</a></li><li><a href="#slide-11">Our recurrent model on Pathfinder</a></li><li><a href="#slide-12">PathTracker: Pathfinder in time</a></li><li><a href="#slide-13">Brains simulate</a></li><li><a href="#slide-14">From grouping to simulation</a></li><li><a href="#slide-15">Planko: which basket will the ball land in?</a></li><li><a href="#slide-16">Brains simulate: monkey fMRI</a></li><li><a href="#slide-17">Model: what the recurrent network does</a></li><li><a href="#slide-18">Recurrence learns simulation; feedforward does not</a></li><li><a href="#slide-20">Settling time predicts reaction times</a></li><li><a href="#slide-21">Perspective taking: seeing through someone else's eyes</a></li><li><a href="#slide-22">The 3D Perception Challenge</a></li><li><a href="#slide-23">Models match people on depth, fail on perspective</a></li><li><a href="#slide-24">A frontier model still misses perspective taking</a></li><li><a href="#slide-25">People mentally move to the other viewpoint</a></li><li><a href="#slide-26">Learning representations vs. manipulating them</a></li><li><a href="#slide-27">Perspective taking needs a world model</a></li><li><a href="#slide-28">What is a world model?</a></li><li><a href="#slide-29">Video world models</a></li><li><a href="#slide-30">Robot planning with a world model</a></li><li><a href="#slide-31">Embodiment: learning by moving</a></li><li><a href="#slide-32">What to keep</a></li><li><a href="#slide-33">What happens next: exam and final project</a></li><li><a href="#slide-34">Starting points for a project</a></li><li><a href="#slide-35">Further reading</a></li><li><a href="#slide-36">Minute paper</a></li></ol></nav><section id="slide-1" data-class="lectitle" data-lang="en" lang="en" aria-labelledby="heading-1"><p class="page">Slide 1</p><div class="lockup">
+  <img src="../images/brown-crest-color.png" alt="Brown University crest">
+  <div class="vrule"></div>
+  <div>
+    <span class="code">CPSY 1291</span>
+    <span class="name">Computational Methods for Mind, Brain &amp; Behavior</span>
+  </div>
+</div>
+<div class="eyebrow">Lecture 19 · Theme 3: Dynamics, sequences &amp; world models</div>
+<h2 id="heading-1">World models in brains and machines</h2>
+<p class="meta">Tuesday, November 24 · Fall 2026</p>
+
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-2" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="2" data-marpit-pagination-total="36" aria-labelledby="heading-2"><p class="page">Slide 2</p>
+<h2 id="heading-2">The circuit: near excitation, far inhibition</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L19/pub_mely2018_fig1a_circuit.png" alt="Reproduced from Mély, Linsley and Serre 2018, Fig. 1A: cortical columns in perspective, each with three pyramidal neurons. The center column (red) holds the recorded unit; a green column nearby sends tuned excitation, a blue column farther away tuned inhibition; rings on the floor mark center, near surround and far surround. An electrode records the population, read out by an ideal neural observer as an orientation. Legend: weakly tuned excitation and untuned inhibition within the receptive field (red), tuned excitation from the near surround (green), tuned inhibition from the far surround (blue)" aria-describedby="figure-2-1"><figcaption id="figure-2-1"><p>Reproduced from Mély, Linsley and Serre 2018, Fig. 1A: cortical columns in perspective, each with three pyramidal neurons. The center column (red) holds the recorded unit; a green column nearby sends tuned excitation, a blue column farther away tuned inhibition; rings on the floor mark center, near surround and far surround. An electrode records the population, read out by an ideal neural observer as an orientation. Legend: weakly tuned excitation and untuned inhibition within the receptive field (red), tuned excitation from the near surround (green), tuned inhibition from the far surround (blue)</p><a href="../images/L19/pub_mely2018_fig1a_circuit.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Thursday ended on horizontal connections inside V1; this is our model of them</li>
+<li><strong>Excitation</strong> from near units, added; <strong>inhibition</strong> from far units, scaled by the unit's own activity</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi></mrow><annotation encoding="application/x-tex">X</annotation></semantics></math>: image input; <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>H</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup><mo separator="true">,</mo><msup><mi>H</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup></mrow><annotation encoding="application/x-tex">H^{(1)}, H^{(2)}</annotation></semantics></math>: two stages of each unit</li>
+<li>Stepped in time, a recurrent network</li>
+</ul>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>η</mi><mtext> </mtext><msup><mover accent="true"><mi>H</mi><mo>˙</mo></mover><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup><mo>+</mo><msup><mi>ϵ</mi><mn>2</mn></msup><msup><mi>H</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup><mo>=</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><mtext> </mtext><mi>ξ</mi><mi>X</mi><mo>−</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>α</mi><msup><mi>H</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup><mo>+</mo><mi>μ</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mtext> </mtext><mstyle mathcolor="#3E6D8E"><msub><mi>W</mi><mi>I</mi></msub><mo>∗</mo><msup><mi>H</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup></mstyle><msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo><mo>+</mo></msub></mrow><annotation encoding="application/x-tex">\eta\,\dot{H}^{(1)} + \epsilon^2 H^{(1)} = \Big[\,\xi X - \big(\alpha H^{(1)} + \mu\big)\,\textcolor{#3E6D8E}{W_I * H^{(2)}}\Big]_+
+</annotation></semantics></math></div></span></p><p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>τ</mi><mtext> </mtext><msup><mover accent="true"><mi>H</mi><mo>˙</mo></mover><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup><mo>+</mo><msup><mi>σ</mi><mn>2</mn></msup><msup><mi>H</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup><mo>=</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><mtext> </mtext><mi>γ</mi><mtext> </mtext><mstyle mathcolor="#3F7A6B"><msub><mi>W</mi><mi>E</mi></msub><mo>∗</mo><msup><mi>H</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup></mstyle><msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo><mo>+</mo></msub></mrow><annotation encoding="application/x-tex">\tau\,\dot{H}^{(2)} + \sigma^2 H^{(2)} = \Big[\,\gamma\,\textcolor{#3F7A6B}{W_E * H^{(1)}}\Big]_+
+</annotation></semantics></math></div></span></p></div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1037/rev0000109" rel="noopener">Mély, Linsley &amp; Serre <b>Psychol Rev 2018</b></a> · equations as written in <a href="https://arxiv.org/abs/1805.08315" rel="noopener">Linsley et al. <b>NeurIPS 2018</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-3" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="3" data-marpit-pagination-total="36" aria-labelledby="heading-3"><p class="page">Slide 3</p>
+<h2 id="heading-3">One circuit explains contextual illusions</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L18/seminar_contextual_illusions.png" alt="Contextual illusions. Left column, tilt illusion: a central disc of vertical black and white stripes inside a ring of stripes tilted slightly from vertical in the top row and close to horizontal in the bottom row. Middle column, color induction: an identical gray center on a pink ring in the top row and on a gray ring in the bottom row. Right column, ring induction: concentric rings of green, purple and orange around a white center, in two versions" aria-describedby="figure-3-1"><figcaption id="figure-3-1"><p>Contextual illusions. Left column, tilt illusion: a central disc of vertical black and white stripes inside a ring of stripes tilted slightly from vertical in the top row and close to horizontal in the bottom row. Middle column, color induction: an identical gray center on a pink ring in the top row and on a gray ring in the bottom row. Right column, ring induction: concentric rings of green, purple and orange around a white center, in two versions</p><a href="../images/L18/seminar_contextual_illusions.png">Open full-size figure</a></figcaption></figure>
+<p class="provenance">The two centers in each column are physically identical</p>
+</div>
+<div class="col">
+<ul>
+<li><strong>Human perception.</strong> <strong>Tilt illusion:</strong> a tilted surround shifts the perceived orientation of the center</li>
+<li><strong>Color induction:</strong> the same gray center looks different on a pink and on a gray surround</li>
+<li><strong>Model:</strong> the same circuit, one set of parameters, reproduces these shifts in orientation, color, motion and depth</li>
+<li>If illusions are side effects of linking fragments into objects, <mark>tasks that require grouping should need this circuit</mark></li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1037/rev0000109" rel="noopener">Mély, Linsley &amp; Serre <b>Psychol Rev 2018</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-4" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="4" data-marpit-pagination-total="36" aria-labelledby="heading-4"><p class="page">Slide 4</p>
+<h2 id="heading-4">Pathfinder: curve tracing for networks</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L17/pub_linsley2018_fig1b_pathfinder.png" alt="Reproduced from Linsley et al. 2018, Fig. 1b: two Pathfinder images, white dashed curves on black, each with two white dots. In the left image one long dashed path joins the two dots; in the right image the dots sit on different paths" aria-describedby="figure-4-1"><figcaption id="figure-4-1"><p>Reproduced from Linsley et al. 2018, Fig. 1b: two Pathfinder images, white dashed curves on black, each with two white dots. In the left image one long dashed path joins the two dots; in the right image the dots sit on different paths</p><a href="../images/L17/pub_linsley2018_fig1b_pathfinder.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li><strong>Prediction from the illusions:</strong> a grouping task should need this circuit</li>
+<li><strong>Pathfinder:</strong> are the two dots joined by one dashed path? People answer quickly and accurately</li>
+<li>Each unit sees only a small patch of the image (its receptive field), while the path can wander anywhere</li>
+<li><strong>hGRU</strong> (horizontal gated recurrent unit, our lab): the same circuit with learned weights and gates; horizontal connections pass activity from dash to dash</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/1805.08315" rel="noopener">Linsley et al. <b>NeurIPS 2018</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-5" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="5" data-marpit-pagination-total="36" aria-labelledby="heading-5"><p class="page">Slide 5</p>
+<h2 id="heading-5">Recurrence vs. depth on Pathfinder</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L18/pub_linsley2018_fig3c_params_v2.png" alt="Reproduced from Linsley et al. 2018, Fig. 3c: accuracy on the longest Pathfinder paths, 0.5 to 1, against the number of free parameters relative to the hGRU, log axis 1 to 1000. The hGRU reaches 0.99 at 1 times. Feedforward networks with 1, 3 or 5 layers stay between 0.5 and 0.93 at 1.4 to 9.5 times. Only large networks such as FCN, U-Net, SegNet and ResNet-152 reach 0.98 to 0.99, at about 230 to 900 times the parameters; ResNet-50 and ResNet-18 stay near chance" aria-describedby="figure-5-1"><figcaption id="figure-5-1"><p>Reproduced from Linsley et al. 2018, Fig. 3c: accuracy on the longest Pathfinder paths, 0.5 to 1, against the number of free parameters relative to the hGRU, log axis 1 to 1000. The hGRU reaches 0.99 at 1 times. Feedforward networks with 1, 3 or 5 layers stay between 0.5 and 0.93 at 1.4 to 9.5 times. Only large networks such as FCN, U-Net, SegNet and ResNet-152 reach 0.98 to 0.99, at about 230 to 900 times the parameters; ResNet-50 and ResNet-18 stay near chance</p><a href="../images/L18/pub_linsley2018_fig3c_params_v2.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li><strong>Model.</strong> <strong>hGRU</strong> (horizontal GRU): a recurrent circuit with GRU-like gates; <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal" data-original-mathvariant="bold">𝐖</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\mathbf{W}_{hh}</annotation></semantics></math> is a convolution (each unit connected to its neighbors in space). One layer: ~99% on the longest paths</li>
+<li>Feedforward CNNs match it only with <mark>200 to 900 times more parameters</mark>; ResNet-18 and ResNet-50 stay at chance</li>
+<li>Activity propagates from dash to dash, one step at a time</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/1805.08315" rel="noopener">Linsley et al. <b>NeurIPS 2018</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-6" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="6" data-marpit-pagination-total="36" aria-labelledby="heading-6"><p class="page">Slide 6</p>
+<h2 id="heading-6">Grouping time follows human reaction times</h2>
+<div class="capfig">
+<figure><img src="../images/L18/seminar_grouping_time_humans_vs_circuit.png" alt="Left: a black and white outline of two animals, one fixation dot labeled Fix, and probe dots A, B and C on the fixated animal at increasing distance along its body, and three probe dots D on the other animal. Middle, humans: reaction time in milliseconds rises from about 708 at A to 741 at B, 761 at C and 767 at D. Right, recurrent circuit: model reaction time in recurrent steps rises in the same order, from about 2.5 at A to 5.5 at B, 10 at C and 17 at D" aria-describedby="figure-6-1"><figcaption id="figure-6-1"><p>Left: a black and white outline of two animals, one fixation dot labeled Fix, and probe dots A, B and C on the fixated animal at increasing distance along its body, and three probe dots D on the other animal. Middle, humans: reaction time in milliseconds rises from about 708 at A to 741 at B, 761 at C and 767 at D. Right, recurrent circuit: model reaction time in recurrent steps rises in the same order, from about 2.5 at A to 5.5 at B, 10 at C and 17 at D</p><a href="../images/L18/seminar_grouping_time_humans_vs_circuit.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>Human behavior:</strong> reaction time rises from A to C, <mark>longest on the other object (D)</mark></li>
+<li><strong>Model:</strong> the hGRU (horizontal connections only), trained to group, never fit to these data: more steps in the same order</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.7554/eLife.14320" rel="noopener">Jeurissen, Self &amp; Roelfsema <b>eLife 2016</b></a> · <a href="https://arxiv.org/abs/2306.11582" rel="noopener">Goetschalckx et al. <b>NeurIPS 2023</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-7" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="7" data-marpit-pagination-total="36" aria-labelledby="heading-7"><p class="page">Slide 7</p>
+<h2 id="heading-7">Grouping spreads along a curve in V1</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L18/pub_pooresmaeili2014_fig4a_gap.png" alt="Reproduced from Pooresmaeili and Roelfsema 2014, Fig. 4A, two panels. Above each, two small displays with the same curves and the same receptive field (a square) far along a curve: in one display that curve is connected to the fixation point (attention in RF, red), in the other it is not (attention outside RF, blue). Below, the average V1 response over time (N = 34 recording sites): both traces share the first peak, then the red trace stays higher. The difference starts at 164 ms when the distractor is far (large gap, left) and at 240 ms when it passes close (small gap, right)" aria-describedby="figure-7-1"><figcaption id="figure-7-1"><p>Reproduced from Pooresmaeili and Roelfsema 2014, Fig. 4A, two panels. Above each, two small displays with the same curves and the same receptive field (a square) far along a curve: in one display that curve is connected to the fixation point (attention in RF, red), in the other it is not (attention outside RF, blue). Below, the average V1 response over time (N = 34 recording sites): both traces share the first peak, then the red trace stays higher. The difference starts at 164 ms when the distractor is far (large gap, left) and at 240 ms when it passes close (small gap, right)</p><a href="../images/L18/pub_pooresmaeili2014_fig4a_gap.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li><strong>Monkey V1</strong> (primary visual cortex), single neurons: the monkey looks to the end of the curve that starts at fixation; the receptive field (square) sees the same curve either way</li>
+<li>On the target curve (red) neurons fire more than on the distractor (blue): an <strong>enhancement</strong>, after the first response</li>
+<li>Far along the curve it starts at 164 ms; <mark>when the distractor passes close, at 240 ms</mark></li>
+<li>It spreads ~50 ms per step, more slowly where the distractor is close</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1016/j.cub.2014.10.007" rel="noopener">Pooresmaeili &amp; Roelfsema <b>Curr Biol 2014</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-8" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="8" data-marpit-pagination-total="36" aria-labelledby="heading-8"><p class="page">Slide 8</p>
+<h2 id="heading-8">Horizontal vs. top-down connections</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L18/kim2020_tasks_bars.svg" alt="Reproduced from Kim et al. 2020, Figs. 4a and 5a. Top, Pathfinder: example images with a yes and a no answer, and accuracy for four circuits against human accuracy near 96 percent. Horizontal plus top-down and horizontal only reach about 96 percent, top-down only about 63 percent, no recurrence 50 percent. Bottom, cABC, where the two marked points are on the same letter or not: horizontal plus top-down about 88 percent, top-down only about 87 percent, horizontal only about 54 percent, no recurrence 50 percent, human accuracy about 84 percent" aria-describedby="figure-8-1"><figcaption id="figure-8-1"><p>Reproduced from Kim et al. 2020, Figs. 4a and 5a. Top, Pathfinder: example images with a yes and a no answer, and accuracy for four circuits against human accuracy near 96 percent. Horizontal plus top-down and horizontal only reach about 96 percent, top-down only about 63 percent, no recurrence 50 percent. Bottom, cABC, where the two marked points are on the same letter or not: horizontal plus top-down about 88 percent, top-down only about 87 percent, horizontal only about 54 percent, no recurrence 50 percent, human accuracy about 84 percent</p><a href="../images/L18/kim2020_tasks_bars.svg">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li><strong>Models</strong> (human accuracy as reference). <strong>cABC</strong> (cluttered ABC): are the two marked points on the same letter? The letters overlap, so local continuation of a line is no longer enough</li>
+<li><strong>Horizontal</strong> alone: Pathfinder, not cABC; <strong>top-down</strong> alone: the reverse → <mark>line continuation needs horizontal links, letter shape needs top-down links</mark></li>
+<li>Both together reach human accuracy on both tasks; without recurrence, accuracy stays at chance</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/1906.01558" rel="noopener">Kim et al. <b>ICLR 2020</b></a> · Serre <b>Annu Rev Vis Sci 2027</b></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-9" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="9" data-marpit-pagination-total="36" aria-labelledby="heading-9"><p class="page">Slide 9</p>
+<h2 id="heading-9">Grouping fills in an object over steps</h2>
+<div class="row">
+<div class="col fig">
+<div>
+<figure><img src="../images/L18/seminar_panoptic_baby-laptop.gif" alt="Animation, photograph of a baby at a laptop: colored object masks start in a few places and spread over the recurrent steps until each object is filled" aria-describedby="figure-9-1"><figcaption id="figure-9-1"><p>Animation, photograph of a baby at a laptop: colored object masks start in a few places and spread over the recurrent steps until each object is filled</p><a href="../images/L18/seminar_panoptic_baby-laptop.gif">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L18/seminar_panoptic_soccer.gif" alt="Animation, photograph of soccer players on a field: colored object masks start in a few places and spread over the recurrent steps until each object is filled" aria-describedby="figure-9-2"><figcaption id="figure-9-2"><p>Animation, photograph of soccer players on a field: colored object masks start in a few places and spread over the recurrent steps until each object is filled</p><a href="../images/L18/seminar_panoptic_soccer.gif">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L18/seminar_panoptic_dancers.gif" alt="Animation, photograph of two dancers: colored object masks start in a few places and spread over the recurrent steps until each object is filled" aria-describedby="figure-9-3"><figcaption id="figure-9-3"><p>Animation, photograph of two dancers: colored object masks start in a few places and spread over the recurrent steps until each object is filled</p><a href="../images/L18/seminar_panoptic_dancers.gif">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L18/seminar_panoptic_dogs.gif" alt="Animation, photograph of two dogs: colored object masks start in a few places and spread over the recurrent steps until each object is filled" aria-describedby="figure-9-4"><figcaption id="figure-9-4"><p>Animation, photograph of two dogs: colored object masks start in a few places and spread over the recurrent steps until each object is filled</p><a href="../images/L18/seminar_panoptic_dogs.gif">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="col">
+<ul>
+<li><strong>At image scale:</strong> a horizontal recurrent circuit added to a feedforward network improves <strong>panoptic segmentation</strong> (label every pixel by category and separate individual objects), with fewer parameters</li>
+<li>Activity starts in a few places and <mark>spreads until each object is filled</mark>; the spreading is learned from the task</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/2005.11362" rel="noopener">Linsley et al. <b>NeurIPS 2020</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-10" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="10" data-marpit-pagination-total="36" aria-labelledby="heading-10"><p class="page">Slide 10</p>
+<h2 id="heading-10">Why transformers replaced RNNs</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L19/L19_rnn_runtime.png" alt="Time per training step in milliseconds, log scale, against sequence length from 64 to 4,096 steps, measured on a laptop GPU. GRU stepped one step at a time (red) rises from about 20 ms to about 1,100 ms. One transformer layer (blue) rises from about 2 ms to about 100 ms. A linear recurrence computed in parallel (green) stays between about 1 and 6 ms" aria-describedby="figure-10-1"><figcaption id="figure-10-1"><p>Time per training step in milliseconds, log scale, against sequence length from 64 to 4,096 steps, measured on a laptop GPU. GRU stepped one step at a time (red) rises from about 20 ms to about 1,100 ms. One transformer layer (blue) rises from about 2 ms to about 100 ms. A linear recurrence computed in parallel (green) stays between about 1 and 6 ms</p><a href="../images/L19/L19_rnn_runtime.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Grouping circuits are recurrent. If recurrence helps, why did transformers win?</li>
+<li><strong>Slow to train:</strong> step <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math> waits for step <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">t-1</annotation></semantics></math> → a GPU cannot compute the steps at once; a transformer computes every position at once</li>
+<li><strong>Hard to learn long memories:</strong> gradients vanish over many steps, even with gates; attention reaches any earlier word in one step</li>
+<li><strong>Fixed-size state:</strong> an exact detail from far back is lost</li>
+<li><strong>Result:</strong> transformers trained on far more text (2017 on). Our fix: recurrence that trains in parallel (next)</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/1706.03762" rel="noopener">Vaswani et al. <b>NeurIPS 2017</b></a> · timing: measured for this course</div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-11" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="11" data-marpit-pagination-total="36" aria-labelledby="heading-11"><p class="page">Slide 11</p>
+<h2 id="heading-11">Our recurrent model on Pathfinder</h2>
+<div>
+<figure><img src="../images/L18/pathfinder14_pos_example.png" alt="A Pathfinder image, path length 14: white dashed curves on black; two white dots joined by one long dashed path" aria-describedby="figure-11-1"><figcaption id="figure-11-1"><p>A Pathfinder image, path length 14: white dashed curves on black; two white dots joined by one long dashed path</p><a href="../images/L18/pathfinder14_pos_example.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L18/seminar_scssm_pathfinder_efficiency.png" alt="Two scatter plots of Pathfinder accuracy, 50 to 90 percent, with human accuracy marked at about 89 percent. Left, against training step time in milliseconds, log scale; right, against number of parameters, log scale. The sCSSM models (blue) form an upper front reaching about 91 percent, at or above human accuracy; Mamba-2 reaches about 84 percent; transformers stay near 50 to 55 percent, close to chance, as do sCSSM versions without the recurrence over steps or without spatial kernels" aria-describedby="figure-11-2"><figcaption id="figure-11-2"><p>Two scatter plots of Pathfinder accuracy, 50 to 90 percent, with human accuracy marked at about 89 percent. Left, against training step time in milliseconds, log scale; right, against number of parameters, log scale. The sCSSM models (blue) form an upper front reaching about 91 percent, at or above human accuracy; Mamba-2 reaches about 84 percent; transformers stay near 50 to 55 percent, close to chance, as do sCSSM versions without the recurrence over steps or without spatial kernels</p><a href="../images/L18/seminar_scssm_pathfinder_efficiency.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>Task:</strong> are the two dots joined by one dashed path? (longest paths, 14 dashes)</li>
+<li><strong>Models:</strong> our lab's <strong>sCSSM</strong>, a recurrent layer that trains in parallel, with a 2-D state laid over the image, reaches human accuracy; <mark>transformers stay near chance</mark></li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2011.04006" rel="noopener">Tay et al. <b>ICLR 2021</b></a> · Linsley, Dhimoïla, Karkada Ashok, Kim &amp; Serre <b>in submission</b></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-12" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="12" data-marpit-pagination-total="36" aria-labelledby="heading-12"><p class="page">Slide 12</p>
+<h2 id="heading-12">PathTracker: Pathfinder in time</h2>
+<div>
+<figure><img src="../images/L18/seminar_pathtracker-demo.gif" alt="Animation of the PathTracker task: a dot moves among identical distractor dots on a black background, from a red start marker; the question is whether it ends on the blue goal marker" aria-describedby="figure-12-1"><figcaption id="figure-12-1"><p>Animation of the PathTracker task: a dot moves among identical distractor dots on a black background, from a red start marker; the question is whether it ends on the blue goal marker</p><a href="../images/L18/seminar_pathtracker-demo.gif">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L18/seminar_scssm_pathtracker_efficiency.png" alt="Two scatter plots of PathTracker accuracy, 50 to 100 percent, with human accuracy marked at 90 percent. Left, against training step time in milliseconds, log scale; right, against number of parameters, log scale. The sCSSM models form an upper front near 80 to 85 percent; Mamba-2, Gated DeltaNet and ConvS5 reach about 70 percent; transformers and S4ND stay near 50 percent, as do sCSSM versions without the temporal recurrence or without spatial kernels" aria-describedby="figure-12-2"><figcaption id="figure-12-2"><p>Two scatter plots of PathTracker accuracy, 50 to 100 percent, with human accuracy marked at 90 percent. Left, against training step time in milliseconds, log scale; right, against number of parameters, log scale. The sCSSM models form an upper front near 80 to 85 percent; Mamba-2, Gated DeltaNet and ConvS5 reach about 70 percent; transformers and S4ND stay near 50 percent, as do sCSSM versions without the temporal recurrence or without spatial kernels</p><a href="../images/L18/seminar_scssm_pathtracker_efficiency.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>Task:</strong> does the moving dot end on the blue marker? Needs a <mark>state carried over time</mark></li>
+<li><strong>Models:</strong> our sCSSM is more accurate than Mamba; transformers stay at chance</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2105.13351" rel="noopener">Linsley et al. <b>NeurIPS 2021</b></a> · Linsley, Dhimoïla, Karkada Ashok, Kim &amp; Serre <b>in submission</b></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-13" data-paginate="true" data-class="lead" data-lang="en" lang="en" data-marpit-pagination="13" data-marpit-pagination-total="36" aria-labelledby="heading-13"><p class="page">Slide 13</p>
+<h2 id="heading-13">Brains simulate</h2>
+<p>Grouping spreads over space, step by step. Can networks also run a scene forward in time, or see it from another place?</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-14" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="14" data-marpit-pagination-total="36" aria-labelledby="heading-14"><p class="page">Slide 14</p>
+<h2 id="heading-14">From grouping to simulation</h2>
+<div class="capfig">
+<figure><img src="../images/L18/prev_arvs_planko_board.png" alt="A Planko board: a light blue ball at the top, ten black planks placed at random, and two catcher baskets at the bottom" aria-describedby="figure-14-1"><figcaption id="figure-14-1"><p>A Planko board: a light blue ball at the top, ten black planks placed at random, and two catcher baskets at the bottom</p><a href="../images/L18/prev_arvs_planko_board.png">Open full-size figure</a></figcaption></figure>
+</div>
+<p>Grouping took steps. So does predicting a fall. Drop the ball. Which basket does it land in?</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-15" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="15" data-marpit-pagination-total="36" aria-labelledby="heading-15"><p class="page">Slide 15</p>
+<h2 id="heading-15">Planko: which basket will the ball land in?</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L18/pub_ahuja2024_fig1a_boards.png" alt="Reproduced from Ahuja et al. 2024, Fig. 1A: six example Planko boards, each a gray square with a light blue ball at the top, randomly placed black planks, and two catcher baskets at the bottom" aria-describedby="figure-15-1"><figcaption id="figure-15-1"><p>Reproduced from Ahuja et al. 2024, Fig. 1A: six example Planko boards, each a gray square with a light blue ball at the top, randomly placed black planks, and two catcher baskets at the bottom</p><a href="../images/L18/pub_ahuja2024_fig1a_boards.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li><strong>Task (humans, monkeys, models):</strong> a ball is dropped from the top, bounces off the planks and lands in the left or the right catcher</li>
+<li>Report the catcher <strong>before</strong> the ball falls; the board changes every trial, so no template works</li>
+<li>Boards range from one plank to ten: <mark>more planks, longer simulation</mark></li>
+<li>Monkeys learn the task gradually, and shift to a <strong>simulation-based strategy</strong> as the boards get harder</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1016/j.cub.2024.10.026" rel="noopener">Ahuja, Yusif Rodriguez, Ashok, Serre, Desrochers &amp; Sheinberg <b>Current Biology 2024</b></a> · <a href="https://arxiv.org/abs/2306.11582" rel="noopener">Goetschalckx et al. <b>NeurIPS 2023</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-16" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="16" data-marpit-pagination-total="36" aria-labelledby="heading-16"><p class="page">Slide 16</p>
+<h2 id="heading-16">Brains simulate: monkey fMRI</h2>
+<div class="capfig">
+<figure><img src="../images/L19/pub_ahuja2024_fmri_noletters.png" alt="Reproduced from Ahuja et al. 2024: three pairs of axial fMRI slices with the motion-sensitive areas MT, MST and V4d circled. Left, a standard motion localizer, motion versus flicker. Middle, watching the ball fall versus a control. Right, mentally simulating the fall, with the ball hidden, versus a control. The same motion-sensitive areas are active in all three" aria-describedby="figure-16-1"><figcaption id="figure-16-1"><p>Reproduced from Ahuja et al. 2024: three pairs of axial fMRI slices with the motion-sensitive areas MT, MST and V4d circled. Left, a standard motion localizer, motion versus flicker. Middle, watching the ball fall versus a control. Right, mentally simulating the fall, with the ball hidden, versus a control. The same motion-sensitive areas are active in all three</p><a href="../images/L19/pub_ahuja2024_fmri_noletters.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li>Where does the brain run the fall? <strong>Monkey fMRI</strong> during Planko: predicting the landing (right) recruits <mark>motion-sensitive areas</mark> (MT, MST, V4d), as watching the fall does (middle)</li>
+<li><strong>Human fMRI:</strong> a "physics engine" network that overlaps areas for action planning (Fischer et al. 2016)</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1016/j.cub.2024.10.026" rel="noopener">Ahuja et al. <b>Current Biology 2024</b></a> · <a href="https://doi.org/10.1073/pnas.1610344113" rel="noopener">Fischer, Mikhael, Tenenbaum &amp; Kanwisher <b>PNAS 2016</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-17" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="17" data-marpit-pagination-total="36" aria-labelledby="heading-17"><p class="page">Slide 17</p>
+<h2 id="heading-17">Model: what the recurrent network does</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L19/ahuja_rnn_decoding_noletters.png" alt="Reproduced from Ashok et al. 2022: four Planko boards with the ball's start position varied from left to right (top row), the recurrent network's hidden-state maps (middle row, bright where the network is active), and the ball path decoded from that state (blue dots) lying on the true simulated path (red dots) (bottom row)" aria-describedby="figure-17-1"><figcaption id="figure-17-1"><p>Reproduced from Ashok et al. 2022: four Planko boards with the ball's start position varied from left to right (top row), the recurrent network's hidden-state maps (middle row, bright where the network is active), and the ball path decoded from that state (blue dots) lying on the true simulated path (red dots) (bottom row)</p><a href="../images/L19/ahuja_rnn_decoding_noletters.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>What does a network need to run it? <strong>Model:</strong> a recurrent network trained on Planko (the same boards as the monkeys)</li>
+<li>Its state changes with the <strong>ball's start position</strong>, step by step</li>
+<li>Decode the ball's position from the state at each step: the decoded path (blue) lies on the <mark>simulated path</mark> (red)</li>
+<li>Nobody told the network to track the ball</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://openreview.net/forum?id=qYLp6nNU7m-" rel="noopener">Ashok et al. <b>SVRHM Workshop 2022</b></a> · <a href="https://doi.org/10.1016/j.cub.2024.10.026" rel="noopener">Ahuja et al. <b>Current Biology 2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-18" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="18" data-marpit-pagination-total="36" aria-labelledby="heading-18"><p class="page">Slide 18</p>
+<h2 id="heading-18">Recurrence learns simulation; feedforward does not</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/limits-of-ai/s31_img00.png" alt="Accuracy bars on four Planko datasets: the recurrent model (blue) stays near human accuracy on all four, while a baseline CNN, AlexNet and a 12-layer CNN fall toward chance when both ball and basket positions move" aria-describedby="figure-18-1"><figcaption id="figure-18-1"><p>Accuracy bars on four Planko datasets: the recurrent model (blue) stays near human accuracy on all four, while a baseline CNN, AlexNet and a 12-layer CNN fall toward chance when both ball and basket positions move</p><a href="../images/limits-of-ai/s31_img00.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li><strong>Models:</strong> a recurrent network and matched feedforward CNNs, trained on four Planko datasets, from fixed ball and basket to <strong>both positions moving</strong></li>
+<li>The <strong>RNN</strong> (blue) stays near human accuracy on all four</li>
+<li>The feedforward CNNs fall to <mark>chance</mark> once both positions move</li>
+<li>Same pattern as Pathfinder: feedforward fails once the answer needs steps</li>
+<li>Project question: does a video-prediction network's state contain the ball's path?</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1016/j.cub.2024.10.026" rel="noopener">Ahuja et al. <b>Current Biology 2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-20" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="20" data-marpit-pagination-total="36" aria-labelledby="heading-20"><p class="page">Slide 20</p>
+<h2 id="heading-20">Settling time predicts reaction times</h2>
+<div class="capfig">
+<figure><img src="../images/L19/pub_goetschalckx2023_fig4_step2_2panel.png" alt="Reproduced from Goetschalckx et al. 2023, Fig. 4, the Planko task: two example boards, a ball at the top, planks, and two baskets; in which basket will the ball land, left or right? Next to it, a scatter: each dot is one board, human reaction time in seconds (0 to 6) against the model's settling time (0 to 30), with a rising line, r = .31" aria-describedby="figure-20-1"><figcaption id="figure-20-1"><p>Reproduced from Goetschalckx et al. 2023, Fig. 4, the Planko task: two example boards, a ball at the top, planks, and two baskets; in which basket will the ball land, left or right? Next to it, a scatter: each dot is one board, human reaction time in seconds (0 to 6) against the model's settling time (0 to 30), with a rising line, r = .31</p><a href="../images/L19/pub_goetschalckx2023_fig4_step2_2panel.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>Task:</strong> in which basket will the ball land?</li>
+<li><strong>Model:</strong> a recurrent network trained on the task. <strong>Settling time:</strong> how long its answer stays unsure</li>
+<li><strong>Human behavior:</strong> boards with a longer settling time take people longer → <mark>r = .31</mark></li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2306.11582" rel="noopener">Goetschalckx et al. <b>NeurIPS 2023</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-21" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="21" data-marpit-pagination-total="36" aria-labelledby="heading-21"><p class="page">Slide 21</p>
+<h2 id="heading-21">Perspective taking: seeing through someone else's eyes</h2>
+<div class="row">
+<div class="col fig">
+<figure><img src="../images/L19/seminar_vpt_concept.png" alt="Schematic: a tree, a flower in front of it and a bag behind it, seen by two people, ME in front and THEM to the side. Level 1 visual perspective taking: from their perspective the bag is not visible. Level 2: from their perspective the flower is on the right of the tree" aria-describedby="figure-21-1"><figcaption id="figure-21-1"><p>Schematic: a tree, a flower in front of it and a bag behind it, seen by two people, ME in front and THEM to the side. Level 1 visual perspective taking: from their perspective the bag is not visible. Level 2: from their perspective the flower is on the right of the tree</p><a href="../images/L19/seminar_vpt_concept.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="col">
+<ul>
+<li>Knowing what another person can see is a first step of <strong>theory of mind</strong>: reasoning about other minds</li>
+<li><strong>Level 1:</strong> can they see it? <strong>Level 2:</strong> how does it look to them? Children master Level 1 first</li>
+<li>Vision-language models pass theory-of-mind and mental-rotation tests separately, and <mark>fail when a task needs both</mark></li>
+<li>Our test asks the Level 1 question with real scenes</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://doi.org/10.1037/0012-1649.17.1.99" rel="noopener">Flavell, Everett, Croft &amp; Flavell <b>Dev Psychol 1981</b></a> · <a href="https://arxiv.org/abs/2602.15892" rel="noopener">Wang et al. <b>CogSci 2026</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-22" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="22" data-marpit-pagination-total="36" aria-labelledby="heading-22"><p class="page">Slide 22</p>
+<h2 id="heading-22">The 3D Perception Challenge</h2>
+<div>
+<figure><figure><img src="../images/L19/seminar_vpt_laptop_a.jpg" alt="A laptop open on a small wooden table on wet concrete, seen from above. A green camera icon sits at the lower left and a red ball at the lower right of the table" aria-describedby="figure-22-1"><figcaption id="figure-22-1"><p>A laptop open on a small wooden table on wet concrete, seen from above. A green camera icon sits at the lower left and a red ball at the lower right of the table</p><a href="../images/L19/seminar_vpt_laptop_a.jpg">Open full-size figure</a></figcaption></figure></figure>
+<figure><figure><img src="../images/L19/seminar_vpt_laptop_b.jpg" alt="The same laptop and table from another viewpoint. The green camera is now in front of the table and the red ball is behind the laptop" aria-describedby="figure-22-2"><figcaption id="figure-22-2"><p>The same laptop and table from another viewpoint. The green camera is now in front of the table and the red ball is behind the laptop</p><a href="../images/L19/seminar_vpt_laptop_b.jpg">Open full-size figure</a></figcaption></figure></figure>
+<figure><figure><img src="../images/L19/seminar_vpt_car_a.jpg" alt="A red car on a driveway, with a green camera icon at the top and a red ball just above the car" aria-describedby="figure-22-3"><figcaption id="figure-22-3"><p>A red car on a driveway, with a green camera icon at the top and a red ball just above the car</p><a href="../images/L19/seminar_vpt_car_a.jpg">Open full-size figure</a></figcaption></figure></figure>
+<figure><figure><img src="../images/L19/seminar_vpt_car_b.jpg" alt="The same red car from the side. The green camera icon is at the car's front wheel and the red ball is behind it on the right" aria-describedby="figure-22-4"><figcaption id="figure-22-4"><p>The same red car from the side. The green camera icon is at the car's front wheel and the red ball is behind it on the right</p><a href="../images/L19/seminar_vpt_car_b.jpg">Open full-size figure</a></figcaption></figure></figure>
+</div>
+<ul>
+<li><strong>Depth order:</strong> is the green camera closer to us than the red ball?</li>
+<li><strong>Visual perspective taking (VPT):</strong> can the green camera see the red ball?</li>
+<li>Same object, two viewpoints: <mark>the answers flip</mark></li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2406.04138" rel="noopener">Linsley*, Zhou*, Ashok*, Nagaraj, Gaonkar, Lewis, Pizlo &amp; Serre <b>ICLR 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-23" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="23" data-marpit-pagination-total="36" aria-labelledby="heading-23"><p class="page">Slide 23</p>
+<h2 id="heading-23">Models match people on depth, fail on perspective</h2>
+<div>
+<figure><img src="../images/L19/seminar_vpt_depth_results.png" alt="Depth-order accuracy against ImageNet accuracy for 318 vision models, three vision-language models and the lab's autoregressive models; the best networks reach the human band near 75 percent" aria-describedby="figure-23-1"><figcaption id="figure-23-1"><p>Depth-order accuracy against ImageNet accuracy for 318 vision models, three vision-language models and the lab's autoregressive models; the best networks reach the human band near 75 percent</p><a href="../images/L19/seminar_vpt_depth_results.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L19/seminar_vpt_results.png" alt="Perspective-taking accuracy against ImageNet accuracy: every vision model, vision-language model and the lab's autoregressive models sit near the 50 percent chance line, far below the human band near 87 percent" aria-describedby="figure-23-2"><figcaption id="figure-23-2"><p>Perspective-taking accuracy against ImageNet accuracy: every vision model, vision-language model and the lab's autoregressive models sit near the 50 percent chance line, far below the human band near 87 percent</p><a href="../images/L19/seminar_vpt_results.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>Models:</strong> 300+ networks (a linear probe on each), three vision-language models; <strong>people:</strong> 75% depth, 87% perspective</li>
+<li>Depth order: the best networks reach the people. Perspective taking: <mark>every model sits near chance</mark></li>
+<li>A <strong>reasoning gap</strong>: models read depth but cannot take another viewpoint</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2406.04138" rel="noopener">Linsley et al. <b>ICLR 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-24" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="24" data-marpit-pagination-total="36" aria-labelledby="heading-24"><p class="page">Slide 24</p>
+<h2 id="heading-24">A frontier model still misses perspective taking</h2>
+<div class="row">
+<div class="col">
+<div class="capfig">
+<figure><img src="../images/L19/seminar_vpt_scene_camera.png" alt="Camera view of a simulated room: a human avatar stands among cubes and cones" aria-describedby="figure-24-1"><figcaption id="figure-24-1"><p>Camera view of a simulated room: a human avatar stands among cubes and cones</p><a href="../images/L19/seminar_vpt_scene_camera.png">Open full-size figure</a></figcaption></figure>
+</div>
+<div class="capfig">
+<figure><img src="../images/L19/seminar_vpt_scene_human.png" alt="The same scene rendered from the avatar's viewpoint: cubes and cones seen from the human's position" aria-describedby="figure-24-2"><figcaption id="figure-24-2"><p>The same scene rendered from the avatar's viewpoint: cubes and cones seen from the human's position</p><a href="../images/L19/seminar_vpt_scene_human.png">Open full-size figure</a></figcaption></figure>
+</div>
+</div>
+<div class="col">
+<ul>
+<li><strong>Model:</strong> a frontier vision-language model (GPT-6 Astra), 800 scenes from the lab's simulator</li>
+<li><strong>Task:</strong> which side is the object on, left or right, front or behind, from the human's view or the camera's view</li>
+<li>From the human's own view it is near perfect (98%); from the camera view <mark>78%</mark></li>
+<li>The drop is all <strong>left versus right</strong> (60%), the judgment that flips with viewpoint; front versus behind stays at 96%</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/2406.04138" rel="noopener">Linsley et al. <b>ICLR 2025</b></a> · Fenner, Karkada Ashok, Linsley, Tellex &amp; Serre <b>unpublished</b></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-25" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="25" data-marpit-pagination-total="36" aria-labelledby="heading-25"><p class="page">Slide 25</p>
+<h2 id="heading-25">People mentally move to the other viewpoint</h2>
+<div>
+<figure><img src="../images/L19/seminar_kessler_schematic.png" alt="Top-down sketch: you at the bottom, and another person seated at 40, 80, 120 and 160 degrees around a table; reaction times rise from 750 to 1030 milliseconds" aria-describedby="figure-25-1"><figcaption id="figure-25-1"><p>Top-down sketch: you at the bottom, and another person seated at 40, 80, 120 and 160 degrees around a table; reaction times rise from 750 to 1030 milliseconds</p><a href="../images/L19/seminar_kessler_schematic.png">Open full-size figure</a></figcaption></figure>
+<figure><img src="../images/L19/seminar_kessler_rt_angle.png" alt="Reaction time in milliseconds against angular disparity from 40 to 160 degrees: rising from about 750 to 1000, faster when the body orientation is congruent with the rotation than when it is incongruent" aria-describedby="figure-25-2"><figcaption id="figure-25-2"><p>Reaction time in milliseconds against angular disparity from 40 to 160 degrees: rising from about 750 to 1000, faster when the body orientation is congruent with the rotation than when it is incongruent</p><a href="../images/L19/seminar_kessler_rt_angle.png">Open full-size figure</a></figcaption></figure>
+</div>
+<ul>
+<li><strong>Human behavior:</strong> judge left or right from another person's seat at a table; <mark>reaction time grows with the angle</mark> to that person</li>
+<li>A <strong>congruent body posture</strong> speeds the judgment</li>
+<li>An <strong>embodied transformation</strong>: people act as if they emulate the movement that would take them there</li>
+</ul>
+<div class="ref"><a href="https://doi.org/10.1016/j.cognition.2009.08.015" rel="noopener">Kessler &amp; Thomson <b>Cognition 2010</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-26" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="26" data-marpit-pagination-total="36" aria-labelledby="heading-26"><p class="page">Slide 26</p>
+<h2 id="heading-26">Learning representations vs. manipulating them</h2>
+<ul>
+<li>Networks <strong>learn</strong> representations of depth, objects, the board</li>
+<li>They fail when the task needs to <strong>manipulate</strong> them: run the ball forward, turn the scene to another viewpoint</li>
+<li>Brains, and our recurrent models, do it by <strong>simulation</strong>: steps run over an internal model</li>
+<li>A model of the world you can run forward and act on is a <strong>world model</strong></li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-27" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="27" data-marpit-pagination-total="36" aria-labelledby="heading-27"><p class="page">Slide 27</p>
+<h2 id="heading-27">Perspective taking needs a world model</h2>
+<div>
+<figure><figure><img src="../images/L19/seminar_agent_rollout_1.jpg" alt="An agent's view at the start: a cone on a gray floor in front of a salmon wall" aria-describedby="figure-27-1"><figcaption id="figure-27-1"><p>An agent's view at the start: a cone on a gray floor in front of a salmon wall</p><a href="../images/L19/seminar_agent_rollout_1.jpg">Open full-size figure</a></figcaption></figure><figcaption>now</figcaption></figure>
+<span>→ <b>a</b> →</span>
+<figure><figure><img src="../images/L19/seminar_agent_rollout_2.jpg" alt="The agent's view after turning: a cone and a dark X-shaped block against the wall" aria-describedby="figure-27-2"><figcaption id="figure-27-2"><p>The agent's view after turning: a cone and a dark X-shaped block against the wall</p><a href="../images/L19/seminar_agent_rollout_2.jpg">Open full-size figure</a></figcaption></figure><figcaption>next</figcaption></figure>
+<span>→ <b>a</b> →</span>
+<figure><figure><img src="../images/L19/seminar_agent_rollout_3.jpg" alt="The agent's view after moving on: a larger cone in front, a red ball and the X-shaped block behind" aria-describedby="figure-27-3"><figcaption id="figure-27-3"><p>The agent's view after moving on: a larger cone in front, a red ball and the X-shaped block behind</p><a href="../images/L19/seminar_agent_rollout_3.jpg">Open full-size figure</a></figcaption></figure><figcaption>next</figcaption></figure>
+</div>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msup><mtext>view</mtext><mrow><mo stretchy="false">⟨</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="false">⟩</mo></mrow></msup><mo>=</mo><mi>F</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msup><mtext>view</mtext><mrow><mo stretchy="false">⟨</mo><mi>t</mi><mo stretchy="false">⟩</mo></mrow></msup><mo separator="true">,</mo><mtext> </mtext><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐚</mi><mrow><mo stretchy="false">⟨</mo><mi>t</mi><mo stretchy="false">⟩</mo></mrow></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow><annotation encoding="application/x-tex">\text{view}^{\langle t+1\rangle} = F\big(\text{view}^{\langle t\rangle},\, \mathbf{a}^{\langle t\rangle}\big)
+</annotation></semantics></math></div></span></p><ul>
+<li>Models <strong>have 3D representations but cannot manipulate them</strong>; people <strong>simulate moving</strong> there</li>
+<li>A world model predicts the next view from the view and an action; chained, it can <mark>simulate moving to another viewpoint</mark></li>
+</ul>
+<div class="ref"><span>Agent views: Alekh Karkada Ashok, <b>ongoing work</b></span> · <a href="https://arxiv.org/abs/2406.04138" rel="noopener">Linsley et al. <b>ICLR 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-28" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="28" data-marpit-pagination-total="36" aria-labelledby="heading-28"><p class="page">Slide 28</p>
+<h2 id="heading-28">What is a world model?</h2>
+<ul>
+<li>A driver imagines a turn: the <strong>state</strong> is what I see and remember, the <strong>action</strong> is turning the wheel, the <strong>next state</strong> is what I will see</li>
+</ul>
+<p><span is="marp-span" data-auto-scaling="downscale-only" class="katex-display"><div class="math-scroll" tabindex="0" role="region" aria-label="Mathematical expression"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mstyle mathcolor="#3F7A6B"><msup><mover accent="true"><mi mathvariant="normal" data-original-mathvariant="bold">𝐡</mi><mo>^</mo></mover><mrow><mo stretchy="false">⟨</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="false">⟩</mo></mrow></msup></mstyle><mo>=</mo><mi>F</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mstyle mathcolor="#3F7A6B"><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐡</mi><mrow><mo stretchy="false">⟨</mo><mi>t</mi><mo stretchy="false">⟩</mo></mrow></msup></mstyle><mo separator="true">,</mo><mtext> </mtext><mstyle mathcolor="#3E6D8E"><msup><mi mathvariant="normal" data-original-mathvariant="bold">𝐚</mi><mrow><mo stretchy="false">⟨</mo><mi>t</mi><mo stretchy="false">⟩</mo></mrow></msup></mstyle><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow><annotation encoding="application/x-tex">\textcolor{#3F7A6B}{\hat{\mathbf{h}}^{\langle t+1\rangle}} = F\big(\textcolor{#3F7A6B}{\mathbf{h}^{\langle t\rangle}},\, \textcolor{#3E6D8E}{\mathbf{a}^{\langle t\rangle}}\big)
+</annotation></semantics></math></div></span></p><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi></mrow><annotation encoding="application/x-tex">F</annotation></semantics></math> is the <strong>transition map</strong>, a whole network; <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal" data-original-mathvariant="bold">𝐡</mi></mrow><annotation encoding="application/x-tex">\mathbf{h}</annotation></semantics></math> is a <strong>latent</strong> (a compressed internal summary of the scene, not the raw pixels), the recurrent state of the last lecture</li>
+<li><strong>Planning</strong> = a <strong>rollout</strong>: run <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi></mrow><annotation encoding="application/x-tex">F</annotation></semantics></math> forward several steps without acting, then pick the action whose imagined outcome is best</li>
+<li>Same predictive objective as self-supervised learning, with an action as an extra input</li>
+<li><strong>JEPA:</strong> predict the next latent instead of the next frame's pixels</li>
+</ul>
+<div class="ref"><a href="https://openreview.net/forum?id=BZ5a1r-kVsf" rel="noopener">LeCun <b>OpenReview 2022</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-29" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="29" data-marpit-pagination-total="36" aria-labelledby="heading-29"><p class="page">Slide 29</p>
+<h2 id="heading-29">Video world models</h2>
+<div class="row">
+<div class="col fig">
+<div>
+<figure><video src="../images/L19/wm_genie3.mp4" autoplay="" loop="" muted="" playsinline="" title="Genie 3: a camera flies along a river canyon; the arrow-key overlay shows a person steering it live"></video><figcaption><b>Genie 3</b> (DeepMind 2025): a world you steer in real time</figcaption></figure>
+<figure><video src="../images/L19/wm_sora2.mp4" autoplay="" loop="" muted="" playsinline="" title="Sora 2: a generated clip of a man balancing on a paddleboard on a lake"></video><figcaption><b>Sora 2</b> (OpenAI 2025): realistic video from a text prompt</figcaption></figure>
+<figure><video src="../images/L19/wm_gaia2.mp4" autoplay="" loop="" muted="" playsinline="" title="GAIA-2: a grid of generated driving scenes in different weather, light and roads"></video><figcaption><b>GAIA-2</b> (Wayve 2025): driving scenes generated on demand</figcaption></figure>
+<figure><video src="../images/L19/wm_dreamer4.mp4" autoplay="" loop="" muted="" playsinline="" title="Dreamer 4: Minecraft scenes imagined by the world model while the agent learns"></video><figcaption><b>Dreamer 4</b> (2025): an agent learns Minecraft <i>inside</i> its world model</figcaption></figure>
+</div>
+</div>
+<div class="col">
+<ul>
+<li>Generated video can look like film, and some models let you <mark>act inside the world they generate</mark></li>
+<li>Realistic pixels do not guarantee correct physics</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://deepmind.google/discover/blog/genie-3-a-new-frontier-for-world-models/" rel="noopener">Genie 3, Google DeepMind <b>2025</b></a> · <a href="https://openai.com/index/sora-2/" rel="noopener">Sora 2, OpenAI <b>2025</b></a> · <a href="https://wayve.ai/thinking/gaia-2/" rel="noopener">GAIA-2, Wayve <b>2025</b></a> · <a href="https://arxiv.org/abs/2509.24527" rel="noopener">Hafner, Yan &amp; Lillicrap <b>arXiv 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-30" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="30" data-marpit-pagination-total="36" aria-labelledby="heading-30"><p class="page">Slide 30</p>
+<h2 id="heading-30">Robot planning with a world model</h2>
+<div class="row">
+<div class="col fig">
+<p><video src="../images/L19/wm_vjepa2_robot.mp4" autoplay="" loop="" muted="" playsinline="" title="V-JEPA 2: a robot arm starts from a start image and a goal image; the world model imagines candidate actions and selects the one most likely to reach the goal"></video></p>
+</div>
+<div class="col">
+<ul>
+<li><strong>V-JEPA 2</strong> (Meta 2025): a world model learned from internet video, then a little robot video</li>
+<li>Given a <strong>goal image</strong>, the robot imagines the outcome of candidate actions and picks the best one: <mark>plan by running the model forward</mark></li>
+<li>Pick-and-place in labs it was never trained in</li>
+</ul>
+</div>
+</div>
+<div class="ref"><a href="https://arxiv.org/abs/2506.09985" rel="noopener">Assran et al. <b>arXiv 2025</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-31" data-paginate="true" data-class="split" data-lang="en" lang="en" data-marpit-pagination="31" data-marpit-pagination-total="36" aria-labelledby="heading-31"><p class="page">Slide 31</p>
+<h2 id="heading-31">Embodiment: learning by moving</h2>
+<div class="row">
+<div class="col fig">
+<p><video src="../images/L19/seminar_agent_roaming_redroom.mp4" poster="../images/L19/seminar_agent_roaming_redroom_poster.jpg" autoplay="" loop="" muted="" playsinline="" preload="auto" aria-label="An agent's own view as it moves through a simulated room with cones, blocks and a red ball"></video></p>
+</div>
+<div class="col">
+<ul>
+<li><strong>Active vision:</strong> an agent learns by moving and seeing what changes</li>
+<li>It chooses its actions and sees their consequences, so it can learn an <mark>action-conditioned model</mark> of the world, then use it to simulate another viewpoint</li>
+<li>Driven by <strong>intrinsic rewards</strong> (curiosity, learning progress, surprise), without labels</li>
+<li>With developmental psychologists: which rewards drive infants' exploration, and does the same reward produce the same learning in the agent?</li>
+</ul>
+</div>
+</div>
+<div class="ref"><span>Active exploration: Alekh Karkada Ashok and collaborators, <b>ongoing work</b></span></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-32" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="32" data-marpit-pagination-total="36" aria-labelledby="heading-32"><p class="page">Slide 32</p>
+<h2 id="heading-32">What to keep</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="What to keep — table"><table><caption>What to keep — table</caption>
+<thead>
+<tr>
+<th scope="col">Theme</th>
+<th scope="col">Summary</th>
+<th scope="col">Open question</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong> Describing</td>
+<td>representations are points in a space; comparing them is a choice</td>
+<td>which geometry matters?</td>
+</tr>
+<tr>
+<td><strong>2</strong> Learning</td>
+<td>stacked, trained units; CNNs untangle like the ventral stream</td>
+<td>same geometry, same computation?</td>
+</tr>
+<tr>
+<td><strong>3</strong> Sequences &amp; state</td>
+<td>attention, LLMs, recurrence; a world model predicts the next state</td>
+<td>can video teach a model to run the world forward?</td>
+</tr>
+<tr>
+<td><strong>Today</strong></td>
+<td>learning a representation is not enough: simulation needs to manipulate it</td>
+<td><mark>can a world model learned by acting close the gap?</mark></td>
+</tr>
+</tbody>
+</table></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-33" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="33" data-marpit-pagination-total="36" aria-labelledby="heading-33"><p class="page">Slide 33</p>
+<h2 id="heading-33">What happens next: exam and final project</h2>
+<ul>
+<li><strong>Tue 12/1: Exam 2</strong>, in class, Lectures 9–19; study guide on Ed</li>
+<li><strong>Thu 12/3:</strong> project work sessions begin; from then on, class meetings are work sessions</li>
+<li><span><strong>Sun 12/6, 11:59 PM:</strong> proposal due, one page per team (moved from Wed 12/2); feedback at the <strong>Tue 12/8</strong> session</span></li>
+<li><strong>Mon 12/21, 9:00 AM:</strong> poster session (open to the public) and the two-page CCN-format report</li>
+<li>AI is allowed on the project, with disclosure: one agent writes, a separate one critiques, as taught in the project-clinic recitation; run smoke tests before spending compute</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-34" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="34" data-marpit-pagination-total="36" aria-labelledby="heading-34"><p class="page">Slide 34</p>
+<h2 id="heading-34">Starting points for a project</h2>
+<ul>
+<li><strong>Data ready to use:</strong> the THINGS 100 bundle (human fMRI of IT, monkey V1/V4/IT recordings, odd-one-out similarity judgments, ResNet-18 features; download the images yourself from OSF, project jum2f) · Michael Lee's collection of about 50 classic similarity data sets</li>
+<li><strong>Benchmarks from our lab:</strong> the 3D-PC stimuli and code, the Planko boards, the ClickMe maps and harmonization code</li>
+<li><strong>AI for neuroscience:</strong> predictive models of neural data</li>
+<li><strong>World models:</strong> does the state of a network trained to predict video contain the ball's path? Released tests: IntPhys 2, Physics-IQ</li>
+<li><strong>Benchmarking AI against people:</strong> run a psychology test on a model, with the human baseline in the same study</li>
+</ul>
+<div class="ref"><a href="https://arxiv.org/abs/2406.04138" rel="noopener">Linsley et al. <b>ICLR 2025</b></a> · <a href="https://arxiv.org/abs/2501.09038" rel="noopener">Motamed et al. <b>WACV 2026</b></a> · <a href="https://arxiv.org/abs/2506.09849" rel="noopener">Bordes et al. <b>arXiv 2025</b></a> · <a href="https://arxiv.org/abs/2211.04533" rel="noopener">Fel et al. <b>NeurIPS 2022</b></a> · <a href="https://doi.org/10.1523/JNEUROSCI.0932-24.2024" rel="noopener">Sandrone <b>J Neurosci 2024</b></a></div>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-35" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="35" data-marpit-pagination-total="36" aria-labelledby="heading-35"><p class="page">Slide 35</p>
+<h2 id="heading-35">Further reading</h2>
+<p>Optional: for going deeper, or as a starting point for the final project.</p>
+<ul>
+<li><a href="https://arxiv.org/abs/2509.24527" rel="noopener">Hafner, Yan &amp; Lillicrap <b>arXiv 2025</b></a>: Dreamer 4, an agent trained entirely inside a learned world model</li>
+<li><a href="https://arxiv.org/abs/2501.09038" rel="noopener">Motamed et al. <b>WACV 2026</b></a>: do generative video models understand physical principles?</li>
+<li><a href="https://arxiv.org/abs/2506.09849" rel="noopener">Bordes et al. <b>arXiv 2025</b></a>: IntPhys 2, violation-of-expectation tests for video models</li>
+<li><a href="https://arxiv.org/abs/2502.11831" rel="noopener">Garrido et al. <b>arXiv 2025</b></a>: intuitive physics emerges from self-supervised video pretraining</li>
+<li><a href="https://arxiv.org/abs/2507.06952" rel="noopener">Vafa, Chang, Rambachan &amp; Mullainathan <b>ICML 2025</b></a>: a model that predicts orbits without learning Newton's law</li>
+<li><a href="https://doi.org/10.1038/s41593-024-01675-7" rel="noopener">Jensen, Hennequin &amp; Mattar <b>Nat Neurosci 2024</b></a>: a recurrent network that plans by imagined rollouts, which resemble hippocampal replay</li>
+<li><a href="https://arxiv.org/abs/2603.03414" rel="noopener">Mineault, Griffiths &amp; Escola <b>arXiv 2026</b></a>: cognitive abilities that benchmarks do not measure</li>
+<li><a href="https://arxiv.org/abs/2504.16940" rel="noopener">Linsley, Feng &amp; Serre <b>Trends Cogn Sci 2025</b></a>: better AI does not mean better models of biology</li>
+</ul>
+<p class="back"><a href="#contents">Return to contents</a></p></section><section id="slide-36" data-paginate="true" data-class="air" data-lang="en" lang="en" data-marpit-pagination="36" data-marpit-pagination-total="36" aria-labelledby="heading-36"><p class="page">Slide 36</p>
+<h2 id="heading-36">Minute paper</h2>
+<p>Submit on <strong>Canvas → Minute papers → Minute Paper 20</strong> (access code read out in class).</p>
+<p>Write three brief points in your own words:</p>
+<ol>
+<li>The same horizontal circuit that groups a curve also produces illusions. Are illusions a bug or a feature<br>of a visual system, and what would a network that never shows them be missing?</li>
+<li>Something you do not yet understand, or a question still open</li>
+<li>Another idea you found interesting, and why it matters for brains, behavior or AI</li>
+</ol>
+<p>Credit for a thoughtful attempt, not for being correct.</p>
+<p class="back"><a href="#contents">Return to contents</a></p></section></main></body></html>
