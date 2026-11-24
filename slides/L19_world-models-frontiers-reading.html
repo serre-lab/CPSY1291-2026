@@ -434,9 +434,9 @@
 </div>
 <div class="col">
 <ul>
-<li><strong>V-JEPA 2</strong> (Meta 2025): a world model learned from internet video, then a little robot video</li>
-<li>Given a <strong>goal image</strong>, the robot imagines the outcome of candidate actions and picks the best one: <mark>plan by running the model forward</mark></li>
-<li>Pick-and-place in labs it was never trained in</li>
+<li><strong>V-JEPA 2</strong> (Meta 2025): a fixed camera watches the robot arm; the model predicts the <strong>next frame</strong> (as features) given the arm's action</li>
+<li><strong>Planning:</strong> given a <strong>goal image</strong>, imagine the outcome of candidate actions and pick the one that lands closest: <mark>run the model forward</mark></li>
+<li>Do the first step, look again, replan; pick-and-place in labs it was never trained in</li>
 </ul>
 </div>
 </div>
